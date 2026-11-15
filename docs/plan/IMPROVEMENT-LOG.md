@@ -49,6 +49,469 @@ Loại: evaluation (từ điển sửa lỗi ASR, dùng chung với agent) · Tr
   - Chạy lại D01–D04, dev và test để kiểm không mất entity nào.
   - Mỗi cụm mới nghe một lần; nhắm vào giọng đọc audio BTC.
   - Nhãn D01 (`sku`, `price_vnd`) chờ `ground_truth.json` mới của BTC có `entities_multi`.
+### 2026-11-15 · Chạy cả data/dev cho GapLoop, Reflection, Combine với phiên bản đã học
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR / CCR / RQR / HR / latency
+
+- **Vấn đề:** ba phương pháp mới chỉ có số trên frozen 20 và proof set, còn Router và Baseline có số trên 409 kịch bản (`eval_3`). Cột BTC vì vậy không cùng mẫu.
+- **Sửa:** `scripts/evaluation/full_dev.ps1 -Method gaploop|reflection|combined [-Only ID]`:
+  - Không chạy lại vòng học. Script chép phiên bản trong `evaluation/runs/<vòng>/learned` vào `apps/ai-agent-service/data/kb` và `data/skills`, chạy `run_eval.py --config full --profile <m> --kb-version/--skills-version`, rồi gỡ các file vừa chép, đưa agent về v0. Bản đang bật vẫn là v0, không publish gì.
+  - GapLoop: kb v5 của gaploop-5. Reflection: skills v2 của reflection-1. Combine: kb v5 + skills v1 của combined_1.
+- **Đã kiểm:** thử `SCN-GEN-0001` cho cả ba phương pháp, 0 lỗi. Dấu prompt advisor và kb khớp với R1 của vòng: Reflection `af773e79`, Combine `853a624d` / kb `5e961542`. GapLoop dùng kb `f0beda4d` với prompt gốc `8c587ab7`; R1 của gaploop-5 còn có skills v1, ở đây chỉ đo tri thức. Sau mỗi lần chạy, `data/kb` chỉ còn v0 và không còn `data/skills`.
+- **Số đo:** đang chạy 3 × 409 kịch bản, kết quả ở `evaluation/runs/full-dev/<method>`.
+- **Còn lại:** thêm ba run này vào `method_metrics.py`.
+
+### 2026-11-15 · Chấm rubric trên một mẫu kịch bản trải đều persona
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: rubric J01–J12
+
+- **Vấn đề:** `--judge-run` chấm mọi cuộc gọi của run. Với `eval_3` (409 kịch bản, cả full lẫn baseline) phí judge quá lớn, mà `--only` thì bị từ chối.
+- **Sửa:**
+  - `--judge-run` nhận `--only` (lặp lại được) và chỉ chấm các kịch bản đó. Danh sách được ghi vào `judge-run.json` (`only`).
+  - Script mới `scripts/evaluation/judge_sample.py` bốc N SCN-GEN và M SCN-ADV đã chạy xong, chia vòng theo persona với seed cố định, rồi in lệnh `--judge-run … --only …`. `--anchor` lấy trước các kịch bản của run so sánh (frozen 20). `--ids` chỉ in danh sách id.
+  - `scripts/evaluation/judge_all.ps1` (`-Step plan|try|all|table`, `-Second`, `-Proof`) chấm mọi phương pháp trên cùng mẫu, bỏ qua run đã COMPLETE, rồi chạy lại `method_metrics.py`. Kế hoạch đầy đủ: 388 cuộc gọi judge.
+- **Đã kiểm:** `test_a_judged_sample_grades_only_the_chosen_scenarios`. `test_rubric_judge.py` và `test_eval_performance.py` qua (14 test). Với `eval_3 --anchor` frozen: 30 kịch bản, 25/49 persona.
+- **Số đo:** đã chấm hết 11 run (388 cuộc gọi). Khoảng 3/4 cuộc gọi INCOMPLETE: judge diễn giải thay vì trích nguyên văn, nhất là verdict PASS kiểu "không có câu xác nhận lại" (501 evidence diễn giải, 18 lệch khoảng trắng hoặc hoa thường, 4 thiếu tiêu chí). `judge_all.ps1` coi run có `summary` là đã xong, để không chấm lại tốn phí. Rubric trên mọi verdict: các tiêu chí đều ≥ 94% ở cả bốn phương pháp, trừ Baseline J01 80,6 và Router J10 2/3.
+- **Còn lại:** rubric của các run vòng (20 kịch bản frozen) chỉ so được với `eval_3` trên phần trùng frozen 20.
+
+### 2026-11-15 · Vòng hai bộ learn publish cùng đề xuất skill một lần
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR / CCR / RQR / HR (của vòng gaploop-5)
+
+- **Vấn đề:** Vòng `gaploop-5` dừng giữa chừng. Kiến thức v5 và skills v1 vẫn đang bật, R1 chưa chạy, và mọi vòng sau (`combined_1`) bị từ chối với lỗi "Not the original agent".
+- **Bằng chứng:**
+  - Vòng có hai bộ learn (`gaploop-5`, `gap-loop`), mỗi bộ một file review với cùng những đề xuất.
+  - Code publish từng file một: file đầu thành skills v1, file thứ hai thay lại một câu đã bị thay, nên `skill_versions.apply` báo "The sentence to replace is not once in change-order.body" (`compare.txt`).
+- **Sửa:** `pipeline/improve/cli.py` `publish` nhận nhiều file review, gộp các đề xuất đã duyệt thành một skills version, và đề xuất trùng (cùng patch) chỉ lấy một lần.
+- **Khôi phục:**
+  - Agent về v0. Các version chưa đo (kb v1–v5, skills v1) cùng bản sao `knowledge-gaps.json` được cất ở `evaluation/runs/gaploop-5/stopped-publish-20261115/`.
+  - Mở lại 5 gap đã resolve để lần chạy lại publish lại 5 câu trả lời (gap đã resolve bị bỏ qua như `no_gap`).
+- **Đã kiểm:** `tests/agent/test_approval_agent.py::test_a_round_with_two_learning_sets_publishes_the_same_change_once` trượt trước khi sửa, qua sau khi sửa. 116 test của vòng cải tiến đều qua.
+- **Số đo:** vòng đã chạy lại đến hết (R1 hai lần). Trên 20 kịch bản frozen, TSR 65/65 so với R0 65/65, nằm trong dao động của Router (55–65 qua 6 lần chạy lại). Trên bộ gap-loop proof: 92,3 so với Router 30,8. Bảng đầy đủ: `scripts/evaluation/method_metrics.py`, `evaluation/runs/method-metrics/summary.md`.
+- **Còn lại:** Đề xuất 4 khác chữ giữa hai file (cùng ý danh xưng), nên vẫn vào skill hai lần.
+
+### 2026-11-15 · Bảng bốn chỉ số theo phương pháp và CSV từng hội thoại
+
+Loại: evaluation · Trạng thái: xong · Chỉ số: TSR / CCR / RQR / HR
+
+- **Vấn đề:** Các vòng cải tiến nằm rải trong `evaluation/runs/`. Không rõ run nào đo được Reflection, GapLoop hay Kết hợp để so với Baseline/Router của `eval_3`, và chưa có số từng hội thoại.
+- **Bằng chứng:**
+  - Chỉ `dev-1` (skills v1), `gapmix-1` (kb v6 + skills v2) và `gap-1` (kb v5, bộ gap-loop) có run sau (`r1-*`).
+  - `reflection-1`, `combined_1`, `gaploop-5` và `budget-1` dừng sau bước learn.
+  - Kịch bản frozen của `dev-1` và `gapmix-1` giống từng byte với `eval_3/scenarios`, cùng `product-extractor-v13`.
+- **Sửa:** Thêm `scripts/evaluation/method_metrics.py`. Script import hàm của `reference_eval.py` (không viết lại công thức) và chấm mỗi phương pháp trên từng cohort mà nó chạy đủ, cả Baseline/Router cắt từ `eval_3`. Kết quả ghi ra `summary.csv`, `conversations.csv` (mỗi cuộc gọi: transcript và 4 chỉ số), `turns.csv` và `summary.md` trong `evaluation/runs/method-metrics`.
+- **Thêm (cùng ngày):**
+  - **Bảng "Chế độ hoạt động & hiệu năng"** (`performance.csv`), lấy từ `performance.measure`.
+    - `performance.py` trước đây bỏ sót token của các run `--config full` (r0/r1 của vòng cải tiến), vì nó chỉ tìm `usage.json`, `manifest.json`, `diagnostics.jsonl`.
+    - Nay đọc cả tên có tiền tố `full.`; có test trong `tests/agent/test_eval_performance.py`.
+  - **Bảng rubric J01–J12** (`rubric.csv`) và 12 cột J01–J12 cho mỗi cuộc gọi trong `conversations.csv`, đọc từ `<run>-judge/` do `run_eval.py --judge-run` tạo.
+    - Mỗi tiêu chí có hai tỉ lệ: % PASS trên mọi verdict, và % PASS chỉ trên cuộc gọi chấm đủ (quy tắc của `judge.summarise`).
+    - Cột `rubric_incomplete_reason` ghi lý do một cuộc gọi bị INCOMPLETE.
+- **Đã kiểm:**
+  - Số toàn bộ của từng run khớp `report.json` (TSR/HR). Kết quả: 1769 cuộc gọi, 9987 lượt.
+  - Chạy thử judge trên `dev-1/r1-dev-1` (20 cuộc gọi, có tốn phí judge): chỉ 4/20 được chấm đủ. 16 cuộc còn lại có đủ verdict, nhưng evidence là câu diễn giải chứ không trích nguyên văn hội thoại.
+- **Số đo:**
+  - **`dev-1` (10 kịch bản):** Router 70,0 / Router chạy lại 90,0 / Reflection 70,0 (TSR).
+  - **`gapmix-1` (20 kịch bản):** TSR 65,0 ở cả Baseline, Router và Kết hợp; HR Router 11,3 so với Kết hợp 15,2.
+  - **Bộ gap-loop (13 ca):** TSR từ 30,8 lên 100.
+- **Còn lại:** Cohort 10–20 kịch bản nhỏ hơn mức dao động giữa hai lần chạy Router. Muốn kết luận cần chạy Reflection/GapLoop/Kết hợp trên cả 409 kịch bản (`--profile ... --no-baseline`).
+
+### 2026-11-15 · Tin nhắn thoại trong chat web: nhấn giữ để ghi, trả lời sau tin cuối
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không
+
+- **Vấn đề:** chat web chỉ có chữ và cuộc gọi realtime. Khách quen gửi tin thoại như trên Zalo, Messenger: nhấn giữ để ghi, gửi nhiều tin liên tiếp, và chờ trả lời một lần.
+- **Sửa:**
+  - **Web:**
+    - `lib/voice-note.ts` (mới):
+      - Ghi bằng `MediaRecorder`; trình duyệt tự giải mã và resample về PCM 16-bit mono 16 kHz, không cần codec trên server.
+      - Bản ghi tối đa 60 s, vừa giới hạn 2 MB của proxy.
+      - Bỏ bản ghi dưới 0,6 s hoặc im lặng, vì ASR nghe 1 s im lặng thành "đúng".
+    - `ChatWidget.tsx`:
+      - Nút micro thay nút Gửi khi ô nhập trống. Nhấn giữ để ghi, thả để gửi, kéo lên hoặc sang trái để hủy; bàn phím dùng Space/Enter, Esc để hủy.
+      - Mỗi tin hiện thành bong bóng có trình phát và chữ nhận dạng.
+      - Sau tin cuối, khi không còn tin đang ghi hay đang nhận dạng, chờ `QUIET_MS = 2,5 s` rồi gửi tất cả thành một lượt `/stream`. Đang chờ agent trả lời lượt trước thì gửi sau khi lượt đó xong. Gõ chữ trong lúc đó thì các tin thoại đi cùng tin chữ.
+  - **Agent** (`conversations.py`):
+    - Route `POST /voice-message` (PCM int16 → `asr.transcribe` + `lexicon.correct`, giống cuộc gọi).
+    - `VOICE_MARK` (`🎤 `) đánh dấu dòng thoại trong tin lưu. `unmark_voice` bỏ dấu cho model và thêm `voice_note`: chữ do nhận dạng giọng nói, chỗ không chắc (số điện thoại, mã đơn, địa chỉ) thì hỏi lại.
+  - **Gateway:** `/voice-message` chuyển tới agent (trước đó rơi sang sales-service, trả 404).
+- **Đã kiểm:**
+  - `test_voice_messages.py` (3 test), thêm 1 test vào `test_gateway.py`; các test liên quan: 26 qua, 1 skip. `tsc` không lỗi.
+  - Playwright, Chromium dùng `T01.wav` làm micro giả:
+    - Hai tin thoại được nhận dạng; một lượt `/stream` với hai dòng `🎤`; agent trả lời một lần.
+    - Kéo lên thì hủy, không có tin mới.
+    - Ở 390 px không có cuộn ngang; không có lỗi trang.
+- **Số đo:** không áp dụng.
+- **Còn lại:**
+  - `conversations.py` và gateway mới chỉ chép vào container; cần build lại `ai-agent-service` và `api-gateway`.
+  - Bản ghi để nghe lại chỉ còn trong phiên trình duyệt. Tải lại trang thì vẫn thấy dòng thoại và chữ, nhưng không còn nút nghe.
+  - Lần ghi đầu, trình duyệt hỏi quyền micro, nên khoảng 1 s đầu có thể bị mất.
+
+### 2026-11-14 · Đơn đang xử lý trên giỏ trống; "Chờ gọi xác nhận"; gộp phiên cùng số trong hàng chờ
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không
+
+- **Vấn đề:**
+  - Chị Hoa đăng nhập web, mở giỏ hàng thì chỉ thấy "Giỏ hàng trống", không biết mình có đơn ở đâu.
+  - Đơn COD trên 2 triệu hiện "Đã xác nhận", dù cửa hàng còn phải gọi xác nhận.
+  - Trong hàng chờ, phiên web chưa xác minh của cùng số (`Số đuôi 6714`) đứng riêng, không gộp với "chị Hoa".
+- **Bằng chứng:**
+  - `/api/customer/orders` của C001 trả đủ 2 đơn (`OD600001`, `WEB-649C18E4`); trang `/don-hang` hiện đúng, nhưng `/gio-hang` không dẫn tới đó.
+  - `agent.calls` id 2: `customer_id` rỗng, `tier UNKNOWN`, `phone_last4 6714`. `call-groups.ts` chỉ gộp theo `customer_id`.
+- **Sửa:**
+  - `lib/orders.ts` (mới), dùng chung cho `/don-hang` và giỏ hàng:
+    - Gom kiểu đơn, mã đơn, nhãn trạng thái.
+    - Thêm `awaitsCall`: đơn COD trên 2 triệu, còn `confirmed`, hiện "Chờ gọi xác nhận" kèm một dòng ghi chú. Đơn `confirmed` khác hiện "Đang chuẩn bị hàng".
+  - `gio-hang/page.tsx`: giỏ trống và khách đã đăng nhập thì hiện các đơn đang xử lý và link "Xem tất cả đơn hàng".
+  - `agent_calls.py` thêm `_same_number`:
+    - Phiên chưa xác minh có số điện thoại (lấy trong vault, khớp 4 số cuối) thuộc đúng một khách CRM thì trả về `number_customer_id`.
+    - Số dùng chung, số không có trong CRM, hoặc hai số cùng 4 số cuối thì không gộp.
+    - Phiên vẫn là chưa xác minh với agent.
+  - `call-groups.ts` gộp theo `customer_id`, nếu không có thì theo `number_customer_id`. Dòng hàng chờ lấy tên từ phiên đã biết tên.
+- **Đã kiểm:**
+  - `test_queue_same_number.py` (mới), cùng `test_shop_orders.py`: 10 test qua. `tsc` không lỗi.
+  - Trên Docker:
+    - API trả `number_customer_id = C001` cho call 2. Hàng chờ còn 1 dòng "chị Hoa · Web chat · Zalo · 4 phiên".
+    - Với token tạm của C001 (đã thu hồi): `/gio-hang` và `/don-hang` hiện 2 đơn và nhãn "Chờ gọi xác nhận". Ở 390 px không có cuộn ngang.
+- **Số đo:** không áp dụng.
+- **Còn lại:** `agent_calls.py` mới chỉ chép vào container; cần build lại image `ai-agent-service`.
+
+### 2026-11-14 · `order_status` không còn timeout ở lần tra đầu tiên
+
+Loại: tool · Trạng thái: xong · Chỉ số: TSR
+
+- **Vấn đề:** chị Hoa hỏi đơn trên web; agent trả lời "hệ thống tra cứu đang quá thời gian phản hồi".
+- **Bằng chứng:** log `ai-agent-service` 16:10:
+  - `order_status` timeout 2 s hai lần (có thử lại), rồi `Circuit open … 60s`. Kèm cảnh báo psycopg vì truy vấn bị ngắt giữa chừng.
+  - Lần gọi đầu của mỗi tiến trình MCP mở database website: import backend-common, tạo engine, mở kết nối. Đo được 1,81 s khi máy rảnh, vượt 2 s khi agent đang gọi model.
+  - Lỗi Kafka (`kafka:9092` không phân giải được) và OTEL 403 trong log không liên quan.
+- **Sửa:**
+  - `runtime/shop_orders.py`: hàm `warm()` mở database website và chạy `SELECT 1` khi server MCP `order`, `crm` khởi động, giống cách server đã nạp trước `btc.mock()`. Website không kết nối được thì chỉ ghi log, server vẫn chạy.
+  - `mcp/servers/order.py`: phần tra đơn website trong `order_status` có hạn mức `WEBSITE_BUDGET = 1.0` s. Quá hạn thì vẫn trả câu trả lời của mock BTC, không để cả tool thất bại.
+- **Đã kiểm:**
+  - Thêm 2 test trong `test_shop_orders.py`. Cùng `test_order_follow_up.py` và `test_seed_prior_calls.py`: 31 test qua.
+  - Trên Docker: lần gọi đầu 1,81 s → 0,23 s; các lần sau 0,03 s; vẫn trả cả `OD600001` và đơn `WEB-`.
+- **Số đo:** không áp dụng (live).
+- **Còn lại:** file đã được chép thẳng vào container. Cần build lại image `ai-agent-service` để giữ bản sửa.
+
+### 2026-11-14 · Hẹn gọi lại của cuộc gọi trước có trong dữ liệu seed
+
+Loại: dữ liệu · Trạng thái: xong · Chỉ số: không
+
+- **Vấn đề:** trang "Hẹn gọi lại" (`/ban-hang/hen-goi-lai`) trống, dù nhiều cuộc gọi trước trong `data/dev` đã hẹn gọi lại khách.
+- **Bằng chứng:**
+  - `agent.mock_state` có 0 lịch hẹn; database live chỉ có 3 cuộc gọi, đều của hôm nay.
+  - `seed_prior_calls` chỉ ghi facts và episode, không chạy lại tool `schedule.callback` có trong `data/dev/conversations/scenarios_<id>/call_1.json`.
+  - 21 trong 74 kịch bản được seed có lịch hẹn ở `call_1`.
+- **Sửa:**
+  - `runtime/seed_prior_calls.py`:
+    - Thêm `callbacks_of`, đọc các `schedule.callback` của `call_1`.
+    - Thêm `book_callbacks`, đặt lại lịch qua `btc.call`; mỗi lịch có khóa idempotency `btc-<id>-call_1-callback-<n>`.
+    - Thêm tùy chọn `--conversations`; mặc định là thư mục `conversations/` cạnh `--scenarios`.
+  - `docker-compose.yml`: `agent-seed` mount thêm `./data/dev/conversations`.
+- **Đã kiểm:**
+  - `tests/agent/test_seed_prior_calls.py`: 2 test qua.
+  - Chạy trên Docker: 21 lịch hẹn; chạy lần hai vẫn 21.
+  - Trang hiện 21 dòng, có tên khách và 4 số cuối.
+- **Số đo:** không áp dụng.
+- **Còn lại:** image `agent-seed` và `ai-agent-service` cần build lại thì `docker compose up` mới có sẵn lịch hẹn. Lần này file đã được chép thẳng vào container đang chạy.
+
+### 2026-11-14 · Mỗi mục của `/ban-hang` và `/admin` là một route; `features/` chia theo module
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không
+
+- **Vấn đề:**
+  - `/ban-hang` và `/admin` mỗi trang là một file lớn chứa mọi tab, chuyển tab bằng `?tab=`.
+  - Không mở thẳng được một mục, link không mang tên mục.
+  - `features/` để phẳng 20 file của nhiều khu.
+- **Sửa:**
+  - **Route:**
+    - `/ban-hang/{tong-quan, hoi-thoai, don-hang, hen-goi-lai}`.
+    - `/admin/{kien-thuc, chinh-sach, skills, cai-tien, danh-gia, de-xuat, san-pham, nhan-su}`.
+    - Mỗi route là một `page.tsx` có tiêu đề riêng.
+    - `layout.tsx` của mỗi khu giữ khung (đăng nhập, menu, thanh trên) và dữ liệu dùng chung khi chuyển mục.
+  - **Link cũ:** `/ban-hang`, `/admin` và các link `?tab=` được chuyển hướng (307) trong `next.config.mjs` `redirects()`, trước khi trang render.
+  - **`features/` theo module:**
+    - `sales/`:
+      - Khung và dữ liệu: `sales-shell`, `sales-context`, `nav`, `labels`, `types`.
+      - Các mục: `overview`, `orders`, `callbacks`, `conversations`, cùng các file console và chuyển máy.
+    - `admin/`:
+      - Khung và dữ liệu: `admin-shell`, `admin-context`, `nav`.
+      - Các mục: `proposals`, `catalog`, và `sections` cho các tab có sẵn.
+    - `developer/`: `agent-console`, `workspace`.
+    - `voice/`: `voice-call`.
+  - **Dùng chung:**
+    - Phiên đăng nhập nhân viên và màn hình yêu cầu đăng nhập nằm ở `components/staff/staff-session.tsx`.
+    - Bốn hàm cập nhật đơn gộp thành `change()`.
+  - **CSS:** menu bên và thẻ KPI nay là link (`<a>`); `sales.css` style cho cả `a` và `button`.
+  - **Test và tài liệu:** e2e và `docs/` dùng đường dẫn mới.
+- **Đã kiểm:**
+  - `tsc` không lỗi.
+  - Playwright với 16 đường dẫn (gồm link `?tab=` cũ):
+    - Đúng URL, đúng tiêu đề, đúng mục được tô sáng.
+    - Chuyển mục qua menu không tải lại trang.
+    - Ở 390 px không có cuộn ngang.
+    - Khi chưa đăng nhập, trang dẫn về `/login?next=/admin/skills`.
+    - Không có lỗi trang.
+- **Số đo:** không áp dụng.
+- **Còn lại:** chưa chạy bộ e2e Playwright đầy đủ.
+
+### 2026-11-14 · Tab Chính sách trên `/admin`; sửa bố cục hội thoại và chuyển máy
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không
+
+- **Chính sách:**
+  - Route `GET /api/developer/policies` (admin, developer) trả mọi mục của 14 tài liệu BTC (99 mục, bộ chỉ đọc), mỗi mục có: nội bộ hay không, ngày hiệu lực, ngày hết hiệu lực, changelog, ngành. Kèm kiến thức bổ sung đã duyệt của version KB đang dùng.
+  - `features/policies-admin.tsx`:
+    - Bên trái là danh sách tài liệu; bên phải có ô tìm (theo mã, tiêu đề, nội dung, không phân biệt dấu) và bộ lọc Tất cả / Khách xem được / Nội bộ / Hết hiệu lực.
+    - Mục nội bộ được tô nền, mục hết hiệu lực làm mờ.
+    - Nội dung hiện danh sách gạch đầu dòng và chữ đậm.
+  - Test trong `test_admin_skills.py`.
+- **Hội thoại và chuyển máy:**
+  - Bỏ khối tiêu đề lặp; thay bằng thanh công cụ gồm số khách đang chờ, ô tìm và ô "Chỉ cuộc đang mở".
+  - Hàng chờ chia ba nhóm: Chờ nhân viên (nổi bật), Đang diễn ra, Đã kết thúc. Mỗi dòng có badge kênh và thời gian kiểu "4 giờ trước".
+  - Đầu cuộc gọi có tên, kênh và trạng thái; nút "Nhận cuộc gọi" nằm ngay đầu khi khách đang chờ.
+  - Sửa bố cục gọn (Bằng chứng ở trên, chat ở dưới):
+    - Dòng chữ "Bằng chứng" chiếm ô đầu của lưới 2 cột, làm lệch cả hai phần.
+    - Thẻ phiên bị cắt; đổi thành chip một dòng.
+    - Nút mở trang sản phẩm bị khuất.
+    - Workspace cao hơn.
+  - Sửa trùng tên `Icon` ở `/ban-hang` (import đổi thành `UiIcon`) để trang biên dịch lại.
+- **Đã kiểm:** `tsc` 0 lỗi; Playwright ở 1440 và 390 không có lỗi trang; 4 test trong `test_admin_skills.py` pass.
+
+### 2026-11-14 · Icon thao tác đơn hàng trên `/ban-hang`
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: khả dụng thao tác trên bảng đơn hàng
+
+- **Vấn đề:** Các hành động Giao hàng, Đã nhận tiền và Hủy chiếm nhiều chỗ trong hàng thao tác của bảng đơn.
+- **Sửa:** Dùng icon xe tải, dấu kiểm và dấu đóng; thêm tên truy cập và tooltip tiếng Việt. Giữ các nút trên cùng một hàng.
+- **Đã kiểm:** Rà soát JSX/CSS; chưa chạy giao diện. `git diff --check` báo CRLF như khoảng trắng cuối dòng trên `ban-hang/page.tsx` (file đang có nhiều thay đổi sẵn).
+- **Số đo:** chưa đo.
+- **Còn lại:** Kiểm tra trực quan ở kích thước desktop và mobile.
+
+### 2026-11-14 · Tab Skills trên `/admin`: xem, sửa, thêm, bỏ, bật version, áp dụng ngay
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: không (công cụ quản trị)
+
+- **Vấn đề:**
+  - Admin không xem được skills mà trợ lý đang dùng, và chỉ có thể quay lui về một số version.
+  - Muốn sửa một skill phải sửa file YAML.
+  - Mỗi lần đổi version phải khởi động lại `ai-agent-service`.
+- **Sửa:**
+  - `context/skills.py`: thêm `reload()`, đọc lại `SKILLS` và `LEARNED_CITES` ngay trong tiến trình. Mọi chỗ đọc skills đều đi qua module này, không giữ bản sao từ lúc import.
+  - `skill_versions.py`:
+    - `read_version` và `versions()`: liệt kê các version, ai viết, ghi chú, và các skill đã đổi so với version trước.
+    - `edit()`: admin sửa, thêm hoặc bỏ skill; mỗi lần lưu thành version mới (v0 không bao giờ bị đổi). Có thể lưu làm bản nháp.
+    - Kiểm tra: tên skill, độ dài mô tả (220 ký tự) và nội dung (6000 ký tự), tên tool trong `done_on`.
+  - Route `GET /improvement/skills` (admin, developer); `POST /improvement/skills` và `POST /improvement/skills/versions/{n}/activate` (chỉ admin). Ghi `admin_skills` vào nhật ký cải tiến.
+  - Bật version của vòng hằng tuần và quay lui giờ cũng áp dụng ngay (`reload_required: false`).
+  - `features/skills-admin.tsx`, tab "Skills của trợ lý":
+    - Thẻ cho từng skill, đánh dấu "Đã sửa so với gốc" hoặc "Mới"; nội dung thu gọn 5 dòng.
+    - Form sửa có bộ đếm ký tự; hai nút "Lưu và áp dụng ngay" và "Lưu bản nháp".
+    - Danh sách version với nút Xem và Bật.
+- **Đã kiểm:**
+  - `tests/agent/test_admin_skills.py` (3 test).
+  - Cập nhật `test_weekly_improvement.py`; cùng `test_reflection_changes_skills.py` có 71 test pass.
+  - `tsc` 0 lỗi.
+- **Số đo:** chưa đo. Skill do admin sửa thay đổi hành vi của trợ lý, nên nên chạy lại bộ frozen trước khi giữ.
+- **Còn lại:** chưa có màn hình so sánh hai version theo từng dòng.
+
+### 2026-11-14 · Pipeline Airflow trên `/admin`: xem từng block, chạy tay
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không
+
+- **Vấn đề:** muốn xem vòng cải tiến (Gap Loop + Reflection) chạy tới đâu và bấm chạy thì phải mở UI riêng của Airflow.
+- **Sửa:**
+  - `runtime/airflow_pipeline.py`: client REST API v1 của Airflow 2 với `status`, `trigger` và `rerun`.
+    - `trigger` bật lại DAG nếu đang tạm dừng, rồi tạo lần chạy với `conf.week`.
+    - `rerun` dùng `clearTaskInstances`, chạy lại cả các block sau.
+  - Ba route trong `api/routes/improvement.py`: `GET /improvement/pipeline` (admin, developer); `POST .../pipeline/runs` và `POST .../runs/{id}/blocks/{block}/rerun` (chỉ admin, gắn tên người bấm).
+  - DAG: `WEEK` lấy `dag_run.conf.week` nếu có.
+  - `docker-compose.airflow.yml`: thêm basic auth cho API, tạo user API khi khởi động, và đặt `AIRFLOW_URL/USER/PASSWORD` cho `ai-agent-service`.
+  - `features/improvement-pipeline.tsx`: 4 block có số thứ tự, mô tả, trạng thái và thời gian; nút "Chạy vòng mới" và "Chạy lại từ đây"; tự cập nhật mỗi 15 giây khi có lần chạy. Airflow chưa bật thì trang hiện lệnh để bật.
+- **Đã kiểm:**
+  - `tests/agent/test_airflow_pipeline.py` (5 test, Airflow giả bằng `httpx.MockTransport`) và `test_airflow_dag.py` đều pass.
+  - Với Airflow 2.10.5 thật chạy trên Docker: API trả `available: true, paused: true, error: null`, và `/admin` hiện 4 block "Chưa chạy" cùng ghi chú DAG đang tạm dừng.
+  - Lỗi gặp khi khởi động, đã sửa trong `docker-compose.airflow.yml`:
+    - `airflow standalone` bị treo: tiến trình cha của webserver chết, gunicorn không mở cổng 8080, log đứng. Đã thay bằng scheduler chạy nền và webserver chạy riêng, LocalExecutor, user `admin` và `api` tạo khi khởi động.
+    - Webserver tự tắt sau 120 giây khởi động (repo mount từ OneDrive nên chậm). Đã nới `WEB_SERVER_MASTER_TIMEOUT` lên 600 giây, dùng 1 worker, thêm `restart: unless-stopped` và healthcheck.
+- **Số đo:** không áp dụng.
+- **Còn lại:** chưa bấm chạy một vòng thật, vì bước học tốn phí model.
+
+### 2026-11-14 · Trang hội thoại và chuyển máy cho Sales: ít chữ hơn, sản phẩm có link
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: ảnh chụp Playwright 1440/390
+
+- **Vấn đề:**
+  - Call Brief liệt kê 10 dòng có mã B1–B10, tên slot thô và độ trễ (ms).
+  - Tin nhắn có nhãn lane và tên tool.
+  - Panel Bằng chứng trộn Tier/Lane/Guard với một khối JSON.
+  - Sản phẩm không có link, và tin nhắn khách trên web hiện cả câu ghi chú giỏ hàng gửi cho model.
+- **Sửa:**
+  - `features/call-evidence.tsx` (thay `call-context.tsx`), panel Bằng chứng gồm hai phần:
+    - **Cuộc trò chuyện này:** khách, kênh (badge), danh tính bằng lời, sản phẩm có link `/san-pham/<sku>` kèm tên lấy từ danh mục và giá, điều khách đã nói, đơn hàng.
+    - **Chi tiết cuộc gọi** (thu gọn): kênh, lane, từng lượt của trợ lý, bộ nhớ dài hạn, các cuộc trước, JSON sau cuộc gọi.
+  - `call-console.tsx`:
+    - Bàn giao từ trợ lý thành một thẻ gồm việc cần làm và sản phẩm có link.
+    - "Đã biết về khách" thu gọn, viết bằng câu thường, không còn mã và tên slot.
+    - Tin nhắn bỏ lane; "Đã tra" viết bằng lời thường kèm chip sản phẩm. Giỏ hàng web hiện thành link.
+    - Hàng chờ ghi "Đã xác minh / Chưa xác minh".
+  - Trang sản phẩm mở được bằng mã biến thể và chọn sẵn đúng biến thể.
+- **Đã kiểm:** `tsc` 0 lỗi; Playwright ở 1440 và 390 không có lỗi trang, không cuộn ngang.
+- **Số đo:** không áp dụng.
+- **Còn lại:** tên sản phẩm cần tải danh mục một lần, nên lúc mới mở có thể hiện mã trước, tên sau.
+
+### 2026-11-14 · Dữ liệu mẫu có sẵn khi `docker compose up` lần đầu
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không (dữ liệu demo)
+
+- **Vấn đề:** khách CRM, đơn cũ của họ và cuộc gọi trước phải nạp bằng tay sau khi cài.
+- **Sửa:**
+  - Logic khách theo số điện thoại và đơn theo mã chuyển sang `packages/backend-common/src/commerce/crm_seed.py`, dùng chung cho seed của shop và `runtime/shop_orders.py` của agent.
+  - `scripts/seed/btc_customers.py` được gọi trong `scripts/seed/catalog.py` (service `seed`), ngay sau bước nạp danh mục BTC.
+  - Service một lần `agent-seed` trong `docker-compose.yml` chạy `seed_prior_calls` trên `data/dev/scenarios`, được mount chỉ đọc.
+  - `DEMO_CUSTOMER_PASSWORD` (mặc định `quivo-demo-2026`, bị bỏ qua khi production) cho khách CRM chưa có tài khoản một mật khẩu, kèm số điện thoại đã xác minh.
+  - Cập nhật `.env.example` và `docs/deployment/README.md`.
+- **Đã kiểm:**
+  - Test: `test_shop_orders.py` (7) và `test_accounts.py` đều pass.
+  - `docker compose run --rm seed`: 70 khách, 52 đơn.
+  - `docker compose up agent-seed`: 74 khách, thoát mã 0.
+  - Đăng nhập API với một khách CRM bằng mật khẩu demo: thành công.
+- **Số đo:** không áp dụng.
+- **Còn lại:** compose cloud không có `agent-seed`, và mật khẩu demo tắt khi production.
+
+### 2026-11-14 · Agent sửa được đơn website; Sales cập nhật trạng thái giao hàng
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: TSR (đơn hàng)
+
+- **Vấn đề:** ba việc còn lại của mục "Một kho đơn":
+  - Agent chưa đổi được đơn khách đặt trên website.
+  - Đơn CRM đang giao bị ghi thành `confirmed`.
+  - Lo ngại đơn có SKU ngừng bán không chép sang được. Kiểm tra lại thì cả 52 đơn CRM đã chép đủ, vì `SKU-AP-X-2024` có trong danh mục ở dạng ẩn.
+- **Sửa:**
+  - Migration `0008_order_shipping.sql`: `orders.status` có thêm `shipping`, `return_requested`, `returned`.
+  - `OrderService.set_status` và route `POST /api/seller/orders/{id}/status` (admin, seller). Các bước cho phép: `confirmed` → `shipping` → `fulfilled`, và `return_requested` → `returned`.
+    - Khi giao xong, hàng rời kho và đơn COD được tính là đã thu tiền.
+    - Khi nhận hàng trả, hàng về kho và tiền đã thu chuyển thành hoàn.
+  - `/ban-hang` có một nút cho bước tiếp theo của mỗi đơn (Giao hàng, Đã giao, Đã nhận hàng trả), cùng nhãn và màu trạng thái mới. Trang đơn của khách hiện đủ các trạng thái.
+  - `shop_orders.update_order`: khi mock báo `ORDER_NOT_FOUND`, `order_update` chuyển sang sửa đơn website (mã `WEB-…` hoặc đơn CRM `OD…`) theo chính sách của mock:
+    - Lần đổi đầu miễn phí, các lần sau 60.000đ; hoàn tiền trong 3–5 ngày làm việc.
+    - Chỉ đổi địa chỉ khi đơn chưa giao.
+    - Chỉ nhận yêu cầu trả hàng khi đơn đã giao.
+  - `mirror_update`: đơn do agent tạo khi đổi sản phẩm hoặc trả hàng thì bản trên website cũng cập nhật theo.
+  - `_sku`: SKU chưa có trên website nhưng có trong danh mục BTC thì được thêm vào ở dạng ngừng bán.
+  - CRM `processing` ánh xạ thành `confirmed`, `shipping` thành `shipping`; seed lại thì cập nhật trạng thái các đơn CRM đã có.
+- **Đã kiểm:**
+  - `test_shop_orders.py`: 6 test pass, gồm đổi địa chỉ, đổi sản phẩm hai lần có phí, trả hàng, các bước của Sales và giữ tồn kho.
+  - Toàn bộ test trừ ASR/giọng nói: 1581 pass. 1 test fail do Windows khóa file, như trước.
+  - Trên Docker: migration 0008 đã chạy. Đơn CRM: 31 `fulfilled`, 11 `shipping`, 10 `confirmed`. Route trạng thái trả 422 khi trạng thái sai và 401 khi thiếu token.
+- **Số đo:** chưa đo.
+- **Còn lại:** đổi sản phẩm trên đơn nhiều dòng chỉ đổi dòng đầu.
+
+### 2026-11-14 · Một kho đơn cho website và trợ lý; khách CRM và cuộc gọi trước của BTC trong database thật
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: TSR (đơn hàng), CCR
+
+- **Vấn đề:**
+  - Đơn agent tạo trên Zalo (OD600001, AirPure Y) không có trong tài khoản website của chị Hoa.
+  - Đơn chị Hoa đặt trên website (áo phao 1.490.000đ) thì agent không tra được.
+  - Khách CRM của BTC và các cuộc gọi trước trong kịch bản không có trong database thật.
+- **Bằng chứng:**
+  - Hội thoại Zalo ngày 14/11 lúc 10:30: `order.status` chỉ trả OD600001.
+  - Agent ghi đơn vào `agent.mock_state`, còn website đọc `commerce.orders`; hai bên không nối với nhau.
+- **Sửa:**
+  - Migration `0007_order_code.sql` thêm `order_code` (unique) và `source` (website | agent | crm) cho `commerce.orders`.
+  - `runtime/shop_orders.py`, chỉ bật khi `SHOP_ORDERS=1` và database không phải `*_eval`:
+    - `order_create` ghi đơn sang website. Khách được tìm theo số điện thoại; nếu chưa có thì tạo mới, chưa xác minh, và sau này đăng ký bằng OTP trên số đó vẫn giữ nguyên lịch sử.
+    - `order_update` đổi địa chỉ thì đổi cả trên website.
+    - `order_status` đọc thêm đơn website, với mã dạng `WEB-xxxxxxxx`.
+  - Giá, khuyến mãi, mã `OD…` và ngày giao vẫn lấy từ mock của BTC, vì guardrail và bộ chấm điểm đọc mock.
+  - Trạng thái và cách thanh toán được ánh xạ sang các giá trị bảng `orders` cho phép.
+  - `SHOP_ORDERS=1` chỉ đặt cho container `ai-agent-service`.
+  - `runtime/seed_prior_calls.py`:
+    - Với mỗi số điện thoại trong `data/dev`, lấy kịch bản đầu tiên có cuộc gọi trước và ghi `call_1` (fact cộng một episode) qua `runner.seed`.
+    - `--shop` seed khách CRM kèm đơn cũ của họ vào website.
+  - Trang `/don-hang`, `/ban-hang` và trang thanh toán hiện cùng một mã đơn với agent.
+- **Đã kiểm:**
+  - `tests/agent/test_shop_orders.py`: 3 test pass (SQLite).
+  - Toàn bộ test trừ ASR/giọng nói: 1578 pass. 1 test fail do Windows khóa file tạm (`test_evaluation_budget`), không liên quan.
+  - Trên Docker: seed 74 khách có cuộc gọi trước; 70 khách CRM với 52 đơn; chép bù OD600001 sang website.
+  - Gọi `order_status` cho số ****6714 trả về OD600001 và WEB-649C18E4.
+- **Số đo:** chưa đo. Eval không đổi vì công tắc tắt khi database là `*_eval`.
+- **Còn lại:**
+  - Trạng thái "shipping" của CRM được ghi thành `confirmed`, vì bảng `orders` không có trạng thái đang giao.
+  - Đơn có SKU không nằm trong danh mục website thì không chép sang (ví dụ `SKU-AP-X-2024`).
+  - Đơn khách đặt trên website chưa có trong mock, nên agent không đổi được đơn đó bằng `order_update`.
+
+### 2026-11-14 · Đổi địa chỉ đơn: địa chỉ mới thật sự nằm trên đơn
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: TSR (đơn hàng)
+
+- **Vấn đề:** agent báo "đã cập nhật đơn OD600001 giao về Hà Nội", nhưng lượt sau `order.status` vẫn trả địa chỉ Hồ Chí Minh.
+- **Bằng chứng:** hội thoại trên web, ngày 14/11, lượt 7–8. `order.update` mock của BTC (`data/btc/eval/mock_tools.py`, chỉ đọc) với `update_address` chỉ trả `updated` và không nhận địa chỉ. Tool `order_update` của mình cũng không có tham số địa chỉ.
+- **Sửa:**
+  - `mcp/servers/order.py`: thêm `new_address`, và hàm `_with_address` bọc mock để ghi địa chỉ lên đơn trong `mock_state` kèm ngày giao mới.
+  - Guardrail `_order_update`: đổi địa chỉ mà thiếu `new_address` thì bị chặn; đổi sang địa chỉ khác không còn bị coi là lặp lại.
+  - `nodes.py` và `advisor.py` ghi kèm `new_address` vào danh sách thay đổi của cuộc gọi.
+- **Đã kiểm:** thêm 2 test trong `tests/agent/test_order_follow_up.py`. Bộ test agent (trừ ASR/giọng nói): 1491 pass.
+- **Số đo:** chưa đo.
+- **Còn lại:** đơn lấy từ lịch sử CRM không nằm trong state, nên chỉ ticket giữ địa chỉ mới; kết quả trả `order_record_updated: false`.
+
+### 2026-11-14 · Gap kiến thức trong cuộc gọi thật dùng chung luật với evaluation
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: số gap sai
+
+- **Vấn đề:** "30m2 á em", "Hồ chí minh á", "ok cho chị đặt hang nay" được ghi là "Câu hỏi còn thiếu kiến thức", dù agent đã trả lời bằng tool.
+- **Bằng chứng:** tab Kiến thức ở `/admin` ngày 14/11. `runtime/harness.py` ghi gap mỗi khi tìm tài liệu không ra (`abstain`). Luật chặt hơn (sửa ngày 12/11) chỉ mới áp dụng cho `record_from_run` của evaluation.
+- **Sửa:** thêm `gaps.unanswered()` làm luật chung, dùng cho cả harness và `record_from_run`. Một lượt chỉ là gap khi: chuyển máy vì ngoài phạm vi tài liệu, hoặc tìm tài liệu không ra **và** agent nói với khách là không có thông tin.
+- **Đã kiểm:** thêm test trong `test_gap_review_and_judge.py`; 1491 pass.
+- **Số đo:** chưa đo.
+- **Còn lại:** 3 gap sai đã ghi trước khi sửa vẫn còn trong danh sách, cần bỏ tay.
+
+### 2026-11-14 · Web chat: nhận ra "chị là chị Hoa" và không reset danh tính vì câu nói chuyện khác
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: CCR
+
+- **Vấn đề:** khách viết "chị là chị hoa sđt là …" nhưng agent vẫn hỏi xác nhận số điện thoại. Câu tiếp theo "tôi không đặt cái này…" bị hiểu là phủ nhận, nên khách thành người lạ. Sau đó "đúng" và nhập lại số điện thoại đều không tra được đơn.
+- **Bằng chứng:** hội thoại trên web ngày 14/11, hồ sơ C001 tên "Hoa".
+- **Sửa:**
+  - `resolver.pick_by_name` nhận được tên đứng sau một xưng hô lặp lại ("chị là chị Hoa").
+  - `_identify`: khi hạng `PROBABLE` mà cùng câu đã có tên trùng hồ sơ thì lên `VERIFIED` luôn.
+  - `_settle`: chỉ reset khi khách phủ nhận rõ (`DENIAL`, `PROXY`, hoặc câu "không" ngắn). Câu nói chuyện khác thì giữ nguyên câu hỏi xác nhận.
+- **Đã kiểm:** thêm 2 test trong `test_memory_integrity.py`; 1491 pass.
+- **Số đo:** chưa đo.
+- **Còn lại:** nói tên và số điện thoại vẫn chỉ là bằng chứng yếu. Không chứng minh được người gõ là chủ số như mã OTP hay đăng nhập.
+
+### 2026-11-14 · Giỏ hàng web là bối cảnh, không phải câu hỏi; panel Bằng chứng hiện điều khách vừa nói
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:**
+  - Khách hỏi tình trạng đơn, agent lại tra giá và tồn kho món trong giỏ.
+  - Panel "Bằng chứng" không hiện fact nào trong lúc gọi, vì bảng `facts` chỉ được ghi sau khi cuộc gọi kết thúc.
+- **Sửa:**
+  - `cart_note` ghi rõ giỏ hàng chỉ là bối cảnh.
+  - Harness lưu `call_facts` vào meta của từng lượt; `/calls/{id}/context` trả `call_facts`.
+  - `call-context.tsx` hiện mục "Khách nói trong cuộc này", và ghi trạng thái bộ nhớ dài hạn dễ hiểu hơn.
+- **Đã kiểm:** `test_cart_note.py` pass; `tsc` 0 lỗi.
+- **Số đo:** chưa đo.
+- **Còn lại:** `call_facts` chỉ gồm các slot trong `call_state.KEPT` (diện tích, ngân sách, thanh toán, khu vực giao…). Sản phẩm và đơn hàng hiện ở mục đơn.
+
+### 2026-11-14 · Trang quản trị (/admin) theo luật app của taste-skill
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: ảnh chụp Playwright ở 1440 và 390, `tsc`
+
+- **Vấn đề:** mọi nút trên /admin đều là nút xanh đặc, kể cả "Xóa". Tab "Nhân sự & kho" là một khối `<details>` gập sẵn, chữ tiếng Anh, ba form dùng chung một ô SKU. Cột "Câu hỏi còn thiếu" bị kéo cao bằng cột FAQ. Thông báo "Đã duyệt…" hiện màu đỏ như lỗi.
+- **Bằng chứng:** ảnh chụp 6 tab trước khi sửa (scratchpad, không commit).
+- **Sửa:** theo phần áp dụng được cho trang app của `Leonxlnx/taste-skill` 2.5 (một cặp nút, chữ tối đa 500, nút nhích khi hover và lún khi bấm, tắt khi reduced-motion). Luật trang marketing (hero, mỗi section một màn hình) không áp dụng. Cụ thể:
+  - `admin-tools.tsx` viết lại thành ba form tiếng Việt, mỗi form có ô SKU riêng.
+  - Nút phụ dùng `ad-btn-quiet` (viền), nút xóa/từ chối dùng `ad-btn-danger` (viền đỏ).
+  - Thông báo bắt đầu bằng "Đã " hiện màu brand với `role=status`.
+  - Kiến thức chia lưới 2:3, cột trái sticky.
+  - CSS chỉ nằm trong `.ad-app` của `admin.css`, vì `/ban-hang` dùng chung `sales.css`.
+- **Đã kiểm:** `tsc` 0 lỗi. Playwright chụp 6 tab ở 1440 và 2 tab ở 390: không có lỗi trang hay API ≥400, không cuộn ngang. Lần đầu tab Nhân sự rộng 1509px vì ô `datetime-local`; đã sửa bằng `minmax(0, 1fr)`.
+- **Số đo:** không có chỉ số agent; đây là thay đổi giao diện.
+- **Còn lại:** chưa chạy `gate.mjs` của skill, vì gate viết cho trang tĩnh marketing và cần build export. Trên điện thoại, menu tab vẫn là thanh cuộn ngang cũ. Nhãn vai trò khi tạo tài khoản đã đổi tiếng Việt nhưng giá trị gửi API giữ nguyên.
 
 ### 2026-11-13 · `--no-baseline`: run profile chỉ chạy và chấm `full`
 

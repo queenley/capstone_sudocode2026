@@ -1,7 +1,7 @@
 from decimal import Decimal
 from urllib.parse import urlencode
 from fastapi import HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import case, select, update
 from src.commerce.repository import CatalogRepository, catalog_row
 from src.core.regions import region_of
 from src.db.models import (
@@ -290,6 +290,8 @@ class OrderService:
             "payment_status": order.payment_status or "unpaid",
             "paid_at": order.paid_at.isoformat() if order.paid_at else None,
             "transfer": self.transfer(order),
+            "order_code": order.order_code,
+            "source": order.source or "website",
         }
         if include_address:
             body["shipping_address"] = self.security.decrypt(order.encrypted_shipping_address)
@@ -324,6 +326,59 @@ class OrderService:
                 event_type="order.cancelled",
                 aggregate_id=order.id,
                 payload={"order_id": str(order.id)},
+            )
+        )
+        self.db.flush()
+        return self.serialize(order)
+
+    #: Where Sales may move an order by hand (migration 0008): it ships, it arrives, a return comes back.
+    #: Cancelling has its own action (cancel), which gives back the reserved stock.
+    STEPS = {
+        "confirmed": {"shipping", "fulfilled"},
+        "shipping": {"fulfilled"},
+        "return_requested": {"returned"},
+    }
+
+    def set_status(self, order, status):
+        """Sales moves an order on: shipping, fulfilled (delivered) or returned. Stock follows the goods: a
+        delivered order leaves the shelf, a returned one comes back to it, and its payment is refunded."""
+        order = self.db.scalar(select(Order).where(Order.id == order.id).with_for_update())
+        if order is None:
+            raise HTTPException(404, "Order not found")
+        if order.status == status:
+            return self.serialize(order)
+        if status not in self.STEPS.get(order.status, set()):
+            raise HTTPException(409, f"Không chuyển được đơn từ {order.status} sang {status}")
+        items = list(self.db.scalars(select(OrderItem).where(OrderItem.order_id == order.id).order_by(OrderItem.sku_id)))
+        if status == "fulfilled":
+            for item in items:
+                self.db.execute(
+                    update(Inventory)
+                    .where(Inventory.sku_id == item.sku_id)
+                    .values(
+                        quantity_on_hand=Inventory.quantity_on_hand - item.quantity,
+                        reserved_quantity=case((Inventory.reserved_quantity >= item.quantity,
+                                                Inventory.reserved_quantity - item.quantity), else_=0),
+                        updated_at=now(),
+                    )
+                )
+            if order.payment_method == "cod" and order.payment_status != "paid":
+                order.payment_status, order.paid_at = "paid", now()  # cash collected on delivery
+        if status == "returned":
+            for item in items:
+                self.db.execute(
+                    update(Inventory)
+                    .where(Inventory.sku_id == item.sku_id)
+                    .values(quantity_on_hand=Inventory.quantity_on_hand + item.quantity, updated_at=now())
+                )
+            if order.payment_status == "paid":
+                order.payment_status = "refunded"
+        order.status = status
+        self.db.add(
+            Outbox(
+                event_type=f"order.{status}",
+                aggregate_id=order.id,
+                payload={"order_id": str(order.id), "status": status},
             )
         )
         return self.serialize(order)

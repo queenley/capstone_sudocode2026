@@ -407,7 +407,7 @@ def _orders_block(orders: Sequence[Mapping[str, Any]], changes: Sequence[Mapping
                      "đó, không tạo đơn mới):\n" + "\n".join(lines))
     if changes:
         lines = [f"- {c.get('order_id')}: {c.get('action')}" + (f" sang {c['new_variant_sku']}" if c.get("new_variant_sku") else "")
-                 for c in changes]
+                 + (f" về {c['new_address']}" if c.get("new_address") else "") for c in changes]
         parts.append("Thay đổi đã thực hiện trong cuộc này (đã xong, không gọi order_update lại cho cùng thay đổi; "
                      "khách hỏi lại thì báo kết quả và phí của lần đó):\n" + "\n".join(lines))
     return "\n".join(parts)

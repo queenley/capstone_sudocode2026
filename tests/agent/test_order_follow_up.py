@@ -207,3 +207,38 @@ def test_absorb_keeps_the_changes_of_the_call():
               "result": {"ok": True, "data": {"order_id": "OD1", "fee_vnd": 0}}}
     update = nodes._absorb(state, [result])
     assert [c["order_id"] for c in update["updated_orders"]] == ["OD0", "OD1"]
+
+
+# ── a new address ─────────────────────────────────────────────────────────
+
+
+def test_a_new_address_goes_onto_the_order_the_next_status_reads():
+    """The organisers' update_address answers "updated" and keeps the old address; ours puts the new one on."""
+    from ai_agent_service.mcp.servers import btc
+    from ai_agent_service.mcp.servers.order import _with_address
+
+    m = btc.mock()
+    saved = dict(m._ORDERS), list(m._TICKETS)
+    try:
+        m._ORDERS["OD9001"] = {"order_id": "OD9001", "customer_phone": "0900000001", "sku": "SKU-AP-Y",
+                               "address": "Hồ Chí Minh", "created_on": "2026-10-15", "status": "created"}
+        update = _with_address(m)
+        result = update("OD9001", "update_address", new_address="Hà Nội", on="2026-10-15")
+        assert result["status"] == "updated" and result["new_address"] == "Hà Nội"
+        assert result["estimated_delivery"] == m._eta("2026-10-15", "Hà Nội")
+        assert m.order_status(order_id="OD9001")["orders"][0]["address"] == "Hà Nội"
+        assert update("OD9001", "update_address", on="2026-10-15") == {"error": "missing_new_address"}
+    finally:
+        m._ORDERS.clear(); m._ORDERS.update(saved[0]); m._TICKETS[:] = saved[1]
+
+
+def test_an_address_change_needs_the_address_and_a_second_one_is_a_new_change():
+    created = [{"order_id": "OD1", "sku": "SKU-A"}]
+    common = dict(tier="VERIFIED", mode="speak", has_phone=True, quotes={}, created=created)
+    bare = {"order_id": "OD1", "action": "update_address"}
+    verdict = actions.check("order_update", bare, **common)
+    assert not verdict.passed and "new_address" in verdict.reasons[0]
+    first = {**bare, "new_address": "Hồ Chí Minh"}
+    second = {**bare, "new_address": "Hà Nội"}
+    assert not actions.check("order_update", first, updated=[first], **common).passed
+    assert actions.check("order_update", second, updated=[first], **common).passed

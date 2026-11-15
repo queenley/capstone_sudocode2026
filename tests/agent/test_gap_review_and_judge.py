@@ -135,3 +135,14 @@ async def test_rubric_missing_duplicate_or_invented_evidence_is_incomplete():
         assert (await judge.grade(scenario, "call_1", rows))["status"] == "INCOMPLETE"
     writer.ainvoke.side_effect = RuntimeError("provider failed")
     assert (await judge.grade(scenario, "call_1", rows))["status"] == "INCOMPLETE"
+
+
+def test_a_turn_answered_from_the_tools_is_no_knowledge_gap():
+    """Retrieval abstains on "30m2 á em": the catalogue answered it, and a live call recorded it as a gap (2026-11-14)."""
+    from ai_agent_service.components.improvement import gaps
+
+    answered = "Dạ phòng 30m², em gợi ý chị mẫu AirPure Y, phù hợp đúng diện tích, giá 5.200.000đ ạ."
+    assert not gaps.unanswered(answered, abstained=True)
+    assert gaps.unanswered("Dạ hiện em chưa có thông tin về chính sách này ạ.", abstained=True)
+    assert not gaps.unanswered("Dạ hiện em chưa có thông tin về chính sách này ạ.", abstained=False)
+    assert gaps.unanswered("Dạ em chuyển chị sang nhân viên ạ.", abstained=False, out_of_documents=True)

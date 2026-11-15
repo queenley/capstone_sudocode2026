@@ -18,10 +18,23 @@ DAG **không bao giờ tự duyệt và không tự bật version**. Admin duy�
 docker compose -f docker-compose.yml -f infra/airflow/docker-compose.airflow.yml up -d --build airflow
 ```
 
-- Giao diện Airflow: http://127.0.0.1:8080. Tài khoản `admin`; mật khẩu in trong log của container `airflow` ở lần chạy đầu (`docker compose ... logs airflow`).
+- Giao diện Airflow: http://127.0.0.1:8080. Tài khoản `admin`, mật khẩu `AIRFLOW_ADMIN_PASSWORD` (mặc định `airflow-admin-local-only`). Lần đầu webserver mất vài phút mới lên; container có healthcheck và tự khởi động lại.
 - Image cài agent vào một venv riêng (`/opt/agent-venv`), để các gói của agent không đụng ràng buộc phiên bản của Airflow. Repo được mount vào `/opt/telesales`, nên vòng chạy đúng code và bộ kịch bản của bản checkout.
 - Skills và trạng thái cải tiến dùng chung volume với `ai-agent-service` (`agent-skills`, `agent-improvement` trong `docker-compose.yml`). Không có volume chung thì admin bật một version mà agent không thấy.
 - **Tốn phí model mỗi tuần.** Đặt `EVAL_BUDGET_DB` trong `.env` để có trần.
+
+### Xem và bấm chạy trên `/admin`
+
+`/admin` → **Cải tiến hằng tuần** → **Pipeline cải tiến (Airflow)** hiện 4 block của DAG theo thứ tự, mỗi block có trạng thái của lần chạy đang chọn: xong, đang chạy, đang chờ, lỗi, chưa tới. Đang có lần chạy thì trang tự cập nhật mỗi 15 giây.
+
+- **Chạy vòng mới:** chọn tuần (`2026-W46`, mặc định tuần hiện tại), rồi bấm. Nếu DAG đang tạm dừng thì nút này bật lại DAG, sau đó tạo một lần chạy với `conf.week`. Tốn phí model ở bước "Đo R0 và học".
+- **Chạy lại từ đây:** chạy lại một block và các block sau nó (lệnh `clear` của Airflow). Block "Chờ admin duyệt" không có nút này, vì nó tự kiểm tra mỗi 30 phút.
+- Chỉ `admin` bấm được; `developer` chỉ xem. Không bước nào tự duyệt đề xuất hay tự bật version.
+- Agent gọi REST API của Airflow (`runtime/airflow_pipeline.py`), cấu hình bằng `AIRFLOW_URL`, `AIRFLOW_USER` và `AIRFLOW_PASSWORD`. Compose này tự đặt các biến đó và tạo user API (`AIRFLOW_API_USER`, mặc định `api` / `airflow-api-local-only`). Phải bật cùng `ai-agent-service` để agent nhận các biến:
+
+```powershell
+docker compose -f docker-compose.yml -f infra/airflow/docker-compose.airflow.yml up -d --build airflow ai-agent-service
+```
 
 Chạy tay một tuần (không cần Airflow), từ gốc repo:
 

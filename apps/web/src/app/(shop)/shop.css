@@ -1479,6 +1479,60 @@
   background: var(--surface-3);
   color: var(--muted);
 }
+/* A COD order over 2 million: the shop calls before it ships (lib/orders.ts awaitsCall). */
+.s-status-call {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  border: 1px solid var(--warn-line);
+}
+.s-order-note {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: 13px;
+}
+/* The empty cart of a signed-in customer: the orders still on their way (gio-hang/page.tsx). */
+.s-open-orders {
+  max-width: 520px;
+  margin: 36px auto 0;
+  padding: 16px 18px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+}
+.s-open-orders h2 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+.s-open-orders ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+.s-open-orders li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--s-line);
+}
+.s-open-orders li > span:first-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.s-open-orders li small {
+  color: var(--s-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.s-open-orders .s-status {
+  flex: none;
+}
 .s-account-foot {
   display: flex;
   justify-content: space-between;
@@ -1814,6 +1868,117 @@
   border-radius: 12px;
   padding: 0 16px;
 }
+/* Voice messages (ChatWidget, lib/voice-note.ts): hold the microphone to record, let go to send, as on Zalo. */
+.s-chat-input .s-mic {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.s-chat-input .s-mic.is-on {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  transform: scale(1.12);
+  box-shadow: 0 0 0 6px var(--danger-soft);
+}
+.s-chat-input .s-mic.is-cancel {
+  background: var(--surface-3);
+  border-color: var(--s-line);
+  color: var(--s-muted);
+  box-shadow: none;
+}
+.s-recording {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+.s-recording b {
+  font-variant-numeric: tabular-nums;
+}
+.s-recording span:last-child {
+  color: var(--s-muted);
+}
+.s-recording.is-cancel {
+  background: var(--surface-3);
+  color: var(--s-muted);
+}
+.s-rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: s-rec-blink 1s ease-in-out infinite;
+}
+@keyframes s-rec-blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-rec-dot {
+    animation: none;
+  }
+}
+.s-voice {
+  display: grid;
+  gap: 6px;
+  min-width: 220px;
+  max-width: 100%;
+  padding: 9px 12px;
+  border-radius: 14px;
+  border-bottom-right-radius: 4px;
+  background: var(--s-brand);
+  color: var(--on-brand);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.s-voice + .s-voice,
+.s-msg-me p + .s-voice,
+.s-voice + p {
+  margin-top: 4px;
+}
+.s-voice-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.s-voice-head svg {
+  flex: none;
+}
+.s-voice audio {
+  width: 100%;
+  height: 32px;
+}
+.s-voice-text {
+  overflow-wrap: anywhere;
+}
+.s-voice-text.is-failed {
+  opacity: 0.85;
+  font-style: italic;
+}
+.s-voice-hint {
+  align-self: center;
+  margin: 2px 0;
+  font-size: 12px;
+  color: var(--s-muted);
+  text-align: center;
+}
 .s-chat-closed {
   padding: 12px;
   border-top: 1px solid var(--s-line);
@@ -1830,6 +1995,16 @@
 }
 .s-chat-foot a:hover {
   color: var(--s-brand);
+}
+/* The icon and the number on one line: Tailwind's preflight makes every svg a block. */
+.s-chat-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.s-chat-foot a svg {
+  flex: none;
 }
 
 /* ---------- responsive ---------- */
@@ -2779,3 +2954,11 @@ footer.s-footer.ground-inverse {
 .s-password-eye:hover { color: var(--ink); background: color-mix(in oklab, var(--ink) 6%, transparent); }
 .s-password-eye:focus-visible { outline: 2px solid var(--action, #059669); outline-offset: 1px; }
 .s-password-eye[aria-pressed="true"] { color: var(--action, #059669); }
+
+/* The assistant's avatar in the chat pictures (.ui-agent from the UI kit) shows Quivo's "Q"
+   (public/logo/main.svg) instead of the kit's star. Doubled class: the kit's file loads after this one. */
+.ui-agent.ui-agent::after {
+  inset: 22%;
+  -webkit-mask: url("/logo/main.svg") center / contain no-repeat;
+          mask: url("/logo/main.svg") center / contain no-repeat;
+}

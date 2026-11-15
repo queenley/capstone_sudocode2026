@@ -527,17 +527,31 @@ def _skill_for(row: dict[str, Any], book: dict[str, Any]) -> str:
     return skill
 
 
-def publish(path: Path, *, scripted: bool = False) -> int:
-    if scripted:
-        review.approve_scripted(path, gap_loop.SCRIPTED)
-    taken, refused = review.approved(path)
-    for item in refused:
-        print(f"  not published {item['proposal_id']}: {item['reason']}")
+def publish(path: Path | Sequence[Path], *, scripted: bool = False) -> int:
+    """The approved changes of one review file, or of a round's several, as one skills version.
+
+    A round with two learning sets writes a review file each, and the same lesson is proposed in both. On 2026-11-15
+    each file was published in turn: the second replaced a sentence the first had already replaced, the round stopped
+    with knowledge and skills switched on and R1 never ran. The same change is taken once."""
+    paths = [path] if isinstance(path, Path) else list(path)
+    taken: list[dict[str, Any]] = []
+    for each in paths:
+        if scripted:
+            review.approve_scripted(each, gap_loop.SCRIPTED)
+        approved, refused = review.approved(each)
+        for item in refused:
+            print(f"  not published {item['proposal_id']}: {item['reason']}")
+        for item in approved:
+            if any(item["patch"] == kept["patch"] for kept in taken):
+                print(f"  same change as one already taken: {item['proposal_id']}")
+            else:
+                taken.append(item)
     if not taken:
         print("Nothing approved to publish")
         return 0
     reviewers = sorted({str(item["reviewer"]).strip() for item in taken})
-    version = skill_versions.publish([item["patch"] for item in taken], reviewer=", ".join(reviewers), note=f"review {path.name}")
+    version = skill_versions.publish([item["patch"] for item in taken], reviewer=", ".join(reviewers),
+                                     note="review " + ", ".join(each.name for each in paths))
     print(f"Published {len(taken)} changes: skills version {version}, approved by {', '.join(reviewers)}. The next run reads it.")
     return 0
 
@@ -840,9 +854,7 @@ async def _round(args: argparse.Namespace) -> int:
         # Only now: answering a gap publishes a knowledge version, and R0 is the agent before it. On 2026-11-12 the
         # answers were published before R0 and both sides measured the same knowledge.
         await gaps_round(args.answers)
-    for review_file in reviews:
-        if review_file.is_file():
-            publish(review_file, scripted=args.scripted)
+    publish([review_file for review_file in reviews if review_file.is_file()], scripted=args.scripted)
     for path in frozen:
         after = [folder / (f"r1-{_label(path)}" if index == 1 else f"r1-{_label(path)}-{index}")
                  for index in range(1, args.r1_runs + 1)]

@@ -20,8 +20,9 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from src.api.routes.shared import staff
 
+from ...components.context import skills as skill_book
 from ...components.improvement import review, skill_versions
-from ...runtime import evaluations
+from ...runtime import airflow_pipeline, evaluations
 from ...runtime.db import connection
 
 router = APIRouter(prefix="/api/developer", tags=["improvement"])
@@ -112,7 +113,8 @@ async def activate(name: str, body: Activation, request: Request) -> dict[str, A
             raise HTTPException(422, str(error)) from error
         await evaluations.set_round(conn, name, status="active", detail={"activated_by": reviewer,
                                                                          "previous_skills_version": previous})
-    return {"status": "active", "skills_version": candidate, "previous": previous, "reload_required": True}
+    await asyncio.to_thread(skill_book.reload)
+    return {"status": "active", "skills_version": candidate, "previous": previous, "reload_required": False}
 
 
 @router.post("/improvement/skills/rollback")
@@ -123,7 +125,8 @@ async def rollback(body: Rollback, request: Request) -> dict[str, Any]:
         previous = await asyncio.to_thread(skill_versions.rollback, body.to, reviewer=reviewer, reason=body.reason)
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
-    return {"skills_version": body.to, "previous": previous, "reload_required": True}
+    await asyncio.to_thread(skill_book.reload)
+    return {"skills_version": body.to, "previous": previous, "reload_required": False}
 
 
 @router.get("/evaluations")
@@ -132,3 +135,162 @@ async def history(request: Request, purpose: str | None = Query(default=None, ma
     staff(request, READ)
     async with connection() as conn:
         return {"runs": await evaluations.list_runs(conn, purpose=purpose, limit=limit)}
+
+
+# ── the round's pipeline on Airflow ───────────────────────────────────────
+
+
+class PipelineRun(BaseModel):
+    week: str | None = Field(default=None, max_length=10)
+
+
+@router.get("/improvement/pipeline")
+async def pipeline(request: Request) -> dict[str, Any]:
+    """The weekly round's blocks and the latest runs, each block's state (runtime/airflow_pipeline.py)."""
+    staff(request, READ)
+    return await airflow_pipeline.status()
+
+
+@router.post("/improvement/pipeline/runs")
+async def pipeline_run(body: PipelineRun, request: Request) -> dict[str, Any]:
+    """Start the round by hand (paid model calls). It files proposals; it never approves or switches one on."""
+    staff(request, ADMIN)
+    reviewer = _reviewer(request)
+    if not airflow_pipeline.configured():
+        raise HTTPException(503, "Airflow chưa được bật (AIRFLOW_URL)")
+    try:
+        return await airflow_pipeline.trigger(body.week, by=reviewer)
+    except airflow_pipeline.PipelineError as error:
+        raise HTTPException(502, str(error)) from error
+
+
+@router.post("/improvement/pipeline/runs/{run_id}/blocks/{block}/rerun")
+async def pipeline_rerun(run_id: str, block: str, request: Request) -> dict[str, Any]:
+    """One block of a run again, and every block after it."""
+    staff(request, ADMIN)
+    _reviewer(request)
+    if not airflow_pipeline.configured():
+        raise HTTPException(503, "Airflow chưa được bật (AIRFLOW_URL)")
+    try:
+        return await airflow_pipeline.rerun(run_id, block)
+    except airflow_pipeline.PipelineError as error:
+        raise HTTPException(502, str(error)) from error
+
+
+# ── the skills, for an admin to read and change ────────────────────────────
+
+
+class SkillIn(BaseModel):
+    description: str = Field(min_length=1, max_length=400)
+    body: str = Field(min_length=1, max_length=8000)
+    done_on: list[str] = Field(default_factory=list, max_length=10)
+
+
+class SkillEdit(BaseModel):
+    #: name -> the skill as it should read, or null to take it out.
+    changes: dict[str, SkillIn | None] = Field(min_length=1, max_length=20)
+    note: str = Field(default="", max_length=500)
+    #: False keeps the new version as a candidate; switch it on later.
+    activate: bool = True
+
+
+@router.get("/improvement/skills")
+async def skills(request: Request, version: int | None = Query(default=None, ge=0)) -> dict[str, Any]:
+    """The skills of the version in force (or of *version*), each marked when it differs from the original, and
+    every version with who wrote it and what it changed."""
+    staff(request, READ)
+
+    def read() -> dict[str, Any]:
+        active = skill_versions.active()
+        shown = active if version is None else version
+        book = skill_versions.read_version(shown)
+        original = skill_versions.read_version(0)
+        return {
+            "active": active,
+            "version": shown,
+            "skills": [{"name": name, "description": skill.get("description", ""), "done_on": skill.get("done_on") or [],
+                        "body": skill.get("body", ""), "changed": original.get(name) != skill,
+                        "new": name not in original} for name, skill in book.items()],
+            "versions": skill_versions.versions(),
+            "limits": {"description": skill_versions.MAX_DESCRIPTION, "body": skill_versions.ADMIN_MAX_BODY},
+            "served": skill_book.active_version(skill_book.versions_dir()) == active,
+        }
+
+    try:
+        return await asyncio.to_thread(read)
+    except ValueError as error:
+        raise HTTPException(404, str(error)) from error
+
+
+@router.post("/improvement/skills")
+async def edit_skills(body: SkillEdit, request: Request) -> dict[str, Any]:
+    """An admin's change to the skills, as the next version; switched on (and served at once) unless kept as a
+    candidate. The original (version 0) is never changed: rolling back to it is always possible."""
+    staff(request, ADMIN)
+    reviewer = _reviewer(request)
+    changes = {name: (skill.model_dump() if skill is not None else None) for name, skill in body.changes.items()}
+    try:
+        version = await asyncio.to_thread(skill_versions.edit, changes, reviewer=reviewer, note=body.note,
+                                          activate=body.activate)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    if body.activate:
+        await asyncio.to_thread(skill_book.reload)
+    return {"skills_version": version, "active": body.activate}
+
+
+@router.post("/improvement/skills/versions/{version}/activate")
+async def activate_skills(version: int, body: Activation, request: Request) -> dict[str, Any]:
+    """Serve *version* from the next turn (a candidate, or an older one to go back to)."""
+    staff(request, ADMIN)
+    reviewer = _reviewer(request)
+    try:
+        if version == 0:
+            previous = await asyncio.to_thread(skill_versions.rollback, 0, reviewer=reviewer,
+                                               reason=body.note or "admin: về bản gốc")
+        else:
+            previous = await asyncio.to_thread(skill_versions.activate, version, reviewer=reviewer, note=body.note)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    await asyncio.to_thread(skill_book.reload)
+    return {"skills_version": version, "previous": previous}
+
+
+# ── the shop's policies, as the assistant reads them ─────────────────────────
+
+
+@router.get("/policies")
+async def policies(request: Request) -> dict[str, Any]:
+    """Every section of the organisers' policy documents (read-only: data/btc/policy), as retrieval sees it: who may
+    hear it (a document marked internal is never quoted to a customer), when it is in force, the changelog entries
+    behind it; then what reviewers added on top, in the knowledge version in force (data/kb)."""
+    staff(request, READ)
+
+    def read() -> dict[str, Any]:
+        from ...components.improvement import versions
+        from ...components.knowledge.corpus import policy_chunks
+        from ...config.config_manager import btc_data_dir
+
+        documents: dict[str, dict[str, Any]] = {}
+        for chunk in policy_chunks(btc_data_dir() / "policy"):
+            doc = documents.setdefault(chunk.doc, {"doc": chunk.doc, "title": chunk.doc_title, "sections": []})
+            doc["sections"].append({
+                "id": chunk.chunk_id, "title": chunk.title, "text": chunk.text, "restricted": chunk.restricted,
+                "valid_from": chunk.valid_from, "valid_to": chunk.valid_to, "changelog": list(chunk.changelog),
+                "industry": chunk.industry,
+            })
+        for doc in documents.values():
+            sections = doc["sections"]
+            doc["internal"] = bool(sections) and all(s["restricted"] for s in sections)
+            doc["retired"] = bool(sections) and all(s["valid_to"] for s in sections)
+        active = versions.active()
+        learned = versions.entries(active) if active else []
+        return {
+            "documents": list(documents.values()),
+            "learned": {"version": active, "entries": [
+                {k: entry.get(k) for k in ("chunk_id", "title", "text", "cites", "valid_from", "valid_to", "approved_by",
+                                           "source", "question") if entry.get(k) is not None}
+                for entry in learned]},
+        }
+
+    return await asyncio.to_thread(read)

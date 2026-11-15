@@ -330,7 +330,7 @@ export default function CheckoutPage() {
         <div className="s-done-icon"><Icon name="check" size={28} /></div>
         <h1 ref={resultHeading} tabIndex={-1}>Đặt hàng thành công</h1>
         <p>
-          Mã đơn <b>#{placed.id.slice(0, 8).toUpperCase()}</b> ·{" "}
+          Mã đơn <b>WEB-{placed.id.slice(0, 8).toUpperCase()}</b> ·{" "}
           {money(placed.total)}.{" "}
           {placed.payment_method === "bank_transfer"
             ? "Vui lòng chuyển khoản theo thông tin dưới đây."

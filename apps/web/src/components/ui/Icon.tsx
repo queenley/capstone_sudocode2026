@@ -12,6 +12,14 @@ const PATHS = {
       <path d="m3 8 9 5 9-5M12 13v8" />
     </>
   ),
+  truck: (
+    <>
+      <path d="M3 6h12v12H3zM15 10h4l3 3v5h-7z" />
+      <circle cx="7.5" cy="18" r="2" />
+      <circle cx="18.5" cy="18" r="2" />
+      <path d="M15 13h6" />
+    </>
+  ),
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   check: <path d="m5 12 5 5L20 7" />,
@@ -52,6 +60,12 @@ const PATHS = {
       <path d="M4 14v-2a8 8 0 0 1 16 0v2" />
       <path d="M4 14a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2zM20 14a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z" />
       <path d="M17 18c0 1.7-1.8 3-5 3" />
+    </>
+  ),
+  mic: (
+    <>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8" />
     </>
   ),
   "thumb-up": (

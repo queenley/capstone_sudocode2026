@@ -361,8 +361,11 @@ class CallStore:
             from . import alerts
             alerts.wake()  # the console rings now, not at its next poll
         found = state.get("knowledge") or {}
-        if found.get("abstain") and found.get("reason") in ("no_match", "absence") and reply:
-            from ..components.improvement import gaps
+        from ..components.improvement import gaps
+        handed = state.get("handoff") or {}
+        out_of_documents = before is None and handed.get("reason") == gaps.OUT_OF_DOCUMENTS  # this turn's transfer
+        abstained = bool(found.get("abstain")) and found.get("reason") in ("no_match", "absence")
+        if reply and gaps.unanswered(reply["text"], abstained=abstained, out_of_documents=out_of_documents):
             question = next((text for speaker, text, _ in rows if speaker == "customer"), "")
             try:
                 recent = [str(m.content) for m in (state.get("messages") or [])[-4:]]
@@ -382,6 +385,9 @@ class CallStore:
             "facts_used": used_slots((state.get("reply") or {}).get("used_lines") or [],
                                      state.get("brief_lines") or [], (state.get("brief") or {}).get("profile_facts") or {}),
             "provenance_version": "strict-cited-slots-v1",
+            # What the customer has stated so far in this call (tokenised, ``call_state``): the console shows it
+            # before after_call writes the ledger, which happens only once the call ends.
+            "call_facts": dict(state.get("call_facts") or {}),
             "tool_calls": [self._tool(r) for r in state.get("tool_results") or []],
             "guard": state.get("guard") or {}, "blocked_drafts": state.get("blocked_drafts") or [],
             "regenerations": state.get("regen_count") or 0,

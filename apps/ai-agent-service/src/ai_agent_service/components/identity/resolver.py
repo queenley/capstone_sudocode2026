@@ -119,7 +119,9 @@ def pick_by_name(text: str, candidates: Sequence[Match]) -> Match | None:
         if not candidate.name:
             continue
         name = re.escape(plain(candidate.name))
-        introduced = re.search(r"\b(?:toi|anh|chi|em|minh|co|chu|bac) (?:la|ten(?: la)?) " + name + r"\b", words)
+        # "chị là Hoa", and "chị là chị Hoa": a Vietnamese speaker repeats the honorific before the name.
+        introduced = re.search(r"\b(?:toi|anh|chi|em|minh|co|chu|bac) (?:la|ten(?: la)?) "
+                               r"(?:(?:anh|chi|em|co|chu|bac) )?" + name + r"\b", words)
         bare = re.fullmatch(r"(?:(?:da|vang) )?(?:(?:anh|chi|em|co|chu|bac) )?" + name + r"(?: day| ne| a| nhe| nghe)*", words)
         if introduced or bare:
             hits.append(candidate)

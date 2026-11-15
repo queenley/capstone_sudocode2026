@@ -279,3 +279,19 @@ def test_a_pass_needs_no_quote_and_a_fail_without_the_call_s_words_is_dropped_no
     assert settled({**judged, "error": "TimeoutError"}, words) is None
     only_pass = settled({**judged, "verdicts": [{**v, "verdict": "PASS"} for v in judged["verdicts"]]}, words)
     assert only_pass["status"] == "COMPLETE" and "dropped" not in only_pass
+
+
+@pytest.mark.asyncio
+async def test_a_round_with_two_learning_sets_publishes_the_same_change_once(home, tmp_path, book, monkeypatch):
+    # 2026-11-15, gaploop-5: both review files proposed the same sentence; publishing them in turn stopped the round.
+    from ai_agent_service.components.context import skills as skill_book
+    from ai_agent_service.components.improvement import skill_versions
+    from ai_agent_service.pipeline.improve import cli
+
+    monkeypatch.setattr(skill_book, "versions_dir", lambda: home / "skills")  # never the repository's data/skills
+
+    path = await reflected(home, tmp_path, ScriptedApproval())
+    twin = path.with_name("r-other.json")
+    twin.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+    assert cli.publish([path, twin], scripted=True) == 0
+    assert skill_versions.active() == 1 and not (home / "skills" / "v2.yaml").exists()

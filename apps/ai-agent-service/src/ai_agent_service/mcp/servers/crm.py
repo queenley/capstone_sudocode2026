@@ -18,6 +18,8 @@ the other.
 
 from __future__ import annotations
 
+import asyncio
+
 from typing import Any, Literal
 
 from typing_extensions import TypedDict
@@ -114,7 +116,7 @@ async def order_create(
     """
     m = btc.mock()
     # order_group is the team's own: the organisers' mock does not take it (the guard reads it, section 4.4).
-    return await btc.call(
+    result = await btc.call(
         "order.create", m.order_create, idempotency_key=idempotency_key,
         call_id=call_id, turn_id=turn_id, purchase_authorization=purchase_authorization, order_group=order_group,
         customer_phone=customer_phone, sku=None if lines else sku, qty=None if lines else qty,
@@ -122,6 +124,14 @@ async def order_create(
         promo_code=promo_code, payment=payment, address=address, on=on or btc.reference_date(),
         basket_skus=basket_skus or None,
     )
+    # A live channel keeps the order on the website too, in the customer's account (runtime/shop_orders.py).
+    from ...runtime import shop_orders
+
+    if shop_orders.enabled():
+        await asyncio.to_thread(shop_orders.mirror_create, result, {
+            "customer_phone": customer_phone, "sku": sku, "qty": qty, "price_vnd": price_vnd, "lines": lines,
+            "payment": payment, "address": address})
+    return result
 
 
 def _lines(lines: list[dict[str, Any]] | None) -> list[dict[str, Any]] | None:
@@ -197,6 +207,9 @@ async def handoff_transfer(brief: dict[str, Any], idempotency_key: str | None = 
 
 if __name__ == "__main__":
     apply_schema(btc.STATE_SCHEMA)
-    # The organisers' mock loaded now, not inside the first call's 2-second budget.
+    # The organisers' mock and the website's database opened now, not inside the first call's 2-second budget.
     btc.mock()
+    from ...runtime import shop_orders
+
+    shop_orders.warm()
     server.run()

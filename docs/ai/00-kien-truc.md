@@ -160,7 +160,7 @@ flowchart LR
 | ② | **Khách gọi trên trình duyệt** | WebSocket `/api/conversations/{id}/voice` qua gateway → VAD/Smart Turn → asr-service → đồ thị nóng → TTS VieNeu → loa khách | như ①; audio không lưu |
 | ③ | **Khách gọi hotline** | SIP → livekit-sip → livekit room → hotline-bridge → cùng WebSocket thoại của ② | như ② |
 | ④ | **Khách nhắn Zalo OA** | Zalo → gateway → `POST /api/channels/zalo/webhook` → đồ thị nóng → trả lời qua API Zalo | `agent.zalo_threads`, `zalo_messages`, `turns` |
-| ⑤ | **Báo giá, tạo đơn, tra / đổi đơn, hẹn gọi lại** | đồ thị nóng → guard hành động → MCP `catalog`/`order`/`crm` → mock của BTC | trạng thái mock ở `agent.mock_state`; kết quả tool trong `turns` |
+| ⑤ | **Báo giá, tạo đơn, tra / đổi đơn, hẹn gọi lại** | đồ thị nóng → guard hành động → MCP `catalog`/`order`/`crm` → mock của BTC | trạng thái mock ở `agent.mock_state`; kết quả tool trong `turns`. Kênh thật (`SHOP_ORDERS=1`): đơn tạo/đổi cũng ghi vào `commerce.orders` của website theo mã `OD…`, và `order.status` đọc thêm đơn website của khách (`runtime/shop_orders.py`); eval không bật |
 | ⑥ | **Chuyển cho nhân viên** (khách đòi gặp người, câu hỏi y tế, khiếu nại nặng) | đồ thị nóng → `handoff.transfer` → ghi `conversation.handoffs` + outbox `handoff.requested` → (Kafka → consumer nếu bật) → màn hình nhân viên qua sales-service, tin nhắn của khách được đánh dấu đỏ | `conversation.handoffs`, `improvement.outbox`; brief chuyển máy ở `agent.calls.handoff_brief` |
 | ⑦ | **Sau cuộc gọi** (nhân viên bấm kết thúc, Sales đóng hội thoại, hoặc 30 phút im lặng) | `after_call` đọc hội thoại đã đóng → trích fact → 4 cửa kiểm → ghi bộ nhớ → tóm tắt cho Call Brief lần sau | `agent.facts`, `agent.episodes`; yêu cầu xóa ở `agent.deletion_requests` |
 

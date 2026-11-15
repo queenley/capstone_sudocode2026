@@ -1200,3 +1200,235 @@ footer.call-controls button.hangup { background: var(--danger); color: var(--on-
 .call-brief-body .handoff-brief { margin-bottom: 0; }
 .call-brief-body .brief { margin: 0; }
 .call-brief-known > * + * { margin-top: 8px; }
+
+/* ── the call's evidence and the conversation, for the consultant (features/call-evidence.tsx) ──────────────
+   Two parts on the side: this conversation (who, channel, products as links, what the customer said, orders),
+   then the call's details folded. In the middle the handover is a card of what to do, the earlier calls fold.
+   Less on screen at once: plain words first, the technical one click away. */
+.call-grid { grid-template-columns: 250px minmax(0, 1fr) 320px; }
+.call-evidence { padding: 18px; }
+.evidence-eyebrow { margin: 0 0 4px; font-size: 12px; color: var(--muted); text-transform: none; letter-spacing: 0; }
+.evidence-part h2 { font-size: 16px; margin: 0 0 12px; }
+.evidence-part h3 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 18px 0 8px; }
+.evidence-who { display: grid; grid-template-columns: 76px 1fr; gap: 8px 10px; margin: 0; font-size: 14px; }
+.evidence-who dt { color: var(--muted); font-size: 13px; }
+.evidence-who dd { margin: 0; }
+.evidence-who dd.ok { color: var(--brand-ink); }
+.evidence-who dd.warn { color: var(--warn-ink); }
+.channel-badge { display: inline-block; font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--surface-3); color: var(--ink-2); border: 1px solid var(--line); }
+.channel-badge.channel-zalo { background: var(--info-soft); color: var(--info-ink); }
+.channel-badge.channel-web { background: var(--brand-soft); color: var(--brand-ink); border-color: var(--brand-line); }
+.channel-badge.channel-hotline { background: var(--warn-soft); color: var(--warn-ink); border-color: var(--warn-line); }
+
+.product-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.product-links a { display: grid; gap: 2px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); text-decoration: none; transition: border-color .15s, background .15s; }
+.product-links a:hover { border-color: var(--brand); background: var(--brand-soft); }
+.product-links a::after { content: "Mở trang sản phẩm ↗"; font-size: 11px; color: var(--brand-ink); }
+.product-links__name { font-size: 14px; font-weight: 500; }
+.product-links__meta { font-size: 12px; color: var(--muted); }
+.product-links.compact { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.product-links.compact a { display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 12px; background: var(--surface); }
+.product-links.compact a::after { content: " ↗"; font-size: 11px; margin-left: 4px; }
+.product-links.compact .product-links__name { font-size: 12px; }
+.message.outgoing .product-links.compact a { border-color: rgb(255 255 255 / 0.5); }
+
+.evidence-said, .evidence-orders, .evidence-facts, .evidence-episodes, .evidence-turns { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.evidence-said li { padding-left: 14px; position: relative; color: var(--ink-2); }
+.evidence-said li::before { content: ""; position: absolute; left: 2px; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--brand); }
+.evidence-orders li { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
+.evidence-orders a { color: var(--brand-ink); }
+.evidence-orders span { color: var(--muted); font-size: 12px; }
+
+.evidence-details { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+.evidence-details > summary { cursor: pointer; display: grid; gap: 2px; list-style: none; }
+.evidence-details > summary::-webkit-details-marker { display: none; }
+.evidence-details > summary span { font-size: 14px; font-weight: 500; }
+.evidence-details > summary span::before { content: "▸ "; color: var(--muted); }
+.evidence-details[open] > summary span::before { content: "▾ "; }
+.evidence-details > summary small { color: var(--muted); font-size: 12px; }
+.evidence-details .facts { margin-top: 12px; }
+.evidence-turns li { display: grid; gap: 4px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 12px; }
+.evidence-turns small { color: var(--muted); font-size: 11px; }
+.evidence-facts code { font-size: 11px; color: var(--muted); margin-right: 4px; }
+.evidence-episodes li { display: grid; gap: 2px; color: var(--ink-2); }
+.evidence-episodes small { color: var(--muted); font-size: 11px; }
+.evidence-raw summary { cursor: pointer; font-size: 12px; color: var(--muted); margin-top: 12px; }
+.evidence-raw pre { font-size: 11px; max-height: 240px; overflow: auto; }
+.link-button { background: none; color: var(--brand-ink); padding: 0; min-height: 0; text-decoration: underline; font-size: inherit; }
+
+.call-brief-stack { display: grid; gap: 10px; margin: 0 0 14px; }
+.handoff-card { border: 1px solid var(--warn-line); background: var(--warn-soft); border-radius: 12px; padding: 14px 16px; }
+.handoff-card.waiting { border-color: var(--danger-line); background: var(--danger-soft); }
+.handoff-card > header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+.handoff-card > header strong { font-size: 15px; font-weight: 500; }
+.handoff-card .facts { grid-template-columns: 140px 1fr; font-size: 13px; gap: 6px 12px; }
+.handoff-card h4 { font-size: 13px; font-weight: 500; margin: 14px 0 8px; color: var(--ink-2); }
+.handoff-card details summary { cursor: pointer; font-size: 12px; color: var(--muted); margin-top: 10px; }
+.call-known { border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.call-known > summary { cursor: pointer; display: flex; gap: 10px; align-items: baseline; padding: 10px 14px; list-style: none; }
+.call-known > summary::-webkit-details-marker { display: none; }
+.call-known > summary strong { font-size: 14px; font-weight: 500; }
+.call-known > summary strong::before { content: "▸ "; color: var(--muted); }
+.call-known[open] > summary strong::before { content: "▾ "; }
+.call-known > summary small { color: var(--muted); font-size: 12px; }
+.call-known__lines { margin: 0; padding: 0 14px 10px 30px; display: grid; gap: 6px; font-size: 13px; color: var(--ink-2); }
+.call-known__opening { margin: 0 14px 12px; padding: 10px 12px; border-radius: 8px; background: var(--surface); font-size: 13px; display: grid; gap: 2px; }
+.call-known__opening small { color: var(--muted); font-size: 11px; }
+.message small.turn-tools { opacity: .8; }
+
+@media (max-width: 1180px) {
+  .call-grid { grid-template-columns: 220px minmax(0, 1fr); }
+  .call-evidence { grid-column: 1 / -1; position: static; max-height: none; }
+}
+@media (max-width: 760px) {
+  .call-grid { grid-template-columns: 1fr; }
+  .call-queue { position: static; max-height: 40vh; }
+  .handoff-card .facts { grid-template-columns: 1fr; }
+}
+
+/* A compact workspace: queue at left, two-column evidence above a chat that stays in view. */
+.call-grid {
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  grid-template-rows: minmax(190px, .78fr) minmax(340px, 1.22fr);
+  grid-template-areas: "queue evidence" "queue chat";
+  height: clamp(560px, calc(100vh - 290px), 900px);
+  align-items: stretch;
+  gap: 14px;
+}
+.call-queue { grid-area: queue; height: 100%; max-height: 100%; }
+.call-evidence {
+  grid-area: evidence;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-content: start;
+  gap: 0 22px;
+  height: 100%;
+  max-height: 100%;
+  overflow: auto;
+  position: static;
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+.call-evidence > .evidence-part:first-child { grid-column: 1; }
+.call-evidence > .evidence-details { grid-column: 2; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; margin-top: 0; padding-top: 0; border-top: 0; }
+.call-evidence .evidence-details > summary { grid-column: 1 / -1; padding: 8px 0 12px; }
+.call-evidence .evidence-details h3,
+.call-evidence .evidence-details > .facts,
+.call-evidence .evidence-details > .evidence-turns,
+.call-evidence .evidence-details > .empty,
+.call-evidence .evidence-details > .evidence-facts,
+.call-evidence .evidence-details > .evidence-episodes,
+.call-evidence .evidence-details > details { grid-column: 1 / -1; }
+.call-evidence .evidence-details .facts { grid-template-columns: minmax(65px, auto) minmax(0, 1fr) minmax(65px, auto) minmax(0, 1fr); }
+.call-transcript-pane {
+  grid-area: chat;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  border-color: var(--line);
+  box-shadow: 0 8px 28px rgb(24 39 31 / 0.06);
+}
+.call-transcript-pane > .panel-title,
+.call-transcript-pane > .call-info,
+.call-transcript-pane > .call-brief-stack,
+.call-transcript-pane > .call-action-bar,
+.call-transcript-pane > .copilot,
+.call-transcript-pane > .buttonrow { flex: 0 0 auto; }
+.call-transcript-pane > .call-info { max-height: 24%; overflow: auto; }
+.call-transcript-pane > .call-turns { flex: 1 1 auto; min-height: 90px; max-height: none; overflow-y: auto; overscroll-behavior: contain; }
+.call-transcript-pane > .copilot { max-height: 42%; overflow-y: auto; }
+.call-info { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.call-transcript-pane > .call-info { margin-top: 0; padding: 0 0 14px; border-top: 0; border-bottom: 1px solid var(--line); }
+.call-info > h3 { margin: 0; font-size: 13px; font-weight: 500; color: var(--muted); }
+.call-info .call-brief-stack { margin: 0; }
+.call-info .call-sessions { margin: 0; }
+@media (max-width: 1180px) {
+  .call-grid { grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: minmax(180px, .72fr) minmax(340px, 1.28fr); }
+  .call-evidence { grid-column: auto; }
+  .call-evidence .evidence-details .facts { grid-template-columns: minmax(78px, auto) minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .call-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; grid-template-areas: "queue" "evidence" "chat"; height: auto; min-height: 0; }
+  .call-queue { position: static; height: auto; max-height: 36vh; }
+  .call-evidence { grid-template-columns: minmax(0, 1fr); height: auto; max-height: 42vh; }
+  .call-evidence > .evidence-part:first-child,
+  .call-evidence > .evidence-details { grid-column: 1; }
+  .call-evidence .evidence-details .facts { grid-template-columns: minmax(78px, auto) minmax(0, 1fr); }
+  .call-transcript-pane { min-height: 620px; max-height: none; }
+  .call-transcript-pane > .call-info { max-height: 30%; }
+  .call-transcript-pane > .call-turns { flex: 1 1 260px; }
+  .call-transcript-pane > .copilot { max-height: none; }
+}
+.call-info .call-sessions { flex-wrap: wrap; overflow: visible; }
+.call-info .call-session { flex: 1 1 200px; min-width: 0; }
+
+/* The consultant's queue and call head (call-console.tsx): one toolbar, the queue in three parts, who waits first. */
+.call-console.embedded { padding-top: 0; }
+.console-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 14px; }
+.console-waiting { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 13px; color: var(--muted); }
+.console-waiting.is-on { border-color: var(--danger-line); background: var(--danger-soft); color: var(--danger-ink); font-weight: 500; }
+.console-search { flex: 1 1 260px; max-width: 420px; margin: 0; min-height: 30px; }
+.console-toolbar .check.inline { min-height: 40px; font-size: 13px; }
+.call-queue h2 { font-size: 15px; margin-bottom: 4px; }
+.queue-part { display: grid; gap: 2px; margin-top: 12px; }
+.queue-part h3 { display: flex; justify-content: space-between; align-items: center; margin: 0 0 4px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.queue-part h3 span { font-size: 11px; padding: 0 8px; border-radius: 999px; background: var(--surface-3); color: var(--ink-2); }
+.queue-part--waiting h3 { color: var(--danger-ink); }
+.queue-part--waiting h3 span { background: var(--danger-soft); color: var(--danger-ink); }
+.queue-part--waiting .queue-item { border-left: 3px solid var(--danger); border-top: 0; border-radius: 8px; background: var(--danger-soft); margin-bottom: 4px; }
+.queue-item { border-top: 0; border-radius: 8px; }
+.queue-item:hover { background: var(--surface-2); }
+.queue-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.queue-meta .channel-badge { font-size: 10px; padding: 0 7px; }
+.call-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
+.call-head h2 { margin: 0 0 6px; font-size: 18px; }
+.call-head p { margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.call-state { color: var(--muted); }
+.call-state.is-live { color: var(--brand-ink); }
+.call-state.is-waiting { color: var(--danger-ink); font-weight: 500; }
+.call-head button { flex: none; }
+.call-action-bar { background: var(--danger-soft); border: 1px solid var(--danger-line); border-radius: 10px; padding: 10px 14px; color: var(--danger-ink); margin-top: 10px; }
+
+/* The compact workspace, fixed: the eyebrow spans both columns of the evidence (it took the first cell, and this
+   conversation fell to the right with the details under it); the sessions are one-line chips (cards were cut by the
+   info strip's height); products a tighter card, so "Mở trang sản phẩm" stays in view. */
+.call-evidence > .evidence-eyebrow { grid-column: 1 / -1; margin-bottom: 6px; }
+.call-evidence > .evidence-part:not(.evidence-details) { grid-column: 1; }
+.call-evidence > .evidence-details { grid-column: 2; grid-row: 2; }
+.call-evidence .evidence-part h2 { font-size: 15px; margin-bottom: 8px; }
+.call-evidence .evidence-who { gap: 4px 10px; font-size: 13px; }
+.call-evidence .product-links a { padding: 7px 10px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.call-evidence .product-links a::after { grid-column: 2; grid-row: 1 / span 2; white-space: nowrap; }
+.call-evidence .product-links__meta { grid-column: 1; }
+.call-info { gap: 8px; }
+.call-info > h3 { display: none; }
+.call-info .call-sessions { gap: 6px; padding: 0; }
+.call-info .call-session { flex: 0 1 auto; padding: 4px 10px; border-radius: 999px; min-height: 0; }
+.call-info .call-session strong { font-size: 12px; }
+.call-info .call-session small { font-size: 11px; }
+.call-info .call-session span:last-child { display: flex; gap: 6px; align-items: baseline; }
+.call-info .call-session .live-dot { margin-top: 0; }
+.call-transcript-pane > .call-info { max-height: none; overflow: visible; padding-bottom: 10px; }
+.call-transcript-pane > .call-info .call-known > summary { padding: 6px 12px; }
+@media (max-width: 760px) {
+  .call-evidence > .evidence-details { grid-column: 1; grid-row: auto; }
+}
+/* Room to read: the workspace is no longer squeezed into one screen (the chat had 160px of messages at 1440×900).
+   The evidence takes about half a screen, the chat about a whole one, and the page scrolls between them; the queue
+   runs down the left of both. */
+.call-grid {
+  height: auto;
+  grid-template-rows: clamp(340px, 46vh, 520px) clamp(560px, calc(100vh - 120px), 900px);
+}
+.call-queue { position: static; height: 100%; max-height: 100%; }
+.call-transcript-pane { height: 100%; }
+.call-transcript-pane > .call-turns { min-height: 240px; }
+.console-toolbar .check.inline { margin: 0; }
+@media (max-width: 760px) {
+  .call-grid { height: auto; grid-template-rows: auto auto auto; }
+  .call-queue { position: static; max-height: 36vh; }
+  .call-evidence { max-height: 60vh; }
+  .call-transcript-pane { height: auto; min-height: max(620px, 85vh); }
+}

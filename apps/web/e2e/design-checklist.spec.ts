@@ -68,14 +68,14 @@ test.afterEach(async ({ page }) => {
 for (const width of [320, 390, 768, 1440]) {
   test(`priority routes fit ${width}px in light and dark themes`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ["/", "/danh-muc/gia-dung", "/san-pham/FIXTURE-AIR", "/gio-hang", "/thanh-toan", "/don-hang", "/calls", "/ban-hang?tab=orders"]) {
+    for (const path of ["/", "/danh-muc/gia-dung", "/san-pham/FIXTURE-AIR", "/gio-hang", "/thanh-toan", "/don-hang", "/calls", "/ban-hang/don-hang"]) {
       await page.goto(path);
       await expect(page.locator("h1")).toBeVisible();
       await expect(page.locator(".s-skeleton, .s-skeleton-block")).toHaveCount(0);
       for (const theme of ["light", "dark"]) {
         await page.evaluate(theme => document.documentElement.dataset.theme = theme, theme);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} / ${theme} / ${width}px`).toBe(true);
-        if ((width === 390 && ["/gio-hang", "/thanh-toan"].includes(path)) || (width === 1440 && ["/", "/ban-hang?tab=orders"].includes(path))) await page.screenshot({ path: test.info().outputPath(`${path.replace(/[^a-z]/gi, "") || "home"}-${width}-${theme}.png`), fullPage: true });
+        if ((width === 390 && ["/gio-hang", "/thanh-toan"].includes(path)) || (width === 1440 && ["/", "/ban-hang/don-hang"].includes(path))) await page.screenshot({ path: test.info().outputPath(`${path.replace(/[^a-z]/gi, "") || "home"}-${width}-${theme}.png`), fullPage: true });
       }
     }
   });
@@ -200,7 +200,7 @@ test("checkout guides required steps, focuses OTP and guards duplicate submissio
 });
 
 test("staff can open order details with the keyboard and filter by a labelled field", async ({ page }) => {
-  await page.goto("/ban-hang?tab=orders");
+  await page.goto("/ban-hang/don-hang");
   const disclosure = page.getByRole("button", { name: /^Chi tiết đơn/ });
   await disclosure.focus();
   await page.keyboard.press("Enter");

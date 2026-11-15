@@ -63,6 +63,8 @@ ZALO_WEBHOOK_INSECURE=0
 
 **Trên máy chủ cloud** (demo khi chưa có OA): mock chạy sau Caddy tại `https://DOMAIN/zalo-mock/`, có mật khẩu. Trong `.env`: `ZALO_MOCK_URL=http://zalo-mock:8090`, `ZALO_MOCK_PASSWORD=<12+ ký tự>` và các khóa `mock-…` ở trên (không cần `ZALO_OPENAPI_URL`), rồi `docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml --profile zalo-mock up -d`. Trình duyệt hỏi mật khẩu (tên đăng nhập bất kỳ). Bỏ `ZALO_MOCK_URL` thì shop gửi tin tới Zalo thật.
 
+**Trên AWS** (Terraform `infra/terraform/aws`): cùng địa chỉ `https://DOMAIN/zalo-mock/`. Bật bằng biến GitHub `ZALO_MOCK_ENABLED=true` và `ZALO_MOCK_PASSWORD` trong secret; xem [aws-terraform-cicd.md, mục 7b](deployment/aws-terraform-cicd.md#7b-demo-zalo-khi-chưa-có-official-account-zalo-mock). Sau ALB, mock chạy với `--base-path /zalo-mock`, vì ALB không cắt tiền tố như Caddy.
+
 Mock kiểm tra như Zalo: access token (`-216`), định dạng và độ dài tin, tối đa 2000 ký tự (`-201`), người nhận có tồn tại (`-213`) và đã nhắn OA trong 7 ngày qua (`-230`). Tin bị từ chối hiện thành dòng cảnh báo trên trang chat, và backend ghi `failed` trong nhật ký. Nếu `.env` có `ZALO_APP_SECRET` và `ZALO_REFRESH_TOKEN`, việc làm mới token cũng đi qua mock. **Không đặt `ZALO_OPENAPI_URL`/`ZALO_OAUTH_URL` khi chạy thật.**
 
 ### Kết nối OA thật

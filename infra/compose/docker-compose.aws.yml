@@ -1,5 +1,6 @@
-# AWS, phase 2 (docs/deployment/aws-plan.md, section 3): the same stack on every EC2 of the Auto Scaling group,
-# behind an ALB, with RDS for PostgreSQL and EFS for the agent's shared files. The instance's user data
+# AWS, phase 2 (docs/deployment/aws-plan.md, section 3): the same stack on the EC2 of the Auto Scaling group,
+# behind an ALB, with EFS for the agent's shared files. PostgreSQL is, by default, a container on the one instance
+# (Terraform use_rds = false, profile local-database), or RDS (use_rds = true). The instance's user data
 # (infra/terraform/aws/templates/user_data.sh.tftpl) writes .env and runs:
 #
 #   docker compose -f docker-compose.yml -f docker-compose.aws.yml pull
@@ -7,8 +8,9 @@
 #
 # What differs from the one-server cloud file (docker-compose.cloud.yml):
 # - no caddy: the ALB holds TLS (ACM) and routes /api/* to the gateway, the rest to web; only those two publish a port;
-# - no postgres: DATABASE_URL points at RDS. Migrations and the catalog seed run once per release as an ECS task
-#   (.github/workflows/deploy-aws.yml), not on each instance;
+# - postgres on the EBS data volume, or none (RDS). Migrations and the catalog seed (catalogue, BTC CRM customers
+#   and their orders) run once per release: on the instance before `up`, or with RDS as an ECS task
+#   (.github/workflows/deploy-aws.yml); the agent's memory seed (agent-seed) runs once per release from the user data;
 # - images come from ECR at one immutable tag (IMAGE_TAG), so every instance runs the same release; nothing is built;
 # - skills, improvement state and knowledge versions live on EFS (EFS_DIR), shared by every instance and the weekly
 #   improvement task; the embedding and voice weights stay on the instance's disk (voice-models);
@@ -24,7 +26,9 @@ x-logging: &logging
 
 # Merged over the development defaults of docker-compose.yml's x-runtime environment.
 x-secrets: &secrets
-  DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL (RDS, sslmode=require)}
+  # The postgres container (postgresql+psycopg://postgres:<POSTGRES_PASSWORD>@postgres:5432/app_db), or RDS with
+  # sslmode=require.
+  DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
   APP_SECRET: ${APP_SECRET:?set APP_SECRET (changing it later makes stored PII unreadable)}
   ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY (a Fernet key)}
   ENVIRONMENT: ${ENVIRONMENT:-production}
@@ -32,14 +36,36 @@ x-secrets: &secrets
   AGENT_TOKEN: ${AGENT_TOKEN:?set AGENT_TOKEN}
   SELLER_TOKEN: ${SELLER_TOKEN:?set SELLER_TOKEN}
   DEVELOPER_TOKEN: ${DEVELOPER_TOKEN:?set DEVELOPER_TOKEN}
+  # The repository's local demo password never reaches AWS (the seed runs as the ops task, in production).
+  DEMO_CUSTOMER_PASSWORD: ""
 
 services:
-  # RDS replaces it; the profile keeps it from ever starting.
+  # Terraform's use_rds = false (the default): the user data sets COMPOSE_PROFILES=local-database, and postgres runs
+  # here with its files on the EBS data volume (PG_DATA_DIR). use_rds = true: RDS replaces it and it never starts.
   postgres:
     profiles: ["local-database"]
-  # Run once per release by the deploy workflow, as an ECS task.
+    volumes: !override
+      - ${PG_DATA_DIR:-/mnt/data/postgres}:/var/lib/postgresql/data
+    restart: unless-stopped
+    logging: *logging
+  # Migrations, the catalogue and the BTC customers (scripts/seed/catalog.py). use_rds: once per release by the
+  # deploy workflow, as the ECS ops task. Otherwise: by the user data, against the postgres above, before `up`.
   seed:
     profiles: ["release-task"]
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-backend-common:${IMAGE_TAG}
+    environment: *secrets
+    logging: *logging
+  # The BTC customers' earlier calls on the agent's memory (docker-compose.yml). Not started by `up`: the user data
+  # runs it once per release for the whole group (lock and marker on EFS), when the release carries
+  # agent-seed.tar.gz (data/dev/scenarios and each call_1.json, unpacked into ./data/dev, the paths the base mounts).
+  agent-seed:
+    profiles: ["agent-seed"]
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-ai-agent:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !reset {}
+    logging: *logging
 
   redis:
     restart: unless-stopped
@@ -126,9 +152,14 @@ services:
       ASR_API_KEY: ${ASR_API_KEY:-}
       HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:?set HOTLINE_BRIDGE_KEY}
       SHOP_PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+      # Never an unsigned webhook. Replies go to Zalo, or to the demo mock when the user data set ZALO_MOCK_URL
+      # (Terraform zalo_mock_enabled).
       ZALO_WEBHOOK_INSECURE: "0"
-      ZALO_OPENAPI_URL: ""
-      ZALO_OAUTH_URL: ""
+      ZALO_OPENAPI_URL: ${ZALO_MOCK_URL:-}
+      ZALO_OAUTH_URL: ${ZALO_MOCK_URL:-}
+      # No Airflow on AWS: the weekly round runs on EventBridge + Fargate (aws-plan.md 3.7), so /admin's
+      # "Pipeline cải tiến (Airflow)" shows it as off. Never inherit an Airflow address from a local .env.
+      AIRFLOW_URL: ""
     volumes: !override
       - voice-models:/app/models
       # EFS, mounted on the instance by its user data; the same directories the weekly improvement task mounts.
@@ -159,6 +190,37 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+  # The Zalo demo without an Official Account (Terraform zalo_mock_enabled; profile zalo-mock, set by the user
+  # data): https://DOMAIN/zalo-mock/, behind ZALO_MOCK_PASSWORD. The ALB keeps the /zalo-mock prefix, hence
+  # --base-path. Its files (scripts/dev, the CRM's Zalo users) come with the release (zalo-mock.tar.gz).
+  zalo-mock:
+    profiles: ["zalo-mock"]
+    image: python:3.12-slim
+    working_dir: /app
+    command: ["python", "-u", "scripts/dev/zalo_mock.py", "--host", "0.0.0.0", "--port", "8090", "--no-browser",
+              "--require-password", "--base-path", "/zalo-mock",
+              "--webhook", "http://api-gateway:8000/api/channels/zalo/webhook"]
+    environment:
+      PYTHONUTF8: "1"
+      ZALO_MOCK_PASSWORD: ${ZALO_MOCK_PASSWORD:-}
+      ZALO_MOCK_URL: ${ZALO_MOCK_URL:-http://zalo-mock:8090}
+      ZALO_OA_NAME: ${ZALO_OA_NAME:-}
+      ZALO_APP_ID: ${ZALO_APP_ID:-mock-app}
+      ZALO_OA_ID: ${ZALO_OA_ID:-mock-oa}
+      ZALO_OA_SECRET_KEY: ${ZALO_OA_SECRET_KEY:-mock-oa-secret}
+      ZALO_ACCESS_TOKEN: ${ZALO_ACCESS_TOKEN:-mock-access-token}
+      ZALO_APP_SECRET: ${ZALO_APP_SECRET:-}
+      ZALO_REFRESH_TOKEN: ${ZALO_REFRESH_TOKEN:-}
+      ZALO_OPENAPI_URL: ${ZALO_MOCK_URL:-http://zalo-mock:8090}
+      ZALO_OAUTH_URL: ${ZALO_MOCK_URL:-http://zalo-mock:8090}
+    volumes:
+      - ./scripts/dev:/app/scripts/dev:ro
+      - ./apps/ai-agent-service/data/btc/catalog:/app/apps/ai-agent-service/data/btc/catalog:ro
+    ports:
+      - "8090:8090"
     restart: unless-stopped
     logging: *logging
 

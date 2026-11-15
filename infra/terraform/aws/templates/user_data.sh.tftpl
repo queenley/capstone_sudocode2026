@@ -52,6 +52,56 @@ EFS_DIR=$EFS
 DOMAIN=${domain}
 ENV
 
+# --- PostgreSQL in a container (use_rds = false): its files on the EBS data volume -----------------------------
+DATA_VOLUME="${data_volume_id}"
+if [ -n "$DATA_VOLUME" ]; then
+  # The replaced instance releases the volume as it terminates: wait for it, then attach it here.
+  for _ in $(seq 1 90); do
+    state=$(aws ec2 describe-volumes --region "$REGION" --volume-ids "$DATA_VOLUME" --query 'Volumes[0].State' --output text)
+    attached=$(aws ec2 describe-volumes --region "$REGION" --volume-ids "$DATA_VOLUME" --query 'Volumes[0].Attachments[0].InstanceId' --output text)
+    [ "$attached" = "$INSTANCE_ID" ] && break
+    if [ "$state" = available ]; then
+      aws ec2 attach-volume --region "$REGION" --volume-id "$DATA_VOLUME" --instance-id "$INSTANCE_ID" --device /dev/sdf >/dev/null
+    fi
+    sleep 10
+  done
+  # Nitro instances name it by the volume id (nvme); older ones /dev/xvdf.
+  SERIAL=$(echo "$DATA_VOLUME" | tr -d -)
+  DEVICE=""
+  for _ in $(seq 1 60); do
+    for candidate in "/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_$SERIAL" /dev/xvdf /dev/sdf; do
+      [ -b "$candidate" ] && DEVICE=$(readlink -f "$candidate") && break 2
+    done
+    sleep 5
+  done
+  [ -n "$DEVICE" ] || { echo "Data volume $DATA_VOLUME did not attach"; exit 1; }
+  blkid "$DEVICE" >/dev/null || mkfs.xfs "$DEVICE"  # a new, empty volume only
+  mkdir -p /mnt/data
+  UUID=$(blkid -s UUID -o value "$DEVICE")
+  grep -q "$UUID" /etc/fstab || echo "UUID=$UUID /mnt/data xfs defaults,nofail 0 2" >> /etc/fstab
+  mountpoint -q /mnt/data || mount /mnt/data
+  mkdir -p /mnt/data/postgres
+  # The postgres service (profile local-database in docker-compose.aws.yml) on this volume.
+  PROFILES="local-database"
+  echo "PG_DATA_DIR=/mnt/data/postgres" >> .env
+fi
+
+# --- The Zalo demo (zalo_mock_enabled): https://DOMAIN/zalo-mock/ ---------------------------------------------
+ZALO_MOCK_TG="${zalo_mock_tg}"
+if [ -n "$ZALO_MOCK_TG" ]; then
+  aws s3 cp --region "$REGION" "s3://${release_bucket}/releases/$TAG/zalo-mock.tar.gz" /tmp/zalo-mock.tar.gz
+  tar -xzf /tmp/zalo-mock.tar.gz -C "$APP" && rm -f /tmp/zalo-mock.tar.gz
+  chmod -R a+rX "$APP/scripts" "$APP/apps"
+  # The shop and the mock must agree on the OA's keys: the mock's when the secret has none of its own.
+  for pair in ZALO_APP_ID=mock-app ZALO_OA_ID=mock-oa ZALO_OA_SECRET_KEY=mock-oa-secret ZALO_ACCESS_TOKEN=mock-access-token; do
+    grep -q "^$${pair%%=*}=" .env || echo "$pair" >> .env
+  done
+  grep -q '^ZALO_MOCK_URL=' .env || echo "ZALO_MOCK_URL=http://zalo-mock:8090" >> .env
+  grep -q '^ZALO_MOCK_PASSWORD=' .env || echo "ZALO_MOCK_PASSWORD missing from the secret: the mock will not start."
+  PROFILES="$${PROFILES:+$PROFILES,}zalo-mock"
+fi
+[ -n "$${PROFILES:-}" ] && echo "COMPOSE_PROFILES=$PROFILES" >> .env
+
 aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "${ecr_registry}"
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.aws.yml"
 
@@ -65,5 +115,77 @@ flock "$EFS/.seed.lock" bash -c "
 
 # asr-service runs only with ASR_LOCAL=1, so its image may not exist: a missing image is not an error here.
 $COMPOSE pull --ignore-pull-failures
+if [ -n "$DATA_VOLUME" ]; then
+  # What the ops task does against RDS, here against this instance's postgres: migrate, then the catalogue and the
+  # BTC customers (scripts/seed/catalog.py). Safe to run again; before the services, which do not migrate in
+  # production.
+  # --profile replaces COMPOSE_PROFILES of .env: name both, so seed sees postgres.
+  SEED="$COMPOSE --profile local-database --profile release-task"
+  $SEED pull seed
+  $SEED up -d --wait postgres redis
+  $SEED run --rm seed
+fi
 $COMPOSE up -d --no-build
 echo "Release $TAG started on $INSTANCE_ID"
+if [ -n "$ZALO_MOCK_TG" ]; then
+  aws elbv2 register-targets --region "$REGION" --target-group-arn "$ZALO_MOCK_TG" --targets "Id=$INSTANCE_ID,Port=8090"
+fi
+
+# --- Nightly pg_dump to S3 (use_rds = false), 01:30 in Viet Nam; kept backup_retention_days ------------------
+if [ -n "$DATA_VOLUME" ]; then
+  cat > /usr/local/bin/telesales-pg-dump <<'DUMP'
+#!/bin/bash
+set -euo pipefail
+cd /opt/telesales
+key="backups/app_db-$(date -u +%Y-%m-%dT%H%M).dump"
+docker compose -f docker-compose.yml -f docker-compose.aws.yml exec -T postgres pg_dump -U postgres -Fc app_db \
+  | aws s3 cp --region "${region}" - "s3://${release_bucket}/$key"
+echo "pg_dump -> s3://${release_bucket}/$key"
+DUMP
+  chmod 700 /usr/local/bin/telesales-pg-dump
+  cat > /etc/systemd/system/telesales-pg-dump.service <<'UNIT'
+[Unit]
+Description=pg_dump of app_db to S3
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/telesales-pg-dump
+UNIT
+  cat > /etc/systemd/system/telesales-pg-dump.timer <<'UNIT'
+[Unit]
+Description=Nightly pg_dump of app_db
+[Timer]
+OnCalendar=*-*-* 18:30:00 UTC
+Persistent=true
+[Install]
+WantedBy=timers.target
+UNIT
+  systemctl daemon-reload
+  systemctl enable --now telesales-pg-dump.timer
+fi
+
+# --- The agent's memory of the BTC customers' earlier calls (agent-seed), once per release for the group ---------
+# Only when the deploy workflow published agent-seed.tar.gz (SEED_AGENT_MEMORY). In the background: it waits for the
+# agent to be healthy (up to 30 minutes), and the boot is done without it. Log: /var/log/telesales-agent-seed.log.
+if aws s3 cp --region "$REGION" "s3://${release_bucket}/releases/$TAG/agent-seed.tar.gz" /tmp/agent-seed.tar.gz; then
+  tar -xzf /tmp/agent-seed.tar.gz -C "$APP" && rm -f /tmp/agent-seed.tar.gz
+  # umask 077 above: the container runs as "app" (uid 1000) and reads these through a bind mount.
+  chmod -R a+rX "$APP/data"
+  cat > "$APP/agent-seed.sh" <<'SEED'
+#!/bin/bash
+# $1: the release, $2: the EFS mount. Run under a lock on EFS; the marker keeps the other instances from repeating it.
+set -uo pipefail
+cd /opt/telesales
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.aws.yml"
+[ -e "$2/.agent-seed-$1" ] && { echo "agent memory already seeded for $1"; exit 0; }
+for _ in $(seq 1 120); do
+  status=$(docker inspect -f '{{.State.Health.Status}}' "$($COMPOSE ps -q ai-agent-service)" 2>/dev/null || true)
+  [ "$status" = healthy ] && break
+  sleep 15
+done
+$COMPOSE --profile agent-seed run --rm --no-deps agent-seed && touch "$2/.agent-seed-$1"
+SEED
+  setsid nohup flock "$EFS/.agent-seed.lock" bash "$APP/agent-seed.sh" "$TAG" "$EFS" \
+    >> /var/log/telesales-agent-seed.log 2>&1 < /dev/null &
+else
+  echo "No agent-seed.tar.gz in release $TAG: the agent's memory is not seeded."
+fi

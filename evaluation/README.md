@@ -96,6 +96,8 @@ python evaluation/rag_offline.py
 python run_eval.py --asr-package /absolute/path/package --asr-unit segments --only CLIP_ID --asr-transcribe --asr-model zipformer-30m --out evaluation/runs/asr-smoke-new
 # Rubric judge BTC trên một run đã có (tốn phí judge, không chạy lại agent); hoặc thêm --judge khi chạy
 python run_eval.py --judge-run evaluation/runs/<run> --out evaluation/runs/<run>-judge
+# Chỉ chấm một mẫu (vd. 20 SCN-GEN + 10 SCN-ADV trải đều persona): script in sẵn lệnh --judge-run kèm --only
+python scripts/evaluation/judge_sample.py evaluation/runs/<run> --gen 20 --adv 10
 # Bốc ≥20 cặp (cuộc gọi, tiêu chí) thành phiếu chấm tay, không gọi model; người chấm điền sheet.csv
 python run_eval.py --judge-sample evaluation/runs/<run>-judge
 # Độ đồng thuận người–judge: % và Cohen's kappa; kappa < 0,6 thì phân tích lỗi

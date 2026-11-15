@@ -1,4 +1,4 @@
-import Workspace from "@/features/workspace";
+import Workspace from "@/features/developer/workspace";
 import { notFound } from "next/navigation";
 export default async function RolePage({
   params,

@@ -60,6 +60,11 @@ resource "aws_vpc_endpoint" "s3" {
   tags              = { Name = "${local.prefix}-s3" }
 }
 
+# The instance ports the ALB forwards to; 8090 only with the Zalo demo (alb.tf).
+locals {
+  alb_ports = merge({ web = 3000, gateway = 8000 }, var.zalo_mock_enabled ? { zalo-mock = 8090 } : {})
+}
+
 # --- Security groups -----------------------------------------------------------------------------------------
 
 resource "aws_security_group" "alb" {
@@ -80,7 +85,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "alb" {
-  for_each                     = { web = 3000, gateway = 8000 }
+  for_each                     = local.alb_ports
   security_group_id            = aws_security_group.alb.id
   referenced_security_group_id = aws_security_group.app.id
   ip_protocol                  = "tcp"
@@ -97,7 +102,7 @@ resource "aws_security_group" "app" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "app_from_alb" {
-  for_each                     = { web = 3000, gateway = 8000 }
+  for_each                     = local.alb_ports
   security_group_id            = aws_security_group.app.id
   referenced_security_group_id = aws_security_group.alb.id
   ip_protocol                  = "tcp"

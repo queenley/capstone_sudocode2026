@@ -164,3 +164,335 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- the admin's own look (taste-skill's rules for an app page) ----------
+   One button pair: the brand fill for the one action a panel exists for, a quiet outline for the rest, and a
+   red outline only for what removes or refuses. Type at weight 500 at most, one heading scale. Buttons step on
+   hover and press on click; nothing else moves. Everything is scoped to .ad-app: /ban-hang shares sales.css. */
+.ad-app h1,
+.ad-app h2,
+.ad-app h3,
+.ad-app strong {
+  font-weight: 500;
+}
+.ad-app .sl-main h1 {
+  font-size: 20px;
+}
+.ad-app .sl-main h2,
+.ad-app .panel h2,
+.ad-app .panel-title h2 {
+  font-size: 17px;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.ad-app .panel,
+.ad-app .sl-panel {
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: none;
+}
+.ad-app .panel-title {
+  align-items: flex-start;
+}
+.ad-app .panel-title h2 {
+  margin: 4px 0 0;
+}
+
+/* buttons: the step on hover and the press, on every button of the page */
+.ad-app main button {
+  transition: background var(--m-out) var(--ease), color var(--m-out) var(--ease),
+    border-color var(--m-out) var(--ease), transform var(--m-press) var(--ease), box-shadow var(--m-out) var(--ease);
+}
+.ad-app main button:hover:not(:disabled) {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.ad-app main button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.ad-app main button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+.ad-app .ad-btn-quiet,
+.ad-app .ad-btn-danger,
+.ad-app .sl-danger {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+}
+.ad-app .ad-btn-quiet:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+.ad-app .ad-btn-quiet[aria-pressed="true"] {
+  background: var(--brand-soft);
+  border-color: var(--brand-line);
+  color: var(--brand-ink);
+}
+.ad-app .ad-btn-danger,
+.ad-app .sl-danger {
+  border-color: var(--danger-line);
+  color: var(--danger-ink);
+}
+.ad-app .ad-btn-danger:hover:not(:disabled),
+.ad-app .sl-danger:hover:not(:disabled) {
+  background: var(--danger-soft);
+}
+
+/* the notice line: a confirmation in the brand's calm tint, an error stays red */
+.ad-app .sl-alert.ad-ok {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+  border-color: var(--brand-line);
+}
+
+/* Kiến thức: the open questions beside the FAQ list, each as tall as it holds */
+.ad-knowledge {
+  grid-template-columns: minmax(300px, 2fr) 3fr;
+  align-items: start;
+}
+.ad-knowledge > .panel:first-child {
+  position: sticky;
+  top: 96px;
+}
+.ad-app .faq-entry {
+  padding: 16px 0;
+  display: grid;
+  gap: 6px;
+}
+.ad-app .faq-entry > strong {
+  font-size: 15px;
+  color: var(--ink);
+}
+.ad-app .faq-entry > p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.ad-app .faq-entry .hint {
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.ad-app .faq-actions {
+  gap: 6px;
+  margin-top: 4px;
+}
+.ad-app .faq-actions button {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* forms: fields at a reading width, two short ones side by side */
+.ad-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.ad-form {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.ad-form h2 {
+  margin: 0;
+}
+.ad-lead {
+  margin: -8px 0 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.ad-form label {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.ad-form label small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.ad-form input,
+.ad-form select {
+  min-height: 42px;
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+}
+.ad-form > button {
+  justify-self: start;
+}
+.ad-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.ad-rollback {
+  max-width: 560px;
+}
+.ad-rollback header {
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .ad-knowledge {
+    grid-template-columns: 1fr;
+  }
+  .ad-knowledge > .panel:first-child {
+    position: static;
+  }
+}
+@media (max-width: 720px) {
+  .ad-pair {
+    grid-template-columns: 1fr;
+  }
+  .ad-tools {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-app main button,
+  .ad-app main button:hover:not(:disabled),
+  .ad-app main button:active:not(:disabled) {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------- the round's pipeline (features/improvement-pipeline.tsx) ----------
+   Four blocks in a row joined by a line, each with its number, what it does and its state; one colour a state. */
+.ad-pipeline__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.ad-pipeline__head h2 { margin: 0 0 6px; }
+.ad-pipeline__head .ad-lead { margin: 0; max-width: 70ch; }
+.ad-pipeline__ui { white-space: nowrap; color: var(--brand-ink); font-size: 14px; }
+.ad-pipeline__off { margin: 14px 0 0; padding: 12px 14px; border-radius: var(--radius); background: var(--surface-2); font-size: 13px; color: var(--ink-2); }
+.ad-pipeline__off code { font-size: 12px; overflow-wrap: anywhere; }
+.ad-pipeline__controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-top: 14px; }
+.ad-pipeline__controls label { display: grid; gap: 4px; margin: 0; font-size: 13px; color: var(--ink-2); }
+.ad-pipeline__controls input, .ad-pipeline__controls select { margin: 0; min-height: 42px; }
+.ad-pipeline__controls input { width: 120px; }
+.ad-pipeline__meta { margin: 10px 0 0; font-size: 12px; }
+.ad-flow { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; position: relative; }
+.ad-flow__block { position: relative; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); transition: border-color var(--m-out) var(--ease), background var(--m-out) var(--ease); }
+.ad-flow__block:not(:last-child)::after { content: ""; position: absolute; top: 29px; right: -15px; width: 16px; height: 2px; background: var(--line-strong); }
+.ad-flow__step { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; background: var(--surface-3); color: var(--ink-2); }
+.ad-flow__body { display: grid; gap: 4px; min-width: 0; align-content: start; }
+.ad-flow__body strong { font-size: 14px; }
+.ad-flow__body code { font-size: 11px; color: var(--muted); }
+.ad-flow__body p { margin: 2px 0 6px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.ad-flow__state { justify-self: start; font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--surface-3); color: var(--ink-2); }
+.ad-flow__rerun { justify-self: start; margin-top: 6px; min-height: 34px !important; padding: 4px 12px !important; font-size: 12px !important; }
+.ad-flow__block.is-success { border-color: var(--brand-line); }
+.ad-flow__block.is-success .ad-flow__step { background: var(--brand); color: var(--on-brand); }
+.ad-flow__block.is-success .ad-flow__state { background: var(--brand-soft); color: var(--brand-ink); }
+.ad-flow__block.is-running, .ad-flow__block.is-queued, .ad-flow__block.is-up_for_reschedule, .ad-flow__block.is-restarting { border-color: var(--info); background: var(--info-soft); }
+.ad-flow__block.is-running .ad-flow__step, .ad-flow__block.is-up_for_reschedule .ad-flow__step { background: var(--info); color: var(--on-brand); animation: ad-pulse 1.6s var(--ease) infinite; }
+.ad-flow__block.is-running .ad-flow__state, .ad-flow__block.is-up_for_reschedule .ad-flow__state { background: var(--surface); color: var(--info-ink); }
+.ad-flow__block.is-failed, .ad-flow__block.is-upstream_failed { border-color: var(--danger-line); background: var(--danger-soft); }
+.ad-flow__block.is-failed .ad-flow__step { background: var(--danger); color: var(--on-brand); }
+.ad-flow__block.is-failed .ad-flow__state, .ad-flow__block.is-upstream_failed .ad-flow__state { background: var(--surface); color: var(--danger-ink); }
+@keyframes ad-pulse { 50% { box-shadow: 0 0 0 6px rgb(42 120 214 / 0.18); } }
+@media (max-width: 1100px) {
+  .ad-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ad-flow__block:nth-child(2)::after { display: none; }
+}
+@media (max-width: 640px) {
+  .ad-flow { grid-template-columns: 1fr; }
+  .ad-flow__block::after { display: none; }
+  .ad-pipeline__head { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-flow__block .ad-flow__step { animation: none !important; }
+}
+
+/* ---------- the skills (features/skills-admin.tsx) ----------
+   The version in force on top, the skills as cards (a body folds to five lines), the versions beside them. */
+.ad-skills__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.ad-skills__head h2 { margin: 0 0 6px; }
+.ad-skills__head .ad-lead { margin: 0; max-width: 72ch; }
+.ad-skills__version { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.ad-skills__version label { display: grid; gap: 4px; margin: 0; font-size: 13px; color: var(--ink-2); }
+.ad-skills__version select { margin: 0; min-height: 42px; }
+.ad-skills__live { padding: 8px 12px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-ink); font-size: 13px; border: 1px solid var(--brand-line); }
+.ad-skills__grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+.ad-skills__list { display: grid; gap: 12px; }
+.ad-skills__add { justify-self: start; }
+.ad-skill { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px 18px; display: grid; gap: 8px; }
+.ad-skill.is-editing { border-color: var(--brand); }
+.ad-skill > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.ad-skill > header > div:first-child { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ad-skill > header strong { font-family: var(--font-mono); font-size: 14px; }
+.ad-skill__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.ad-skill__actions button { min-height: 34px; padding: 4px 12px; font-size: 13px; }
+.ad-skill__desc { margin: 0; font-size: 14px; color: var(--ink); }
+.ad-skill__done { margin: 0; font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ad-skill__done code { font-size: 11px; padding: 1px 6px; border-radius: 6px; background: var(--surface-3); }
+.ad-skill__body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font-sans); font-size: 13px; line-height: 1.6; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 10px 12px; max-height: calc(1.6em * 5 + 20px); overflow: hidden; position: relative; }
+.ad-skill__body.is-open { max-height: none; }
+.ad-skill .link-button { justify-self: start; font-size: 13px; }
+.ad-tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn-ink); border: 1px solid var(--warn-line); }
+.ad-tag.is-new { background: var(--info-soft); color: var(--info-ink); border-color: var(--line); }
+.ad-tag.is-live { background: var(--brand-soft); color: var(--brand-ink); border-color: var(--brand-line); }
+.ad-skill-form h3 { margin: 0; font-size: 15px; font-weight: 500; }
+.ad-skill-form textarea { margin: 0; font: inherit; }
+.ad-skill-form__body { font-family: var(--font-mono) !important; font-size: 13px !important; line-height: 1.55; }
+.ad-skills__versions { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow-y: auto; }
+.ad-skills__versions h3 { margin: 0 0 10px; font-size: 15px; font-weight: 500; }
+.ad-skills__versions ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ad-skills__versions li { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.ad-skills__versions li.is-active { border-color: var(--brand-line); background: var(--brand-soft); }
+.ad-skills__versions li > div:first-child { display: flex; gap: 8px; align-items: center; }
+.ad-skills__versions small { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.ad-skills__note { font-style: italic; }
+@media (max-width: 1100px) {
+  .ad-skills__grid { grid-template-columns: 1fr; }
+  .ad-skills__versions { position: static; max-height: none; }
+}
+
+/* ---------- the policies (features/policies-admin.tsx) ----------
+   The documents on the left, the sections on the right: search and a filter on top, each section with its code,
+   its title and who may hear it; an internal or retired one is set apart. */
+.ad-policies { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; align-items: start; }
+.ad-policies__docs { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow-y: auto; }
+.ad-policies__docs h2 { margin: 0 0 6px; }
+.ad-policies__docs .ad-lead { margin: 0 0 12px; }
+.ad-policies__docs ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.ad-policies__docs li button { width: 100%; display: grid; gap: 2px; text-align: left; background: transparent; color: var(--ink); border: 1px solid transparent; border-radius: 10px; padding: 8px 10px; min-height: 0; font-weight: 400; transform: none !important; }
+.ad-policies__docs li button:hover { background: var(--surface-2); }
+.ad-policies__docs li button.is-on { background: var(--brand-soft); border-color: var(--brand-line); color: var(--brand-ink); }
+.ad-policies__docs li button span { font-size: 13px; }
+.ad-policies__docs li button small { font-size: 11px; color: var(--muted); }
+.ad-policies__main { display: grid; gap: 14px; min-width: 0; }
+.ad-policies__tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: sticky; top: 76px; z-index: 2; }
+.ad-policies__tools input { flex: 1 1 320px; margin: 0; min-height: 42px; }
+.ad-policies__filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.ad-chip { min-height: 34px !important; padding: 4px 12px !important; font-size: 13px !important; border-radius: 999px !important; background: var(--surface) !important; color: var(--ink-2) !important; border: 1px solid var(--line-strong) !important; }
+.ad-chip.is-on { background: var(--brand-soft) !important; color: var(--brand-ink) !important; border-color: var(--brand-line) !important; }
+.ad-policy-doc { display: grid; gap: 4px; }
+.ad-policy-doc > h2, .ad-policy-doc__head h2 { margin: 0; }
+.ad-policy-doc__head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.ad-policy-doc__head code { font-size: 11px; color: var(--muted); }
+.ad-policy { border-top: 1px solid var(--line); padding: 14px 0 6px; scroll-margin-top: 140px; }
+.ad-policy > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.ad-policy > header code { font-size: 12px; padding: 1px 7px; border-radius: 6px; background: var(--surface-3); color: var(--ink-2); }
+.ad-policy > header strong { font-size: 15px; }
+.ad-policy.is-internal { background: linear-gradient(90deg, var(--warn-soft), transparent 40%); padding-left: 10px; border-radius: 6px; }
+.ad-policy.is-retired { opacity: .7; }
+.ad-tag.is-old { background: var(--surface-3); color: var(--muted); border-color: var(--line); }
+.ad-policy__text { display: grid; gap: 4px; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.ad-policy__text p { margin: 0; }
+.ad-policy__text p.is-item { padding-left: 16px; position: relative; }
+.ad-policy__text p.is-item::before { content: ""; position: absolute; left: 4px; top: .7em; width: 5px; height: 5px; border-radius: 50%; background: var(--brand); }
+.ad-policy__meta { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+@media (max-width: 1000px) {
+  .ad-policies { grid-template-columns: 1fr; }
+  .ad-policies__docs { position: static; max-height: none; }
+  .ad-policies__tools { position: static; }
+}
+.ad-policy > header, .ad-policy-doc > .ad-policy-doc__head { justify-content: flex-start; height: auto; padding: 0; border: 0; }
+.ad-policy-doc__head { justify-content: space-between !important; }

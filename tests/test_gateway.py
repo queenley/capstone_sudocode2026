@@ -132,3 +132,11 @@ def test_real_redis_rate_counter_is_bounded_and_expires(gateway, monkeypatch):
         for key in redis.scan_iter(prefix + ":*"):
             redis.delete(key)
         redis.close()
+
+
+def test_a_web_chat_voice_message_goes_to_the_agent(gateway):
+    module, _ = gateway
+    conversation = f"api/conversations/{uuid4()}"
+    assert module.upstream_for(f"{conversation}/voice-message") == module.AI_AGENT_SERVICE_URL
+    assert module.upstream_for(f"{conversation}/stream") == module.AI_AGENT_SERVICE_URL
+    assert module.upstream_for(f"{conversation}/messages") == module.SALES_SERVICE_URL

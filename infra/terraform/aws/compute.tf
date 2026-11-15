@@ -1,6 +1,7 @@
 # EC2 Auto Scaling group: every instance runs the whole compose stack (infra/compose/docker-compose.aws.yml) at the
-# release in SSM. Instances keep nothing: state is in RDS and EFS, so a broken instance is replaced, and a release is
-# an instance refresh (one instance at a time, the ALB sending traffic only to healthy ones).
+# release in SSM. Instances keep nothing: state is in EFS and in PostgreSQL (by default a container whose files are
+# on an EBS data volume the instance attaches at boot, data.tf; with use_rds, RDS), so a broken instance is replaced,
+# and a release is an instance refresh behind the ALB.
 data "aws_ssm_parameter" "al2023" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
@@ -62,6 +63,40 @@ data "aws_iam_policy_document" "instance" {
     actions   = ["elasticfilesystem:ClientMount", "elasticfilesystem:ClientWrite"]
     resources = [aws_efs_file_system.main.arn]
   }
+  # use_rds = false: attach the database's volume at boot, and write the nightly pg_dump.
+  dynamic "statement" {
+    for_each = var.use_rds ? [] : [1]
+    content {
+      sid       = "DataVolume"
+      actions   = ["ec2:AttachVolume"]
+      resources = [aws_ebs_volume.data[0].arn, "arn:${local.partition}:ec2:${var.region}:${local.account_id}:instance/*"]
+    }
+  }
+  dynamic "statement" {
+    for_each = var.use_rds ? [] : [1]
+    content {
+      sid       = "DescribeVolumes"
+      actions   = ["ec2:DescribeVolumes"]
+      resources = ["*"] # Describe* takes no resource
+    }
+  }
+  # zalo_mock_enabled: the instance registers itself with the mock's target group (alb.tf).
+  dynamic "statement" {
+    for_each = var.zalo_mock_enabled ? [1] : []
+    content {
+      sid       = "ZaloMockTarget"
+      actions   = ["elasticloadbalancing:RegisterTargets"]
+      resources = [aws_lb_target_group.zalo_mock[0].arn]
+    }
+  }
+  dynamic "statement" {
+    for_each = var.use_rds ? [] : [1]
+    content {
+      sid       = "PgDump"
+      actions   = ["s3:PutObject", "s3:GetObject"]
+      resources = ["${aws_s3_bucket.releases.arn}/backups/*"]
+    }
+  }
 }
 
 resource "aws_iam_role_policy" "instance" {
@@ -113,6 +148,8 @@ resource "aws_launch_template" "app" {
     log_group         = aws_cloudwatch_log_group.app.name
     efs_id            = aws_efs_file_system.main.id
     compose_version   = var.docker_compose_version
+    data_volume_id    = var.use_rds ? "" : aws_ebs_volume.data[0].id
+    zalo_mock_tg      = var.zalo_mock_enabled ? aws_lb_target_group.zalo_mock[0].arn : ""
   }))
 
   tag_specifications {
@@ -122,11 +159,12 @@ resource "aws_launch_template" "app" {
 }
 
 resource "aws_autoscaling_group" "app" {
-  name                      = "${local.prefix}-app"
-  min_size                  = var.asg_min
-  max_size                  = var.asg_max
-  desired_capacity          = var.asg_min
-  vpc_zone_identifier       = aws_subnet.public[*].id
+  name             = "${local.prefix}-app"
+  min_size         = var.asg_min
+  max_size         = var.asg_max
+  desired_capacity = var.asg_min
+  # use_rds = false: the data volume's AZ only (an EBS volume attaches within its AZ).
+  vpc_zone_identifier       = var.use_rds ? aws_subnet.public[*].id : [aws_subnet.public[0].id]
   target_group_arns         = [aws_lb_target_group.web.arn, aws_lb_target_group.gateway.arn]
   health_check_type         = var.health_check_type
   health_check_grace_period = var.health_check_grace_seconds
@@ -137,11 +175,13 @@ resource "aws_autoscaling_group" "app" {
     version = aws_launch_template.app.latest_version
   }
 
-  # A changed launch template (AMI, user data, size) is rolled out like a release: one instance at a time.
+  # A changed launch template (AMI, user data, size) is rolled out like a release: one instance at a time. With
+  # PostgreSQL on the instance's data volume, the old instance goes first (min 0% healthy): the volume must be
+  # free before the new one attaches it, so a release is a few minutes down.
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      min_healthy_percentage = 50
+      min_healthy_percentage = var.use_rds ? 50 : 0
       instance_warmup        = var.health_check_grace_seconds
     }
   }
@@ -151,5 +191,9 @@ resource "aws_autoscaling_group" "app" {
 
   lifecycle {
     ignore_changes = [desired_capacity]
+    precondition {
+      condition     = var.use_rds || var.asg_max == 1
+      error_message = "use_rds = false keeps PostgreSQL on one instance's volume: asg_min and asg_max must be 1."
+    }
   }
 }

@@ -27,8 +27,9 @@ import os
 
 REPO = os.environ.get("IMPROVE_REPO", "/opt/telesales")
 PYTHON = os.environ.get("IMPROVE_PYTHON", "/opt/agent-venv/bin/python")
-#: The ISO week the run is for: the week the scheduled interval ends in (the Monday it fires).
-WEEK = "{{ data_interval_end.strftime('%G-W%V') }}"
+#: The ISO week the run is for: the one a run started by hand names (/admin sends {"week": "2026-W46"}), else the
+#: week the scheduled interval ends in (the Monday it fires).
+WEEK = "{{ dag_run.conf.get('week') or data_interval_end.strftime('%G-W%V') }}"
 
 LEARN = ["data/reflection/budget/learn/scenarios"]
 FROZEN = ["data/reflection/budget/frozen/scenarios", "data/gap-loop/frozen/scenarios"]

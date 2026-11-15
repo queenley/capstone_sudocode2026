@@ -38,8 +38,11 @@ def _rows(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-async def judge_run(run: Path, out: Path, judge: Any) -> int:
-    """Judge every call of *run*'s traces into *out*; the run itself is not changed. 0 when every call was judged."""
+async def judge_run(run: Path, out: Path, judge: Any, *, only: Iterable[str] = ()) -> int:
+    """Judge every call of *run*'s traces into *out*; the run itself is not changed. 0 when every call was judged.
+
+    *only*, when given, limits the judge to those scenarios: a sample, to spend less on the judge.
+    """
     from .cli import Layout, _write_json, prepare_output
 
     try:
@@ -47,11 +50,18 @@ async def judge_run(run: Path, out: Path, judge: Any) -> int:
         if out.resolve().is_relative_to(run.resolve()) or run.resolve().is_relative_to(out.resolve()):
             raise ValueError("Judge output must be separate from the source run")
         cohort, _ = scenarios.load(scenarios_dir)
+        chosen = set(only)
+        if chosen:
+            missing = sorted(chosen - {item.scenario_id for item in cohort})
+            if missing:
+                raise ValueError(f"Not in the run's scenarios: {', '.join(missing)}")
+            cohort = [item for item in cohort if item.scenario_id in chosen]
         prepare_output(Layout(out, {}))
     except (OSError, ValueError, TypeError, KeyError) as error:
         print(error)
         return 2
-    _write_json(out / "judge-run.json", {"source": str(run), "scenarios": str(scenarios_dir), "status": "INCOMPLETE"})
+    record = {"source": str(run), "scenarios": str(scenarios_dir), **({"only": sorted(chosen)} if chosen else {})}
+    _write_json(out / "judge-run.json", {**record, "status": "INCOMPLETE"})
     everything = []
     for config, path in traces.items():
         judgments = await rubric.judge_calls(judge, cohort, _rows(path), config)
@@ -61,8 +71,7 @@ async def judge_run(run: Path, out: Path, judge: Any) -> int:
     _write_json(out / "judge-summary.json", summary)
     (out / "judge-table.txt").write_text(rubric.table(summary) + "\n", encoding="utf-8")
     complete = all(item.get("status") == "COMPLETE" for item in everything)
-    _write_json(out / "judge-run.json", {"source": str(run), "scenarios": str(scenarios_dir),
-                                        "status": "COMPLETE" if complete else "INCOMPLETE", "summary": summary})
+    _write_json(out / "judge-run.json", {**record, "status": "COMPLETE" if complete else "INCOMPLETE", "summary": summary})
     print(rubric.table(summary))
     return 0 if complete else 1
 

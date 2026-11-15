@@ -2,6 +2,7 @@
 
 Regression suggestions stay outside evaluation datasets and are never approved labels.
 """
+import functools
 import hashlib
 import json
 from pathlib import Path
@@ -56,6 +57,29 @@ def record(question: str, *, call_id: str, turn_id: str, recent: Sequence[str] =
 OUT_OF_DOCUMENTS = "ngoai_pham_vi_tai_lieu"
 
 
+@functools.lru_cache(maxsize=1)
+def _grader() -> Any:
+    return signals.grader()
+
+
+def unanswered(reply: str, *, abstained: bool, out_of_documents: bool = False) -> bool:
+    """Whether a turn is a knowledge gap: the one rule of a live call and of an evaluation run.
+
+    A transfer because the documents do not answer is one. Retrieval abstaining (no passage, or a passage saying
+    there is no information) is one only when the assistant also told the customer it has no information, as the
+    organisers' grader reads that (its ``ABSTAIN_KW``). Retrieval abstains on every turn the documents are not for:
+    "30m2 á em", "Hồ chí minh á", "ok cho chị đặt hàng nay" were answered from the catalogue and the order tools,
+    and a live call recorded each as an open question (2026-11-14), as the evaluation once did with "cảm ơn em".
+    """
+    if out_of_documents:
+        return True
+    if not abstained:
+        return False
+    grader = _grader()
+    said = grader._say_norm(str(reply or ""))
+    return any(grader.said(said, phrase) for phrase in grader.ABSTAIN_KW)
+
+
 def record_from_run(rows: Sequence[Mapping[str, Any]], diagnostics: Sequence[Mapping[str, Any]] = ()) -> int:
     """The questions a finished run could not answer, recorded as a live call records them.
 
@@ -67,7 +91,6 @@ def record_from_run(rows: Sequence[Mapping[str, Any]], diagnostics: Sequence[Map
     recorded as open questions on 2026-11-12. The earlier turns of the call go with it, for :func:`restate_open` to
     resolve "máy này".
     """
-    grader = signals.grader()
     abstained = {(str(d["scenario_id"]), str(d["call"]), int(d["turn"])) for d in diagnostics
                  if d.get("config") in (None, "full") and d.get("turn") is not None
                  and ((d.get("knowledge") or {}).get("abstain") in ("no_match", "absence"))}
@@ -83,8 +106,8 @@ def record_from_run(rows: Sequence[Mapping[str, Any]], diagnostics: Sequence[Map
                               for tool in row.get("tool_calls") or [])
             if not str(row.get("customer_text") or "").strip():
                 continue
-            told = any(grader.said(grader._say_norm(str(row.get("agent_text") or "")), phrase) for phrase in grader.ABSTAIN_KW)
-            if not transferred and not ((scenario, call, int(row.get("turn") or 0)) in abstained and told):
+            if not unanswered(str(row.get("agent_text") or ""), out_of_documents=transferred,
+                              abstained=(scenario, call, int(row.get("turn") or 0)) in abstained):
                 continue
             recent = [str(t.get(key) or "") for t in turns[max(0, index - 2):index] for key in ("customer_text", "agent_text")]
             if record(str(row.get("customer_text") or ""), call_id=f"{scenario}/{call}", turn_id=str(row.get("turn")),

@@ -156,6 +156,8 @@ export type AgentCall = {
   route_reason: string | null;
   mode: "speak" | "copilot";
   customer_id: string | null;
+  /** Not identified in this session, but the number given is this CRM customer's alone: grouped with them. */
+  number_customer_id?: string | null;
   customer_label: string | null;
   brief: { id: string; text: string; sensitive?: boolean }[];
   brief_object: {
@@ -201,6 +203,30 @@ export type AgentCallDetail = AgentCall & {
 /** A cart line sent with a chat message: the cart lives in this browser, so the assistant
  *  only knows it from here. `name` is the product as the shop shows it. */
 export type ChatCartLine = { sku: string; qty: number; name?: string };
+
+/** One voice message as text (POST /api/conversations/{id}/voice-message): 16-bit mono PCM at 16 kHz in, the words
+ *  the recogniser heard out. Only transcribes: the chat sends the customer's voice messages as one turn. */
+export async function transcribeVoice(
+  session: Session,
+  pcm: Int16Array,
+  signal?: AbortSignal,
+): Promise<{ text: string; seconds: number }> {
+  const response = await fetch(`/backend/api/conversations/${session.conversation_id}/voice-message`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/octet-stream",
+      Authorization: "Bearer " + session.conversation_token,
+    },
+    body: new Blob([pcm.slice().buffer], { type: "application/octet-stream" }),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60_000)]) : AbortSignal.timeout(60_000),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok)
+    throw Object.assign(new Error(typeof data.detail === "string" ? data.detail : "Không nhận dạng được tin nhắn thoại."), {
+      status: response.status,
+    });
+  return data;
+}
 
 export async function streamTurn(
   session: Session,

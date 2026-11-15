@@ -124,7 +124,7 @@ def parser() -> argparse.ArgumentParser:
                         help="Run and score only full, in a run directory: for a --profile run of the --report "
                              "ablation, whose Baseline column is the router run's own. Half the model calls.")
     parser.add_argument("--only", action="append", default=[], metavar="SCENARIO_ID",
-                        help="Run only this scenario; repeat for more.")
+                        help="Run only this scenario; repeat for more. With --judge-run: judge only these scenarios' calls.")
     parser.add_argument("--ingest", type=Path, metavar="RUN_DIR",
                         help="Keep a scored run's numbers in the agent's database, for the admin's evaluation "
                              "dashboard. No model call, and the main database, not the *_eval one.")
@@ -337,8 +337,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         out = (args.out or args.judge_sample / "human-review").resolve()
         return judge_agreement.draw(args.judge_sample.resolve(), out, size=args.sample_size)
     if args.judge_run:
-        if args.relabel or args.no_extract or args.config or args.judge or args.provider or args.model or args.only:
-            print("--judge-run judges a finished run's replies; agent, extractor and selection options are not supported")
+        if args.relabel or args.no_extract or args.config or args.judge or args.provider or args.model:
+            print("--judge-run judges a finished run's replies; agent and extractor options are not supported")
             return 2
         from . import judge_agreement
 
@@ -348,7 +348,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except RuntimeError as error:
             print(error)
             return 2
-        return asyncio.run(judge_agreement.judge_run(args.judge_run.resolve(), out, _judge()))
+        return asyncio.run(judge_agreement.judge_run(args.judge_run.resolve(), out, _judge(), only=args.only))
     if args.relabel:
         if args.no_extract or args.judge or args.provider or args.model or args.only:
             print("--relabel runs only the extractor; agent/selection options are not supported (--config is)")

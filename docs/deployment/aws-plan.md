@@ -5,7 +5,7 @@ Trang này là **thiết kế**. Giai đoạn 2 đã có code: Terraform `infra/
 Kế hoạch đi hai giai đoạn, cộng một lộ trình nâng cấp khi cần:
 
 1. **Giai đoạn 1, một EC2 + Docker Compose:** dùng lại nguyên `infra/compose/docker-compose.cloud.yml`. Nhanh nhất để có demo HTTPS.
-2. **Giai đoạn 2, bản gọn:** ALB + 2 EC2 chạy cùng bộ Docker Compose + RDS PostgreSQL + EFS. Mục tiêu: không còn một điểm hỏng, có backup tự động của RDS, đổi version không gián đoạn. Cố ý **không** dùng EKS, WAF, NAT Gateway, ElastiCache, VPC interface endpoint, MWAA: đó là các khoản tính tiền theo giờ dù không có tải, và hệ thống ở cỡ hiện tại chưa cần chúng (mục 3.1).
+2. **Giai đoạn 2, bản gọn:** ALB + EC2 chạy cùng bộ Docker Compose + EFS. **Code hiện mặc định dựng một máy CPU với PostgreSQL trong container** trên một ổ EBS riêng, khoảng 215 USD/tháng (mục 9). Đặt `use_rds = true` để có thiết kế đầy đủ mô tả dưới đây: 2 EC2 + RDS PostgreSQL. Mục tiêu: không còn một điểm hỏng, có backup tự động của RDS, đổi version không gián đoạn. Cố ý **không** dùng EKS, WAF, NAT Gateway, ElastiCache, VPC interface endpoint, MWAA: đó là các khoản tính tiền theo giờ dù không có tải, và hệ thống ở cỡ hiện tại chưa cần chúng (mục 3.1).
 3. **Khi lớn hơn:** bật lại từng phần theo tín hiệu cụ thể (mục 7). Kiến trúc EKS đầy đủ nằm ở đó.
 
 Kiến trúc ứng dụng mà kế hoạch này triển khai: [docs/ai/00-kien-truc.md](../ai/00-kien-truc.md). Cách chạy local và GCP: [README.md](README.md).
@@ -193,7 +193,7 @@ Các khối:
 6. volume `agent-skills`, `agent-improvement` và thư mục `data/kb` của agent là bind mount vào EFS (mục 3.5);
 7. logging driver `awslogs` gửi log thẳng lên CloudWatch Logs, không cần CloudWatch Agent.
 
-**Khởi động máy:** user data của launch template cài Docker và mount EFS. Sau đó nó đọc `TAG` và secret từ SSM Parameter Store / Secrets Manager, ghi ra `.env`, rồi `docker compose pull && docker compose up -d`. Máy mới của ASG tự lên đúng version, không cần ai SSH vào.
+**Khởi động máy:** user data của launch template cài Docker và mount EFS. Sau đó nó đọc `TAG` và secret từ SSM Parameter Store / Secrets Manager, ghi ra `.env`, rồi `docker compose pull && docker compose up -d`. Máy mới của ASG tự lên đúng version, không cần ai SSH vào. Nếu release có `agent-seed.tar.gz`, máy chạy nền `agent-seed` một lần cho cả nhóm, sau khi agent khỏe, để nạp cuộc gọi trước của khách BTC vào bộ nhớ agent ([aws-terraform-cicd.md, mục 2](aws-terraform-cicd.md#dữ-liệu-mẫu-trên-aws)).
 
 **Health check:** ALB kiểm `/health/ready` của gateway (healthcheck mà compose đã dùng; nó kiểm cả identity, sales, commerce) và `/` của web. ASG dùng health check của ELB, nên một máy mà ứng dụng chết sẽ bị thay.
 
@@ -263,7 +263,7 @@ Từng bước, từ bucket state tới release đầu tiên và cách quay lui:
 |---|---|---|
 | Hạ tầng | [infra/terraform/aws](../../infra/terraform/aws/) | viết tay bằng resource của provider AWS 6.x (không dùng module ngoài), để đọc được hết trong một thư mục. Remote state S3 có khóa (`use_lockfile`) |
 | Khởi động máy | [user_data.sh.tftpl](../../infra/terraform/aws/templates/user_data.sh.tftpl) | Amazon Linux 2023, Docker và Compose, mount EFS, đọc release từ SSM, secret từ Secrets Manager, rồi `compose up` |
-| Phát hành | [deploy-aws.yml](../../.github/workflows/deploy-aws.yml) | build và push image theo SHA, dời tag `latest-release`, migrate và seed bằng Fargate task `ops`, ghi release, instance refresh, smoke test |
+| Phát hành | [deploy-aws.yml](../../.github/workflows/deploy-aws.yml) | build và push image theo SHA, dời tag `latest-release`, đưa compose và dữ liệu cho `agent-seed` lên S3, migrate và seed bằng Fargate task `ops`, ghi release, instance refresh, smoke test |
 | Thay hạ tầng | [terraform-aws.yml](../../.github/workflows/terraform-aws.yml) | `plan` trên pull request bằng role chỉ đọc; `apply` chạy tay và cần người duyệt |
 | Quyền | [github.tf](../../infra/terraform/aws/github.tf) | GitHub OIDC, không có access key; ba role: deploy, terraform-plan, terraform-apply |
 | Giám sát | [monitoring.tf](../../infra/terraform/aws/monitoring.tf) | alarm ALB 5xx/4xx/độ trễ, target không khỏe, RDS CPU và dung lượng, Fargate task lỗi, AWS Budgets |
@@ -388,13 +388,21 @@ flowchart TB
 
 ## 9. Chi phí
 
-Chưa ước tính bằng AWS Pricing Calculator cho region và cỡ máy đã chốt. Các khoản theo thứ tự lớn dự kiến:
+Ước lượng theo giá on-demand ở `ap-southeast-1`, 730 giờ mỗi tháng, chưa kiểm bằng AWS Pricing Calculator (sai khoảng ±15%). **Chưa tính phí API model** (OpenAI, theo token), gần như chắc chắn là khoản lớn nhất.
 
-1. API model (tính theo token, không phải AWS). Đây gần như chắc chắn là khoản lớn nhất.
-2. 2 EC2 chạy thường trực; giảm được bằng Savings Plans.
-3. RDS Single-AZ và dung lượng backup.
-4. ALB (theo giờ + theo LCU).
-5. Public IPv4, CloudWatch Logs, EFS, ECR, Fargate của vòng cải tiến (vài giờ mỗi tuần): đều nhỏ.
+| Khoản | Mặc định: 1 máy CPU, Postgres trong container | `use_rds = true`: 2 máy + RDS |
+|---|---|---|
+| EC2 | 1 × `t3.xlarge` ~155 | 2 × `r7i.large` ~230 |
+| PostgreSQL | ổ EBS 30 GB ~3, snapshot ~2, `pg_dump` trên S3 <1 | RDS `db.t4g.medium` + 50 GB ~70 |
+| ALB | ~22 | ~22 |
+| Public IPv4 (máy + ALB) | ~11 | ~15 |
+| EBS gốc (60 GB/máy) | ~6 | ~12 |
+| ECR, CloudWatch, EFS, S3, Secrets, SSM | ~10–15 | ~10–20 |
+| **Tổng/tháng** | **≈ 210–220 USD** | **≈ 360–390 USD** |
+
+- `monthly_budget_usd` mặc định 250, vừa với cấu hình một máy.
+- Giảm thêm: Savings Plan 1 năm cho EC2 (khoảng −30% phần EC2); hoặc tắt máy ngoài giờ demo bằng `aws autoscaling set-desired-capacity --desired-capacity 0` (ổ dữ liệu vẫn còn, chỉ trả tiền lưu trữ, ALB và IPv4 của ALB).
+- GPU cho ASR không nằm trong số trên. Một `g4dn.xlarge` chạy 24/7 khoảng 540 USD/tháng; ASR mặc định (Zipformer 30M int8) chạy được trên CPU.
 
 So với bản EKS cũ, bản gọn bỏ các khoản cố định: control plane EKS, NAT Gateway mỗi AZ, VPC interface endpoint, ElastiCache, WAF, MWAA, và nửa giá RDS (Multi-AZ). Mục 3.1 ghi mỗi khoản và khi nào cần bật lại.
 

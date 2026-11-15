@@ -158,13 +158,18 @@ def main():
             from scripts.seed.btc_catalog import seed_btc
 
             print("BTC catalogue:", seed_btc(session, args.btc))
+            session.commit()
+            from scripts.seed.btc_customers import seed_btc_customers
+
+            # After the catalogue: a CRM order points at its products (SKU-AP-X-2024, kept as discontinued).
+            print("BTC customers:", seed_btc_customers(session, args.btc))
             if args.dataset:
                 from scripts.seed.btc_catalog import apply_images
 
                 print("Product photos:", apply_images(session, args.dataset / "catalog/product_images.json"))
             session.commit()
     print(
-        "Catalog seed complete; customer transcripts and gold labels were not imported into live memory."
+        "Catalog seed complete; the agent's memory of earlier calls is seeded by the agent-seed service."
     )
 
 

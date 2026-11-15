@@ -1,9 +1,14 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import ProductArt from "@/components/product/ProductArt";
 import { money, variantLabel } from "@/lib/catalog";
 import { cart, useCart } from "@/lib/cart";
 import { useCartItems } from "@/lib/cart-items";
+import { useAccount } from "@/lib/account";
+import { awaitsCall, CALL_NOTE, CustomerOrder, isOpen, orderCode, statusLabel } from "@/lib/orders";
+import { customerToken } from "@/lib/session";
+import { api } from "@/services/api";
 
 export default function CartPage() {
   const lines = useCart();
@@ -20,6 +25,7 @@ export default function CartPage() {
         <Link className="s-btn" href="/">
           Tiếp tục mua sắm
         </Link>
+        <OpenOrders />
       </div>
     );
 
@@ -102,5 +108,42 @@ export default function CartPage() {
         </aside>
       </div>
     </div>
+  );
+}
+
+/** A signed-in customer with an empty cart may be looking for what they already ordered: the orders still on their
+ *  way, and which of them the shop will call about before shipping. */
+function OpenOrders() {
+  const { account } = useAccount();
+  const [orders, setOrders] = useState<CustomerOrder[] | null>(null);
+
+  useEffect(() => {
+    const token = customerToken();
+    if (!account || !token) return;
+    api<CustomerOrder[]>("/api/customer/orders", token)
+      .then((all) => setOrders(all.filter(isOpen)))
+      .catch(() => setOrders([]));
+  }, [account]);
+
+  if (!account || !orders?.length) return null;
+  return (
+    <section className="s-open-orders" aria-label="Đơn hàng đang xử lý">
+      <h2>Bạn có {orders.length} đơn đang xử lý</h2>
+      <ul>
+        {orders.slice(0, 3).map((order) => (
+          <li key={order.id}>
+            <span>
+              <b>{orderCode(order)}</b>
+              <small>{order.items.map((i) => `${i.name} × ${i.quantity}`).join(", ")}</small>
+            </span>
+            <span className={`s-status s-status-${awaitsCall(order) ? "call" : order.status}`}>{statusLabel(order)}</span>
+          </li>
+        ))}
+      </ul>
+      {orders.some(awaitsCall) && <p className="s-order-note">{CALL_NOTE}</p>}
+      <Link className="s-link-btn" href="/don-hang">
+        Xem tất cả đơn hàng →
+      </Link>
+    </section>
   );
 }

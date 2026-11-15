@@ -2,44 +2,21 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import VerifyPhone from "@/components/shop/VerifyPhone";
-import TransferInfo, { Transfer } from "@/components/shop/TransferInfo";
+import TransferInfo from "@/components/shop/TransferInfo";
 import { api } from "@/services/api";
 import { money } from "@/lib/catalog";
 import { account, useAccount } from "@/lib/account";
 import { customerToken, forgetConversation, setCustomerToken } from "@/lib/session";
 import { shopContext } from "@/lib/shop-context";
-
-type Order = {
-  id: string;
-  status: string;
-  total: string;
-  discount: string;
-  created_at: string | null;
-  payment_method: "cod" | "bank_transfer";
-  payment_status: string;
-  transfer: Transfer | null;
-  items: {
-    sku_code: string;
-    name: string;
-    quantity: number;
-    unit_price: string;
-    variant: Record<string, unknown>;
-  }[];
-};
-
-const PAYMENT: Record<string, string> = {
-  unpaid: "Thanh toán khi nhận hàng",
-  awaiting_transfer: "Chờ chuyển khoản",
-  paid: "Đã thanh toán",
-  refunded: "Đã hoàn tiền",
-};
-
-const STATUS: Record<string, string> = {
-  confirmed: "Đã xác nhận",
-  cancelled: "Đã hủy",
-  shipping: "Đang giao",
-  delivered: "Đã giao",
-};
+import {
+  awaitsCall,
+  CALL_NOTE,
+  CustomerOrder as Order,
+  ORDER_SOURCE,
+  orderCode,
+  PAYMENT_LABEL,
+  statusLabel,
+} from "@/lib/orders";
 
 export default function OrdersPage() {
   const { account: owner } = useAccount();
@@ -207,7 +184,8 @@ export default function OrdersPage() {
             <article key={order.id} className="s-order">
               <header>
                 <div>
-                  <b>Đơn #{order.id.slice(0, 8).toUpperCase()}</b>
+                  <b>Đơn {orderCode(order)}</b>
+                  {order.source && ORDER_SOURCE[order.source] && <span className="s-muted"> · {ORDER_SOURCE[order.source]}</span>}
                   {order.created_at && (
                     <span className="s-muted">
                       {" "}
@@ -215,8 +193,8 @@ export default function OrdersPage() {
                     </span>
                   )}
                 </div>
-                <span className={`s-status s-status-${order.status}`}>
-                  {STATUS[order.status] || order.status}
+                <span className={`s-status s-status-${awaitsCall(order) ? "call" : order.status}`}>
+                  {statusLabel(order)}
                 </span>
               </header>
               {order.items.map((item) => (
@@ -228,6 +206,7 @@ export default function OrdersPage() {
                   <span>{money(Number(item.unit_price) * item.quantity)}</span>
                 </div>
               ))}
+              {awaitsCall(order) && <p className="s-order-note">{CALL_NOTE}</p>}
               {order.status !== "cancelled" &&
                 order.payment_status === "awaiting_transfer" &&
                 order.transfer && <TransferInfo transfer={order.transfer} />}
@@ -240,14 +219,14 @@ export default function OrdersPage() {
                       ? "Chuyển khoản"
                       : "COD"}
                     {" · "}
-                    {PAYMENT[order.payment_status] || order.payment_status}
+                    {PAYMENT_LABEL[order.payment_status] || order.payment_status}
                   </small>
                 </span>
                 <button
                   className="s-link-btn"
                   onClick={() =>
                     shopContext.openChat(
-                      `Tôi muốn hỏi về đơn hàng #${order.id.slice(0, 8).toUpperCase()}`,
+                      `Tôi muốn hỏi về đơn hàng ${orderCode(order)}`,
                     )
                   }
                 >

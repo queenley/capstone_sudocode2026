@@ -43,16 +43,20 @@ export default function ProductPage() {
     return () => { active = false; };
   }, [attempt]);
 
-  const product = useMemo(() => all?.find((p) => p.ref === ref) || null, [all, ref]);
+  // A product's own code, or one of its variants' (SKU-JK-DWN-L-BE): staff open the exact item a chat named.
+  const product = useMemo(
+    () => all?.find((p) => p.ref === ref) || all?.find((p) => p.variants.some((v) => v.sku_code === ref)) || null,
+    [all, ref],
+  );
   const variant = product?.variants.find((v) => v.sku_code === skuCode) || null;
 
   // Pick the first variant in stock, and tell the chat what is being viewed.
   useEffect(() => {
     if (!product) return;
-    const first = product.variants.find((v) => v.available > 0) || product.variants[0];
+    const first = product.variants.find((v) => v.sku_code === ref) || product.variants.find((v) => v.available > 0) || product.variants[0];
     setSkuCode(first.sku_code);
     return () => shopContext.leave();
-  }, [product]);
+  }, [product, ref]);
 
   useEffect(() => {
     if (!product || !skuCode) return;

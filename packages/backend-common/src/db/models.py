@@ -262,6 +262,11 @@ class Order(Base):
     payment_method = Column(String, nullable=False, default="cod")
     payment_status = Column(String, nullable=False, default="unpaid")
     paid_at = Column(DateTime(timezone=True))
+    #: The code the customer was told (OD600001), for an order the agent placed or the CRM's history holds
+    #: (migration 0007); None for a website checkout, which shows its id.
+    order_code = Column(String, unique=True)
+    #: website | agent | crm.
+    source = Column(String, nullable=False, default="website")
 
 
 class OrderItem(Base):

@@ -268,7 +268,8 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
     if not order_id:
         return ["Thiếu order_id."]
     if any(done.get("order_id") == order_id and done.get("action") == action
-           and done.get("new_variant_sku") == args.get("new_variant_sku") for done in updated):
+           and done.get("new_variant_sku") == args.get("new_variant_sku")
+           and done.get("new_address") == args.get("new_address") for done in updated):
         # A second exchange of the same order is a new one, and charged (DT-03): the customer asked once.
         return [f"Đơn {order_id} đã được {action} đúng như vậy trong cuộc gọi này; không gọi lại. "
                 "Báo khách kết quả và phí của lần trước."]
@@ -277,6 +278,9 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
         reasons.append(f"Đơn {order_id} chưa thấy trong đơn của khách; tra order_status trước.")
     if action not in UPDATE_ACTIONS:
         reasons.append(f"action phải là một trong {', '.join(sorted(UPDATE_ACTIONS))}.")
+    if action == "update_address" and not str(args.get("new_address") or "").strip():
+        # The tool would answer "updated" with no address to put on the order: ask the customer for it first.
+        reasons.append("Đổi địa chỉ cần new_address: địa chỉ mới khách vừa nói (hỏi khách nếu chưa có).")
     new = args.get("new_variant_sku")
     if action in ("exchange_size", "exchange_product"):
         if not new:

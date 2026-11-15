@@ -1,13 +1,82 @@
-# --- RDS PostgreSQL 16 ---------------------------------------------------------------------------------------
+# --- PostgreSQL in a container (use_rds = false, the default) ------------------------------------------------
+# The one instance runs postgres:16 from the compose stack, its files on this volume. The volume is not the
+# instance's: a replaced instance (a release, a failed health check) attaches it again at boot
+# (templates/user_data.sh.tftpl), so the group stays in this volume's AZ.
+resource "aws_ebs_volume" "data" {
+  count             = var.use_rds ? 0 : 1
+  availability_zone = local.azs[0]
+  size              = var.data_volume_gb
+  type              = "gp3"
+  encrypted         = true
+  final_snapshot    = true
+  tags              = { Name = "${local.prefix}-data", Snapshot = "${local.prefix}-data" }
+
+  lifecycle {
+    prevent_destroy = true # the database: removing it is a decision made by hand, never by a plan
+  }
+}
+
+# Daily snapshot of the data volume (01:00 in Viet Nam), kept backup_retention_days. A snapshot is crash-consistent;
+# the nightly pg_dump to S3 (user data) is the logical copy, restorable one database at a time.
+data "aws_iam_policy_document" "dlm_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["dlm.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "dlm" {
+  count              = var.use_rds ? 0 : 1
+  name               = "${local.prefix}-dlm"
+  assume_role_policy = data.aws_iam_policy_document.dlm_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "dlm" {
+  count      = var.use_rds ? 0 : 1
+  role       = aws_iam_role.dlm[0].name
+  policy_arn = "arn:${local.partition}:iam::aws:policy/service-role/AWSDataLifecycleManagerServiceRole"
+}
+
+resource "aws_dlm_lifecycle_policy" "data" {
+  count              = var.use_rds ? 0 : 1
+  description        = "${local.prefix} data volume, daily"
+  execution_role_arn = aws_iam_role.dlm[0].arn
+  state              = "ENABLED"
+
+  policy_details {
+    resource_types = ["VOLUME"]
+    target_tags    = { Snapshot = "${local.prefix}-data" }
+
+    schedule {
+      name      = "daily"
+      copy_tags = true
+      create_rule {
+        interval      = 24
+        interval_unit = "HOURS"
+        times         = ["18:00"]
+      }
+      retain_rule {
+        count = var.backup_retention_days
+      }
+    }
+  }
+}
+
+# --- RDS PostgreSQL 16 (use_rds = true) ----------------------------------------------------------------------
 # Single-AZ, automated backups and point-in-time recovery. The master password is RDS-managed in Secrets Manager:
 # it never enters this state. The runtime role (telesales_runtime) and the app_db_eval database are made once by
-# hand (docs/deployment/aws-terraform-cicd.md, step 4).
+# hand (docs/deployment/aws-terraform-cicd.md, step 5).
 resource "aws_db_subnet_group" "main" {
+  count      = var.use_rds ? 1 : 0
   name       = local.prefix
   subnet_ids = aws_subnet.private[*].id
 }
 
 resource "aws_db_parameter_group" "main" {
+  count  = var.use_rds ? 1 : 0
   name   = "${local.prefix}-pg16"
   family = "postgres16"
   parameter {
@@ -17,6 +86,7 @@ resource "aws_db_parameter_group" "main" {
 }
 
 resource "aws_db_instance" "main" {
+  count                           = var.use_rds ? 1 : 0
   identifier                      = local.prefix
   engine                          = "postgres"
   engine_version                  = "16"
@@ -28,9 +98,9 @@ resource "aws_db_instance" "main" {
   db_name                         = "app_db"
   username                        = "telesales_admin"
   manage_master_user_password     = true
-  db_subnet_group_name            = aws_db_subnet_group.main.name
+  db_subnet_group_name            = aws_db_subnet_group.main[0].name
   vpc_security_group_ids          = [aws_security_group.db.id]
-  parameter_group_name            = aws_db_parameter_group.main.name
+  parameter_group_name            = aws_db_parameter_group.main[0].name
   multi_az                        = var.db_multi_az
   publicly_accessible             = false
   backup_retention_period         = var.db_backup_retention_days
@@ -153,6 +223,20 @@ resource "aws_s3_bucket_lifecycle_configuration" "releases" {
       noncurrent_days = 90
     }
   }
+  # use_rds = false: the instance's nightly pg_dump (backups/app_db-<date>.dump).
+  rule {
+    id     = "pg-dumps"
+    status = "Enabled"
+    filter {
+      prefix = "backups/"
+    }
+    expiration {
+      days = var.backup_retention_days
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+  }
 }
 
 # The release every instance runs. The deploy workflow writes it, then refreshes the instances.
@@ -190,5 +274,9 @@ resource "aws_ssm_parameter" "deploy" {
     task_sg           = aws_security_group.task.id
     release_alias     = var.release_alias_tag
     target_groups     = [aws_lb_target_group.web.arn, aws_lb_target_group.gateway.arn]
+    # rds: the workflow migrates and seeds with the ops task. container: the instance does it at boot, against
+    # its own postgres, and the one instance is replaced old-first (min_healthy 0) so the data volume is free.
+    database    = var.use_rds ? "rds" : "container"
+    min_healthy = var.use_rds ? 50 : 0
   })
 }

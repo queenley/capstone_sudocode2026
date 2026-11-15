@@ -76,6 +76,12 @@ def machine() -> dict[str, Any]:
     return {"platform": platform.platform(), "processor": platform.processor() or platform.machine(), "cpus": os.cpu_count()}
 
 
+def _beside(directory: Path, name: str) -> Path:
+    """*name* in a run, or ``full.<name>`` in a one-configuration run (``--config full``, an improvement round's r0/r1)."""
+    plain = directory / name
+    return plain if plain.is_file() or not (directory / f"full.{name}").is_file() else directory / f"full.{name}"
+
+
 def measure(directory: Path) -> dict[str, Any]:
     """The table's figures from a finished run's directory. A run without a ``full`` trace has nothing to report."""
     trace_path = directory / "full.jsonl"
@@ -86,9 +92,9 @@ def measure(directory: Path) -> dict[str, Any]:
     rows = [row for lines in trace.values() for row in lines]
     if not rows:
         raise ValueError(f"{trace_path} is empty")
-    manifest_path = directory / "manifest.json"
+    manifest_path = _beside(directory, "manifest.json")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
-    usage_path = directory / "usage.json"
+    usage_path = _beside(directory, "usage.json")
     usage = json.loads(usage_path.read_text(encoding="utf-8")).get("full", []) if usage_path.is_file() else []
     turn_tokens = _tokens(usage, "turns")
     after_tokens = _tokens(usage, "after_call")
@@ -105,7 +111,7 @@ def measure(directory: Path) -> dict[str, Any]:
         "tokens_per_turn": _per_turn(turn_tokens, len(rows)) if usage else None,
         "with_after_call": _per_turn({**turn_tokens, **{f"{k}#after": v for k, v in after_tokens.items()}}, len(rows)) if usage else None,
         "tokens_by_agent": turn_tokens,
-        "stages": stages(directory / "diagnostics.jsonl"),
+        "stages": stages(_beside(directory, "diagnostics.jsonl")),
     }
 
 

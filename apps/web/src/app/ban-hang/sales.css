@@ -55,7 +55,7 @@
   display: grid;
   gap: 3px;
 }
-.sl-side nav button,
+.sl-side nav :is(a, button),
 .sl-side-foot a,
 .sl-side-foot button {
   display: flex;
@@ -70,23 +70,23 @@
   border-radius: var(--radius-sm);
   width: 100%;
 }
-.sl-side nav button svg,
+.sl-side nav :is(a, button) svg,
 .sl-side-foot svg {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
 }
-.sl-side nav button > span:first-of-type {
+.sl-side nav :is(a, button) > span:first-of-type {
   flex: 1;
 }
-.sl-side nav button:hover,
+.sl-side nav :is(a, button):hover,
 .sl-side-foot a:hover,
 .sl-side-foot button:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.08);
   color: var(--on-chrome);
   opacity: 1;
 }
-.sl-side nav button.active {
+.sl-side nav :is(a, button).active {
   background: var(--chrome-active);
   color: var(--on-chrome-active);
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
@@ -228,6 +228,15 @@
   top: 88px;
   max-height: calc(100vh - 104px);
 }
+/* The workspace is taller than a screen (evidence, then the chat): the queue is one screen high and stays in view
+   while the consultant scrolls down to the chat. */
+@media (min-width: 761px) {
+  .sl-console .call-queue {
+    position: sticky;
+    align-self: start;
+    height: calc(100vh - 104px);
+  }
+}
 .sl-alert {
   background: var(--danger-soft);
   color: var(--danger-ink);
@@ -270,6 +279,12 @@
   gap: 4px;
   font-weight: 400;
   transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+}
+/* A KPI is a link to its section (/ban-hang/don-hang …), drawn as a card. */
+a.sl-kpi,
+a.sl-link,
+.sl-side a {
+  text-decoration: none;
 }
 .sl-kpi:hover:not(:disabled) {
   box-shadow: var(--shadow);
@@ -412,6 +427,26 @@
   color: var(--muted);
   border-color: var(--line);
 }
+/* Sales' steps of an order: on its way in the info tint, delivered in the brand's, a return in the warning one. */
+.sl-badge-shipping {
+  background: var(--info-soft);
+  color: var(--info-ink);
+  border-color: var(--line);
+}
+.sl-badge-fulfilled {
+  background: var(--brand-soft-2);
+  color: var(--brand-ink);
+}
+.sl-badge-return_requested {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  border-color: var(--danger-line);
+}
+.sl-badge-returned {
+  background: var(--surface-3);
+  color: var(--muted);
+  border-color: var(--line);
+}
 .sl-pay-paid {
   background: var(--brand-soft-2);
   color: var(--brand-ink);
@@ -516,7 +551,22 @@
 .sl-actions {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.sl-action-icon {
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  height: 34px;
+  justify-content: center;
+  padding: 0;
+  border-radius: 9px;
+}
+.sl-action-icon .icon { width: 17px; height: 17px; }
+.sl-action-paid { background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand-ink); }
+.sl-action-cancel:hover { background: var(--danger-soft); }
+.sl-actions button:disabled { opacity: .5; cursor: wait;
 }
 
 /* ---------- sign-in gate ---------- */
@@ -587,7 +637,7 @@
   .sl-side-foot::-webkit-scrollbar {
     display: none;
   }
-  .sl-side nav button,
+  .sl-side nav :is(a, button),
   .sl-side-foot a,
   .sl-side-foot button {
     width: auto;

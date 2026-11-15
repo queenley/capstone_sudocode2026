@@ -230,10 +230,21 @@ class Platform:
 # ── HTTP ──────────────────────────────────────────────────────────────────
 
 
-def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
+def handler(platform: Platform, base: str = "") -> type[BaseHTTPRequestHandler]:
+    """``base``: the path prefix the page is served under when the proxy keeps it (``/zalo-mock`` behind AWS's
+    ALB, which cannot strip a prefix as Caddy's ``handle_path`` does). A path without it is served as well: the
+    shop calls the OA API inside the network at ``http://zalo-mock:8090/v3.0/...``."""
+    base = base.rstrip("/")
+
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args) -> None:  # the platform prints its own log
             pass
+
+        def route(self) -> str:
+            path = urllib.parse.urlsplit(self.path).path
+            if base and path.startswith(base + "/"):
+                return path[len(base):]
+            return path
 
         def reply(self, status: int, body: object, content_type: str = "application/json") -> None:
             data = body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode("utf-8")
@@ -265,7 +276,17 @@ def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
             return True
 
         def do_GET(self) -> None:
-            path = urllib.parse.urlsplit(self.path).path
+            if base and urllib.parse.urlsplit(self.path).path == base:
+                # The page's own calls are relative (api/state): they need the trailing slash.
+                self.send_response(301)
+                self.send_header("Location", base + "/")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            path = self.route()
+            if path == "/health":  # the load balancer's check: no password, nothing about the platform
+                self.reply(200, {"status": "ok"})
+                return
             if (path == "/" or path.startswith("/api/")) and self.locked():
                 return
             if path == "/":
@@ -303,7 +324,7 @@ def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
                     platform.watchers.remove(watcher)
 
         def do_POST(self) -> None:
-            path = urllib.parse.urlsplit(self.path).path
+            path = self.route()
             raw = self.body()
             if path.startswith("/api/") and self.locked():
                 return
@@ -366,6 +387,8 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Print what .env lacks, then exit")
     parser.add_argument("--require-password", action="store_true",
                         help="refuse to start without ZALO_MOCK_PASSWORD (a public address)")
+    parser.add_argument("--base-path", default="",
+                        help="the prefix a proxy keeps in front of the page, e.g. /zalo-mock behind AWS's ALB")
     args = parser.parse_args()
 
     if args.require_password and len(os.environ.get("ZALO_MOCK_PASSWORD", "")) < 12:
@@ -384,7 +407,7 @@ def main() -> int:
     config = {**DEFAULTS, **{k: v for k, v in config.items() if v}}
     gateway = config.get("GATEWAY_URL", "http://127.0.0.1:8000").rstrip("/")
     platform = Platform(config, args.webhook or gateway + "/api/channels/zalo/webhook")
-    server = ThreadingHTTPServer((args.host, args.port), handler(platform))
+    server = ThreadingHTTPServer((args.host, args.port), handler(platform, args.base_path))
     server.daemon_threads = True
     url = f"http://127.0.0.1:{args.port}"
     print(f"Mock Zalo: {url}  → webhook {platform.webhook}  ({len(platform.users)} users). Ctrl+C để dừng.")

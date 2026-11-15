@@ -33,6 +33,15 @@ def test_cost_is_tokens_per_turn_at_each_list_price(run):
     assert figures["with_after_call"]["total"] == 1325
 
 
+def test_a_round_run_names_its_files_after_the_configuration(run):
+    # An improvement round's r0/r1 run is --config full: full.usage.json, full.manifest.json beside full.jsonl.
+    for name in ("usage.json", "manifest.json"):
+        (run / name).rename(run / f"full.{name}")
+    figures = performance.measure(run)
+    assert figures["tokens_per_turn"]["total"] == 1050
+    assert figures["advisor"]["model"] == "gpt-4.1-mini"
+
+
 def test_what_the_run_did_not_measure_is_said_not_zero(run):
     (run / "usage.json").unlink()
     text = performance.table(performance.measure(run))

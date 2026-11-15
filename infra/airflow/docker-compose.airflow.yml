@@ -1,9 +1,9 @@
 # The weekly improvement round on Airflow, beside the app's compose (it uses its postgres network and the agent's
-# shared volumes). Local only: `airflow standalone` is Airflow's single-process dev mode. On AWS the same commands
+# shared volumes). Local only: one container runs the scheduler and the webserver. On AWS the same commands
 # run as a Fargate task on an EventBridge schedule (infra/improve, docs/deployment/aws-plan.md 3.7).
 #
 #   docker compose -f docker-compose.yml -f infra/airflow/docker-compose.airflow.yml up -d --build airflow
-#   # UI: http://127.0.0.1:8080 (user admin; its password is printed in the airflow container's log on first start)
+#   # UI: http://127.0.0.1:8080 (user admin, password AIRFLOW_ADMIN_PASSWORD: airflow-admin-local-only by default)
 #
 # Spends model calls every week. Set EVAL_BUDGET_DB in .env to cap them.
 services:
@@ -24,8 +24,37 @@ services:
     build:
       context: .
       dockerfile: infra/airflow/Dockerfile
-    command: standalone
+    # The scheduler in the background and the webserver in front, with two users: "admin" for Airflow's own UI and
+    # one the shop's /admin drives the round with (runtime/airflow_pipeline.py). Not `airflow standalone`: in this
+    # container its webserver parent died after start (gunicorn left without port 8080) and its log went silent.
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - >-
+        airflow db migrate &&
+        (airflow users create --role Admin --username admin --password "$${AIRFLOW_ADMIN_PASSWORD}"
+        --firstname Admin --lastname Shop --email admin@shop.example || true) &&
+        (airflow users create --role Admin --username "$${AIRFLOW_API_USER}" --password "$${AIRFLOW_API_PASSWORD}"
+        --firstname API --lastname Shop --email api@shop.example || true) &&
+        (airflow scheduler &) &&
+        exec airflow webserver --port 8080 --workers 1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 600s
     environment:
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-airflow-admin-local-only}
+      AIRFLOW_API_USER: ${AIRFLOW_API_USER:-api}
+      AIRFLOW_API_PASSWORD: ${AIRFLOW_API_PASSWORD:-airflow-api-local-only}
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      # A webserver on a slow disk (the repository mounted from a laptop) takes minutes to start: past the default
+      # 120 s it was shut down before it answered once.
+      AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "600"
+      AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: "600"
+      # The REST API with a user and password (the /admin pipeline view), beside the UI's own sessions.
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__DAGS_FOLDER: /opt/telesales/infra/airflow/dags
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD:-airflow-local-only}@airflow-db:5432/airflow
@@ -53,6 +82,15 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+
+
+  # The agent reads the pipeline and starts it for /admin (Cải tiến hằng tuần, Pipeline).
+  ai-agent-service:
+    environment:
+      AIRFLOW_URL: http://airflow:8080
+      AIRFLOW_USER: ${AIRFLOW_API_USER:-api}
+      AIRFLOW_PASSWORD: ${AIRFLOW_API_PASSWORD:-airflow-api-local-only}
+      AIRFLOW_PUBLIC_URL: http://127.0.0.1:8080
 
 volumes:
   airflow-db:

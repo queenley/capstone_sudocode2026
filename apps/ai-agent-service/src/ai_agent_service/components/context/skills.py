@@ -63,6 +63,18 @@ def learned_cites(book: Mapping[str, Mapping[str, Any]], original: Mapping[str, 
 
 #: Empty for the original agent.
 LEARNED_CITES: tuple[str, ...] = learned_cites(SKILLS, load_prompt_yaml("advisor/skills.yaml"))
+
+
+def reload() -> int:
+    """The skills in force read again, in this process: what an admin switched on in /admin applies to the next turn,
+    without a restart. Every reader goes through this module's ``SKILLS`` and ``LEARNED_CITES`` (never a copy taken
+    at import), so reassigning them is enough. Returns the version now served."""
+    global SKILLS, LEARNED_CITES
+    SKILLS = read_book()
+    LEARNED_CITES = learned_cites(SKILLS, load_prompt_yaml("advisor/skills.yaml"))
+    return active_version(versions_dir())
+
+
 #: Past this many, the oldest leaves the prompt; the model can load it again.
 MAX_LOADED = 3
 

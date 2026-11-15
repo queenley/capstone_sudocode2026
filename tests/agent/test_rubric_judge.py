@@ -134,3 +134,20 @@ def test_fewer_than_twenty_pairs_is_flagged(tmp_path, monkeypatch):
     monkeypatch.setattr(judge_agreement.scenarios, "load",
                         lambda folder: ([SimpleNamespace(scenario_id="SC-J", data=SCENARIO)], []))
     assert judge_agreement.draw(_judged_run(tmp_path, 8), tmp_path / "few") == 1
+
+
+@pytest.mark.asyncio
+async def test_a_judged_sample_grades_only_the_chosen_scenarios(tmp_path, monkeypatch):
+    other = {**SCENARIO, "scenario_id": "SC-K"}
+    monkeypatch.setattr(judge_agreement.scenarios, "load", lambda folder: (
+        [SimpleNamespace(scenario_id="SC-J", data=SCENARIO), SimpleNamespace(scenario_id="SC-K", data=other)], []))
+    run = _judged_run(tmp_path, 1)
+    with (run / "full.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"scenario_id": "SC-K", "call": "call_2", "turn": 1, "customer_text": "Chào",
+                                 "agent_text": "Dạ chị", "tool_calls": []}) + "\n")
+    judge = SimpleNamespace(grade=AsyncMock(return_value={"status": "COMPLETE", "verdicts": []}))
+    assert await judge_agreement.judge_run(run, tmp_path / "judged", judge, only=["SC-K"]) == 0
+    judged = [json.loads(line) for line in (tmp_path / "judged" / "full.judge.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [item["scenario_id"] for item in judged] == ["SC-K"]
+    assert json.loads((tmp_path / "judged" / "judge-run.json").read_text(encoding="utf-8"))["only"] == ["SC-K"]
+    assert await judge_agreement.judge_run(run, tmp_path / "missing", judge, only=["SC-Z"]) == 2

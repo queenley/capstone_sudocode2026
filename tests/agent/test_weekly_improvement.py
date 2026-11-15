@@ -184,8 +184,11 @@ async def test_the_admin_cannot_switch_on_a_harmful_or_stale_candidate(monkeypat
     switched = []
     monkeypatch.setattr(skill_versions, "active", lambda folder=None: 0)
     monkeypatch.setattr(skill_versions, "activate", lambda v, **k: switched.append((v, k["reviewer"])) or 0)
+    reloaded = []
+    monkeypatch.setattr(routes.skill_book, "reload", lambda: reloaded.append(True) or 1)
     result = await routes.activate("weekly-2026-W46", routes.Activation(), _request())
-    assert result["reload_required"] and switched == [(1, "staff:u-1")]
+    # Served from the next turn: the skills are read again in the process, no restart.
+    assert not result["reload_required"] and reloaded and switched == [(1, "staff:u-1")]
     assert store.updates[-1]["status"] == "active"
 
 

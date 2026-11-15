@@ -45,6 +45,41 @@ resource "aws_lb_target_group" "gateway" {
   }
 }
 
+# The Zalo demo (zalo_mock_enabled): https://DOMAIN/zalo-mock/, as the one-server stack serves it behind Caddy. The
+# ALB cannot strip the prefix, so the mock runs with --base-path /zalo-mock. Not in the group's target_group_arns:
+# with ELB health checks a broken demo would get the instance replaced. The instance registers itself at boot.
+resource "aws_lb_target_group" "zalo_mock" {
+  count                = var.zalo_mock_enabled ? 1 : 0
+  name                 = "${local.prefix}-zalo-mock"
+  port                 = 8090
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.main.id
+  target_type          = "instance"
+  deregistration_delay = 10
+  health_check {
+    path                = "/health"
+    matcher             = "200"
+    interval            = 30
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_lb_listener_rule" "zalo_mock" {
+  count        = var.zalo_mock_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 5
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.zalo_mock[0].arn
+  }
+  condition {
+    path_pattern {
+      values = ["/zalo-mock", "/zalo-mock/*"]
+    }
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80

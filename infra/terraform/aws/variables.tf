@@ -34,18 +34,20 @@ variable "vpc_cidr" {
 
 variable "instance_type" {
   type        = string
-  default     = "r7i.large"
-  description = "2 vCPU / 16 GB: the agent holds up to 3 GB and mostly waits on the model. An assumption to measure."
+  default     = "t3.xlarge"
+  description = "4 vCPU / 16 GB on one CPU host: the whole stack, PostgreSQL and ASR on CPU (ASR_LOCAL=1). The agent holds up to 3 GB (+1.5 GB with voice). With use_rds and two instances, r7i.large. An assumption to measure."
 }
 
 variable "asg_min" {
-  type    = number
-  default = 2
+  type        = number
+  default     = 1
+  description = "1 while use_rds = false: PostgreSQL lives on the one instance's data volume."
 }
 
 variable "asg_max" {
-  type    = number
-  default = 4
+  type        = number
+  default     = 1
+  description = "1 while use_rds = false (an EBS volume attaches to one instance only)."
 }
 
 variable "root_volume_gb" {
@@ -76,6 +78,29 @@ variable "docker_compose_version" {
 
 # --- Data ----------------------------------------------------------------------------------------------------
 
+variable "use_rds" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    false (default, the cheapest): PostgreSQL runs as a container on the one instance, its files on an EBS data
+    volume that outlives the instance (data_volume_gb), with daily snapshots and a nightly pg_dump to S3.
+    true: RDS PostgreSQL (db_* below), up to asg_max instances, the weekly round on Fargate. Switching moves no data:
+    pg_dump from one, restore into the other (docs/deployment/aws-terraform-cicd.md, section 10).
+  EOT
+}
+
+variable "data_volume_gb" {
+  type        = number
+  default     = 30
+  description = "use_rds = false: the EBS volume holding PostgreSQL's files (gp3, grows with modify-volume)."
+}
+
+variable "backup_retention_days" {
+  type        = number
+  default     = 7
+  description = "use_rds = false: days kept of the data volume's daily snapshots and of the nightly pg_dump in S3."
+}
+
 variable "db_instance_class" {
   type    = string
   default = "db.t4g.medium"
@@ -100,6 +125,18 @@ variable "db_multi_az" {
 variable "db_backup_retention_days" {
   type    = number
   default = 7
+}
+
+# --- Zalo demo -----------------------------------------------------------------------------------------------
+
+variable "zalo_mock_enabled" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    true: the Zalo mock (scripts/dev/zalo_mock.py) at https://DOMAIN/zalo-mock/, behind ZALO_MOCK_PASSWORD (12+
+    characters, in the app secret), and the shop answers Zalo through it, not through Zalo. A demo without an
+    Official Account: anyone with the password chats with the assistant at the shop's model cost.
+  EOT
 }
 
 # --- Weekly improvement round --------------------------------------------------------------------------------
@@ -137,8 +174,8 @@ variable "alarm_email" {
 
 variable "monthly_budget_usd" {
   type        = number
-  default     = 300
-  description = "AWS spend warning (model API spend is the provider's, not AWS's)."
+  default     = 250
+  description = "AWS spend warning (model API spend is the provider's, not AWS's). The default single CPU host is about 215 USD a month on demand (docs/deployment/aws-plan.md section 9)."
 }
 
 # --- GitHub Actions ------------------------------------------------------------------------------------------

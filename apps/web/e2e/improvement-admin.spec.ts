@@ -74,7 +74,7 @@ async function fixtures(page: Page, status = "waiting_review") {
 
 test("an admin approves one proposal and refuses another only with a reason", async ({ page }) => {
   const { sent } = await fixtures(page);
-  await page.goto("/admin?tab=improvement");
+  await page.goto("/admin/cai-tien");
   await page.getByRole("button", { name: "Mở 2026-11-09" }).click();
   const card = page.getByRole("article", { name: "Đề xuất SK-weekly-2026-W46-budget-1" });
   await expect(card.getByText("Khi tổng vượt ngân sách khách nói, báo tổng và phần vượt.")).toBeVisible();
@@ -89,7 +89,7 @@ test("an admin approves one proposal and refuses another only with a reason", as
 test("a measured candidate is switched on only after the admin confirms the measurement", async ({ page }) => {
   const { sent, measured } = await fixtures(page, "measured");
   measured();
-  await page.goto("/admin?tab=improvement");
+  await page.goto("/admin/cai-tien");
   await page.getByRole("button", { name: "Mở 2026-11-09" }).click();
   await expect(page.getByRole("table", { name: "Phép đo budget" })).toContainText("83.3");
   const go = page.getByRole("button", { name: "Bật skills v1" });
@@ -102,7 +102,7 @@ test("a measured candidate is switched on only after the admin confirms the meas
 
 test("the dashboard draws one cohort week by week, marks the skills switch, and has a table view", async ({ page }) => {
   await fixtures(page);
-  await page.goto("/admin?tab=evaluation");
+  await page.goto("/admin/danh-gia");
   const tsr = page.getByRole("figure", { name: "Task Success Rate (TSR)" });
   await expect(tsr).toBeVisible();
   // Two cohorts exist: one is drawn, and the page says why the other is not on the same line.

@@ -16,13 +16,28 @@ output "app_secret_arn" {
   value       = aws_secretsmanager_secret.app.arn
 }
 
+output "database" {
+  description = "container: PostgreSQL on the instance, files on data_volume_id. rds: rds_endpoint."
+  value       = var.use_rds ? "rds" : "container"
+}
+
+output "data_volume_id" {
+  description = "use_rds = false: the EBS volume with PostgreSQL's files (daily snapshots, tag Snapshot)."
+  value       = var.use_rds ? null : aws_ebs_volume.data[0].id
+}
+
 output "rds_endpoint" {
-  value = aws_db_instance.main.address
+  value = var.use_rds ? aws_db_instance.main[0].address : null
 }
 
 output "rds_master_secret_arn" {
-  description = "The RDS-managed master password, to create the runtime role and app_db_eval once."
-  value       = aws_db_instance.main.master_user_secret[0].secret_arn
+  description = "use_rds: the RDS-managed master password, to create the runtime role and app_db_eval once."
+  value       = var.use_rds ? aws_db_instance.main[0].master_user_secret[0].secret_arn : null
+}
+
+output "release_bucket" {
+  description = "releases/<sha>/ (compose files) and, with use_rds = false, backups/ (nightly pg_dump)."
+  value       = aws_s3_bucket.releases.bucket
 }
 
 output "ecr_registry" {

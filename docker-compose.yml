@@ -40,6 +40,9 @@ x-runtime: &runtime
     BANK_ACCOUNT_NAME: ${BANK_ACCOUNT_NAME:-}
     # The identity events worker tells the AI agent when a customer deleted their data (policy QT-06).
     AI_AGENT_SERVICE_URL: ${AI_AGENT_SERVICE_URL:-http://ai-agent-service:8400}
+    # A local demo: the seed gives every BTC CRM customer this password, so the shop opens as chị Hoa
+    # (0984726714) at /dang-nhap. Ignored when ENVIRONMENT=production; empty: no demo passwords.
+    DEMO_CUSTOMER_PASSWORD: ${DEMO_CUSTOMER_PASSWORD:-quivo-demo-2026}
   depends_on:
     postgres:
       condition: service_healthy
@@ -160,6 +163,9 @@ services:
       # a provider is offered only when its key is set.
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-${GEMINI_API_KEY:-}}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # 1: the orders the agent places or changes are kept on the website too, and order.status lists the
+      # customer's website orders (runtime/shop_orders.py). Never set for an evaluation run.
+      SHOP_ORDERS: ${SHOP_ORDERS:-1}
       # Zalo OA (apps/ai-agent-service/src/ai_agent_service/runtime/zalo.py).
       ZALO_APP_ID: ${ZALO_APP_ID:-}
       ZALO_OA_ID: ${ZALO_OA_ID:-}
@@ -284,6 +290,24 @@ services:
     <<: *runtime
     command: ["python", "-m", "src.messaging.worker", "--service", "ai-agent"]
     restart: unless-stopped
+  # Once, after the agent is up: each BTC customer's earlier call (data/dev, one scenario a number) on the agent's
+  # memory, so the assistant greets chị Hoa knowing what she asked before. Safe to run again; no model call.
+  agent-seed:
+    build:
+      context: .
+      dockerfile: apps/ai-agent-service/Dockerfile
+      args:
+        WITH_VOICE: ${AGENT_WITH_VOICE:-0}
+        VOICE_TTS: ${VOICE_TTS:-}
+    init: true
+    environment:
+      <<: *environment
+    volumes: ["./data/dev/scenarios:/app/seed/scenarios:ro", "./data/dev/conversations:/app/seed/conversations:ro"]
+    command: ["python", "-m", "ai_agent_service.runtime.seed_prior_calls", "--scenarios", "/app/seed/scenarios"]
+    depends_on:
+      ai-agent-service:
+        condition: service_healthy
+    restart: "no"
   web:
     build:
       context: .

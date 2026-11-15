@@ -5,7 +5,14 @@ github_repository = "your-org/your-repo"
 tf_state_bucket   = "your-terraform-state-bucket"
 alarm_email       = ""
 # region           = "ap-southeast-1"
+# Default: one CPU host (t3.xlarge), PostgreSQL in a container on an EBS data volume, about 215 USD/month.
+# instance_type    = "t3.xlarge"
+# data_volume_gb   = 30
+# backup_retention_days = 7
+# Later, with RDS and two instances (move the data first: aws-terraform-cicd.md section 10):
+# use_rds          = true
 # instance_type    = "r7i.large"
-# asg_min          = 2                      # 1 for staging
+# asg_min          = 2
+# asg_max          = 4
 # db_multi_az      = false
 # improve_schedule_enabled = false          # true spends model calls every week

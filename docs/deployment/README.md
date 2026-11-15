@@ -3,7 +3,7 @@
 Hai cách chạy:
 
 - **Docker Compose**: máy local, hoặc cả hệ thống trên **một máy chủ cloud (VM)**. Xem mục 0 ngay dưới.
-- **AWS**: thiết kế ở [aws-plan.md](aws-plan.md); Terraform (`infra/terraform/aws`), compose AWS và hai workflow GitHub Actions, hướng dẫn từng bước ở [aws-terraform-cicd.md](aws-terraform-cicd.md). Chưa apply trên tài khoản thật.
+- **AWS**: thiết kế ở [aws-plan.md](aws-plan.md); Terraform (`infra/terraform/aws`), compose AWS và hai workflow GitHub Actions, hướng dẫn từng bước ở [aws-terraform-cicd.md](aws-terraform-cicd.md) (dữ liệu mẫu trên AWS: mục 2 của trang đó). Chưa apply trên tài khoản thật.
 - **Cloud có quản lý (GKE, Cloud SQL)**: mục 1–4. Gồm ba thành phần, và **không thành phần nào tự triển khai ứng dụng**:
 
 - `infra/terraform/gcp`: GKE Autopilot private node, Cloud SQL PostgreSQL HA có backup, Memorystore Redis HA (TLS), Artifact Registry, một secret rỗng trong Secret Manager, VPC peering và Cloud NAT. **Có phát sinh chi phí.**
@@ -27,6 +27,15 @@ docker compose up -d --build                      # http://localhost:3000
 docker compose --profile hotline up -d --build    # + tổng đài
 ```
 
+**Dữ liệu mẫu có sẵn sau lần `up` đầu.** Không cần chạy thêm lệnh nào, và chạy lại cũng chỉ thêm phần còn thiếu:
+
+| Service | Chạy khi | Nạp |
+|---|---|---|
+| `seed` | trước shop | Danh mục BTC, 70 khách CRM (50 của BTC, 20 tổng hợp) và 52 đơn cũ của họ, theo mã `OD…` mà agent đọc |
+| `agent-seed` | một lần, sau `ai-agent-service` | Cuộc gọi trước của mỗi khách vào bộ nhớ agent, 74 khách: với mỗi số điện thoại, lấy kịch bản đầu tiên trong `data/dev` có cuộc trước |
+
+`DEMO_CUSTOMER_PASSWORD` (mặc định `quivo-demo-2026`) là mật khẩu cho mọi khách CRM chưa có tài khoản, để đăng nhập `/dang-nhap` bằng số điện thoại của họ. Khách đã có tài khoản giữ mật khẩu của mình. Biến này bị bỏ qua khi `ENVIRONMENT=production`; để trống thì không tạo mật khẩu demo.
+
 **Cloud, một VM** (Ubuntu có Docker; bản ghi DNS A của `DOMAIN` trỏ về IP máy; mở cổng 80, 443, và UDP 5060, 40000–40100, 40200–40300 nếu dùng tổng đài):
 
 ```bash
@@ -43,6 +52,9 @@ Khác biệt cần biết khi chạy cloud:
 - `ENVIRONMENT=production` (mặc định): backend từ chối secret yếu hoặc trùng nhau, và OTP chỉ gửi qua nhà cung cấp SMS (`OTP_DELIVERY_URL`). Muốn demo khi chưa có SMS: `ENVIRONMENT=staging`, mã OTP hiện trên màn hình như ở local.
 - Giọng đọc mặc định `openai:coral` (`VOICE_TTS`); image AI không cài VieNeu. ASR mặc định ở máy GPU (`ASR_URL`, `ASR_API_KEY`, xem [apps/asr-service/README.md](../../apps/asr-service/README.md)); chưa có GPU thì `ASR_LOCAL=1`, `ASR_URL=` để chạy ASR trên CPU của VM.
 - Chế độ giả lập Zalo (`ZALO_WEBHOOK_INSECURE`, `ZALO_OPENAPI_URL`) luôn tắt, dù `.env` có đặt.
+- Dữ liệu mẫu: `seed` và `agent-seed` vẫn chạy như local (`agent-seed` dùng chung image với `ai-agent-service`, không build thêm). Riêng `DEMO_CUSTOMER_PASSWORD` **mặc định rỗng** trên cloud, không lấy giá trị local công khai trong repo. Muốn demo đăng nhập bằng mật khẩu thì đặt `ENVIRONMENT=staging` và một mật khẩu riêng trong `.env`.
+- Tin nhắn thoại trong chat web dùng chung ASR với cuộc gọi: thiếu `ASR_URL` và `ASR_LOCAL=0` thì nút ghi âm báo lỗi, chat chữ vẫn chạy.
+- Khung "Pipeline cải tiến (Airflow)" trên `/admin` cần thêm `-f infra/airflow/docker-compose.airflow.yml` ([infra/airflow/README.md](../../infra/airflow/README.md)). Cổng 8080 của Airflow chỉ mở trên `127.0.0.1`; đổi `AIRFLOW_ADMIN_PASSWORD` và `AIRFLOW_API_PASSWORD` trước khi chạy trên máy chủ.
 - Tạo tài khoản nhân viên: `docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml run --rm identity-service python /app/scripts/admin/create_admin.py`.
 
 ## 1. Nền tảng (Terraform)

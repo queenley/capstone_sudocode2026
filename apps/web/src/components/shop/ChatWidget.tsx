@@ -4,9 +4,9 @@
 // browser (the agent's voice channel), the Zalo link, and the hand-over to a
 // person (the agent hands off; staff reply from /calls or /ban-hang).
 import { useEffect, useRef, useState } from "react";
-import { ChatCartLine, streamTurn } from "@/services/api";
+import { ChatCartLine, streamTurn, transcribeVoice } from "@/services/api";
 import { VoiceCall } from "@/services/voice";
-import VoiceCallPanel from "@/features/voice-call";
+import VoiceCallPanel from "@/features/voice/voice-call";
 import ChatProducts from "@/components/shop/ChatProducts";
 import {
   loadConversation,
@@ -23,6 +23,7 @@ import { account as accountStore, useAccount } from "@/lib/account";
 import { newKey } from "@/lib/cart-items";
 import ReturningWelcome from "@/components/shop/ReturningWelcome";
 import Icon from "@/components/ui/Icon";
+import { clock, MAX_SECONDS, VoiceRecorder, voiceSupported } from "@/lib/voice-note";
 
 /** The cart in this browser with the names the shop shows, for the assistant ("giỏ hàng tôi có gì").
  *  Signed in, the assistant reads the account's cart itself (its account_cart tool): nothing is sent. */
@@ -47,7 +48,19 @@ async function cartForChat(): Promise<ChatCartLine[] | null> {
   });
 }
 
-type Line = { speaker: string; text: string };
+type Line = {
+  speaker: string;
+  text: string;
+  /** A voice message recorded here: its recording, and where its words are. */
+  voice?: { url: string; seconds: number; state: "listening" | "done" | "failed" };
+  /** Not sent to the assistant yet: kept when the conversation is read again from the server. */
+  local?: boolean;
+};
+
+/** Marks a line the customer spoke (api/routes/conversations.py VOICE_MARK): shown as a voice message. */
+const VOICE_MARK = "\u{1F3A4} ";
+/** After the last voice message, how long the chat waits for another before the assistant answers all of them. */
+const QUIET_MS = 2500;
 
 const SUGGESTIONS = [
   "Tư vấn máy lọc không khí cho phòng 25m²",
@@ -87,6 +100,28 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   const abort = useRef<AbortController | null>(null);
   const pending = useRef<{ id: string; text: string } | null>(null);
   const currentSession = useRef<ShopSession | null>(null);
+  // Voice messages, as on Zalo: hold to record, let go to send; the assistant answers when the customer stops.
+  const [voiceOk, setVoiceOk] = useState(false);
+  const [recording, setRecording] = useState<{ seconds: number; cancel: boolean } | null>(null);
+  const [gathering, setGathering] = useState(0);
+  const recorder = useRef<VoiceRecorder | null>(null);
+  /** The words of voice messages the assistant has not answered yet, in the order said. */
+  const notes = useRef<string[]>([]);
+  /** Voice messages still being recognised. */
+  const listening = useRef(0);
+  const flushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** A voice message's words -> its recording, to play it back once the conversation is read again. */
+  const audio = useRef(new Map<string, string>());
+
+  useEffect(() => setVoiceOk(voiceSupported()), []);
+  useEffect(() => {
+    const recordings = audio.current;
+    return () => {
+      recorder.current?.cancel();
+      if (flushTimer.current) clearTimeout(flushTimer.current);
+      recordings.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
   useEffect(
     () => () => {
@@ -125,7 +160,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       currentSession.current?.conversation_id !== s.conversation_id
     )
       return;
-    setLines(state.messages);
+    setLines((old) => [...state.messages, ...old.filter((line) => line.local)]);
     setStatus(state.status);
   }
 
@@ -165,6 +200,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       sending.current = false;
       pending.current = null;
       currentSession.current = null;
+      forgetVoice();
       setBusy(false);
       setCall((old) => {
         old?.stop();
@@ -195,7 +231,12 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   }, [session, status, chatOpen]);
 
   async function send(message: string) {
-    const content = message.trim();
+    const typed = message.trim();
+    // Retrying the turn whose outcome is unknown sends it as it was; otherwise the voice messages not answered yet
+    // go first, in the order said, then what was typed: one turn, one answer.
+    const retrying = !!pending.current && pending.current.text === typed;
+    const spoken = retrying ? [] : [...notes.current];
+    const content = retrying ? typed : [...spoken.map((words) => VOICE_MARK + words), typed].filter(Boolean).join("\n");
     if (!content || sending.current) return;
     if (pending.current && pending.current.text !== content) {
       setError(
@@ -204,6 +245,12 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       return;
     }
     sending.current = true;
+    if (flushTimer.current) clearTimeout(flushTimer.current);
+    flushTimer.current = null;
+    notes.current = notes.current.slice(spoken.length);
+    setGathering(notes.current.length);
+    const sent = new Set(spoken.map((words) => VOICE_MARK + words));
+    const shown = retrying ? content : typed;
     const version = revision.current;
     const controller = new AbortController();
     abort.current = controller;
@@ -216,8 +263,9 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       if (version !== revision.current) return;
       const human = status === "handed_off";
       setLines((old) => [
-        ...old,
-        { speaker: "customer", text: content },
+        // The voice messages sent now are the server's from here on.
+        ...old.map((line) => (line.local && sent.has(line.text) ? { ...line, local: false } : line)),
+        ...(shown ? [{ speaker: "customer", text: shown }] : []),
         ...(human ? [] : [{ speaker: "assistant", text: "" }]),
       ]);
       await streamTurn(
@@ -257,10 +305,134 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
     }
   }
 
+  function forgetVoice() {
+    recorder.current?.cancel();
+    recorder.current = null;
+    setRecording(null);
+    notes.current = [];
+    setGathering(0);
+    if (flushTimer.current) clearTimeout(flushTimer.current);
+    flushTimer.current = null;
+  }
+
+  /** The assistant answers once the customer stops: no recording, nothing being recognised, QUIET_MS of quiet. */
+  function scheduleFlush() {
+    if (flushTimer.current) clearTimeout(flushTimer.current);
+    flushTimer.current = null;
+    if (!notes.current.length || recorder.current || listening.current) return;
+    flushTimer.current = setTimeout(() => {
+      flushTimer.current = null;
+      // Still answering the turn before: the end of that turn schedules this again.
+      if (sending.current || recorder.current || listening.current) return;
+      void send("");
+    }, QUIET_MS);
+  }
+
+  async function startVoice() {
+    if (recorder.current || status === "closed") return;
+    setError("");
+    if (flushTimer.current) clearTimeout(flushTimer.current);
+    flushTimer.current = null;
+    const voice = new VoiceRecorder();
+    recorder.current = voice;
+    setRecording({ seconds: 0, cancel: false });
+    try {
+      await voice.start();
+    } catch (e) {
+      if (recorder.current === voice) recorder.current = null;
+      setRecording(null);
+      const name = (e as { name?: string })?.name;
+      if (name !== "AbortError")
+        setError(
+          name === "NotAllowedError"
+            ? "Trình duyệt chưa cho phép dùng micro. Hãy bật quyền micro cho trang này để gửi tin nhắn thoại."
+            : "Không mở được micro trên thiết bị này.",
+        );
+      scheduleFlush();
+    }
+  }
+
+  async function stopVoice(cancel: boolean) {
+    const voice = recorder.current;
+    if (!voice) return;
+    recorder.current = null;
+    setRecording(null);
+    if (cancel) {
+      voice.cancel();
+      scheduleFlush();
+      return;
+    }
+    const note = await voice.stop().catch(() => null);
+    if (!note) {
+      setError("Tin nhắn thoại quá ngắn hoặc chưa nghe rõ. Nhấn giữ nút micro trong lúc nói.");
+      scheduleFlush();
+      return;
+    }
+    const url = URL.createObjectURL(note.blob);
+    const version = revision.current;
+    listening.current++;
+    setLines((old) => [
+      ...old,
+      { speaker: "customer", text: "", voice: { url, seconds: note.seconds, state: "listening" }, local: true },
+    ]);
+    try {
+      const s = await ensure();
+      const heard = await transcribeVoice(s, note.pcm);
+      if (version !== revision.current) return;
+      const words = heard.text.trim();
+      if (!words) throw new Error("Chưa nghe rõ tin nhắn thoại. Bạn nói lại giúp nhé.");
+      audio.current.set(words, url);
+      notes.current.push(words);
+      setGathering(notes.current.length);
+      setLines((old) =>
+        old.map((line) =>
+          line.voice?.url === url ? { ...line, text: VOICE_MARK + words, voice: { ...line.voice, state: "done" } } : line,
+        ),
+      );
+    } catch (e) {
+      if (version !== revision.current) return;
+      setLines((old) =>
+        old.map((line) => (line.voice?.url === url ? { ...line, local: false, voice: { ...line.voice, state: "failed" } } : line)),
+      );
+      setError(e instanceof Error ? e.message : "Không nhận dạng được tin nhắn thoại.");
+    } finally {
+      listening.current--;
+      if (version === revision.current) scheduleFlush();
+    }
+  }
+
+  // The turn before is answered: the voice messages said meanwhile go now (after the same quiet).
+  useEffect(() => {
+    if (!busy) scheduleFlush();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy]);
+
+  // The recording's clock; a minute is the most a voice message holds, then it is sent.
+  const isRecording = recording !== null;
+  useEffect(() => {
+    if (!isRecording) return;
+    const timer = setInterval(() => {
+      const voice = recorder.current;
+      if (!voice) return;
+      const seconds = voice.elapsed();
+      if (seconds >= MAX_SECONDS) void stopVoice(false);
+      else setRecording((old) => old && { ...old, seconds });
+    }, 200);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRecording]);
+
+  /** Let go away from the button (up, or far to the left) cancels, as on Zalo. */
+  function away(event: React.PointerEvent<HTMLButtonElement>) {
+    const box = event.currentTarget.getBoundingClientRect();
+    return event.clientY < box.top - 60 || event.clientX < box.left - 140;
+  }
+
   async function restart() {
     revision.current++;
     abort.current?.abort();
     pending.current = null;
+    forgetVoice();
     setError("");
     const s = await newSession();
     currentSession.current = s;
@@ -379,14 +551,18 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                     {SPEAKER[line.speaker] || line.speaker}
                   </span>
                 )}
-                <p>
-                  {line.text ||
-                    (busy && i === lines.length - 1 ? (
-                      <span className="s-typing">Đang soạn câu trả lời…</span>
-                    ) : (
-                      ""
-                    ))}
-                </p>
+                {line.speaker === "customer" && (line.voice || line.text.includes(VOICE_MARK)) ? (
+                  <CustomerWords line={line} audio={audio.current} />
+                ) : (
+                  <p>
+                    {line.text ||
+                      (busy && i === lines.length - 1 ? (
+                        <span className="s-typing">Đang soạn câu trả lời…</span>
+                      ) : (
+                        ""
+                      ))}
+                  </p>
+                )}
                 {/* Once the reply is complete, the products it names: picture, price, link. */}
                 {line.speaker !== "customer" &&
                   line.speaker !== "system" &&
@@ -409,6 +585,11 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
             {status === "handed_off" && (
               <p className="s-chat-handoff">
                 Đã chuyển cho nhân viên. Nhân viên đã xem cuộc trò chuyện này, bạn không cần nhắc lại.
+              </p>
+            )}
+            {gathering > 0 && !busy && !recording && (
+              <p className="s-voice-hint" role="status">
+                Đã nhận {gathering} tin nhắn thoại. Trợ lý sẽ trả lời khi bạn gửi xong.
               </p>
             )}
             <div ref={bottom} />
@@ -444,6 +625,13 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                 send(text);
               }}
             >
+              {recording ? (
+                <div className={"s-recording" + (recording.cancel ? " is-cancel" : "")} role="status" aria-live="polite">
+                  <span className="s-rec-dot" aria-hidden="true" />
+                  <b>{clock(recording.seconds)}</b>
+                  <span>{recording.cancel ? "Thả ra để hủy" : "Thả ra để gửi · kéo lên để hủy"}</span>
+                </div>
+              ) : (
               <textarea
                 ref={input}
                 autoFocus
@@ -459,13 +647,55 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                   }
                 }}
               />
-              <button
-                type="submit"
-                disabled={busy || !text.trim()}
-                aria-label="Gửi"
-              >
-                Gửi
-              </button>
+              )}
+              {voiceOk && !text.trim() ? (
+                <button
+                  type="button"
+                  className={"s-mic" + (recording ? " is-on" : "") + (recording?.cancel ? " is-cancel" : "")}
+                  aria-label="Nhấn giữ để ghi âm tin nhắn thoại"
+                  title="Nhấn giữ để ghi âm, thả ra để gửi"
+                  onPointerDown={(event) => {
+                    if (event.button !== 0) return;
+                    event.preventDefault();
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    void startVoice();
+                  }}
+                  onPointerMove={(event) => {
+                    if (!recorder.current) return;
+                    const cancel = away(event);
+                    setRecording((old) => (old && old.cancel !== cancel ? { ...old, cancel } : old));
+                  }}
+                  onPointerUp={(event) => void stopVoice(away(event))}
+                  onPointerCancel={() => void stopVoice(true)}
+                  onKeyDown={(event) => {
+                    if ((event.key === " " || event.key === "Enter") && !event.repeat) {
+                      event.preventDefault();
+                      void startVoice();
+                    } else if (event.key === "Escape" && recorder.current) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      void stopVoice(true);
+                    }
+                  }}
+                  onKeyUp={(event) => {
+                    if (event.key === " " || event.key === "Enter") {
+                      event.preventDefault();
+                      void stopVoice(false);
+                    }
+                  }}
+                  onContextMenu={(event) => event.preventDefault()}
+                >
+                  <Icon name="mic" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={busy || !text.trim()}
+                  aria-label="Gửi"
+                >
+                  Gửi
+                </button>
+              )}
             </form>
           )}
           <footer className="s-chat-foot">
@@ -490,6 +720,41 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
           }}
         />
       )}
+    </>
+  );
+}
+
+/** What the customer said: typed lines as text, voice messages with their recording (when this browser made it)
+ *  and the words the recogniser heard. */
+function CustomerWords({ line, audio }: { line: Line; audio: Map<string, string> }) {
+  if (line.voice && line.voice.state !== "done")
+    return (
+      <div className="s-voice">
+        <span className="s-voice-head">
+          <Icon name="mic" size={14} /> Tin nhắn thoại · {clock(line.voice.seconds)}
+        </span>
+        <audio controls preload="metadata" src={line.voice.url} />
+        <span className={"s-voice-text" + (line.voice.state === "failed" ? " is-failed" : "")}>
+          {line.voice.state === "listening" ? "Đang nghe…" : "Chưa nhận dạng được, bạn gửi lại giúp nhé"}
+        </span>
+      </div>
+    );
+  return (
+    <>
+      {line.text.split("\n").map((part, i) => {
+        if (!part.startsWith(VOICE_MARK)) return part ? <p key={i}>{part}</p> : null;
+        const words = part.slice(VOICE_MARK.length);
+        const url = line.voice?.url || audio.get(words);
+        return (
+          <div key={i} className="s-voice">
+            <span className="s-voice-head">
+              <Icon name="mic" size={14} /> Tin nhắn thoại{line.voice ? ` · ${clock(line.voice.seconds)}` : ""}
+            </span>
+            {url && <audio controls preload="metadata" src={url} />}
+            <span className="s-voice-text">{words}</span>
+          </div>
+        );
+      })}
     </>
   );
 }

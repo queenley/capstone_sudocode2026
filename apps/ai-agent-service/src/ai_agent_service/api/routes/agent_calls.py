@@ -81,7 +81,36 @@ class FaqEntry(BaseModel):
 async def list_calls(request: Request, open_only: bool = Query(default=False),
                      limit: int = Query(default=30, ge=1, le=100)) -> list[dict[str, Any]]:
     _actor(request)
-    return [_call(row) for row in await calls.list_calls(open_only=open_only, limit=limit)]
+    rows = await calls.list_calls(open_only=open_only, limit=limit)
+    same = await _same_number(rows)
+    return [{**_call(row), "number_customer_id": same.get(row["id"])} for row in rows]
+
+
+async def _same_number(rows: list[dict[str, Any]]) -> dict[int, str]:
+    """For a session nobody was identified in, the CRM customer whose number it gave, when that number is theirs
+    alone: so the queue shows chị Hoa's unverified web chat with her other sessions, not as a stranger "Số đuôi 6714".
+
+    The session stays unverified (``customer_id`` is untouched, and so is everything the agent may say); this only
+    groups rows for staff. A number shared by several customers, or one no CRM customer has, joins nothing, as the
+    call-backs name nobody for such a number (``list_callbacks``)."""
+    from ...runtime import vault as vaults
+    from ...runtime.calls import national_phone
+
+    mock = btc.mock()
+    found: dict[int, str] = {}
+    for row in rows:
+        last4 = row.get("phone_last4")
+        if row.get("customer_id") or not last4:
+            continue
+        vault = await vaults.load(row["id"])
+        phones = {national_phone(value) for kind, value in vault.entries.values() if kind == "PHONE"}
+        phones = {phone for phone in phones if phone.endswith(last4)}
+        if len(phones) != 1:
+            continue
+        crm = mock.crm_get_customer(phone=phones.pop())
+        if crm.get("found") and not crm.get("ambiguous") and crm.get("customer_id"):
+            found[row["id"]] = crm["customer_id"]
+    return found
 
 
 #: The proxies in front close a stream after two minutes; the stream ends first and the console reconnects.
@@ -210,8 +239,20 @@ async def customer_context(call_id: int, request: Request):
     fields = ("order_id", "sku", "variant_sku", "qty", "price_vnd", "payment", "status", "estimated_delivery")
     orders = [{"source": "agent", **{field: order.get(field) for field in fields}} for key, order in (state.get("orders") or {}).items()
               if key in order_ids and isinstance(order, dict)]
-    return {"facts": facts, "episodes": episodes, "orders": orders,
+    return {"facts": facts, "episodes": episodes, "orders": orders, "call_facts": _call_facts(turns),
             "identity_confirmed": row.get("tier") == "VERIFIED", "memory_status": row.get("memory_status")}
+
+
+def _call_facts(turns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """What the customer stated in this call, from the last turn that kept it, each in the advisor's own words.
+
+    The ledger (``facts``) is written by after_call once the call ends: during the call it holds only earlier calls,
+    and the console showed nothing of the area, payment or delivery area the customer had just given."""
+    from ...components.memory import brief
+
+    latest = next((meta["call_facts"] for meta in (t.get("meta") for t in reversed(turns))
+                   if isinstance(meta, dict) and meta.get("call_facts")), None) or {}
+    return [{"slot": slot, "value": value, "text": brief.spoken(slot, value)} for slot, value in latest.items()]
 
 
 @router.post("/calls/{call_id}/handoff")

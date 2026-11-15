@@ -120,3 +120,104 @@ def rollback(to: int, *, reviewer: str, reason: str, folder: Path | None = None)
     atomic_text(where / skill_book.ACTIVE, json.dumps({"version": to}))
     review.log("rollback_skills", version=to, previous=previous, reviewer=reviewer, reason=reason)
     return previous
+
+
+# ── what an admin reads and writes in /admin (Cải tiến hằng tuần, Skills) ─────────────────────────────────────
+
+#: A skill an admin writes may be longer than one Reflection grows: a person writes the whole procedure.
+ADMIN_MAX_BODY = 6000
+SKILL_NAME = re.compile(r"^[a-z][a-z0-9-]{1,47}$")
+TOOL_NAME = re.compile(r"^[a-z][a-z0-9_]{1,63}$")
+
+
+def read_version(version: int, folder: Path | None = None) -> dict[str, Any]:
+    """The skills of *version*: 0 is the file in the prompts, a later one ``data/skills/v<N>.yaml``."""
+    where = folder or skill_book.versions_dir()
+    if version == 0:
+        from ...config.config_manager import load_prompt_yaml
+
+        return load_prompt_yaml("advisor/skills.yaml")
+    path = where / f"v{version}.yaml"
+    if not path.is_file():
+        raise ValueError(f"No skills version {version}")
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def versions(folder: Path | None = None) -> list[dict[str, Any]]:
+    """Every version, newest first: when it was written, by whom, why, and which skills it changed from the one
+    before it (the improvement log says who and why; a version Reflection wrote names its round's reviewer)."""
+    where = folder or skill_book.versions_dir()
+    notes: dict[int, dict[str, Any]] = {}
+    path = review.log_path()
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if row.get("action") in ("publish_skills", "candidate_skills", "admin_skills") and row.get("version") is not None:
+                notes[int(row["version"])] = row
+    current = active(where)
+    out = [{"version": 0, "active": current == 0, "saved_at": None, "by": "gốc (config/prompts)", "note": "",
+            "changed": []}]
+    previous = read_version(0, where)
+    for number in _versions(where):
+        book = read_version(number, where)
+        changed = sorted(name for name in set(book) | set(previous) if book.get(name) != previous.get(name))
+        row = notes.get(number, {})
+        mtime = (where / f"v{number}.yaml").stat().st_mtime
+        from datetime import datetime, timezone
+
+        out.append({"version": number, "active": current == number,
+                    "saved_at": row.get("at") or datetime.fromtimestamp(mtime, timezone.utc).isoformat(),
+                    "by": row.get("reviewer") or "", "note": row.get("note") or "", "changed": changed})
+        previous = book
+    return list(reversed(out))
+
+
+def _checked(name: str, skill: Mapping[str, Any]) -> dict[str, Any]:
+    if not SKILL_NAME.match(name):
+        raise ValueError(f"Tên skill {name!r}: chữ thường, số và gạch ngang, 2-48 ký tự")
+    description = " ".join(str(skill.get("description") or "").split())
+    body = str(skill.get("body") or "").strip()
+    done_on = [str(tool).strip() for tool in skill.get("done_on") or [] if str(tool).strip()]
+    if not description or not body:
+        raise ValueError(f"{name}: cần cả mô tả và nội dung")
+    if len(description) > MAX_DESCRIPTION:
+        raise ValueError(f"{name}: mô tả dài quá {MAX_DESCRIPTION} ký tự (model đọc mô tả của mọi skill mỗi lượt)")
+    if len(body) > ADMIN_MAX_BODY:
+        raise ValueError(f"{name}: nội dung dài quá {ADMIN_MAX_BODY} ký tự")
+    bad = [tool for tool in done_on if not TOOL_NAME.match(tool)]
+    if bad:
+        raise ValueError(f"{name}: tên tool không hợp lệ: {', '.join(bad)}")
+    return {"description": description, "done_on": done_on, "body": body}
+
+
+def edit(changes: Mapping[str, Mapping[str, Any] | None], *, reviewer: str, note: str = "", activate: bool = True,
+         folder: Path | None = None) -> int:
+    """A person's edit of the skills in force as the next version: each name maps to its new skill, or to None to
+    take it out. Never edits a file that exists; ``activate=False`` keeps it as a candidate to switch on later."""
+    if not reviewer.strip():
+        raise ValueError("Sửa skill cần tên người sửa")
+    if not changes:
+        raise ValueError("Không có thay đổi")
+    where = folder or skill_book.versions_dir()
+    where.mkdir(parents=True, exist_ok=True)
+    current = active(where)
+    book = dict(skill_book.read_book(where))
+    for name, skill in changes.items():
+        if skill is None:
+            if name not in book:
+                raise ValueError(f"Không có skill {name}")
+            book.pop(name)
+        else:
+            book[name] = _checked(name, skill)
+    if not book:
+        raise ValueError("Phải còn ít nhất một skill")
+    target = max([current, *_versions(where)]) + 1
+    atomic_text(where / f"v{target}.yaml", yaml.safe_dump(book, allow_unicode=True, sort_keys=False, width=110))
+    if activate:
+        atomic_text(where / skill_book.ACTIVE, json.dumps({"version": target}))
+    review.log("admin_skills", version=target, previous=current, reviewer=reviewer, note=note, activated=activate,
+               skills=sorted(changes), removed=sorted(name for name, skill in changes.items() if skill is None))
+    return target

@@ -37,6 +37,9 @@ x-secrets: &secrets
   AGENT_TOKEN: ${AGENT_TOKEN:?set AGENT_TOKEN}
   SELLER_TOKEN: ${SELLER_TOKEN:?set SELLER_TOKEN}
   DEVELOPER_TOKEN: ${DEVELOPER_TOKEN:?set DEVELOPER_TOKEN}
+  # Not the local default (a password everyone can read in the repository): empty unless .env sets one, and
+  # ignored anyway when ENVIRONMENT=production.
+  DEMO_CUSTOMER_PASSWORD: ${DEMO_CUSTOMER_PASSWORD:-}
 
 services:
   caddy:
@@ -124,6 +127,15 @@ services:
       ZALO_OPENAPI_URL: ${ZALO_MOCK_URL:-}
       ZALO_OAUTH_URL: ${ZALO_MOCK_URL:-}
     restart: unless-stopped
+    logging: *logging
+  # The BTC customers' earlier calls on the agent's memory, once after the agent is up (docker-compose.yml).
+  # The same build arguments as ai-agent-service, so it reuses that build instead of making a second image.
+  agent-seed:
+    build:
+      args:
+        WITH_VOICE: ${AGENT_WITH_VOICE:-1}
+        VOICE_TTS: ${VOICE_TTS:-openai:coral}
+    environment: *secrets
     logging: *logging
 
   api-gateway:

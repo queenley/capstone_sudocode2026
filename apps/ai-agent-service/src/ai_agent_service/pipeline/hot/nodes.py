@@ -312,9 +312,23 @@ async def _settle(state: HotState, context: HotContext, answer: str) -> dict[str
 
     profile = resolver.Match(str(state.get("customer_id") or ""), state.get("customer_name"), state.get("honorific"))
     confirmed = resolver.pick_by_name(answer, [profile]) is not None or await _confirms(state, context, answer)
-    if not confirmed or not profile.customer_id:
+    if not profile.customer_id:
         return dict(STRANGER)
+    if not confirmed:
+        if _denies(answer):
+            return dict(STRANGER)
+        # Words about something else ("tôi không đặt cái này, tra giỏ hàng giúp"): not an answer to the question.
+        # Read as a denial, it made the caller a stranger, and the "đúng" that followed opened nothing (2026-11-14).
+        return {}
     return {"tier": "VERIFIED", "awaiting": None, **await _brief(state, context, time.perf_counter())}
+
+
+def _denies(answer: str) -> bool:
+    """A denial of who the caller is: the denying words, someone calling for another, or a bare short "no"."""
+    text = answer.lower()
+    if resolver.DENIAL.search(text) or resolver.PROXY.search(resolver.plain(text)):
+        return True
+    return len(re.findall(r"\w+", text)) <= 3 and resolver.confirms(answer) is False
 
 
 async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
@@ -816,7 +830,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
                 pending_purchase = None
             if result["name"] == "order.update":
                 asked = result.get("args") or {}
-                updated.append({k: asked.get(k) for k in ("order_id", "action", "new_variant_sku")})
+                updated.append({k: asked.get(k) for k in ("order_id", "action", "new_variant_sku", "new_address")})
             for order in data.get("orders") or ([data] if data.get("order_id") else []):
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])

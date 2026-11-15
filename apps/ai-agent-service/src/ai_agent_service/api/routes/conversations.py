@@ -54,13 +54,35 @@ class TurnRequest(BaseModel):
     turn_id: str | None = Field(default=None, min_length=1, max_length=64)
 
 
+#: Marks a line of a customer message the customer spoke (a voice message, ``/voice-message``), not typed. Kept in
+#: the stored conversation so the chat and the staff console show it as a voice message; taken off for the model.
+VOICE_MARK = "🎤 "
+
+
+def unmark_voice(message: str) -> tuple[str, int]:
+    """The message as the customer meant it, and how many of its lines were voice messages."""
+    lines = message.split("\n")
+    spoken = sum(1 for line in lines if line.startswith(VOICE_MARK))
+    return "\n".join(line[len(VOICE_MARK):] if line.startswith(VOICE_MARK) else line for line in lines), spoken
+
+
+def voice_note(count: int) -> str:
+    """Words recognised from the customer's voice messages: the model reads them as speech, not as typed text."""
+    many = f"{count} tin nhắn thoại" if count > 1 else "tin nhắn thoại"
+    return (f"(Khách gửi {many}; chữ ở trên do hệ thống nhận dạng giọng nói, có thể thiếu dấu hoặc nghe nhầm. "
+            f"Hiểu theo ý; chỗ nào không chắc, nhất là số điện thoại, mã đơn, địa chỉ, thì hỏi lại khách.)")
+
+
 def cart_note(lines: list[CartLine]) -> str:
     """The web cart as context under the customer's words; prices are quoted by the tools, never from here."""
     if not lines:
         return "(Giỏ hàng trên website của khách đang trống)"
     items = "; ".join(f"{' '.join((line.name or '').split())[:160] or line.sku} [{line.sku}] x{line.qty}"
                       for line in lines)
-    return f"(Giỏ hàng trên website của khách: {items}. Giá và tồn kho phải tra bằng công cụ.)"
+    # Background, not the subject: sent under every message, it read as the question, and a customer asking about
+    # an order heard the cart item's price and stock first (2026-11-14).
+    return (f"(Giỏ hàng trên website của khách: {items}. Chỉ là bối cảnh: chỉ nhắc khi khách hỏi về giỏ hàng hay "
+            f"sản phẩm trong giỏ; khách hỏi việc khác thì trả lời đúng việc đó. Giá và tồn kho phải tra bằng công cụ.)")
 
 
 async def _turn(request: Request, conversation_id: str, data: TurnRequest,
@@ -110,7 +132,9 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
             raise HTTPException(error.status, str(error)) from error
         return {**_result(row, turn_id, None, stored["content"]), "replayed": True}
 
-    message = data.message
+    message, spoken = unmark_voice(data.message)
+    if spoken:
+        message = f"{message}\n{voice_note(spoken)}"
     if data.selected_sku:
         # The product the customer has open on the page is context, not their words.
         message = f"{message}\n(Khách đang xem sản phẩm {data.selected_sku})"
@@ -265,3 +289,48 @@ async def stream(conversation_id: UUID, data: TurnRequest, request: Request) -> 
 
 def _event(name: str, data: dict[str, Any]) -> str:
     return f"event: {name}\ndata: {json.dumps(data, ensure_ascii=False, default=str)}\n\n"
+
+
+# ── voice messages: hold to record, as on Zalo or Messenger ──────────────────
+
+#: A voice message is at most a minute, as on Zalo: 16-bit mono at 16 kHz, under the web proxy's 2 MB.
+VOICE_RATE = 16_000
+VOICE_MAX_SECONDS = 60.0
+
+
+@router.post("/conversations/{conversation_id}/voice-message")
+async def voice_message(conversation_id: UUID, request: Request) -> dict[str, Any]:
+    """One voice message the customer recorded in the web chat, as text: ``{text, seconds}``.
+
+    The browser decodes its recording and sends 16-bit little-endian mono PCM at 16 kHz. This only transcribes:
+    the client gathers the customer's voice messages and sends them as one turn (``/stream``, each line marked
+    with ``VOICE_MARK``)
+    when they stop, so the assistant answers the last of several, not each. Recognised by the same recogniser and
+    lexicon as a call (``components/voice/asr.py``, ``intake/lexicon.py``)."""
+    conversation = await platform.authorize(request.app, str(conversation_id), bearer(request))
+    if conversation.status not in ("open", "handed_off"):
+        raise HTTPException(409, "Conversation is closed")
+    limit = int(VOICE_MAX_SECONDS * VOICE_RATE * 2)
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+        if len(body) > limit:
+            raise HTTPException(413, f"Tin nhắn thoại dài tối đa {VOICE_MAX_SECONDS:.0f} giây")
+    if not body or len(body) % 2:
+        raise HTTPException(400, "The body must be 16-bit PCM samples")
+    import numpy as np
+
+    from ...components.intake.lexicon import lexicon
+    from ...components.voice import asr
+    from ...runtime import options
+
+    samples = np.frombuffer(bytes(body), dtype="<i2").astype(np.float32) / 32768.0
+    words = lexicon()
+    try:
+        heard = await asyncio.wait_for(
+            asyncio.to_thread(asr.transcribe, options.voice().asr, samples, words.hotwords), timeout=asr.TIMEOUT)
+    except (asyncio.TimeoutError, RuntimeError, OSError) as error:
+        logger.warning("Voice message on %s not recognised: %s", conversation_id, error)
+        raise HTTPException(503, "Chưa nhận dạng được tin nhắn thoại. Vui lòng thử lại hoặc nhập chữ.") from error
+    text, _ = words.correct(" ".join(heard.text.split()))
+    return {"text": text, "seconds": round(samples.size / VOICE_RATE, 2)}

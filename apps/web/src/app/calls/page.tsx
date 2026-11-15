@@ -1,4 +1,4 @@
-import CallConsole from "@/features/call-console";
+import CallConsole from "@/features/sales/call-console";
 
 export default function CallsPage() {
   return <CallConsole />;

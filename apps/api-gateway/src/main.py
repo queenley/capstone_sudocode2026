@@ -105,7 +105,8 @@ def upstream_for(path: str) -> str:
     if path == "api/conversations" or path.startswith("api/conversations/"):
         if "/identity/" in path:
             return IDENTITY_SERVICE_URL
-        if path.endswith("/turns") or path.endswith("/stream"):
+        # voice-message: a voice message recorded in the web chat, transcribed by the agent.
+        if path.endswith(("/turns", "/stream", "/voice-message")):
             return AI_AGENT_SERVICE_URL
         return SALES_SERVICE_URL
     if path.startswith("api/admin/users"):

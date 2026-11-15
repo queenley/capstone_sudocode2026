@@ -12,7 +12,8 @@ resource "aws_sns_topic_subscription" "email" {
 
 locals {
   alb_dimension = { LoadBalancer = aws_lb.main.arn_suffix }
-  alarms = {
+  alarms        = merge(local.app_alarms, { for key, alarm in local.rds_alarms : key => alarm if var.use_rds })
+  app_alarms = {
     alb-5xx = {
       namespace = "AWS/ApplicationELB", metric = "HTTPCode_ELB_5XX_Count", statistic = "Sum", threshold = 10,
       period    = 300, periods = 1, dimensions = local.alb_dimension, description = "The ALB answered 5xx (no healthy target, timeouts)."
@@ -35,13 +36,16 @@ locals {
       period     = 300, periods = 3, description = "A gateway target stayed unhealthy for 15 minutes.",
       dimensions = { LoadBalancer = aws_lb.main.arn_suffix, TargetGroup = aws_lb_target_group.gateway.arn_suffix }
     }
+  }
+  # The RDS instance's identifier is local.prefix (data.tf).
+  rds_alarms = {
     rds-cpu = {
       namespace = "AWS/RDS", metric = "CPUUtilization", statistic = "Average", threshold = 80,
-      period    = 300, periods = 3, dimensions = { DBInstanceIdentifier = aws_db_instance.main.identifier }, description = "RDS CPU over 80% for 15 minutes."
+      period    = 300, periods = 3, dimensions = { DBInstanceIdentifier = local.prefix }, description = "RDS CPU over 80% for 15 minutes."
     }
     rds-storage = {
       namespace = "AWS/RDS", metric = "FreeStorageSpace", statistic = "Minimum", threshold = 5 * 1024 * 1024 * 1024, comparison = "LessThanThreshold",
-      period    = 300, periods = 1, dimensions = { DBInstanceIdentifier = aws_db_instance.main.identifier }, description = "RDS has under 5 GB free."
+      period    = 300, periods = 1, dimensions = { DBInstanceIdentifier = local.prefix }, description = "RDS has under 5 GB free."
     }
   }
 }

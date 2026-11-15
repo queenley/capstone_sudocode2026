@@ -387,3 +387,22 @@ async def test_forgetting_a_customer_also_clears_their_conversation_log(monkeypa
     assert {'facts','episodes','identities','pii_vault','turns','calls_unlinked'}<=set(result['deleted'])
     assert any(s.startswith('DELETE FROM turns WHERE call_id = ANY') for s in executed)
     assert any(s.startswith('UPDATE calls SET customer_id = NULL') for s in executed)
+
+
+def test_a_name_after_a_repeated_honorific_is_the_name_given():
+    """"chị là chị Hoa, sđt ..." names the profile: the web chat asked her to confirm it again (2026-11-14)."""
+    from ai_agent_service.components.identity import resolver
+
+    hoa = resolver.Match("C001", "Hoa", "chị")
+    assert resolver.pick_by_name("chị là chị hoa sđt là 0900000000, muốn hỏi đơn hàng", [hoa]) == hoa
+    assert resolver.pick_by_name("chị là Hoa", [hoa]) == hoa
+    assert resolver.pick_by_name("chị gọi thay cho chị Hoa", [hoa]) is None
+
+
+def test_words_about_something_else_are_no_denial_of_who_is_calling():
+    from ai_agent_service.pipeline.hot.nodes import _denies
+
+    assert not _denies("tôi không đặt cái này nhưng hãy tra giỏ hàng của tôi")
+    assert _denies("không phải")
+    assert _denies("không")
+    assert _denies("nhầm số rồi em")

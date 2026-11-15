@@ -9,7 +9,7 @@ Dành cho frontend, QA và tích hợp. Gateway (`:8000`) là entry point công 
 | `/api/catalog*`, `/api/seller/*`, `/api/admin/catalog`, `/api/admin/inventory/*`, `/api/admin/promotions` | Commerce `:8100` |
 | `/api/auth/*`, `/api/customer/*`, `/api/admin/users*`, `/api/conversations/{id}/identity/*` | Identity `:8200` |
 | `/api/conversations*` (còn lại), `/api/staff/*`, `/api/admin/proposals*` | Sales `:8300` |
-| `/api/conversations/{id}/turns`, `/stream`, WS `/voice`; `/api/agent/*`, `/api/developer/*` | AI Agent `:8400` |
+| `/api/conversations/{id}/turns`, `/stream`, `/voice-message`, WS `/voice`; `/api/agent/*`, `/api/developer/*` | AI Agent `:8400` |
 | route khác | 404 `No service owns this route` |
 
 Mỗi service có `/docs` và `/openapi.json` trên địa chỉ nội bộ. Bản snapshot nằm ở `contracts/api/openapi/<service>.json`, sinh bằng `python -m scripts.contracts.export_contracts`. Gateway chưa gộp các OpenAPI này.
@@ -93,6 +93,7 @@ Các channel hợp lệ: `web`, `chat`, `call`, `hotline`, `fanpage`, `zalo`.
 | POST | `/api/conversations/{id}/turns` | conversation | Một lượt, trả JSON |
 | POST | `/api/conversations/{id}/stream` | conversation | Cùng lượt đó, trả qua SSE |
 | WS | `/api/conversations/{id}/voice` | conversation (frame đầu) | Cuộc gọi thoại |
+| POST | `/api/conversations/{id}/voice-message` | conversation | Một tin nhắn thoại thành chữ: body PCM 16-bit mono 16 kHz, tối đa 60 giây; trả `{text, seconds}` |
 
 Request:
 
@@ -136,11 +137,13 @@ Voice WebSocket:
 3. Mã đóng: `4404` khi token sai, `4409` khi conversation không mở, `1011` khi gateway không tới được AI service.
 4. Nếu server chưa cài gói voice, server gửi `{"type":"error"}` rồi đóng.
 
-Trên web, nút **☏ Gọi cửa hàng** ở khung chat mở cuộc gọi này (`src/features/voice-call.tsx`). Trình duyệt kết nối WebSocket thẳng tới gateway, vì route handler của Next không proxy được WebSocket: dùng `NEXT_PUBLIC_VOICE_URL` (build arg của image web), mặc định `ws(s)://<host của trang>:8000`.
+**Tin nhắn thoại** (giống Zalo, Messenger): trong khung chat, khách nhấn giữ nút micro để ghi âm, thả ra để gửi, kéo lên để hủy (`src/lib/voice-note.ts`). Trình duyệt tự giải mã bản ghi về PCM 16 kHz, gửi `/voice-message` để lấy chữ. Khách gửi được nhiều tin liên tiếp; 2,5 giây sau tin cuối (không còn tin đang ghi hay đang nhận dạng), web gửi tất cả thành **một** lượt `/stream`, mỗi dòng mở đầu bằng `🎤 `. Agent bỏ dấu này trước khi đưa cho model, thêm ghi chú rằng chữ do nhận dạng giọng nói và có thể sai, rồi trả lời một lần. Tin đã lưu giữ dấu `🎤 `, nên khung chat và console nhân viên đều hiện đó là tin thoại.
+
+Trên web, nút **☏ Gọi cửa hàng** ở khung chat mở cuộc gọi này (`src/features/voice/voice-call.tsx`). Trình duyệt kết nối WebSocket thẳng tới gateway, vì route handler của Next không proxy được WebSocket: dùng `NEXT_PUBLIC_VOICE_URL` (build arg của image web), mặc định `ws(s)://<host của trang>:8000`.
 
 ## AI Agent: console nhân viên (`/api/agent`, role agent/admin)
 
-Giao diện: trang `/calls` của web (`src/features/call-console.tsx`).
+Giao diện: trang `/calls` và `/ban-hang/hoi-thoai` của web (`src/features/sales/call-console.tsx`).
 
 
 | Method | Path | Mô tả |

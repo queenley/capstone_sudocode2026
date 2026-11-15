@@ -218,8 +218,8 @@ Các ràng buộc vận hành:
 |---|---|---|
 | A. Tách trang admin và sales | xong | `apps/web/src/app/admin/page.tsx`, `login/page.tsx`, `ban-hang/page.tsx` |
 | B. Lưu trong database, ingest | đã code, đã chạy trên database dev | `runtime/evaluations.py`, `pipeline/eval/history.py`, `run_eval.py --ingest` |
-| C. Vòng hằng tuần, Airflow, duyệt trên web | đã code và test, **chưa chạy một tuần thật** | `pipeline/improve/weekly.py`, `api/routes/improvement.py`, `features/improvement-admin.tsx`, `infra/airflow/` |
-| D. Dashboard | đã code và test với dữ liệu giả | `features/evaluation-dashboard.tsx` |
+| C. Vòng hằng tuần, Airflow, duyệt trên web | đã code và test, **chưa chạy một tuần thật** | `pipeline/improve/weekly.py`, `api/routes/improvement.py`, `features/admin/improvement-admin.tsx` (`/admin/cai-tien`), `infra/airflow/` |
+| D. Dashboard | đã code và test với dữ liệu giả | `features/admin/evaluation-dashboard.tsx` (`/admin/danh-gia`) |
 
 Đã kiểm ngày 12/11/2026:
 
