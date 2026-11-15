@@ -12,19 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Lan ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ chị xác nhận đơn hàng giày chạy bộ RunLite 2 Pro size 43 màu đen ạ.",
+      "text": "Dạ em chào chị Lan ạ, em là trợ lý ảo của shop BTC. Chị muốn xác nhận đơn hàng giày chạy bộ phải không ạ?",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1740000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -34,9 +25,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị là Lan. Chị muốn xác nhận đơn hàng giày chạy bộ size 43 màu đen.",
+      "text": "Alo, chị là Lan. Chị muốn xác nhận đơn hàng giày chạy bộ size 43 màu đen. Mẫu RunLite 2 Pro nhé em.",
       "facts_stated": {
-        "size": 43
+        "size": 43,
+        "color": "den",
+        "product_advised": "SKU-SN-RUN2"
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -45,12 +38,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm giày chạy bộ RunLite 2 Pro size 43 màu đen hiện có sẵn hàng, giá 1.740.000đ ạ. Chị muốn chọn hình thức thanh toán nào cho đơn này ạ?",
+      "text": "Dạ, chị xác nhận muốn mua giày chạy bộ RunLite 2 Pro size 43 màu đen đúng không ạ? Giá sản phẩm là 1.740.000đ. Em kiểm tra hiện mẫu này đang còn hàng chị nhé.",
       "questions": [
         {
-          "slot": "payment",
-          "type": "open",
-          "text": "Chị muốn chọn hình thức thanh toán nào cho đơn này ạ?"
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận lên đơn: 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ. Thông tin này đúng chưa chị?"
         }
       ],
       "facts_used": [],
@@ -74,7 +67,9 @@
     {
       "speaker": "customer",
       "text": "Chị sẽ thanh toán bằng hình thức COD.",
-      "facts_stated": {},
+      "facts_stated": {
+        "payment": "COD"
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -82,12 +77,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận thanh toán COD ạ. Chị muốn shop giao hàng về khu vực nào giúp em xác nhận thông tin ạ?",
+      "text": "Dạ, chị chọn thanh toán COD ạ. Đơn hàng sẽ được giao về TP Huế đúng không chị?",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "open",
-          "text": "Chị muốn shop giao hàng về khu vực nào giúp em xác nhận thông tin ạ?"
+          "type": "confirm",
+          "text": "Đơn hàng giao về TP Huế đúng không chị?"
         }
       ],
       "facts_used": [],
@@ -102,7 +97,9 @@
     {
       "speaker": "customer",
       "text": "Giao hàng về TP Huế nhé.",
-      "facts_stated": {},
+      "facts_stated": {
+        "delivery_area": "TP Huế"
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -110,12 +107,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận giao hàng về TP Huế ạ. Đơn này tổng giá trị 1.740.000đ, shop giao dự kiến trong 4 ngày làm việc, nhận hàng vào khoảng ngày 20/10 ạ. Em xin phép đọc lại thông tin đơn hàng để chị xác nhận ạ: 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, thanh toán COD, giao về TP Huế, nhận hàng khoảng ngày 20/10. Chị xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "text": "Em cảm ơn chị Lan đã xác nhận. Đơn hàng sẽ giao về TP Huế, thanh toán COD. Dự kiến giao trong 4 ngày làm việc, khoảng ngày 20/10/2026.",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Em xin phép đọc lại thông tin đơn hàng để chị xác nhận ạ: 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, thanh toán COD, giao về TP Huế, nhận hàng khoảng ngày 20/10. Chị xác nhận giúp em thông tin trên đúng chưa ạ?"
+          "text": "Em đọc lại đơn hàng: 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, giao TP Huế, thanh toán COD, nhận trong khoảng ngày 20/10/2026. Chị đồng ý để em lên đơn luôn không ạ?"
         }
       ],
       "facts_used": [],
@@ -125,8 +122,8 @@
           "value": 1740000
         },
         {
-          "field": "in_stock",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
         }
       ],
       "tool_calls": [
@@ -155,13 +152,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn hàng cho chị thành công. Mã đơn của chị là OD600001, tổng 1.740.000đ, shop sẽ giao hàng về TP Huế và chị thanh toán khi nhận hàng. Nếu cần hỗ trợ thêm, chị liên hệ lại shop bất cứ lúc nào nhé ạ. Em cảm ơn chị Lan đã đặt hàng tại BTC!",
+      "text": "Dạ, em đã tạo đơn hàng cho chị: 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, giao về TP Huế, thanh toán COD. Dự kiến chị nhận hàng vào ngày 20/10/2026. Em cảm ơn chị Lan đã đặt hàng tại shop BTC ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1740000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
         }
       ],
       "tool_calls": [
@@ -183,43 +184,43 @@
           "key": "size",
           "value": 43,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn8"
         },
         {
           "key": "color",
           "value": "den",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn8"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn8"
         },
         {
           "key": "delivery_area",
           "value": "TP Huế",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn8"
         },
         {
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn8"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1740000,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn8"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-43-DEN",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn8"
         },
         {
           "key": "order_id",
@@ -239,7 +240,7 @@
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "neutral",
+    "sentiment": "positive",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
@@ -250,6 +251,7 @@
       "price_vnd": 1740000,
       "payment": "COD",
       "delivery_area": "TP Huế",
+      "estimated_delivery": "2026-10-20",
       "order_id": "OD600001"
     }
   }

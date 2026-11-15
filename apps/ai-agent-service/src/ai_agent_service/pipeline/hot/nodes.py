@@ -1288,6 +1288,7 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         earlier_numbers=_earlier_numbers(state.get("call_log") or []),
         earlier_counts=frozenset(int(n) for entry in state.get("call_log") or [] for n in re.findall(r"\d+", str(entry.get("result") or ""))),
         basket_total=_basket_total(state, results),
+        order_quotes=_order_quotes(state, results),
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),
@@ -1311,7 +1312,22 @@ def _earlier_numbers(log: Sequence[Mapping[str, Any]]) -> frozenset[int]:
 def _basket_total(state: HotState, results: Sequence[Mapping[str, Any]]) -> int | None:
     quotes = {**(state.get("quotes") or {}), **_quoted_in(results)}
     lines = _basket_lines(_basket_after(state.get("basket") or {}, results), quotes)
+    # A pricing.quote_order of these very units holds their price (AIR-2ND-50); the standalone quotes do not add up to it.
+    priced = _order_quotes(state, results).get(purchase.units_key([{"sku": s, "qty": q} for s, _, q in lines]))
+    if lines and priced:
+        return sum(int(price) for _, price in priced)
     return sum(price * qty for _, price, qty in lines) or None
+
+
+def _order_quotes(state: HotState, results: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Units priced by a ``pricing.quote_order`` of this call, this turn's included, units key to ``[[sku, price], ...]``."""
+    found = dict(state.get("order_quotes") or {})
+    for result in results:
+        envelope = result.get("result") or {}
+        if (result.get("name") == "pricing.quote_order" and envelope.get("ok")
+                and (priced := purchase.quoted_units(envelope.get("data") or {}))):
+            found[priced[0]] = priced[1]
+    return found
 
 
 def _quoted_in(results: Sequence[Mapping[str, Any]]) -> dict[str, int]:

@@ -12,8 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã xác nhận đơn hàng áo phao anh đặt trước đó.",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn đổi địa chỉ giao hàng cho đơn áo phao đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh muốn cập nhật địa chỉ mới là gì ạ?"
+        }
+      ],
       "facts_used": [
         "order_id",
         "owned_sku"
@@ -31,22 +37,29 @@
       "text": "Alo, anh muốn đổi địa chỉ giao hàng cho đơn hàng áo phao anh đã đặt.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh muốn cập nhật địa chỉ giao hàng mới đúng không ạ? Anh vui lòng cho em biết địa chỉ mới để em hỗ trợ cập nhật đơn.",
+      "text": "Dạ vâng, anh vui lòng cho em biết địa chỉ mới để em cập nhật cho đơn hàng OD900802 nhé.",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "open",
-          "text": "Anh vui lòng cho em biết địa chỉ mới để em hỗ trợ cập nhật đơn."
+          "text": "Anh muốn chuyển tới địa chỉ nào vậy ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900802"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -67,28 +80,34 @@
           "spoken": "Hải Châu, Đà Nẵng"
         }
       ],
-      "pause_before_ms": 400,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ nhận hàng mới là Hải Châu, Đà Nẵng cho đơn áo phao của anh. Em sẽ tiến hành cập nhật ngay trên hệ thống ạ.",
-      "questions": [],
+      "text": "Em đã ghi nhận địa chỉ giao hàng mới là Hải Châu, Đà Nẵng cho đơn áo phao OD900802 của anh ạ. Đơn này vẫn đang trong trạng thái xử lý.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh xác nhận muốn cập nhật địa chỉ này cho đơn đang xử lý đúng không ạ?"
+        }
+      ],
       "facts_used": [
         "order_id"
       ],
-      "claims": [],
-      "tool_calls": [
+      "claims": [
         {
-          "name": "order.update",
-          "args": {
-            "order_id": "OD900803",
-            "action": "update_address",
-            "on": "2026-11-02"
-          }
+          "field": "order_id",
+          "value": "OD900802"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
         }
       ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
@@ -106,18 +125,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra thì đơn hàng áo phao của anh đã được giao thành công rồi ạ.",
+      "text": "Dạ đúng rồi anh, đơn hàng của anh hiện vẫn trong trạng thái xử lý nên em có thể đổi địa chỉ giúp anh ngay bây giờ ạ.",
       "questions": [],
-      "facts_used": [
-        "order_id"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
-      "tool_calls": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD900802",
+            "action": "update_address",
+            "on": "2026-11-02"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
@@ -129,16 +155,15 @@
       "text": "Hy vọng chuyển đến địa chỉ mới sẽ không mất thêm thời gian nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã cập nhật địa chỉ mới cho anh rồi ạ. Nếu cần hỗ trợ thêm về giao hàng hoặc đổi trả, anh có thể liên hệ lại shop bất cứ lúc nào.",
+      "text": "Dạ em đã cập nhật địa chỉ mới cho đơn của anh rồi ạ. Việc đổi địa chỉ khi đơn còn đang xử lý sẽ không ảnh hưởng đến thời gian giao hàng đâu anh.",
       "questions": [],
       "facts_used": [
-        "order_id",
         "delivery_area"
       ],
       "claims": [],

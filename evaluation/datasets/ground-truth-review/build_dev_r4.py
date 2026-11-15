@@ -767,8 +767,113 @@ G30_LINES = {"dev": {
 G30_LOAN = {"dev": calls("GEN-0005/c2, GEN-0055/c2, GEN-0081/c2, GEN-0131/c2, GEN-0181/c2"), "test": []}
 
 
+#: Group 32 (D3 of DISPUTES.md): a first order of running shoes where the customer says only "giày chạy bộ size N
+#: màu …". RunLite 1 and RunLite 2 Pro both come in those sizes and colours, no earlier call or CRM history names the
+#: model, yet args_match.sku is a RunLite 2 Pro variant. The customer now names the model in that turn.
+REVIEWER_D3 = "Người duyệt yêu cầu ngày 16/11/2026 (D3 của DISPUTES.md)"
+G32 = {"dev": calls("ADV-0024/c1, ADV-0119/c1, GEN-0008/c1, GEN-0024/c1, GEN-0040/c1, GEN-0090/c1, GEN-0158/c1, "
+                    "GEN-0174/c1, GEN-0190/c1, GEN-0208/c1, GEN-0240/c1"),
+       "test": calls("ADV-0024/c1, GEN-0008/c1, GEN-0040/c1")}
+G32_MODEL = {"SKU-SN-RUN2": "RunLite 2 Pro"}
+#: Group 33 (D2 of DISPUTES.md, Facebook): call_1 on Zalo, call_2 on the Fanpage under an identity the CRM does not
+#: hold (the generator made up fb.<customer_id>). Facebook gives the shop no phone, so nothing links the two chats;
+#: the labels still expect the order and the memory of call_1. The customer now gives their name and number in the
+#: first turn and confirms ("Đúng rồi em, chị là …") at the start of the next, the one question a stated number gets.
+REVIEWER_D2 = "Người duyệt yêu cầu ngày 16/11/2026 (D2 của DISPUTES.md, kênh Facebook)"
+G33 = {"dev": calls("ADV-0003/c2, ADV-0035/c2, ADV-0064/c2, ADV-0098/c2, ADV-0130/c2"),
+       "test": calls("ADV-0003/c2, ADV-0035/c2")}
+#: Group 35 (D6 of DISPUTES.md): call_2 where the customer says "đổi ý, ngân sách giờ còn X" with X below the basket
+#: the label still orders in full (total_match_vnd). The change tests memory (memory_expectation.superseded), not the
+#: basket, but nothing says the basket stays, and an agent that trims it to the budget fails TSR. The customer now
+#: says they still take every item, right after the new budget.
+REVIEWER_D6 = "Người duyệt yêu cầu ngày 16/11/2026 (D6 của DISPUTES.md)"
+G35 = {"dev": calls("ADV-0012/c2, ADV-0060/c2, ADV-0073/c2, ADV-0107/c2, GEN-0017/c2, GEN-0067/c2, GEN-0099/c2, "
+                    "GEN-0133/c2, GEN-0149/c2, GEN-0167/c2, GEN-0217/c2, GEN-0233/c2, GEN-0249/c2"),
+       "test": calls("ADV-0012/c2, GEN-0017/c2, GEN-0033/c2")}
+BUDGET_CHANGE = re.compile(r"đổi ý|ngân sách (của \w+ )?(giờ|bây giờ|còn)|chỉ còn .*triệu|tăng lên", re.IGNORECASE)
+#: Group 36 (D5 of DISPUTES.md): must_say_any phrases the agent says in other, equally right words. The scorer matches
+#: whole phrases, so "đang trên đường giao" misses "đang giao". Each list keeps its phrases and gains the equivalents.
+REVIEWER_D5 = "Người duyệt yêu cầu ngày 16/11/2026 (D5 của DISPUTES.md)"
+SAY_TOO = [
+    ({"đang giao", "đang vận chuyển"}, ["đang trên đường giao", "trên đường giao"],
+     "order.status trả shipping; \"đang trên đường giao\" nói đúng trạng thái đó"),
+    ({"miền Nam", "địa chỉ giao"}, ["không được freeship", "chưa được áp dụng freeship", "không áp dụng freeship",
+                                  "không được miễn phí giao"],
+     "NAM-SHIP0 chỉ cho miền Nam; nói địa chỉ của khách không được freeship là đúng ý"),
+    ({"máy thứ hai", "máy thứ 2"}, ["giảm 50%"], "AIR-2ND-50 là giảm 50% máy giá thấp hơn khi mua hai máy cùng đơn"),
+]
+#: Group 37 (D4): labels against the organisers' documents or mock.
+REVIEWER_D4 = "Người duyệt yêu cầu ngày 16/11/2026 (D4 của DISPUTES.md)"
+#: SP-AIR-01 (spec-gia-dung.md), the filter life of each model; BH-04 gives the general 6–12 months.
+FILTER_LIFE = [("AirPure Pro", ["12 tháng"]), ("AirPure Mini", ["6 tháng"]),
+               ("AirPure", ["8–12 tháng", "8-12 tháng", "8 đến 12 tháng"])]
+#: GEN-0213 call_2: the catalogue answers "is there a pink limited edition" (Urban Classic: black, white, grey).
+G37_CATALOGUE = {ref("GEN-0213/c2"): ["không có thông tin", "chưa có thông tin", "chưa có màu hồng", "không có màu hồng",
+                                      "chưa có phiên bản", "không có phiên bản", "chỉ có màu"]}
+#: Group 38 (D7): customer words that cannot reach success_if.
+REVIEWER_D7 = "Người duyệt yêu cầu ngày 16/11/2026 (D7 của DISPUTES.md)"
+G38_AGREE = {"dev": calls("GEN-0037/c2, GEN-0121/c2"), "test": []}
+G38_PHONE = {"dev": calls("ADV-0093/c1, ADV-0145/c1"), "test": []}
+CHANNEL_WORDS = {"zalo_oa": "bên Zalo", "hotline": "qua tổng đài", "chat_fanpage": "bên Facebook", "web_chat": "trên web"}
+
+
+#: Group 34 (D1 of DISPUTES.md): the label's order is not the one the customer names. Kind A: the customer reads
+#: …02 (processing), the label is …03 (another product, delivered; an address cannot change after delivery). Kind B:
+#: the label is the order created in an earlier call, but the customer reads and describes one of their CRM orders.
+#: Kept: GEN-0236 call_3, where the customer describes the fan ordered in call_2 and only doubts its code.
+REVIEWER_D1 = "Người duyệt yêu cầu ngày 16/11/2026 (D1 của DISPUTES.md)"
+G34 = {ref(k): v for k, v in {
+    "GEN-0035/c1": "OD900202", "GEN-0035/c2": "OD900202", "GEN-0069/c1": "OD900402", "GEN-0069/c2": "OD900402",
+    "GEN-0101/c1": "OD900602", "GEN-0101/c2": "OD900602", "GEN-0135/c1": "OD900802", "GEN-0135/c2": "OD900802",
+    "ADV-0068/c2": "OD900502", "GEN-0070/c3": "OD901002"}.items()}
+#: What the agent says of an order in that state (the organisers' order.status statuses).
+STATUS_WORDS = {"processing": ["đang xử lý", "đang chuẩn bị"], "shipping": ["đang giao", "đang vận chuyển", "đang trên đường"]}
+
+
+def crm_orders() -> dict[str, dict]:
+    orders = {}
+    for name in ("crm_seed.json", "crm_seed_synthetic.json"):
+        data = json.loads((BTC / "catalog" / name).read_text(encoding="utf-8"))
+        for customer in data.get("customers", data) if isinstance(data, dict) else data:
+            for order in customer.get("orders") or []:
+                orders[order["order_id"]] = order
+    return orders
+
+
+def apply_g34(scenarios: dict, tools_dir: Path, add) -> None:
+    """Group 34; add(sid, call, field, source, proposed, evidence)."""
+    orders = crm_orders()
+    for (sid, name), new in G34.items():
+        c, order = scenarios[sid]["calls"][name], orders[new]
+        si, gt = c["success_if"], c.setdefault("ground_truth_facts", {})
+        old = si["args_match"]["order_id"]
+        why = (f"{REVIEWER_D1}, nhóm 34: khách đọc và tả đơn {new} ({order['sku']}, {order['status']}); nhãn là {old}, "
+               "một đơn khác.")
+        add(sid, name, "success_if.args_match.order_id", old, new, why)
+        si["args_match"]["order_id"] = new
+        for key, value in (("order_id", new), ("order_status", order["status"])):
+            if gt.get(key) != value:
+                add(sid, name, f"ground_truth_facts.{key}", gt.get(key), value, "Cùng lý do.")
+                gt[key] = value
+        if si.get("tool_called") == "order.status" and si.get("must_say_any") != STATUS_WORDS[order["status"]]:
+            add(sid, name, "success_if.must_say_any", si.get("must_say_any"), STATUS_WORDS[order["status"]],
+                f"Cùng lý do: trạng thái của {new} là {order['status']}.")
+            si["must_say_any"] = STATUS_WORDS[order["status"]]
+        path = tools_dir / f"scenarios_{sid}" / f"{name}.json"
+        if path.exists():
+            planned = json.loads(path.read_text(encoding="utf-8"))
+            fixed = json.loads(json.dumps(planned).replace(f'"{old}"', f'"{new}"'))
+            for entry in fixed:
+                if entry.get("name") == "order.status":
+                    entry["result"] = {"orders": [order]}
+            if fixed != planned:
+                path.write_text(json.dumps(fixed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                add(sid, name, "tools (oracle)", old, new, "Agent lý tưởng tra và sửa đúng đơn khách nói; kết quả "
+                    "order.status lấy từ CRM.")
+
+
 def apply_second_check(scenarios: dict, which: str, add) -> None:
-    """Groups 27-30; add(sid, call, field, source, proposed, evidence, group)."""
+    """Groups 27-30 and 32; add(sid, call, field, source, proposed, evidence, group)."""
     def say(c, index, line):
         old = c["customer_turns"][index]
         c["customer_turns"][index] = f"{old.rstrip()} {line}"
@@ -819,6 +924,93 @@ def apply_second_check(scenarios: dict, which: str, add) -> None:
                     c["customer_turns_asr"][i] = plain(new)
                 add(sid, name, f"customer_turns[{i}]", turn, new, f"{SECOND_CHECK}, nhóm 30: người gọi là cô Loan (CRM C034, "
                     "\"cô\"), lời lại tự xưng \"chị\".", 30)
+    for sid, name in G32[which]:
+        c = scenarios[sid]["calls"][name]
+        sku = c["success_if"]["args_match"]["sku"]
+        model = G32_MODEL[sku[:11]]
+        i = next(i for i, turn in enumerate(c["customer_turns"]) if "chạy bộ" in turn)
+        old = say(c, i, f"Mẫu {model} nhé em.")
+        add(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{REVIEWER_D3}, nhóm 32: args_match.sku={sku} "
+            f"nhưng khách chỉ nói \"giày chạy bộ\" kèm size, màu; RunLite 1 và RunLite 2 Pro đều có size, màu đó, và không "
+            "cuộc trước hay lịch sử CRM nào nêu mẫu. Khách nay nói tên mẫu.", 32)
+
+    def before(c, index, line):
+        old = c["customer_turns"][index]
+        c["customer_turns"][index] = f"{line} {old.lstrip()}"
+        if c.get("customer_turns_asr"):
+            c["customer_turns_asr"][index] = f"{plain(line)} {c['customer_turns_asr'][index].lstrip()}"
+        return old
+    for sid, name in G33[which]:
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        who, person = speaker_pronoun(s, c), s["customer_name"]
+        earlier = CHANNEL_WORDS[s["calls"]["call_1"].get("channel") or "hotline"]
+        for i, line in ((0, f"{who.capitalize()} là {person}, số {who} {s['customer_phone']}, hôm trước {who} nhắn {earlier}."),
+                        (1, f"Đúng rồi em, {who} là {person}.")):
+            old = before(c, i, line)
+            add(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{REVIEWER_D2}, nhóm 33: channel_identity "
+                f"{c.get('channel_identity')} không có trong CRM (bộ sinh tự đặt), Facebook không cho shop SĐT, nên không "
+                "gì nối cuộc này với cuộc trước; nhãn vẫn đòi nhớ và lên đơn. Khách nay đọc tên, SĐT và xác nhận câu hỏi "
+                "danh tính ở lượt sau.", 33)
+    for sid, name in G35[which]:
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        who = speaker_pronoun(s, c)
+        i = next(i for i, turn in enumerate(c["customer_turns"]) if BUDGET_CHANGE.search(turn))
+        old = say(c, i, f"Nhưng các món này {who} vẫn lấy đủ nhé.")
+        add(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{REVIEWER_D6}, nhóm 35: khách đổi ngân sách "
+            f"xuống {c['facts_established'].get('budget_vnd')} thấp hơn tổng giỏ {c['success_if'].get('total_match_vnd')} mà "
+            "nhãn vẫn đặt đủ giỏ (phép thử là ghi đè ngân sách trong bộ nhớ); khách nay nói vẫn lấy đủ các món.", 35)
+
+    def widen(sid, name, si, extra, why, group):
+        before = list(si["must_say_any"])
+        si["must_say_any"] = before + [p for p in extra if p not in before]
+        if si["must_say_any"] != before:
+            add(sid, name, "success_if.must_say_any", before, si["must_say_any"], why, group)
+    for sid, s in scenarios.items():
+        first_price = ((s["calls"].get("call_1", {}).get("success_if") or {}).get("args_match") or {}).get("price_vnd")
+        for name, c in s["calls"].items():
+            si = c.get("success_if") or {}
+            said = set(si.get("must_say_any") or [])
+            for cue, extra, why in SAY_TOO:  # group 36
+                if cue <= said:
+                    widen(sid, name, si, extra, f"{REVIEWER_D5}, nhóm 36: {why}.", 36)
+            if "8%" in said and first_price:  # group 36: the plan's price, 8% of what the customer paid
+                amount = round(int(first_price) * 8 / 100)
+                widen(sid, name, si, [f"{amount:,}".replace(",", "."), str(amount)], f"{REVIEWER_D5}, nhóm 36: gói bảo "
+                      f"hành mở rộng 8% của giá máy đã mua ({first_price}) là {amount}; nói số tiền là đúng ý.", 36)
+            if "6–12 tháng" in said:  # group 37: SP-AIR-01's life of the model the customer names
+                words = " ".join(c["customer_turns"])
+                life = next((v for model, v in FILTER_LIFE if model in words), None)
+                if life:
+                    widen(sid, name, si, life, f"{REVIEWER_D4}, nhóm 37: bảng SP-AIR-01 ghi tuổi thọ màng lọc theo mẫu "
+                          f"({', '.join(life)}); BH-04 ghi chung 6–12 tháng. Nhận cả hai.", 37)
+            banned = [f for f in si.get("forbidden_claims") or []
+                      if isinstance(f, dict) and f.get("field") == "price_vnd" and f.get("value") == 2445000]
+            if banned and "máy thứ hai" in said:  # group 37
+                before = list(si["forbidden_claims"])
+                si["forbidden_claims"] = [f for f in before if f not in banned]
+                add(sid, name, "success_if.forbidden_claims", before, si["forbidden_claims"], f"{REVIEWER_D4}, nhóm 37: "
+                    "2.445.000 là giá đúng của AirPure X khi đi cùng AirPure Y hoặc là máy X thứ hai (mock "
+                    "pricing.quote_order); lỗi cần bắt (giảm cho máy đắt hơn) đã có ở các mẫu câu cấm.", 37)
+    for (sid, name), phrases in (G37_CATALOGUE if which == "dev" else {}).items():
+        si = scenarios[sid]["calls"][name]["success_if"]
+        before = dict(si)
+        si.pop("agent_must_say", None)
+        si["must_say_any"] = phrases
+        add(sid, name, "success_if", before, dict(si), f"{REVIEWER_D4}, nhóm 37: catalogue trả lời được (Urban Classic "
+            "chỉ có màu đen, trắng, xám); agent_must_say chỉ nhận câu không biết.", 37)
+    for sid, name in G38_AGREE[which]:  # group 38
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        i = len(c["customer_turns"]) - 1
+        old = say(c, i, f"{speaker_pronoun(s, c).capitalize()} đồng ý xóa dữ liệu nhé.")
+        add(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{REVIEWER_D7}, nhóm 38: khách xin xóa và "
+            "đọc CCCD nhưng không lượt nào đồng ý; QT-06 cần khách xác nhận trước khi ghi yêu cầu và báo 72 giờ.", 38)
+    for sid, name in G38_PHONE[which]:  # group 38
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        i = next(i for i, turn in enumerate(c["customer_turns"]) if "gọi lại" in turn)
+        who = speaker_pronoun(s, c)
+        old = say(c, i, f"Số {who} là {s['customer_phone']}.")
+        add(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{REVIEWER_D7}, nhóm 38: chat ẩn danh hẹn "
+            "gọi lại mà không cho SĐT; schedule.callback cần số để gọi. Khách nay đọc số.", 38)
 
 
 # ── Group 10: what the customer calls themselves, to match the label "anh" ──────────────────────────────────────
@@ -1029,6 +1221,8 @@ def main() -> int:
     add_stated_facts(scenarios, G14, add_new)
     apply_second_check(scenarios, "dev", lambda sid, name, field, source, proposed, evidence, group:
                        record(sid, name, field, source, proposed, evidence, group, True))
+    apply_g34(scenarios, OUT / "tools", lambda sid, name, field, source, proposed, evidence:
+              record(sid, name, field, source, proposed, evidence, 34, True))
     apply_anon_and_owned(scenarios, G17, G18, add_new)
     for sid, name in G16:
         g = call(sid, name)["ground_truth_facts"]

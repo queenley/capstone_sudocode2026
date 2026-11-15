@@ -12,23 +12,28 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận anh vừa hỏi về đơn hàng giày chạy bộ RunLite 1, em xin cập nhật cho anh ngay đây ạ.",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần hỗ trợ về đơn hàng giày chạy bộ RunLite 1 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh cần hỏi về đơn OD900502 đúng không ạ?"
+        }
+      ],
       "facts_used": [
-        "order_id",
         "size",
         "payment",
         "delivery_area",
         "product_advised",
         "variant_sku",
         "price_quoted_vnd",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -43,26 +48,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đơn hàng giày chạy bộ RunLite 1 của anh hiện đã tạo và đang ở trạng thái khởi tạo trên hệ thống ạ.",
+      "text": "Dạ vâng, để em kiểm tra tình trạng đơn OD900502 của anh ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "order_status",
-          "value": "created"
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "OD600001"
+            "order_id": "OD900502"
           }
         }
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -77,16 +77,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đơn OD900502 của anh đúng là vẫn đang trong quá trình giao tới địa chỉ TP Huế anh đã cung cấp ạ.",
+      "text": "Dạ đơn OD900502 của anh đang trên đường giao ạ. Đơn hàng giày chạy bộ RunLite 1 hiện trạng thái là đang vận chuyển.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
       ],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -101,19 +104,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Hiện tại đơn hàng của anh vẫn đang ở trạng thái đã tạo và chưa có cập nhật mới nào thêm ạ. Khi đơn chuyển sang trạng thái giao hàng, hệ thống sẽ gửi SMS cho anh.",
+      "text": "Dạ hiện tại shop cập nhật đơn hàng đang vận chuyển đến anh, mã vận đơn sẽ được gửi qua SMS hoặc Zalo khi đơn vị giao nhận tiếp nhận hàng ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "order_status",
-          "value": "created"
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -128,7 +126,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em thông tin thêm, khi đơn hàng được bàn giao cho đơn vị vận chuyển thì anh sẽ nhận được mã vận đơn và dự kiến nhận hàng trong 2–4 ngày làm việc tại TP Huế ạ. Anh cứ yên tâm chờ giúp em nhé.",
+      "text": "Dạ với đơn giày chạy bộ RunLite 1, anh ở TP Huế dự kiến nhận hàng trong 2 đến 4 ngày làm việc kể từ khi đơn giao cho đơn vị vận chuyển, shop sẽ thông báo khi có cập nhật mới nhất đến anh ạ.",
       "questions": [],
       "facts_used": [
         "delivery_area"
@@ -137,13 +135,13 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "cap_nhat_don",
+    "intent": "hoi_tinh_trang_don_hang",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

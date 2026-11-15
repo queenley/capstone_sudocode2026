@@ -34,6 +34,10 @@ FIXED = {
             "SCN-GEN-0210__call_3": "Agent mẫu hỏi quá max_agent_questions: 2."},
     "test": {},
 }
+#: Label groups made after the regeneration of 10/11/2026 (build_dev_r4.py): 32 (D3, words), 33 (D2, words), 34 (D1,
+#: the order of the label), 35 (D6, words), 38 (D7, words).
+LATE_GROUPS = {32, 33, 34, 35, 38}
+LATE_DAY = "2026-11-16"
 
 
 def mark(name: str) -> dict[str, int]:
@@ -54,11 +58,21 @@ def mark(name: str) -> dict[str, int]:
     why.update({cid: reason for cid, reason in FIXED[name].items() if cid not in regenerated})
     report = json.loads((root / "conversion-report.json").read_text(encoding="utf-8"))
     revision = report.get("revision", "?")
+    # Per call: a call regenerated before regenerated_on existed (10/11/2026) has no day here, so it reads as stale.
+    regenerated_on = json.loads(regenerated_path.read_text(encoding="utf-8")).get("regenerated_on", {}) \
+        if regenerated_path.exists() else {}
     for change in report["changes"]:
         if change["call"].startswith("call_") and change["field"].startswith("customer_turns"):
             cid = f"{change['scenario_id']}__{change['call']}"
             if cid not in regenerated:
                 why.setdefault(cid, f"Lời khách đã đổi ở bản nhãn {revision}; hội thoại mẫu còn theo lời cũ.")
+        # Groups changed after a regeneration (words or the order of the label): a transcript written before follows
+        # the old scenario, even one already written again, until a regeneration on or after that day.
+        if change.get("group") in LATE_GROUPS:
+            cid = f"{change['scenario_id']}__{change['call']}"
+            if regenerated_on.get(cid, "") < LATE_DAY:
+                why[cid] = (f"Nhãn hoặc lời khách đã đổi ngày {LATE_DAY} (nhóm {change['group']}); hội thoại mẫu "
+                            "còn theo bản cũ.")
     counts = {"marked": 0, "added": 0}
     for cid, reason in sorted(why.items()):
         row = by_id.get(cid)

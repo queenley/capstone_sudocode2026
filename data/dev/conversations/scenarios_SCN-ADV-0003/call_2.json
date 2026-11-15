@@ -12,18 +12,62 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Lan, hôm trước chị có quan tâm Máy lọc không khí AirPure Mini để bàn với gia đình, chị xác nhận muốn mua đúng không ạ?",
+      "text": "Dạ em chào chị Lan ạ, hôm trước chị có hỏi về Máy lọc không khí AirPure Mini để bàn với gia đình. Chị xác nhận lại mình muốn mua đúng sản phẩm đó phải không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "chị xác nhận muốn mua đúng không ạ?"
+          "text": "Chị xác nhận lại mình muốn mua đúng sản phẩm đó phải không ạ?"
         }
       ],
       "facts_used": [
         "product_advised",
         "blocker",
         "room_area_m2",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi la lan so chi 0981933190 hom truoc chi nhan ben zalo chi xac nhan mua may loc khong khi airpure mini",
+      "facts_stated": {
+        "product_advised": "SKU-AP-MINI"
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0981933190",
+          "spoken": "0981933190"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, Máy lọc không khí AirPure Mini đang có hàng, giá 2.190.000đ ạ. Máy phù hợp phòng dưới 12m2, bảo hành 24 tháng. Chị muốn thanh toán qua ngân hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị muốn thanh toán qua ngân hàng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
         "price_quoted_vnd"
       ],
       "claims": [
@@ -45,46 +89,7 @@
     },
     {
       "speaker": "customer",
-      "text": "chi xac nhan mua may loc khong khi airpure mini",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Mini hiện còn hàng, giá 2.190.000đ, freeship về Huế ạ. Chị muốn thanh toán chuyển khoản đúng không ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Chị muốn thanh toán chuyển khoản đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "delivery_area"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "chi se thanh toan qua ngan hang",
+      "text": "dung roi em chi la lan chi se thanh toan qua ngan hang",
       "facts_stated": {
         "payment": "bank"
       },
@@ -95,12 +100,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận thanh toán qua ngân hàng. Địa chỉ giao là TP Huế đúng không chị?",
+      "text": "Dạ, em ghi nhận thanh toán qua ngân hàng ạ. Chị cho em xin khu vực giao hàng để em kiểm tra ngày giao dự kiến nhé.",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Địa chỉ giao là TP Huế đúng không chị?"
+          "type": "open",
+          "text": "Chị cho em xin khu vực giao hàng để em kiểm tra ngày giao dự kiến nhé."
         }
       ],
       "facts_used": [
@@ -127,27 +132,24 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận: 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, giao TP Huế, thanh toán chuyển khoản. Dự kiến giao ngày 24/10. Chị kiểm tra lại giúp em, đúng hết em lên đơn luôn ạ.",
+      "text": "Dạ giao về TP Huế, dự kiến nhận hàng ngày 24/10 nha chị. Em đọc lại đơn: Máy lọc không khí AirPure Mini, 1 máy, giá 2.190.000đ, giao TP Huế, thanh toán chuyển khoản. Đúng sản phẩm và thông tin chị đặt không ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị kiểm tra lại giúp em, đúng hết em lên đơn luôn ạ."
+          "text": "Đúng sản phẩm và thông tin chị đặt không ạ?"
         }
       ],
       "facts_used": [
-        "product_advised",
         "delivery_area",
-        "payment"
+        "product_advised",
+        "payment",
+        "price_quoted_vnd"
       ],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "in_stock",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
         }
       ],
       "tool_calls": [
@@ -160,13 +162,7 @@
         }
       ],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-10-24",
-          "spoken": "24/10"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
@@ -182,7 +178,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho chị. Tổng đơn 2.190.000đ, giao dự kiến ngày 24/10 tại TP Huế. Shop sẽ gửi thông tin thanh toán cho chị ngay trong hôm nay ạ. Cảm ơn chị đã đặt hàng!",
+      "text": "Dạ em lên đơn cho chị Lan: Máy lọc không khí AirPure Mini, giao TP Huế, thanh toán chuyển khoản, tổng 2.190.000đ. Đơn dự kiến giao ngày 24/10. Em đã tạo đơn thành công, khi hàng gửi đi shop sẽ nhắn mã vận đơn cho chị qua Zalo hoặc Fanpage ạ. Cảm ơn chị Lan đã đặt hàng!",
       "questions": [],
       "facts_used": [
         "product_advised",
@@ -194,6 +190,10 @@
         {
           "field": "price_vnd",
           "value": 2190000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
         }
       ],
       "tool_calls": [
@@ -227,13 +227,13 @@
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "order_id",
@@ -242,40 +242,20 @@
           "source": "call_2#turn8"
         }
       ],
-      "entities": [
-        {
-          "type": "money",
-          "value": "2190000",
-          "spoken": "2.190.000đ"
-        },
-        {
-          "type": "date",
-          "value": "2026-10-24",
-          "spoken": "24/10"
-        },
-        {
-          "type": "address",
-          "value": "TP Huế",
-          "spoken": "TP Huế"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "chot_don",
+    "intent": "xac_nhan_dat_mua",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
-    "commitments": [
-      {
-        "text": "Gửi thông tin thanh toán cho khách"
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
@@ -283,7 +263,7 @@
       "qty": 1,
       "price_vnd": 2190000,
       "payment": "bank",
-      "delivery_area": "TP Huế",
+      "address": "TP Huế",
       "order_id": "OD600001",
       "estimated_delivery": "2026-10-24"
     }

@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Máy hút sữa điện đôi Medela Swing Maxi, chị cần xác nhận đơn giày chạy bộ size 43 màu đen đúng không ạ?",
+      "text": "Dạ em chào chị Trịnh Thị Lan ạ, hôm trước chị có quan tâm tới Ghế ngồi ô tô cho bé Chicco; hôm nay chị muốn xác nhận đơn giày chạy bộ RunLite 2 Pro đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "order_id",
           "type": "confirm",
-          "text": "Hôm trước chị có đặt Máy hút sữa điện đôi Medela Swing Maxi, chị cần xác nhận đơn giày chạy bộ size 43 màu đen đúng không ạ?"
+          "text": "Hôm nay chị muốn xác nhận đơn giày chạy bộ RunLite 2 Pro đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -28,13 +28,13 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị muốn xác nhận đơn hàng giày chạy bộ size 43 màu đen mà chị đã hỏi hôm trước.",
+      "text": "Alo em, chị muốn xác nhận đơn hàng giày chạy bộ size 43 màu đen mà chị đã hỏi hôm trước. Mẫu RunLite 2 Pro nhé em.",
       "facts_stated": {
         "product_advised": "SKU-SN-RUN2",
         "size": 43,
@@ -47,14 +47,8 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giày chạy bộ RunLite 2 Pro size 43 màu đen bên em đang còn hàng, giá 1.740.000đ ạ. Chị muốn chọn thanh toán và nhận hàng thế nào ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "open",
-          "text": "Chị muốn chọn thanh toán và nhận hàng thế nào ạ?"
-        }
-      ],
+      "text": "Dạ vâng chị, giày chạy bộ RunLite 2 Pro size 43 màu đen bên em đang còn hàng. Giá hiện tại là 1.740.000đ ạ. Mẫu này thuộc dòng mới nhất, chị được đổi trả trong 7 ngày nếu chưa sử dụng và sản phẩm còn nguyên tem hộp chị nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -69,7 +63,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -86,20 +80,33 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị muốn giao tới khu vực nào để em kiểm tra thời gian giao hàng cho mình ạ?",
+      "text": "Dạ chị chọn thanh toán COD và giao tận nơi, em ghi nhận ạ. Đơn này chị sẽ không mất phí thu hộ, tổng thanh toán vẫn là 1.740.000đ. Nếu chị cần xuất hoá đơn điện tử thì báo giúp em nhé.",
       "questions": [
         {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Chị muốn giao tới khu vực nào để em kiểm tra thời gian giao hàng cho mình ạ?"
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận lại: chị đặt 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giao tại Ninh Kiều, Cần Thơ, thanh toán COD với tổng tiền 1.740.000đ, nhận hàng dự kiến ngày 20/10/2026. Thông tin như vậy đúng chưa chị?"
         }
       ],
       "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-15"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 550,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -116,47 +123,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, thanh toán COD, giao tại Ninh Kiều, Cần Thơ. Thời gian giao dự kiến là ngày 20/10/2026 ạ. Em lên đơn cho mình nhé, chị xác nhận giúp em thông tin trên đúng chưa ạ?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Đơn giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, thanh toán COD, giao tại Ninh Kiều, Cần Thơ. Thời gian giao dự kiến là ngày 20/10/2026 ạ. Em lên đơn cho mình nhé, chị xác nhận giúp em thông tin trên đúng chưa ạ?"
-        }
-      ],
+      "text": "Dạ sản phẩm sẽ giao về Ninh Kiều, Cần Thơ cho chị, dự kiến nhận hàng ngày 20/10/2026. Chị đồng ý lên đơn luôn giúp em xác nhận lại thông tin nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1740000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        },
         {
           "field": "estimated_delivery",
           "value": "2026-10-20"
         }
       ],
-      "tool_calls": [
-        {
-          "name": "delivery_estimate",
-          "args": {
-            "address": "Ninh Kiều, Cần Thơ",
-            "on": "2026-10-15"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-10-20",
-          "spoken": "20/10/2026"
-        }
-      ],
-      "pause_before_ms": 700,
+      "entities": [],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -171,23 +150,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận đơn hàng giày chạy bộ RunLite 2 Pro size 43 màu đen cho chị với giá 1.740.000đ, thanh toán COD, giao tại Ninh Kiều, Cần Thơ dự kiến ngày 20/10/2026. Em lên đơn ngay cho mình, shop sẽ gửi mã vận đơn khi bàn giao cho đơn vị vận chuyển ạ. Em cảm ơn chị đã đặt hàng tại shop BTC!",
+      "text": "Dạ em đã tạo đơn hàng cho chị: giày chạy bộ RunLite 2 Pro size 43 màu đen, tổng tiền 1.740.000đ, giao tại Ninh Kiều, Cần Thơ, thanh toán COD. Đơn dự kiến giao ngày 20/10/2026. Em cảm ơn chị đã đặt hàng tại shop, có thông tin đơn em sẽ gửi SMS cho chị ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1740000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-10-20"
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -207,43 +173,43 @@
           "key": "color",
           "value": "den",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn1"
         },
         {
           "key": "delivery_area",
           "value": "Ninh Kiều, Cần Thơ",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn5"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn3"
         },
         {
           "key": "size",
           "value": 43,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn1"
         },
         {
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn1"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1740000,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn2"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-43-DEN",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn1"
         },
         {
           "key": "order_id",
@@ -252,20 +218,14 @@
           "source": "call_1#turn7"
         }
       ],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-10-20",
-          "spoken": "20/10/2026"
-        }
-      ],
-      "pause_before_ms": 800,
+      "entities": [],
+      "pause_before_ms": 900,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "chot_don",
+    "intent": "xac_nhan_don_giay_runlite",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

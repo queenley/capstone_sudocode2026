@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận đơn hàng của chị và sẵn sàng hỗ trợ cập nhật địa chỉ giao hàng cho mình ạ.",
+      "text": "Dạ em chào chị ạ, hôm trước chị có đặt Giày chạy bộ RunLite 2 Pro và hiện chị đang có đơn hàng OD900202 đang xử lý. Em có thể hỗ trợ gì cho chị ạ?",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -21,7 +21,7 @@
       "claims": [
         {
           "field": "order_id",
-          "value": "OD900203"
+          "value": "OD900202"
         }
       ],
       "tool_calls": [],
@@ -34,18 +34,31 @@
     {
       "speaker": "customer",
       "text": "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng OD900202.",
-      "facts_stated": {},
+      "facts_stated": {
+        "order_id": "OD900202"
+      },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị muốn đổi địa chỉ giao hàng cho đơn, em xác nhận lại thông tin để hỗ trợ chị nhanh nhất ạ.",
-      "questions": [],
+      "text": "Dạ em ghi nhận chị muốn đổi địa chỉ giao hàng cho đơn hàng OD900202. Chị vui lòng cho em biết địa chỉ mới mà mình muốn cập nhật ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị vui lòng cho em biết địa chỉ mới mà mình muốn cập nhật ạ?"
+        }
+      ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900202"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -59,38 +72,31 @@
       "facts_stated": {
         "delivery_area": "Hải Châu, Đà Nẵng"
       },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Hải Châu, Đà Nẵng",
-          "spoken": "Hải Châu"
-        }
-      ],
-      "pause_before_ms": 0,
+      "entities": [],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ mới là Hải Châu, Đà Nẵng cho đơn hàng của chị. Em sẽ tiến hành cập nhật ngay trên hệ thống ạ.",
-      "questions": [],
-      "facts_used": [],
+      "text": "Dạ em đã ghi nhận địa chỉ giao hàng mới là Hải Châu, Đà Nẵng cho đơn OD900202. Chị xác nhận giúp em nội dung này trước khi em cập nhật trên hệ thống nhé ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em nội dung này trước khi em cập nhật trên hệ thống nhé ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [
         {
           "field": "order_id",
-          "value": "OD900203"
+          "value": "OD900202"
         }
       ],
-      "tool_calls": [
-        {
-          "name": "order.update",
-          "args": {
-            "order_id": "OD900203",
-            "action": "update_address",
-            "on": "2026-10-18"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
@@ -102,28 +108,39 @@
       "text": "Chị đã đặt giày trekking, mà giờ địa chỉ có chút thay đổi.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã cập nhật thành công địa chỉ giao hàng mới cho đơn hàng của chị. Nếu cần hỗ trợ thêm gì, chị cứ liên hệ shop bất cứ lúc nào ạ.",
+      "text": "Dạ, đơn hàng OD900202 là giày trekking, em sẽ cập nhật địa chỉ giao hàng mới là Hải Châu, Đà Nẵng cho chị ngay ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [
         {
           "field": "order_id",
-          "value": "OD900203"
+          "value": "OD900202"
         }
       ],
-      "tool_calls": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD900202",
+            "action": "update_address",
+            "on": "2026-10-18"
+          }
+        }
+      ],
       "memory_writes": [
         {
           "key": "delivery_area",
           "value": "Hải Châu, Đà Nẵng",
           "op": "set",
-          "source": "call_2#turn4"
+          "source": "call_2#turn6"
         }
       ],
       "entities": [],
@@ -135,6 +152,26 @@
       "speaker": "customer",
       "text": "Em có thể giúp chị cập nhật địa chỉ này không?",
       "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã cập nhật địa chỉ giao hàng mới thành công cho đơn hàng OD900202. Cảm ơn chị đã liên hệ shop, nếu cần hỗ trợ thêm chị cứ gọi cho em nhé ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900202"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

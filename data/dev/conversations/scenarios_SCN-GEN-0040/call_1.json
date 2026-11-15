@@ -12,14 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ xác nhận đơn giày chạy bộ RunLite 2 Pro size 43 màu đen cho mình nhé.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ xác nhận đơn giày chạy bộ RunLite 2 Pro size 43 màu đen của chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1740000
-        },
         {
           "field": "in_stock",
           "value": true
@@ -34,24 +30,25 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn xác nhận đơn mua giày chạy bộ size 43 màu đen nhé.",
+      "text": "Alo, chị muốn xác nhận đơn mua giày chạy bộ size 43 màu đen nhé. Mẫu RunLite 2 Pro nhé em.",
       "facts_stated": {
         "size": 43,
-        "color": "den"
+        "color": "den",
+        "product_advised": "SKU-SN-RUN2"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đơn chị đặt là giày chạy bộ RunLite 2 Pro size 43 màu đen, giá 1.740.000đ, hiện còn hàng. Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?",
+      "text": "Dạ chị đặt mẫu giày chạy bộ RunLite 2 Pro size 43 màu đen đúng không ạ? Giá là 1.740.000đ, hiện bên em còn hàng. Chị muốn thanh toán chuyển khoản ngân hàng như lần trước phải không ạ?",
       "questions": [
         {
           "slot": "payment",
           "type": "confirm",
-          "text": "Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?"
+          "text": "Chị muốn thanh toán chuyển khoản ngân hàng như lần trước phải không ạ?"
         }
       ],
       "facts_used": [],
@@ -67,8 +64,14 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
+      "entities": [
+        {
+          "type": "money",
+          "value": "1740000",
+          "spoken": "1.740.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -79,31 +82,22 @@
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị lấy 1 đôi giày chạy bộ RunLite 2 Pro size 43 màu đen, giao tại Long Biên, Hà Nội và thanh toán chuyển khoản. Em xin xác nhận lại ạ: sản phẩm là giày chạy bộ RunLite 2 Pro size 43 màu đen, 1 đôi, giá 1.740.000đ, giao về Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng, dự kiến giao ngày 17/10. Chị xác nhận giúp em thông tin trên đúng chưa để em lên đơn nhé?",
+      "text": "Dạ em đã ghi nhận thanh toán chuyển khoản ngân hàng ạ. Chị nhận hàng tại Long Biên, Hà Nội đúng không để em kiểm tra thời gian giao dự kiến cho chị nhé.",
       "questions": [
         {
-          "slot": "order_summary",
+          "slot": "delivery_area",
           "type": "confirm",
-          "text": "Chị xác nhận giúp em thông tin trên đúng chưa để em lên đơn nhé?"
+          "text": "Chị nhận hàng tại Long Biên, Hà Nội đúng không để em kiểm tra thời gian giao dự kiến cho chị nhé."
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1740000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "delivery_estimate",
@@ -114,8 +108,14 @@
         }
       ],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -125,14 +125,73 @@
       "facts_stated": {
         "delivery_area": "Long Biên, Hà Nội"
       },
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã xác nhận thông tin đơn hàng của chị đầy đủ. Em tiến hành tạo đơn hàng cho mình ngay bây giờ ạ.",
+      "text": "Dạ, giày RunLite 2 Pro size 43 màu đen giá 1.740.000đ, giao về Long Biên, Hà Nội. Thanh toán chuyển khoản ngân hàng. Dự kiến giao trong 2 ngày làm việc, khoảng 17/10. Em chốt đơn, chị xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em chốt đơn, chị xác nhận giúp em thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1740000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-17"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1740000",
+          "spoken": "1.740.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-17",
+          "spoken": "17/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã tạo đơn giày chạy bộ RunLite 2 Pro size 43 màu đen cho chị, giao tại Long Biên, Hà Nội với giá 1.740.000đ, thanh toán chuyển khoản. Đơn sẽ được giao dự kiến ngày 17/10. Em cảm ơn chị đã mua hàng tại shop BTC ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -141,8 +200,8 @@
           "value": 1740000
         },
         {
-          "field": "in_stock",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-10-17"
         }
       ],
       "tool_calls": [
@@ -159,18 +218,79 @@
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 43,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1740000,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-43-DEN",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1740000",
+          "spoken": "1.740.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-17",
+          "spoken": "17/10"
+        },
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        }
+      ],
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
@@ -179,80 +299,13 @@
       "text": "Mong là đơn này nhanh chóng được xử lý nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ đơn hàng của chị đã được tạo thành công. Em cảm ơn chị đã đặt hàng tại shop BTC, đơn sẽ được giao dự kiến ngày 17/10 tại Long Biên, Hà Nội. Chúc chị một ngày vui vẻ ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1740000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "size",
-          "value": 43,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "color",
-          "value": "den",
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "payment",
-          "value": "bank",
-          "op": "set",
-          "source": "call_1#turn4"
-        },
-        {
-          "key": "delivery_area",
-          "value": "Long Biên, Hà Nội",
-          "op": "set",
-          "source": "call_1#turn6"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-SN-RUN2",
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 1740000,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "variant_sku",
-          "value": "SKU-SN-RUN2-43-DEN",
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "order_id",
-          "value": "OD600001",
-          "op": "set",
-          "source": "call_1#turn8"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "xac_nhan_don",
+    "intent": "xac_nhan_va_chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

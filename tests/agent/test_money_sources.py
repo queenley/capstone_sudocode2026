@@ -136,3 +136,31 @@ def test_a_call_back_without_a_number_asks_for_it():
                                              ({"callback_at": "2026-10-21T10:00", "customer_phone": "0912345678"}, False)])
 def test_a_known_number_books(args, has_phone):
     assert callback(args, has_phone) == []
+
+
+# SCN-ADV-0012 call_2 (run 15/11/2026): pricing.quote_order priced AirPure Y + Mini at 6.295.000 (AIR-2ND-50), then a
+# later turn told the customer "không, tổng giỏ là 7.390.000đ", the sum of the two standalone quotes, and passed.
+STANDALONE = {"SKU-AP-Y": 5_200_000, "SKU-AP-MINI": 2_190_000}
+
+
+def _quoted_together():
+    from ai_agent_service.components.guardrails.purchase import units_key
+    return {units_key([{"sku": "SKU-AP-Y"}, {"sku": "SKU-AP-MINI"}]): [["SKU-AP-Y", 5_200_000], ["SKU-AP-MINI", 1_095_000]]}
+
+
+def test_units_quoted_together_are_not_the_sum_of_their_standalone_quotes():
+    said = frozenset({5_200_000, 2_190_000, 1_095_000, 6_295_000})
+    more = {"quotes": STANDALONE, "order_quotes": _quoted_together(), "earlier_numbers": said}
+    assert money("Dạ không ạ, tổng giỏ hôm nay là 7.390.000đ.", **more)
+    assert money("Dạ đúng ạ, tổng giỏ hôm nay là 6.295.000đ.", **more) == []
+
+
+def test_standalone_quotes_still_add_up_when_no_order_quote_priced_those_units():
+    assert money("Dạ tổng hai món là 7.390.000đ ạ.", quotes=STANDALONE) == []
+
+
+def test_the_basket_total_is_the_order_quote_of_the_same_units():
+    from ai_agent_service.pipeline.hot.nodes import _basket_total
+    state = {"basket": {"SKU-AP-Y": {"qty": 1}, "SKU-AP-MINI": {"qty": 1}}, "quotes": STANDALONE}
+    assert _basket_total(state, ()) == 7_390_000
+    assert _basket_total({**state, "order_quotes": _quoted_together()}, ()) == 6_295_000

@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ chị về máy lọc nước RO cho gia đình mình ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về máy lọc nước đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -36,12 +36,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với gia đình 6 người thì bên em có máy lọc nước RO Karofi 9 lõi, công suất đáp ứng tốt nhu cầu sử dụng ạ. Giá hiện tại là 5.990.000đ, hàng còn sẵn tại shop.",
+      "text": "Dạ, với nhu cầu cho gia đình 6 người, bên em đang có máy lọc nước RO Karofi 9 lõi, bảo hành 36 tháng ạ. Giá máy hiện tại là 5.990.000đ, phù hợp với gia đình đông người và nguồn nước máy thành phố. Chị có muốn tham khảo sản phẩm này không ạ?",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "open",
-          "text": "Chị dự trù ngân sách khoảng bao nhiêu cho máy lọc nước này ạ?"
+          "text": "Chị dự kiến ngân sách cho máy lọc nước là khoảng bao nhiêu ạ?"
         }
       ],
       "facts_used": [],
@@ -49,10 +49,6 @@
         {
           "field": "price_vnd",
           "value": 5990000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -75,13 +71,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy RO Karofi 9 lõi bên em có giá 5.990.000đ nên phù hợp với ngân sách của chị ạ. Máy dùng RO chuẩn, nước máy hay nước giếng đều lọc được, bảo hành 36 tháng thân máy.",
+      "text": "Dạ sản phẩm máy lọc nước RO Karofi 9 lõi đang có giá 5.990.000đ, nằm trong ngân sách của chị ạ. Máy phù hợp cho gia đình 6 người và bảo hành chính hãng 36 tháng. Hiện sản phẩm này đang còn hàng chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -102,13 +102,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá, nhưng vẫn được miễn phí vận chuyển toàn quốc nếu chị đặt đơn ạ.",
+      "text": "Dạ hiện tại giá máy đã là giá tốt nhất, chưa có khuyến mãi thêm. Tuy nhiên, chị được miễn phí thu hộ khi thanh toán COD và bảo hành chính hãng 36 tháng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_active",
           "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -120,7 +124,7 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị cần bàn với gia đình rồi hẹn em gọi lại tối mai tầm 7 giờ nhé.",
+      "text": "Chị cần bàn với gia đình rồi hẹn em gọi lại tối mai tầm 7 giờ nhé. Số chị là 0977000008.",
       "facts_stated": {
         "blocker": "để bàn với gia đình"
       },
@@ -129,6 +133,11 @@
           "type": "time",
           "value": "19:00",
           "spoken": "7 giờ"
+        },
+        {
+          "type": "phone",
+          "value": "0977000008",
+          "spoken": "0977000008"
         }
       ],
       "pause_before_ms": 0,
@@ -137,7 +146,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận, tối mai lúc 7 giờ em sẽ gọi lại để hỗ trợ chị tiếp nhé. Chúc chị buổi tối vui vẻ ạ!",
+      "text": "Dạ em ghi nhận chị sẽ trao đổi với gia đình và hẹn gọi lại cho chị vào lúc 7 giờ tối mai qua số 0977000008 nhé. Em sẽ đặt lịch gọi lại đúng 7 giờ để hỗ trợ chị tốt nhất ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -161,7 +170,7 @@
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "budget_vnd",
@@ -197,16 +206,21 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_hoi_nguoi_nha",
-    "objection_handling": "Đã xác nhận lại thời điểm gọi lại, hẹn đúng khung giờ khách chọn.",
+    "objection_type": "can_ban_nguoi_nha",
+    "objection_handling": "Đã ghi nhận lý do và đặt lịch gọi lại đúng khung giờ khách yêu cầu.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "action": "schedule_callback",
+        "time": "2026-10-16T19:00",
+        "phone": "0977000008"
+      }
+    ],
     "supersedes": [],
     "callback": {
-      "customer_phone": "0977000008",
       "callback_at": "2026-10-16T19:00",
-      "note": "khách hỏi người nhà rồi báo lại"
+      "reason": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

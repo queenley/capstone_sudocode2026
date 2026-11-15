@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Thu ạ, hôm trước chị có quan tâm Máy tiệt trùng sấy khô Moaz Bebe và bảo chờ cuối tháng nhận lương, giờ mình tiếp tục đặt luôn đúng không chị?",
+      "text": "Dạ em chào chị Thu ạ, hôm trước chị quan tâm Máy tiệt trùng sấy khô Moaz Bebe và đang chờ cuối tháng nhận lương, hôm nay chị muốn đặt luôn đúng không ạ?",
       "questions": [],
       "facts_used": [
         "blocker",
@@ -24,37 +24,35 @@
         {
           "field": "price_vnd",
           "value": 1890000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "chi muon dat may tiet trung say kho moaz bebe",
-      "facts_stated": {
-        "product_advised": "SKU-MB-STER"
-      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "chi la thu so chi 0976158464 hom truoc chi nhan ben zalo chi muon dat may tiet trung say kho moaz bebe",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STER"
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0976158464",
+          "spoken": "0976158464"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm Máy tiệt trùng sấy khô Moaz Bebe hiện còn hàng, giá 1.890.000đ, được miễn phí vận chuyển toàn quốc qua chương trình MOM-FREESHIP ạ.",
+      "text": "Dạ máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, hiện vẫn còn hàng và áp dụng miễn phí vận chuyển cho ngành mẹ & bé. Máy được bảo hành 12 tháng chính hãng chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -74,39 +72,37 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "hinh thuc thanh toan la chuyen khoan nhe",
-      "facts_stated": {
-        "payment": "bank"
-      },
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "dung roi em chi la thu hinh thuc thanh toan la chuyen khoan nhe",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị chọn thanh toán chuyển khoản nhé. Chị muốn gửi hàng về địa chỉ nào ạ?",
+      "text": "Dạ em ghi nhận hình thức chuyển khoản. Chị muốn giao máy về địa chỉ nào ạ?",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "open",
-          "text": "Chị muốn gửi hàng về địa chỉ nào ạ?"
+          "text": "Chị muốn giao máy về địa chỉ nào ạ?"
         }
       ],
-      "facts_used": [
-        "payment"
-      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -117,36 +113,25 @@
         "delivery_area": "Cầu Giấy, Hà Nội"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, với địa chỉ Cầu Giấy, Hà Nội, dự kiến nhận hàng trong 2 ngày làm việc, khoảng ngày 20/10 ạ. Em đọc lại đơn: Máy tiệt trùng sấy khô Moaz Bebe, 1 máy, giá 1.890.000đ, giao về Cầu Giấy, Hà Nội, thanh toán chuyển khoản, miễn phí vận chuyển, dự kiến nhận hàng ngày 20/10. Chị kiểm tra lại giúp em thông tin trên đúng chưa để em lên đơn nhé?",
+      "text": "Dạ, em tóm tắt đơn của chị: 1 Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, chuyển khoản, giao tại Cầu Giấy, Hà Nội, dự kiến nhận hàng trong 2 ngày (khoảng 20/10). Thông tin vậy đúng rồi chị xác nhận giúp em nhé?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị kiểm tra lại giúp em thông tin trên đúng chưa để em lên đơn nhé?"
+          "text": "Thông tin vậy đúng rồi chị xác nhận giúp em nhé?"
         }
       ],
       "facts_used": [
-        "delivery_area"
+        "delivery_area",
+        "payment"
       ],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1890000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        },
         {
           "field": "delivery_days",
           "value": 2
@@ -167,7 +152,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -176,31 +161,22 @@
       "text": "chot don luon em nhe",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho chị, mã đơn OD600001. Shop sẽ gửi hướng dẫn chuyển khoản và cập nhật trạng thái qua tin nhắn, dự kiến nhận hàng ngày 20/10 chị nhé. Cảm ơn chị đã đặt hàng tại shop ạ!",
+      "text": "Dạ em lên đơn cho chị luôn, tổng 1.890.000đ, chuyển khoản, giao về Cầu Giấy trong 2 ngày. Đơn xong shop sẽ gửi thông tin tài khoản và xác nhận đơn cho chị nhé.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1890000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-10-20"
         }
       ],
       "tool_calls": [
@@ -240,13 +216,13 @@
           "key": "price_quoted_vnd",
           "value": 1890000,
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn2"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn2"
         },
         {
           "key": "order_id",
@@ -256,13 +232,13 @@
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang",
+    "intent": "xac_nhan_mua",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -276,7 +252,7 @@
       "qty": 1,
       "price_vnd": 1890000,
       "payment": "bank",
-      "address": "Cầu Giấy, Hà Nội",
+      "delivery_area": "Cầu Giấy, Hà Nội",
       "order_id": "OD600001"
     }
   }

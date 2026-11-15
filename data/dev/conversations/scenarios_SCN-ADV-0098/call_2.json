@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Ngọc, hôm trước chị có quan tâm Túi trữ sữa Sunmum 50 túi và còn chờ cuối tháng nhận lương, hôm nay mình đặt luôn đúng không ạ?",
+      "text": "Dạ em chào chị Ngọc, hôm trước chị có quan tâm Túi trữ sữa Sunmum 50 túi, còn chờ cuối tháng nhận lương. Giờ mình đặt luôn sản phẩm này phải không ạ?",
       "questions": [
         {
           "slot": "other",
           "type": "open",
-          "text": "hôm nay mình đặt luôn đúng không ạ?"
+          "text": "Giờ mình đặt luôn sản phẩm này phải không ạ?"
         }
       ],
       "facts_used": [
@@ -34,29 +34,35 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "alo em chi muon dat mua tui tru sua sunmum nam muoi tui",
+      "text": "chi la ngoc so chi 0992298369 hom truoc chi nhan ben zalo alo em chi muon dat mua tui tru sua sunmum nam muoi tui",
       "facts_stated": {
         "product_advised": "SKU-MB-BAG"
       },
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0992298369",
+          "spoken": "0992298369"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị đặt 1 hộp Túi trữ sữa Sunmum 50 túi, giá 119.000đ ạ. Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?",
+      "text": "Dạ em xác nhận mình muốn đặt Túi trữ sữa Sunmum 50 túi giá 119.000đ ạ. Sản phẩm bên em còn hàng, không áp dụng khuyến mãi hay freeship, phí ship đến Huế 35.000đ. Chị sẽ thanh toán qua ngân hàng đúng không ạ?",
       "questions": [
         {
           "slot": "payment",
           "type": "confirm",
-          "text": "Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?"
+          "text": "Chị sẽ thanh toán qua ngân hàng đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -64,34 +70,46 @@
         {
           "field": "price_vnd",
           "value": 119000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "freeship",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "chi se thanh toan qua ngan hang",
+      "text": "dung roi em chi la ngoc chi se thanh toan qua ngan hang",
       "facts_stated": {
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị chọn thanh toán qua ngân hàng. Chị nhận hàng tại khu vực nào để em kiểm tra giúp mình ạ?",
+      "text": "Dạ em đã ghi nhận mình thanh toán qua ngân hàng. Chị cho em xin khu vực giao hàng là ở đâu ạ?",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "open",
-          "text": "Chị nhận hàng tại khu vực nào để em kiểm tra giúp mình ạ?"
+          "text": "Chị cho em xin khu vực giao hàng là ở đâu ạ?"
         }
       ],
       "facts_used": [],
@@ -99,7 +117,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -109,17 +127,38 @@
       "facts_stated": {
         "delivery_area": "TP Huế"
       },
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "TP Huế",
+          "spoken": "tp hue"
+        }
+      ],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra, đơn hàng giao về TP Huế sẽ nhận từ 2 đến 4 ngày làm việc, dự kiến nhận ngày 27/10 nhé chị.",
-      "questions": [],
-      "facts_used": [],
+      "text": "Dạ em đã có địa chỉ giao TP Huế. Đơn của mình là: Túi trữ sữa Sunmum 50 túi, số lượng 1, giá 119.000đ, giao tại TP Huế, thanh toán qua ngân hàng. Dự kiến giao hàng ngày 27/10. Chị xác nhận giúp em lên đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em lên đơn nhé?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 119000
+        },
         {
           "field": "estimated_delivery",
           "value": "2026-10-27"
@@ -145,20 +184,14 @@
       "text": "chot don giup chi nhe",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Em chốt đơn cho chị: 1 hộp Túi trữ sữa Sunmum 50 túi, giá 119.000đ, giao TP Huế, thanh toán chuyển khoản ngân hàng, nhận dự kiến 27/10. Thông tin như vậy đúng rồi đúng không ạ?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Thông tin như vậy đúng rồi đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em lên đơn cho chị. Đơn sẽ giao dự kiến ngày 27/10, tổng thanh toán 119.000đ, chị chuyển khoản sau khi shop xác nhận đơn nhé.",
+      "questions": [],
       "facts_used": [
         "delivery_area",
         "payment",
@@ -169,30 +202,12 @@
         {
           "field": "price_vnd",
           "value": 119000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-27"
         }
       ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "dung roi em",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho chị, mã đơn OD600001. Cảm ơn chị đã đặt hàng, khi chuyển khoản xong chị báo lại giúp em để em xác nhận nhé!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -212,41 +227,50 @@
           "key": "delivery_area",
           "value": "TP Huế",
           "op": "set",
-          "source": "call_2#turn5"
+          "source": "call_2#turn6"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn4"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-BAG",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 119000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn11"
+          "source": "call_2#turn8"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "dung roi em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_mua_tui_tru_sua",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -261,8 +285,7 @@
       "price_vnd": 119000,
       "payment": "bank",
       "address": "TP Huế",
-      "order_id": "OD600001",
-      "estimated_delivery": "2026-10-27"
+      "order_id": "OD600001"
     }
   }
 }

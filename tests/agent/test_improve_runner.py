@@ -103,6 +103,11 @@ def test_uvicorn_takes_the_real_client_not_a_spoofed_forwarded_for():
 def test_on_aws_nothing_is_built_and_the_agents_shared_files_are_on_efs():
     services = _compose("infra/compose/docker-compose.aws.yml")["services"]
     assert services["postgres"]["profiles"] and services["seed"]["profiles"]
+    # The Zalo demo (Terraform zalo_mock_enabled) is the one exception: a stock Python image running the release's
+    # scripts, started only under its profile, behind the ALB's /zalo-mock rule on 8090 (infra/terraform/aws/alb.tf).
+    demo = services.pop("zalo-mock")
+    assert demo["profiles"] == ["zalo-mock"] and "build" not in demo
+    assert demo["ports"] == ["8090:8090"] and "--require-password" in demo["command"]
     for name, service in services.items():
         if "image" in service and name != "redis":
             assert "build" in service and service["build"] is None, name   # !reset null

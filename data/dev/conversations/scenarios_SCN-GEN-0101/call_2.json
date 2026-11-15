@@ -12,23 +12,28 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, cảm ơn anh đã gọi lại. Em xác nhận anh muốn đổi địa chỉ giao hàng cho đơn OD900602 đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em nhận thông tin anh muốn đổi địa chỉ giao cho đơn hàng OD900602, đúng không anh?",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "open",
-          "text": "Anh muốn chuyển sang địa chỉ nào ạ?"
+          "type": "confirm",
+          "text": "Anh muốn đổi địa chỉ giao hàng sang Quận 7, TP.HCM đúng không ạ?"
         }
       ],
       "facts_used": [
         "order_id",
         "owned_sku"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -39,26 +44,40 @@
         "order_id": "OD900602"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận yêu cầu đổi địa chỉ cho đơn hàng này. Anh vui lòng cho em biết địa chỉ nhận hàng mới cụ thể để em hỗ trợ cập nhật nhé.",
-      "questions": [
+      "text": "Dạ em ghi nhận yêu cầu đổi địa chỉ của anh sang Quận 7, TP.HCM. Em sẽ cập nhật ngay trên hệ thống cho đơn hàng OD900602 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Anh muốn giao về địa chỉ nào ở Quận 7, TP.HCM ạ?"
+          "field": "order_id",
+          "value": "OD900602"
         }
       ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD900602",
+            "action": "update_address",
+            "on": "2026-10-31"
+          }
+        }
+      ],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -68,35 +87,36 @@
       "facts_stated": {
         "delivery_area": "Quận 7, TP.HCM"
       },
-      "entities": [],
-      "pause_before_ms": 500,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tiếp nhận địa chỉ mới là Quận 7, TP.HCM và sẽ tiến hành cập nhật ngay cho anh. Đơn hàng của anh đã được giao thành công trước đó nên việc đổi địa chỉ sẽ áp dụng cho các lần giao tiếp theo nếu có phát sinh.",
+      "text": "Dạ việc đổi địa chỉ giao hàng sang Quận 7, TP.HCM sẽ không ảnh hưởng đến thời gian giao đâu anh nhé. Đơn OD900602 của anh hiện vẫn đang trong quá trình xử lý ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "order_status",
-          "value": "delivered"
-        }
-      ],
-      "tool_calls": [
+          "field": "order_id",
+          "value": "OD900602"
+        },
         {
-          "name": "order.update",
-          "args": {
-            "order_id": "OD900603",
-            "action": "update_address",
-            "on": "2026-10-31"
-          }
+          "field": "order_status",
+          "value": "processing"
         }
       ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -105,20 +125,25 @@
       "text": "Mong là đổi địa chỉ này không làm ảnh hưởng đến thời gian giao hàng nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh yên tâm, việc cập nhật địa chỉ này sẽ không ảnh hưởng đến thời gian giao hàng nếu có phát sinh đơn mới hoặc giao lại về sau. Em đã hoàn tất thao tác thay đổi theo yêu cầu của anh.",
+      "text": "Dạ vâng, cảm ơn anh đã thông báo sớm để shop hỗ trợ nhanh nhất. Anh yên tâm, bên em đã cập nhật địa chỉ mới, đơn hàng OD900602 sẽ được xử lý đúng tiến độ ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -127,16 +152,21 @@
       "text": "Anh đã nói với em về đơn hàng này hôm qua rồi, nên hy vọng việc thay đổi sẽ nhanh chóng.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em đã cập nhật địa chỉ mới cho anh. Nếu cần hỗ trợ gì thêm về đơn hàng, anh cứ gọi lại cho shop nhé. Em cảm ơn anh đã liên hệ!",
+      "text": "Dạ em đã hoàn tất cập nhật địa chỉ giao hàng cho anh. Nếu cần kiểm tra trạng thái đơn OD900602, anh có thể liên hệ lại qua hotline hoặc Zalo OA của shop bất cứ lúc nào ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -147,7 +177,7 @@
         }
       ],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     }

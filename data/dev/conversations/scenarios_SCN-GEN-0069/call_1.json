@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em hỗ trợ chị tra cứu thông tin đơn hàng nhé.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị D muốn hỏi về đơn hàng, em xin phép kiểm tra thông tin cho mình ạ.",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -31,68 +31,76 @@
       "text": "Alo, chị D đây, chị muốn hỏi về tình trạng đơn hàng của mình.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ chị hỏi về đơn hàng mã OD900402 đúng không ạ? Để em kiểm tra giúp chị tình trạng đơn và các đơn gần đây nhé.",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Chị hỏi về đơn hàng mã OD900402 đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "order_id"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đơn hàng mã OD900402 đang xử lý, không biết khi nào thì giao hàng ạ?",
-      "facts_stated": {
-        "order_id": "OD900402"
-      },
-      "entities": [],
       "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra trên hệ thống thì đơn hàng mã OD900402 của chị hiện vẫn đang trong quá trình xử lý. Ngoài ra, đơn hàng mã OD900403 của chị là Nồi chiên không dầu Lock&Lock 4L đã giao thành công rồi ạ.",
+      "text": "Dạ vâng, chị hỏi về đơn hàng mã OD900402 đúng không ạ? Em kiểm tra thì đơn hàng này đang xử lý ạ.",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [
         {
           "field": "order_id",
-          "value": "OD900403"
+          "value": "OD900402"
         },
         {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "OD900403"
+            "order_id": "OD900402"
           }
         }
       ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900402",
+          "spoken": "OD900402"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng mã OD900402 đang xử lý, không biết khi nào thì giao hàng ạ?",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900402",
+          "spoken": "OD900402"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị hiện tại vẫn đang trong quá trình xử lý nên chưa có thông tin giao hàng chính xác ạ. Khi đơn hàng được chuyển sang trạng thái giao, bên em sẽ gửi mã vận đơn và cập nhật cho chị ngay.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 700,
@@ -110,14 +118,27 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra thì chưa có cập nhật mới về đơn hàng đang xử lý, nếu có thay đổi shop sẽ chủ động liên hệ với chị qua điện thoại hoặc Zalo ạ.",
+      "text": "Dạ em kiểm tra trên hệ thống thì chưa có thông báo giao hàng mới cho đơn OD900402 ạ. Bên em sẽ chủ động liên hệ khi có cập nhật mới về đơn hàng của chị.",
       "questions": [],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900402"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 650,
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900402",
+          "spoken": "OD900402"
+        }
+      ],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -132,10 +153,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận thông tin của chị, khi đơn OD900402 sẵn sàng giao hoặc có thay đổi trạng thái, nhân viên bên em sẽ liên hệ trực tiếp để thông báo cho chị sớm nhất ạ. Em cảm ơn chị đã liên hệ shop!",
+      "text": "Dạ em thông tin lại, đơn hàng của chị đang xử lý nên nhân viên giao hàng chưa liên hệ. Khi đơn chuyển sang trạng thái giao, bên em sẽ gọi xác nhận và gửi mã vận đơn cho chị ạ.",
       "questions": [],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -145,7 +173,7 @@
     }
   ],
   "gold": {
-    "intent": "hoi_tinh_trang_don",
+    "intent": "cap_nhat_don",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

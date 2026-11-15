@@ -13,7 +13,8 @@
 # chỉ được chọn qua --kb-version / --skills-version của lần chạy này. Hai phương pháp không chạy song song được.
 param(
     [Parameter(Mandatory)][ValidateSet("gaploop", "reflection", "combined")][string]$Method,
-    [string[]]$Only = @()
+    [string[]]$Only = @(),
+    [switch]$Resume   # chạy tiếp run bị dừng (DB mất, máy ngủ): giữ kịch bản đã xong, chỉ chạy phần còn lại
 )
 $ErrorActionPreference = "Stop"
 Set-Location (Resolve-Path "$PSScriptRoot\..\..")
@@ -29,10 +30,11 @@ $plan = @{
 }[$Method]
 $learned = "evaluation\runs\$($plan.Round)\learned"
 
-# Chỉ chạy khi agent đang ở bản gốc: không có kb v>0, không có thư mục skills.
+# Chỉ chạy khi agent đang ở bản gốc: không có kb v>0, không có phiên bản skills (thư mục rỗng thì được).
 $stray = @(Get-ChildItem "$kbDir\v*.jsonl" | Where-Object { $_.Name -ne "v0.jsonl" })
-if ($stray.Count -or (Test-Path $skillsDir)) {
-    "Agent không ở v0: $($stray.Name -join ', ') $(if (Test-Path $skillsDir) { $skillsDir }). Rollback trước."
+$skillFiles = @(if (Test-Path $skillsDir) { Get-ChildItem $skillsDir -File })
+if ($stray.Count -or $skillFiles.Count) {
+    "Agent không ở v0: $(($stray + $skillFiles).Name -join ', '). Rollback trước."
     exit 2
 }
 
@@ -43,7 +45,8 @@ if (Test-Path "$out\full.manifest.json") {
         "== $out đã chạy xong, không chạy lại."; exit 0
     }
 }
-if ((Test-Path $out) -and (Get-ChildItem $out).Count) {
+if ($Resume -and -not (Test-Path "$out\full.manifest.json")) { "Không có run để chạy tiếp ở $out."; exit 2 }
+if (-not $Resume -and (Test-Path $out) -and (Get-ChildItem $out).Count) {
     Move-Item $out ("$out.stopped-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
 }
 New-Item -ItemType Directory -Force $out | Out-Null
@@ -59,12 +62,17 @@ try {
         $cmd += @("--kb-version", $plan.Kb)
     }
     if ($null -ne $plan.Skills) {
-        New-Item -ItemType Directory $skillsDir | Out-Null; $copied += $skillsDir
-        Copy-Item "$learned\skills\v*.yaml" $skillsDir
+        New-Item -ItemType Directory -Force $skillsDir | Out-Null
+        foreach ($file in Get-ChildItem "$learned\skills\v*.yaml") {
+            Copy-Item $file.FullName "$skillsDir\$($file.Name)"; $copied += "$skillsDir\$($file.Name)"
+        }
         Set-Content "$skillsDir\active.json" '{"version": 0}' -Encoding utf8   # đang bật vẫn là v0
+        $copied += "$skillsDir\active.json"
         $cmd += @("--skills-version", $plan.Skills)
     }
     foreach ($id in $Only) { $cmd += @("--only", $id) }
+    # --resume lấy cohort, profile và phiên bản từ manifest của run; chỉ cần file phiên bản có mặt.
+    if ($Resume) { $cmd = @("run_eval.py", "--resume", "$out\full.jsonl") }
     "== $Method : kb $($plan.Kb) skills $($plan.Skills) từ $learned -> $out"
     & $py @cmd
     $code = $LASTEXITCODE

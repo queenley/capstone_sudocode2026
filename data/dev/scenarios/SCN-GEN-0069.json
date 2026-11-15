@@ -96,16 +96,16 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "OD900403"
+          "order_id": "OD900402"
         },
         "must_say_any": [
-          "đã giao",
-          "giao thành công"
+          "đang xử lý",
+          "đang chuẩn bị"
         ]
       },
       "ground_truth_facts": {
-        "order_id": "OD900403",
-        "order_status": "delivered",
+        "order_id": "OD900402",
+        "order_status": "processing",
         "call_date": "2026-10-31"
       },
       "relevant_policy_ids": [
@@ -137,13 +137,13 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "OD900403",
+          "order_id": "OD900402",
           "action": "update_address"
         }
       },
       "ground_truth_facts": {
-        "order_id": "OD900403",
-        "order_status": "delivered",
+        "order_id": "OD900402",
+        "order_status": "processing",
         "call_date": "2026-11-02"
       },
       "memory_expectation": {

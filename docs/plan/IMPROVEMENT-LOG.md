@@ -21,6 +21,34 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-16 · Sửa nhãn và lời khách D1–D7 của DISPUTES; Zalo ID cho 5 khách CRM tổng hợp
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR, HR, CCR
+
+- **Vấn đề:** các cuộc trượt TSR vì nhãn hoặc lời khách sai, không phải vì agent (`DISPUTES.md`, mục "Đang tranh chấp"). D1: nhãn là đơn khác đơn khách đọc. D2: chat Facebook bằng ID bộ sinh tự đặt, không gì nối với cuộc trước; chat Zalo của khách CRM tổng hợp thiếu `zalo_id`. D3: khách chỉ nói "giày chạy bộ", nhãn chọn RunLite 2 Pro. D6: khách hạ ngân sách dưới tổng giỏ, nhãn vẫn đặt đủ giỏ.
+- **Bằng chứng:** `evaluation/runs/full-dev/gaploop` (15/11): ADV-0012/c2 bỏ Mini sau câu đổi ngân sách; ADV-0009, 0048, 0077, 0143 tier UNKNOWN. Kiểm từng nhãn với CRM, catalogue và mock BTC.
+- **Sửa:** `build_dev_r4.py` nhóm 32 (D3, 11 cuộc dev + 3 test), 33 (D2 Facebook, 5 + 2), 34 (D1, 10 cuộc dev; gồm `tools/` của đáp án), 35 (D6, 13 + 3); build lại `data/dev` và `data/test`. CRM tổng hợp: `zalo_id` cho SYN-C002, 004, 006, 008, 010, hash mới trong `tests/agent/btc_pack.sha256.json`. `mark_conversations.py` đánh dấu hội thoại mẫu của các nhóm này; `regenerate_conversations.py` ghi ngày sinh lại từng cuộc. Sinh lại hội thoại mẫu và audio của các lượt đổi lời.
+- **Đã kiểm:** 409 + 100 kịch bản nạp được; `test_btc_pack.py` qua; 5 Zalo ID tra ra đúng khách; resolver nhận SĐT và câu xác nhận của nhóm 33.
+- **Sửa thêm (D4, D5, D7, tìm trong `method-metrics/conversations.csv`):** nhóm 36 (D5, 25 cuộc dev + 8 test): `must_say_any` nhận cách nói tương đương ("đang trên đường giao", "không được freeship", "giảm 50%", số tiền 8%). Nhóm 37 (D4, 8 + 3): tuổi thọ màng lọc theo SP-AIR-01, bỏ cấm giá 2.445.000, GEN-0213 theo catalogue. Nhóm 38 (D7, 4 cuộc dev): khách đồng ý xóa, khách đọc SĐT khi hẹn gọi lại.
+- **Số đo:** chấm lại trace cũ, không gọi model (nhóm 34, 36, 37 đổi nhãn chấm). `eval_3`: TSR full 62,1 → 66,7%, baseline 55,5 → 59,2%; HR full 13,0 → 11,6%, baseline 13,8 → 12,8%; CCR, RQR không đổi. Frozen 20: Router 65 → 75%, GapLoop 65 → 70%, Reflection 60 → 60%, Kết hợp 60 → 65%. Nhóm 32, 33, 35, 38 và CRM Zalo chỉ đo được khi chạy lại agent: chưa đo.
+- **Còn lại:** GEN-0070/c3 chuyển sang trượt theo nhãn mới: agent tra đơn vừa tạo thay vì đơn khách đọc. Lỗi agent A10 (hỏi thừa khi khách đã đưa đủ) và A11 chưa sửa.
+
+### 2026-11-16 · Guard không cho tổng giá lẻ thay tổng của `pricing.quote_order` cùng các máy
+
+Loại: hard guard · Trạng thái: đang đo · Chỉ số: HR (giá), TSR
+
+- **Vấn đề:** khi đã có `pricing.quote_order` cho một giỏ hai máy lọc (máy rẻ hơn giảm 50%, AIR-2ND-50), agent vẫn có thể báo tổng bằng cách cộng hai giá `pricing.get_quote` lẻ, và guard cho qua. Guard coi mọi tổng của các giá lẻ trong cuộc là "tổng giỏ" hợp lệ.
+- **Bằng chứng:** `evaluation/runs/full-dev/gaploop/full.jsonl` (15/11), `SCN-ADV-0012 call_2`. Turn 2 gọi `pricing.quote_order` (Y + Mini, tổng 6.295.000) và báo đúng. Turn 3 khách hỏi lại "6 triệu 295 đúng không", agent trả lời "Dạ không ạ, tổng giỏ hôm nay là 7.390.000đ" (5.200.000 + 2.190.000 giá lẻ). `full.diagnostics.jsonl`: `guard_passed: true`, không tạo lại bản nháp.
+- **Sửa:**
+  - `components/guardrails/hard.py`: `GuardInput.order_quotes` (units key của `purchase.units_key` → giá từng máy). `allowed_amounts` bỏ tổng của các giá lẻ khi đúng các máy đó đã có `quote_order`; tổng của `quote_order` vẫn được phép vì đã nằm trong số của tool.
+  - `pipeline/hot/nodes.py`: `_order_quotes` gộp `state["order_quotes"]` với `quote_order` của lượt này và truyền vào guard. `_basket_total` trả tổng của `quote_order` khi giỏ trùng các máy đã báo giá, thay vì cộng giá lẻ.
+  - Chọn guard vì skill `config/prompts/agent/advisor/skills.yaml` đã dặn "hơn một máy: không lấy giá từng món" mà model vẫn cộng; guard là chỗ chặn được con số sai trước khi khách nghe.
+- **Đã kiểm:** `tests/agent/test_money_sources.py`: 3 ca mới (7.390.000 bị chặn và 6.295.000 qua khi có `quote_order`; cộng giá lẻ vẫn qua khi chưa có `quote_order`; `_basket_total` lấy tổng `quote_order`). Các test guard, tiền và đơn hàng: 306 qua. Cả bộ (Python 3.12, Windows): 1.829 qua, 3 lỗi chỉ có trên Windows có từ trước (`test_evaluation_budget` khóa file, `test_voice_transport` biến môi trường quá dài).
+- **Số đo:** chưa đo.
+- **Còn lại:**
+  - Cùng cuộc đó trượt TSR vì lý do khác: turn 4 khách hạ ngân sách xuống 5 triệu, agent bỏ Mini và đặt chỉ AirPure Y; nhãn đòi cả hai món. Lời khách cố định không trả lời câu hỏi lại của agent; ghi ở `data/dev/DISPUTES.md` (D7) nếu người duyệt đồng ý.
+  - Trước khi có `quote_order`, tổng giá lẻ của hai máy lọc vẫn qua guard (chưa biết có AIR-2ND-50). Skill đã dặn gọi `quote_order` trước; chưa chặn bằng guard.
+
 ### 2026-11-14 · Từ điển ASR: tên sản phẩm BTC đọc theo cách Việt ("e pia", "ka rô phi", "cê ô đê", "run lai")
 
 Loại: evaluation (từ điển sửa lỗi ASR, dùng chung với agent) · Trạng thái: đang đo · Chỉ số: entity accuracy ASR, `sku`, `payment`

@@ -12,21 +12,20 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh, hôm trước anh có hỏi về Quạt đứng Senko TS16 và chờ cuối tháng nhận lương. Hiện sản phẩm này còn hàng, giá mới là 590.000đ anh nhé. Mình đặt luôn hôm nay đúng không ạ?",
+      "text": "Dạ em chào anh Lê Văn C ạ, hôm trước anh hỏi Quạt đứng Senko TS16 nhưng còn chờ cuối tháng nhận lương, hôm nay mình muốn đặt mua đúng không anh?",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Mình đặt Quạt đứng Senko TS16 đúng không ạ?"
+          "slot": "other",
+          "type": "open",
+          "text": "hôm nay mình muốn đặt mua đúng không anh?"
         }
       ],
       "facts_used": [
         "blocker",
         "product_advised",
         "price_quoted_vnd",
-        "order_id",
-        "owned_sku",
-        "promo_code"
+        "promo_code",
+        "order_id"
       ],
       "claims": [
         {
@@ -34,36 +33,46 @@
           "value": 590000
         },
         {
-          "field": "in_stock",
-          "value": true
+          "field": "price_quoted_vnd",
+          "value": 590000
+        },
+        {
+          "field": "promo_11-11_active",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "chao em anh muon dat mua quat dung senko ts16",
+      "text": "anh la le van c so anh 0998000003 hom truoc anh nhan ben zalo chao em anh muon dat mua quat dung senko ts16",
       "facts_stated": {
         "product_advised": "SKU-FAN-SEN"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000003",
+          "spoken": "0998000003"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh chọn Quạt đứng Senko TS16, giá hiện tại là 590.000đ. Anh muốn thanh toán COD đúng không ạ?",
+      "text": "Dạ em xác nhận anh muốn mua Quạt đứng Senko TS16, giá hiện tại là 590.000đ ạ. Giá này đã hết khuyến mãi 11-11 hôm trước. Anh chọn thanh toán COD đúng không ạ?",
       "questions": [
         {
           "slot": "payment",
           "type": "confirm",
-          "text": "Anh muốn thanh toán COD đúng không ạ?"
+          "text": "Anh chọn thanh toán COD đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -71,18 +80,26 @@
         {
           "field": "price_vnd",
           "value": 590000
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 590000
+        },
+        {
+          "field": "promo_11-11_active",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "hinh thuc thanh toan la cod nhe",
+      "text": "dung roi em anh la le van c hinh thuc thanh toan la cod nhe",
       "facts_stated": {
         "payment": "COD"
       },
@@ -93,20 +110,26 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận thanh toán COD. Anh nhận hàng ở Quận 7, TP.HCM đúng không ạ?",
+      "text": "Dạ cảm ơn anh, mình sẽ giao hàng đến Quận 7, TP.HCM đúng không ạ?",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "confirm",
-          "text": "Anh nhận hàng ở Quận 7, TP.HCM đúng không ạ?"
+          "text": "mình sẽ giao hàng đến Quận 7, TP.HCM đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "quan 7 tp hcm"
+        }
+      ],
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
@@ -116,15 +139,27 @@
       "facts_stated": {
         "delivery_area": "Quận 7, TP.HCM"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "quan 7 tp hcm"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận lại đơn: Quạt đứng Senko TS16, 1 cái, giá 590.000đ, giao Quận 7, TP.HCM, thanh toán COD. Thời gian giao dự kiến 2 ngày làm việc, khoảng 17/11 anh nhận hàng nhé. Em lên đơn cho anh luôn ạ.",
-      "questions": [],
+      "text": "Dạ em báo lại đơn của anh: Quạt đứng Senko TS16, số lượng 1, giá 590.000đ, giao Quận 7, TP.HCM, thanh toán COD. Dự kiến giao hàng trong 2 ngày làm việc, khoảng ngày 17/11. Anh xác nhận giúp em thông tin trên đúng chưa để em lên đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em thông tin trên đúng chưa để em lên đơn nhé?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
@@ -147,7 +182,49 @@
             "address": "Quận 7, TP.HCM",
             "on": "2026-11-14"
           }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "quan 7 tp hcm"
+        }
+      ],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "dung roi em len don giup anh nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn Quạt đứng Senko TS16 cho anh, tổng 590.000đ, giao dự kiến ngày 17/11. Nhân viên sẽ liên hệ khi giao hàng tới nơi. Cảm ơn anh đã đặt hàng bên em ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
         },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        }
+      ],
+      "tool_calls": [
         {
           "name": "order.create",
           "args": {
@@ -184,7 +261,7 @@
           "key": "price_quoted_vnd",
           "value": 590000,
           "op": "supersede",
-          "source": "call_2#turn2"
+          "source": "call_2#turn3"
         },
         {
           "key": "order_id",
@@ -193,17 +270,14 @@
           "source": "call_2#turn10"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "dung roi em len don giup anh nhe",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "quan 7 tp hcm"
+        }
+      ],
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
@@ -215,24 +289,6 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho anh. Đơn sẽ giao trong 2 ngày làm việc, dự kiến anh nhận hàng ngày 17/11. Cảm ơn anh đã đặt hàng tại shop ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "estimated_delivery",
-          "value": "2026-11-17"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
@@ -240,7 +296,7 @@
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "neutral",
+    "sentiment": "positive",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [

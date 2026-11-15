@@ -33,6 +33,7 @@ from ..intake.itn import amounts, format_vnd
 from ..intake.pii import PATTERNS, TOKEN
 from . import Verdict
 from .actions import COD_LIMIT_VND
+from .purchase import units_key
 
 MAX_SENTENCES = 3
 MAX_BASKET = 8
@@ -88,6 +89,9 @@ class GuardInput:
     earlier_counts: frozenset[int] = field(default_factory=frozenset)
     #: The total the system added up for the basket the customer is choosing.
     basket_total: int | None = None
+    #: The units a ``pricing.quote_order`` of this call priced, units key to ``[[sku, unit price], ...]``. The sum
+    #: of standalone quotes over those units is not their price: a second air purifier is at half price (KM-05).
+    order_quotes: Mapping[str, Any] = field(default_factory=dict)
     #: The brief's freshness warnings: what has ended or run out, stated by ``refresh``.
     warnings: tuple[str, ...] = ()
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
@@ -150,10 +154,12 @@ def allowed_amounts(view: GuardInput) -> set[int]:
         # A rate of the documents applied to a price (a warranty plan at 8% of the product).
         for rate in RATE.findall(text):
             found |= {round(price * int(rate) / 100) for price in base if price >= 100_000}
-    # A basket's total: the sum of some of today's quotes (at most a call's few products).
-    quoted = list(view.quotes.values())[:MAX_BASKET]
+    # A basket's total: the sum of some of today's quotes (at most a call's few products), unless a
+    # pricing.quote_order priced those very units: then its total is the price, already among the tools' numbers.
+    quoted = list(view.quotes.items())[:MAX_BASKET]
     for size in range(2, len(quoted) + 1):
-        found |= {sum(group) for group in combinations(quoted, size)}
+        found |= {sum(price for _, price in group) for group in combinations(quoted, size)
+                  if units_key([{"sku": sku} for sku, _ in group]) not in view.order_quotes}
     return found
 
 

@@ -12,143 +12,32 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Lan, hôm trước chị có hỏi về Máy lọc không khí AirPure Mini để bàn với gia đình, hôm nay chị xác nhận mua đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "hôm trước chị có hỏi về Máy lọc không khí AirPure Mini để bàn với gia đình, hôm nay chị xác nhận mua đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "product_advised",
-        "blocker",
-        "room_area_m2",
-        "price_quoted_vnd"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "chi xac nhan mua may loc khong khi airpure mini",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, Máy lọc không khí AirPure Mini bên em giá 2.190.000đ, hiện còn hàng. Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "product_advised",
-        "price_quoted_vnd"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "hinh thuc thanh toan la chuyen khoan ngan hang",
-      "facts_stated": {
-        "payment": "bank"
-      },
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, mình giao hàng tại TP Huế đúng không ạ? Đơn này bên em sẽ miễn phí giao hàng toàn quốc cho chị luôn ạ.",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "mình giao hàng tại TP Huế đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "payment"
-      ],
-      "claims": [
-        {
-          "field": "freeship",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "khu vuc giao hang la tp hue",
-      "facts_stated": {
-        "delivery_area": "TP Huế"
-      },
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em tóm tắt đơn: Máy lọc không khí AirPure Mini, giá 2.190.000đ, giao TP Huế, chị thanh toán chuyển khoản ngân hàng. Hàng dự kiến giao ngày 24/10. Thông tin vậy đúng hết chưa để em lên đơn cho chị nhé?",
+      "text": "Dạ em chào chị Lan, hôm trước chị có quan tâm Máy lọc không khí AirPure Mini để bàn với gia đình, mình xác nhận lại đơn đúng không ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Thông tin vậy đúng hết chưa để em lên đơn cho chị nhé?"
+          "text": "Em xác nhận lại đơn: Máy lọc không khí AirPure Mini, giá 2.190.000đ, giao tại TP Huế, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến ngày 24/10. Đúng như chị đặt không ạ?"
         }
       ],
       "facts_used": [
-        "delivery_area",
-        "payment"
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
       ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
         },
         {
           "field": "estimated_delivery",
@@ -167,38 +56,50 @@
       "memory_writes": [],
       "entities": [
         {
+          "type": "phone",
+          "value": "0981933190",
+          "spoken": "0981933190"
+        },
+        {
           "type": "date",
           "value": "2026-10-24",
           "spoken": "24/10"
         }
       ],
-      "pause_before_ms": 400,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "chot don cho chi nhe",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 500,
+      "text": "chi la lan so chi 0981933190 hom truoc chi nhan ben zalo chi xac nhan mua may loc khong khi airpure mini",
+      "facts_stated": {
+        "room_area_m2": 12
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0981933190",
+          "spoken": "0981933190"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn cho chị, mã đơn OD600001. Tổng 2.190.000đ, chị chuyển khoản theo hướng dẫn bên em gửi sau nhé. Có gì chị cứ nhắn shop bất cứ lúc nào ạ, cảm ơn chị đã đặt hàng!",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Đơn hàng của chị: Máy lọc không khí AirPure Mini, giá 2.190.000đ, giao tại TP Huế, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến ngày 24/10. Em tiến hành lên đơn cho mình ngay nhé ạ.",
       "questions": [],
-      "facts_used": [
-        "delivery_area",
-        "payment",
-        "product_advised",
-        "price_quoted_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 2190000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
         }
       ],
       "tool_calls": [
@@ -215,51 +116,102 @@
           }
         }
       ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0981933190",
+          "spoken": "0981933190"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-24",
+          "spoken": "24/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "dung roi em chi la lan hinh thuc thanh toan la chuyen khoan ngan hang",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị sẽ được giao tại TP Huế, dự kiến nhận vào ngày 24/10. Em đã ghi nhận thanh toán chuyển khoản ngân hàng. Nếu cần hỗ trợ thêm chị nhắn em nhé, em cảm ơn chị Lan ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
       "memory_writes": [
         {
           "key": "delivery_area",
           "value": "TP Huế",
           "op": "set",
-          "source": "call_2#turn6"
+          "source": "call_2#turn5"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn4"
+          "source": "call_2#turn5"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn5"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn5"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn8"
+          "source": "call_2#turn5"
         }
       ],
       "entities": [
         {
-          "type": "order_id",
-          "value": "OD600001",
-          "spoken": "OD600001"
-        },
-        {
-          "type": "money",
-          "value": "2190000",
-          "spoken": "2.190.000đ"
+          "type": "date",
+          "value": "2026-10-24",
+          "spoken": "24/10"
         }
       ],
-      "pause_before_ms": 400,
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "khu vuc giao hang la tp hue",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chot don cho chi nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -269,7 +221,7 @@
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
@@ -280,7 +232,8 @@
       "price_vnd": 2190000,
       "payment": "bank",
       "address": "TP Huế",
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-24"
     }
   }
 }

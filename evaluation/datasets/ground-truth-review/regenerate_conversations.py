@@ -108,8 +108,11 @@ def main() -> None:
     record = root / "review" / "regenerated.json"
     previous = json.loads(record.read_text(encoding="utf-8")) if record.exists() else {"conversation_ids": []}
     all_ids = sorted(set(previous["conversation_ids"]) | written)
+    # The day of each call's latest transcript: a label changed after it makes the transcript stale again.
+    days = {**previous.get("regenerated_on", {}), **{cid: date.today().isoformat() for cid in written}}
     record.write_text(json.dumps({"generated_by": "evaluation/datasets/ground-truth-review/regenerate_conversations.py",
-                                  "updated_on": date.today().isoformat(), "conversation_ids": all_ids},
+                                  "updated_on": date.today().isoformat(), "conversation_ids": all_ids,
+                                  "regenerated_on": dict(sorted(days.items()))},
                                  ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"written {len(written)}/{len(ids)}; review_sheet approvals cleared: {clear_approvals(root, written)}", flush=True)
     for script in ("mark_conversations.py", "auto_verify.py"):

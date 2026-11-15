@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Huy ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure Pro và cần suy nghĩ thêm, hôm nay mình muốn đặt hàng mấy món cho nhà mới đúng không anh?",
+      "text": "Dạ em chào anh Huy ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Máy lọc không khí AirPure Pro và cần suy nghĩ thêm, hôm nay anh quyết định rồi đúng không ạ?",
       "questions": [],
       "facts_used": [
         "product_advised",
@@ -21,16 +21,11 @@
         "price_quoted_vnd",
         "promo_code"
       ],
-      "claims": [
-        {
-          "field": "promo_AIR-OCT_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -39,33 +34,26 @@
       "text": "Alo, anh gọi lại đây! Anh quyết định mua mấy món cho nhà mới rồi.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã quay lại ạ. Em nghe anh muốn lấy Máy lọc không khí AirPure Pro trước đúng không ạ? Giá hiện tại là 7.690.000đ, vẫn áp dụng khuyến mãi AIR-OCT như anh được báo hôm trước.",
-      "questions": [],
-      "facts_used": [
-        "product_advised",
-        "price_quoted_vnd",
-        "promo_code"
-      ],
-      "claims": [
+      "text": "Dạ vâng, anh muốn lấy những sản phẩm nào cho nhà mới ạ? Anh có thể liệt kê giúp em từng món mình cần nhé.",
+      "questions": [
         {
-          "field": "price_vnd:SKU-AP-PRO",
-          "value": 7690000
-        },
-        {
-          "field": "promo_AIR-OCT_active",
-          "value": true
+          "slot": "other",
+          "type": "open",
+          "text": "Anh có thể liệt kê giúp em từng món mình cần nhé."
         }
       ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -74,16 +62,24 @@
       "text": "Trước tiên là anh muốn lấy một cái máy lọc không khí AirPure Pro.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, Máy lọc không khí AirPure Pro còn hàng, bảo hành 12 tháng chính hãng anh nhé. Anh muốn thêm món nào nữa mình lên đơn luôn cho tiện ạ?",
+      "text": "Dạ, Máy lọc không khí AirPure Pro hiện đang có giá 7.690.000đ, còn hàng và được tặng kèm khuyến mãi AIR-OCT. Máy này phù hợp phòng đến 45m², bảo hành 24 tháng chính hãng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd:SKU-AP-PRO",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
         {
           "field": "in_stock",
           "value": true
@@ -92,7 +88,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -101,13 +97,13 @@
       "text": "Rồi một cái nồi chiên không dầu Xiaomi 4.5L nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, hiện tại cũng còn hàng anh nhé. Em ghi nhận vào đơn cho anh luôn.",
+      "text": "Dạ, Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, bảo hành 12 tháng, hiện còn hàng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -119,7 +115,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -128,13 +124,13 @@
       "text": "Tiếp theo là cho anh một cái quạt đứng Senko TS16.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, quạt đứng Senko TS16 giá 590.000đ, có hàng sẵn kho anh ạ. Anh còn muốn thêm gì nữa không em ghi hết một lần cho tiện.",
+      "text": "Dạ, Quạt đứng Senko TS16 giá 590.000đ, bảo hành 12 tháng, còn hàng luôn anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -146,7 +142,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -155,13 +151,13 @@
       "text": "Cuối cùng là một cái màng lọc thay thế cho máy lọc không khí.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, màng lọc thay thế cho AirPure Pro giá 990.000đ, còn hàng luôn anh nhé. Để em tổng hợp lại đơn cho mình ạ.",
+      "text": "Dạ, Màng lọc thay thế AirPure Pro giá 990.000đ, hiện còn hàng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -173,7 +169,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -182,13 +178,13 @@
       "text": "Tổng tiền là bao nhiêu em nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ tổng cộng 4 món là 10.860.000đ, đã gồm khuyến mãi và miễn phí vận chuyển cho anh. Đơn trên 10 triệu nên không áp dụng thanh toán khi nhận, mình chuyển khoản giúp em nhé.",
+      "text": "Dạ, tổng cộng 4 sản phẩm là 10.860.000đ anh nhé. Đơn này vượt 10 triệu nên không áp dụng thanh toán khi nhận hàng, anh có thể chuyển khoản giúp em ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -204,31 +200,25 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "À, ngân sách giờ anh tăng lên 8 triệu rưỡi.",
+      "text": "À, ngân sách giờ anh tăng lên 8 triệu rưỡi. Nhưng các món này anh vẫn lấy đủ nhé.",
       "facts_stated": {
         "budget_vnd": 8500000
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, với ngân sách 8 triệu rưỡi thì tổng đơn hiện tại là 10 triệu 860 nghìn đồng anh nhé, mình có muốn cân nhắc bớt sản phẩm nào không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Mình có muốn cân nhắc bớt sản phẩm nào không ạ?"
-        }
-      ],
+      "text": "Dạ em ghi nhận ngân sách mới của anh là 8 triệu rưỡi, các sản phẩm anh chọn tổng vẫn là 10.860.000đ, đã bao gồm khuyến mãi tốt nhất hiện tại rồi ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -239,7 +229,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -250,13 +240,13 @@
         "payment": "cod"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ rất tiếc, đơn trên 10 triệu nên shop chưa hỗ trợ thanh toán khi nhận, anh vui lòng chuyển khoản giúp em ạ.",
+      "text": "Dạ em thông báo với anh, đơn hàng trên 10 triệu nên shop chưa hỗ trợ thanh toán khi nhận hàng. Anh vui lòng chuyển khoản giúp em nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -268,7 +258,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -279,42 +269,18 @@
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã xác nhận. Em sẽ chốt đơn theo hình thức chuyển khoản cho mình ạ. Anh nghe giúp em thông tin đơn hàng trước khi lên đơn nhé.",
-      "questions": [],
-      "facts_used": [
-        "payment"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ em đọc lại đơn hàng: Máy lọc không khí AirPure Pro giá 7.690.000đ, nồi chiên không dầu Xiaomi 4.5L 1.590.000đ, quạt đứng Senko TS16 590.000đ, màng lọc thay thế 990.000đ. Giao về Nha Trang, Khánh Hòa, tổng cộng 10.860.000đ, chuyển khoản. Dự kiến giao ngày 22/10/2026. Anh xác nhận giúp em thông tin trên đúng chưa để em lên đơn ạ?",
+      "text": "Dạ em cảm ơn anh đã đồng ý chuyển khoản. Để em xác nhận lại đơn hàng: Máy lọc không khí AirPure Pro 7.690.000đ, Nồi chiên không dầu Xiaomi 4.5L 1.590.000đ, Quạt đứng Senko TS16 590.000đ, Màng lọc thay thế AirPure Pro 990.000đ. Tổng cộng 10.860.000đ, giao về Nha Trang, Khánh Hòa, dự kiến nhận hàng ngày 22/10/2026. Anh xác nhận giúp em thông tin này để em lên đơn nhé.",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Anh xác nhận giúp em thông tin trên đúng chưa để em lên đơn ạ?"
+          "text": "Anh xác nhận giúp em thông tin này để em lên đơn nhé."
         }
       ],
       "facts_used": [
@@ -341,7 +307,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
@@ -350,25 +316,16 @@
       "text": "Đúng rồi em, lên đơn giúp anh nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn cho anh, tổng 10 triệu 860 nghìn đồng, chuyển khoản. Dự kiến giao trước ngày 22/10/2026. Em gửi thông tin chuyển khoản và mã đơn cho anh ngay sau cuộc gọi này ạ, anh kiểm tra giúp em nhé.",
+      "text": "Dạ em lên đơn cho anh ngay bây giờ ạ. Anh vui lòng chuyển khoản theo hướng dẫn khi nhận được tin nhắn xác nhận đơn hàng. Cảm ơn anh đã mua sắm tại shop BTC!",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "total_vnd",
-          "value": 10860000
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-10-22"
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -444,7 +401,7 @@
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn22"
+          "source": "call_2#turn19"
         },
         {
           "key": "budget_vnd",
@@ -462,55 +419,51 @@
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_2#turn2"
+          "source": "call_2#turn5"
         },
         {
           "key": "price_quoted_vnd",
           "value": 7690000,
           "op": "set",
-          "source": "call_2#turn2"
+          "source": "call_2#turn5"
         },
         {
           "key": "promo_code",
           "value": "AIR-OCT",
           "op": "set",
-          "source": "call_2#turn2"
+          "source": "call_2#turn5"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn22"
+          "source": "call_2#turn19"
         }
       ],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_nhieu_mon_gia_dung",
+    "intent": "dat_nhieu_san_pham",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
-    "commitments": [
-      {
-        "info": "Gửi thông tin chuyển khoản và mã đơn cho khách qua Zalo/SMS sau cuộc gọi"
-      }
-    ],
+    "commitments": [],
     "supersedes": [
       {
         "slot": "budget_vnd",
-        "from": 8000000,
-        "to": 8500000
+        "old_value": 8000000,
+        "new_value": 8500000
       }
     ],
     "callback": null,
     "order": {
-      "items": [
+      "products": [
         {
           "sku": "SKU-AP-PRO",
           "qty": 1,
@@ -534,7 +487,7 @@
       ],
       "total_vnd": 10860000,
       "payment": "bank",
-      "address": "Nha Trang, Khánh Hòa",
+      "delivery_area": "Nha Trang, Khánh Hòa",
       "estimated_delivery": "2026-10-22"
     }
   }

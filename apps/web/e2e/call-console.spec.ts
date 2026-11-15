@@ -144,10 +144,11 @@ test("one customer's sessions on every channel are one row, switched above the b
 
   await expect(page.locator(".queue-row")).toHaveCount(2);
   const row = page.locator(".queue-row", { hasText: "Chị Lan" });
-  await expect(row).toContainText("3 phiên · Hotline, Zalo, Web chat");
+  await expect(row.locator(".channel-badge")).toHaveText("Hotline · Zalo · Web chat");
+  await expect(row.locator(".queue-meta")).toContainText("3 phiên · ");
   await row.click();
-  // The open session leads; the brief sits above the transcript.
-  const brief = page.locator(".call-transcript-pane .call-brief-main");
+  // The open session leads; what is known about the customer sits above the transcript.
+  const brief = page.locator(".call-transcript-pane .call-known");
   await expect(brief).toContainText("Brief của phiên 13");
   const sessions = page.getByRole("navigation", { name: "Các phiên của khách này" });
   await expect(sessions.getByRole("button")).toHaveCount(3);
@@ -198,7 +199,7 @@ test("a handoff pushed on the stream turns the bell red, and the bell opens the 
   await expect(panel).toContainText("Khách muốn gặp nhân viên");
   await panel.getByRole("button", { name: /Anh Minh/ }).click();
   await expect(page.locator(".call-transcript-pane h2")).toContainText("Anh Minh");
-  await expect(page.locator(".call-brief-main.waiting")).toBeVisible();
+  await expect(page.locator(".call-state.is-waiting")).toBeVisible();
 });
 
 test("without the stream the bell polls the queue", async ({ page }) => {
@@ -240,6 +241,7 @@ test("the sales workspace's bell opens the waiting call in the conversations tab
   await page.goto("/ban-hang");
   await page.getByRole("button", { name: "1 khách đang chờ nhân viên" }).click();
   await page.getByRole("dialog", { name: "Khách chờ nhân viên" }).getByRole("button", { name: /Cô Bình/ }).click();
-  await expect(page.getByRole("button", { name: /Hội thoại & chuyển máy/ })).toHaveAttribute("aria-current", "page");
+  await expect(page).toHaveURL(/\/ban-hang\/hoi-thoai/);
+  await expect(page.getByRole("link", { name: /Hội thoại & chuyển máy/ })).toHaveAttribute("aria-current", "page");
   await expect(page.locator(".call-transcript-pane h2")).toContainText("Cô Bình");
 });

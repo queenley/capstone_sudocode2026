@@ -12,21 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc không khí AirPure X đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về sản phẩm nào bên em vậy ạ?",
       "questions": [
         {
           "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh muốn tìm hiểu về máy lọc không khí AirPure X đúng không ạ?"
+          "type": "open",
+          "text": "Anh cần tư vấn về sản phẩm nào bên em vậy ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -37,7 +32,9 @@
     {
       "speaker": "customer",
       "text": "Alo, cho anh hỏi về máy lọc không khí AirPure X đi.",
-      "facts_stated": {},
+      "facts_stated": {
+        "product_advised": "SKU-AP-X"
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -45,16 +42,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy AirPure X phù hợp cho phòng diện tích đến 25 mét vuông, anh có thể cho em biết diện tích phòng mình là bao nhiêu để em tư vấn chính xác hơn ạ?",
+      "text": "Dạ vâng, máy lọc không khí AirPure X phù hợp phòng diện tích tối đa 25 mét vuông, có cảm biến bụi mịn và chế độ ngủ êm, hiện đang còn hàng ạ. Anh có thể cho em biết diện tích phòng mình để em tư vấn kỹ hơn không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "open",
-          "text": "Anh cho em hỏi diện tích phòng mình là bao nhiêu mét vuông ạ?"
+          "text": "Anh có thể cho em biết diện tích phòng mình để em tư vấn kỹ hơn không ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -76,12 +78,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, với phòng 15 mét vuông thì AirPure X rất phù hợp anh nhé. Anh có ngân sách dự kiến cho sản phẩm này không để em báo giá chính xác nhất ạ?",
+      "text": "Dạ với phòng 15 mét vuông, AirPure X là phù hợp rồi ạ. Máy này không có khóa trẻ em nên nếu nhà mình không có trẻ nhỏ thì rất hợp lý anh nhé. Anh dự kiến ngân sách cho sản phẩm này khoảng bao nhiêu ạ?",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "open",
-          "text": "Anh dự kiến ngân sách cho máy lọc không khí là khoảng bao nhiêu ạ?"
+          "text": "Anh dự kiến ngân sách cho sản phẩm này khoảng bao nhiêu ạ?"
         }
       ],
       "facts_used": [],
@@ -99,14 +101,20 @@
       "facts_stated": {
         "budget_vnd": 5000000
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5000000",
+          "spoken": "5 triệu"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá máy lọc không khí AirPure X hiện tại là 4.890.000đ anh nhé.",
+      "text": "Dạ hiện tại giá máy lọc không khí AirPure X là 4.890.000đ anh nhé. Mức giá này đang đúng với ngân sách mình luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -133,13 +141,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại máy AirPure X đang có chương trình tặng kèm một màng lọc thay thế khi mua trong thời gian khuyến mãi anh nhé.",
+      "text": "Dạ hiện tại AirPure X đang tặng kèm một màng lọc thay thế chính hãng khi mua máy, anh nhận đủ hàng với giá không đổi ạ. Ngoài ra, shop hỗ trợ miễn phí thu hộ khi thanh toán COD cho đơn này luôn anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
         }
       ],
       "tool_calls": [],
@@ -151,7 +167,7 @@
     },
     {
       "speaker": "customer",
-      "text": "À, anh cần bàn với gia đình rồi hẹn lại, tối thứ Hai (19/10) tầm 7 giờ em gọi lại anh nhé.",
+      "text": "À, anh cần bàn với gia đình rồi hẹn lại, tối thứ Hai (19/10) tầm 7 giờ em gọi lại anh nhé. Số anh là 0977000005.",
       "facts_stated": {
         "blocker": "để bàn với gia đình"
       },
@@ -165,6 +181,11 @@
           "type": "time",
           "value": "19:00",
           "spoken": "7 giờ"
+        },
+        {
+          "type": "phone",
+          "value": "0977000005",
+          "spoken": "0977000005"
         }
       ],
       "pause_before_ms": 0,
@@ -173,7 +194,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận anh cần trao đổi với gia đình. Em sẽ gọi lại cho anh vào lúc 7 giờ tối thứ Hai, ngày 19/10 như anh yêu cầu ạ.",
+      "text": "Dạ em ghi nhận anh cần tham khảo thêm với gia đình. Em sẽ gọi lại cho anh vào lúc 7 giờ tối thứ Hai, ngày 19/10 theo số 0977000005 để hỗ trợ thêm anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -197,43 +218,43 @@
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call#turn4"
         },
         {
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call#turn4"
         },
         {
           "key": "budget_vnd",
           "value": 5000000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call#turn6"
         },
         {
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call#turn10"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-X",
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4890000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call#turn7"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call#turn9"
         }
       ],
       "entities": [],
@@ -245,20 +266,15 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_ban_gia_dinh",
-    "objection_handling": "Ghi nhận lý do và hẹn gọi lại đúng thời gian khách yêu cầu.",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đã xác nhận và đặt lịch gọi lại đúng thời điểm khách yêu cầu.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [
-      {
-        "time": "2026-10-19T19:00",
-        "action": "gọi lại"
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-19T19:00",
-      "note": "khách hỏi người nhà rồi báo lại"
+      "reason": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

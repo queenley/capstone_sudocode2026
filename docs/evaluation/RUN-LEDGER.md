@@ -348,3 +348,14 @@ User đã thêm lại `asr_hard_vi` và yêu cầu neural denoiser tùy chọn, 
 - 86 tests ASR/voice/pack BTC pass; thêm HTTP smoke native COMPLETE và dừng server tạm. Full suite chung chưa chốt khi luồng EC03 đang cập nhật guard/test độc lập.
 
 Bằng chứng private: `evaluation/runs/20261101-denoiser/{cohort-lock.json,comparison.json,source-used/manifest.json}`, entity-review riêng và mỗi run smoke/segments/montage. Hướng dẫn, số liệu và giới hạn: [neural-denoiser-comparison.md](neural-denoiser-comparison.md). Không chỉnh source ASR hoặc nhãn giữa các conditions; không commit/push/merge trong lượt tích hợp này.
+
+## 16/11/2026 — Chấm lại run cũ theo nhãn sửa D1–D3 (không gọi model)
+
+Nhãn `data/dev` đổi ở nhóm 32–34 của `build_dev_r4.py` (DISPUTES.md D1, D2 Facebook, D3). Không chạy lại agent hay extractor: `reference_eval.py` của BTC chấm lại trace đã có với nhãn mới. Chỉ nhóm 34 (D1, 6 kịch bản, 10 cuộc) đổi nhãn chấm; nhóm 32–33 chỉ đổi lời khách, điểm của chúng giữ nguyên (lời agent trong trace cũ trả lời lời khách cũ).
+
+- `eval_3` (Router, 409 kịch bản, `product-extractor-v13`): chấm bằng bản đóng băng của run tái tạo đúng `report.json`. Nhãn mới: TSR full 62,1→62,8% (254→257), baseline 55,5→55,7%; HR full 13,0→11,6% (613→543 claim sai / 4.699), baseline 13,8→12,8%; CCR, RQR không đổi. Đổi kết quả (full): 9 cuộc thành qua (ADV-0068/c2, GEN-0035, 0069, 0101, 0135 c1+c2); GEN-0070/c3 thành trượt (agent tra đơn vừa tạo, khách hỏi đơn Senko OD901002).
+- `method-metrics`: chạy lại `scripts/evaluation/method_metrics.py` với cohort lấy nhãn hiện tại. Trên frozen 20 (`gapmix-1`), Router 65→70%, GapLoop 65→70%, Reflection 60→60%, Kết hợp 60→65%; HR giảm 4–6 điểm ở mọi phương pháp. Không so với bảng cũ mà không ghi đổi nhãn.
+
+- Sau đó, cùng ngày, thêm nhóm 36 (D5: `must_say_any` nhận cách nói tương đương), 37 (D4: tuổi thọ màng lọc theo SP-AIR-01, bỏ cấm giá 2.445.000, GEN-0213 theo catalogue) và 38 (D7: lời khách, không đổi điểm trace cũ). `eval_3` với nhãn D1–D7: TSR full **66,7%** (62,1 trước sửa), baseline **59,2%** (55,5); HR, CCR, RQR như sau D1. 17 cuộc thêm thành qua, từng cuộc đọc lại câu agent khớp đúng ý nhãn. Frozen 20: Baseline 65→65%, Router 65→75%, GapLoop 65→70%, Reflection 60→60%, Kết hợp 60→65%.
+
+Bằng chứng: `evaluation/runs/eval_3-rescore-20261116/` (`report-old-labels.json`, `report-new-labels.json` chỉ D1, `report-new-labels-d1-d7.json`), `evaluation/runs/labels-20261116/` (cohort nhãn mới), `evaluation/runs/method-metrics-labels-20261116/`.

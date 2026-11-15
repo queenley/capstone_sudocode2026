@@ -12,17 +12,27 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Trần Thị B ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Giày trekking HikePro, em kiểm tra thông tin đơn hàng giúp chị nhé.",
-      "questions": [],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
+      "text": "Dạ em chào chị Trần Thị B ạ, em là trợ lý ảo của shop. Em nhận được thông tin chị muốn hỏi về đơn hàng OD900202 của mình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Em nhận được thông tin chị muốn hỏi về đơn hàng OD900202 của mình đúng không ạ?"
+        }
       ],
-      "claims": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900202"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -39,34 +49,28 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị hỏi về đơn hàng OD900202 đúng không ạ, em xác nhận lại thông tin giúp chị.",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Dạ chị hỏi về đơn hàng OD900202 đúng không ạ, em xác nhận lại thông tin giúp chị."
-        }
-      ],
+      "text": "Dạ vâng, chị hỏi về đơn Giày trekking HikePro mã OD900202 đúng không ạ? Hiện tại đơn hàng của chị đang xử lý và chuẩn bị giao ạ.",
+      "questions": [],
       "facts_used": [
         "order_id"
       ],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD900203"
+          "field": "order_status",
+          "value": "processing"
         }
       ],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "OD900203"
+            "order_id": "OD900202"
           }
         }
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -81,23 +85,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra hệ thống thì đơn hàng mã OD900203 của chị đã giao thành công rồi ạ.",
+      "text": "Dạ hiện đơn hàng OD900202 của chị vẫn đang được shop xử lý nên chưa có mã vận đơn và chưa bàn giao cho đơn vị vận chuyển ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD900203"
-        },
-        {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -112,25 +114,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị, đơn hàng OD900203 là Quạt đứng Senko, đã giao cho mình ạ. Đơn Giày trekking HikePro mã OD900202 hiện đang được xử lý, khi giao bên em sẽ báo qua Zalo hoặc gọi điện cho chị nhé.",
+      "text": "Dạ em kiểm tra thì đơn Giày trekking HikePro của chị vẫn đang trong quá trình chuẩn bị và sẽ sớm được chuyển sang đơn vị giao hàng. Khi có mã vận đơn, bên em sẽ gửi SMS/Zalo cho chị để chị theo dõi trạng thái đơn nhé.",
       "questions": [],
-      "facts_used": [
-        "order_id"
-      ],
+      "facts_used": [],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD900203"
-        },
-        {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -145,20 +141,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện em chưa có thông tin chính xác về thời gian giao hàng cho đơn Giày trekking HikePro của chị. Khi đơn chuyển sang trạng thái giao, shop sẽ liên hệ báo trước cho chị ạ.",
+      "text": "Dạ hiện tại shop đang xử lý đơn hàng của chị rồi ạ. Khi đơn được bàn giao cho đơn vị vận chuyển, chị sẽ nhận được mã vận đơn và có thể nhận hàng trong 2–4 ngày làm việc tiếp theo tùy khu vực. Em sẽ gửi thông báo ngay khi có cập nhật mới nhất tới chị.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 650,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_tinh_trang_don_hang",
+    "intent": "cap_nhat_don",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

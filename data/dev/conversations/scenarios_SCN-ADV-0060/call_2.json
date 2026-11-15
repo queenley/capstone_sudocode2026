@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure X và có nói chờ cuối tháng nhận lương, hôm nay anh muốn mình chốt đơn luôn đúng không ạ?",
+      "text": "Dạ em chào anh Đạt ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure X, còn chờ cuối tháng nhận lương. Anh muốn mình tiếp tục thế nào ạ?",
       "questions": [],
       "facts_used": [
         "product_advised",
@@ -21,20 +21,11 @@
         "price_quoted_vnd",
         "promo_code"
       ],
-      "claims": [
-        {
-          "field": "price_vnd:SKU-AP-X",
-          "value": 4890000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -43,24 +34,15 @@
       "text": "Alo em, anh muốn mua máy lọc không khí AirPure X.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure X bên em đang sẵn hàng, giá 4.890.000đ, tặng kèm màng lọc thay thế theo chương trình GIFT-FILTER còn hiệu lực đến 22/10. Anh muốn giao về Long Biên, Hà Nội như lần trước và giữ giá này đúng không ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Anh muốn giao về Long Biên, Hà Nội như lần trước và giữ giá này đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "delivery_area",
-        "price_quoted_vnd"
-      ],
+      "text": "Dạ Máy lọc không khí AirPure X bên em đang còn hàng, giá hôm nay là 4.890.000đ, tặng kèm một màng lọc thay thế. Máy phù hợp phòng 25m², bảo hành 24 tháng chính hãng.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd:SKU-AP-X",
@@ -69,12 +51,20 @@
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -83,26 +73,34 @@
       "text": "Chốt cho anh một cái nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận anh lấy 1 máy AirPure X. Anh còn muốn mua thêm sản phẩm nào nữa không ạ?",
+      "text": "Dạ em ghi nhận anh lấy 1 Máy lọc không khí AirPure X. Anh muốn giao về địa chỉ Long Biên, Hà Nội như cũ đúng không ạ?",
       "questions": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh còn muốn mua thêm sản phẩm nào nữa không ạ?"
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh muốn giao về địa chỉ Long Biên, Hà Nội như cũ đúng không ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "delivery_area"
+      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -111,41 +109,25 @@
       "text": "Còn máy lọc không khí AirPure Mini nữa, anh cũng lấy một cái.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ AirPure Mini hiện cũng đang có hàng, giá 1.095.000đ. Tổng đơn của anh gồm 1 máy AirPure X và 1 máy AirPure Mini, giao về Long Biên, Hà Nội. Tổng cộng là 5.985.000đ, đã bao gồm quà tặng và miễn phí vận chuyển. Anh xác nhận giúp em thông tin đơn hàng này để em lên đơn nhé?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Tổng đơn của anh gồm 1 máy AirPure X và 1 máy AirPure Mini, giao Long Biên, Hà Nội, tổng cộng 5.985.000đ, anh xác nhận giúp em để em lên đơn nhé?"
-        }
-      ],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "text": "Dạ anh lấy thêm 1 Máy lọc không khí AirPure Mini, giá là 1.095.000đ. Máy này phù hợp để bàn hoặc phòng nhỏ 12m², cũng bảo hành 24 tháng ạ.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd:SKU-AP-MINI",
           "value": 1095000
-        },
-        {
-          "field": "total_vnd",
-          "value": 5985000
-        },
-        {
-          "field": "freeship",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -154,13 +136,13 @@
       "text": "Tổng tiền là bao nhiêu em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ tổng tiền hai sản phẩm là 5.985.000đ, đã bao gồm quà tặng màng lọc và miễn phí vận chuyển anh nhé.",
+      "text": "Dạ tổng hai sản phẩm là 5.985.000đ, đã gồm ưu đãi và miễn phí vận chuyển về Long Biên, Hà Nội ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -169,18 +151,20 @@
           "value": 5985000
         },
         {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        },
-        {
           "field": "freeship",
           "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "5985000",
+          "spoken": "5.985.000"
+        }
+      ],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -191,35 +175,35 @@
         "payment": "COD"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đơn này đủ điều kiện thanh toán COD, anh nhận hàng rồi thanh toán cho bên vận chuyển là được ạ. Đơn trên 2 triệu nên sẽ có nhân viên gọi xác nhận đơn trước khi giao anh nhé.",
+      "text": "Dạ anh chọn thanh toán khi nhận hàng (COD), bên em miễn phí thu hộ cho đơn này luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "cod_allowed",
+          "field": "promo_COD-0_active",
           "value": true
         },
         {
-          "field": "needs_confirmation_call",
+          "field": "cod_allowed",
           "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "À ngân sách anh đổi ý rồi, giờ còn 4.500.000đ thôi.",
+      "text": "À ngân sách anh đổi ý rồi, giờ còn 4.500.000đ thôi. Nhưng các món này anh vẫn lấy đủ nhé.",
       "facts_stated": {
         "budget_vnd": 4500000
       },
@@ -227,28 +211,67 @@
         {
           "type": "money",
           "value": "4500000",
-          "spoken": "4.500.000đ"
+          "spoken": "4.500.000"
         }
       ],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận ngân sách mới của anh là 4.500.000đ. Tuy nhiên tổng đơn hiện tại là 5.985.000đ cho cả hai máy, nếu anh muốn điều chỉnh lại số lượng hoặc chọn sản phẩm khác phù hợp ngân sách thì em sẵn sàng hỗ trợ ạ.",
+      "text": "Dạ em báo lại, với tổng hai sản phẩm là 5.985.000đ, hiện ngân sách của anh là 4.500.000đ thì mình đang vượt một chút. Nếu anh vẫn muốn lấy đủ hai máy, em lên đơn theo giá hiện tại cho anh nhé.",
       "questions": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh muốn giữ cả hai sản phẩm hay điều chỉnh lại đơn cho phù hợp ngân sách không ạ?"
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận lấy 1 Máy lọc không khí AirPure X và 1 AirPure Mini, tổng 5.985.000đ, giao về Long Biên, Hà Nội, thanh toán COD và nhận dự kiến ngày 21/10 đúng không ạ?"
         }
       ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5985000",
+          "spoken": "5.985.000"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em tạo đơn cho anh ạ. Đơn hàng gồm 1 Máy lọc không khí AirPure X, 1 AirPure Mini, tổng cộng 5.985.000đ, giao về Long Biên, Hà Nội và thanh toán khi nhận hàng. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao cho anh vào ngày 21/10 nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "total_vnd",
-          "value": 5985000
+          "field": "needs_confirmation_call",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
         }
       ],
       "tool_calls": [
@@ -288,19 +311,19 @@
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_2#turn11"
+          "source": "call_2#turn12"
         },
         {
           "key": "budget_vnd",
           "value": 4500000,
           "op": "supersede",
-          "source": "call_2#turn13"
+          "source": "call_2#turn10"
         },
         {
           "key": "delivery_area",
           "value": "Long Biên, Hà Nội",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn6"
         },
         {
           "key": "product_advised",
@@ -312,38 +335,40 @@
           "key": "price_quoted_vnd",
           "value": 4890000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn15"
+          "source": "call_2#turn13"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "5985000",
+          "spoken": "5.985.000"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10"
+        }
+      ],
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "mua_nhieu_sp",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -359,7 +384,7 @@
     ],
     "callback": null,
     "order": {
-      "items": [
+      "products": [
         {
           "sku": "SKU-AP-X",
           "qty": 1,
@@ -373,9 +398,11 @@
       ],
       "total_vnd": 5985000,
       "payment": "COD",
-      "delivery_area": "Long Biên, Hà Nội",
+      "address": "Long Biên, Hà Nội",
+      "estimated_delivery": "2026-10-21",
       "promo_code": "GIFT-FILTER",
-      "order_id": "OD600001"
+      "gift_sku": "SKU-AP-FLT-X",
+      "needs_confirmation_call": true
     }
   }
 }

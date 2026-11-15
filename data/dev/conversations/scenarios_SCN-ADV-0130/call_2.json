@@ -12,13 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Hà ạ, hôm trước chị hỏi về Giày chạy bộ RunLite 2 Pro size 38 màu đen, lúc đó chị còn cần suy nghĩ thêm. Em có thể hỗ trợ chị tiếp tục đặt hàng nhé ạ.",
+      "text": "Dạ em chào chị Hà ạ, hôm trước chị có hỏi về Giày chạy bộ RunLite 2 Pro size 38 màu đen, chị cần tư vấn hay chốt đơn luôn ạ?",
       "questions": [],
       "facts_used": [
         "product_advised",
+        "size",
+        "color",
         "blocker",
         "variant_sku",
-        "size",
         "price_quoted_vnd"
       ],
       "claims": [
@@ -34,33 +35,44 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "hom truoc chi da hoi ve giay chay bo size 38 mau den",
+      "text": "chi la ha so chi 0930048764 hom truoc chi nhan ben zalo hom truoc chi da hoi ve giay chay bo size 38 mau den",
       "facts_stated": {
         "size": 38,
-        "color": "den"
+        "color": "den",
+        "product_advised": "SKU-SN-RUN2"
       },
-      "entities": [],
-      "pause_before_ms": 400,
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0930048764",
+          "spoken": "0930048764"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm Giày chạy bộ RunLite 2 Pro size 38 màu đen hiện còn hàng, giá 1.690.000đ ạ. Chị muốn thanh toán bằng hình thức nào để em lên đơn luôn cho mình nhé?",
+      "text": "Dạ đúng rồi chị, hiện Giày chạy bộ RunLite 2 Pro size 38 màu đen còn hàng, giá 1.690.000đ. Chị muốn thanh toán qua ngân hàng đúng không ạ?",
       "questions": [
         {
           "slot": "payment",
-          "type": "open",
-          "text": "Chị muốn thanh toán bằng hình thức nào để em lên đơn luôn cho mình nhé?"
+          "type": "confirm",
+          "text": "Chị muốn thanh toán qua ngân hàng đúng không ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "product_advised",
+        "size",
+        "color"
+      ],
       "claims": [
         {
           "field": "price_vnd",
@@ -74,37 +86,39 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "chi muon thanh toan qua ngan hang",
+      "text": "dung roi em chi la ha chi muon thanh toan qua ngan hang",
       "facts_stated": {
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận thanh toán chuyển khoản. Chị nhận hàng tại khu vực nào để em kiểm tra thời gian giao giúp mình ạ?",
+      "text": "Dạ em đã ghi nhận thanh toán chuyển khoản ạ. Chị muốn giao hàng tại quận Long Biên, Hà Nội luôn đúng không chị?",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "open",
-          "text": "Chị nhận hàng tại khu vực nào để em kiểm tra thời gian giao giúp mình ạ?"
+          "type": "confirm",
+          "text": "Chị muốn giao hàng tại quận Long Biên, Hà Nội luôn đúng không chị?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "payment"
+      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -114,26 +128,33 @@
       "facts_stated": {
         "delivery_area": "Long Biên, Hà Nội"
       },
-      "entities": [],
-      "pause_before_ms": 400,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "quan long bien ha noi"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đơn của mình giao tại quận Long Biên, Hà Nội sẽ nhận hàng sau khoảng 2 ngày làm việc, dự kiến vào ngày 06/11. Em tóm tắt lại đơn: Giày chạy bộ RunLite 2 Pro size 38 màu đen, giá 1.690.000đ, thanh toán chuyển khoản, giao Long Biên Hà Nội, nhận hàng khoảng ngày 06/11. Chị kiểm tra giúp em thông tin trên đã đúng hết chưa ạ?",
+      "text": "Dạ vâng, em tổng hợp đơn cho chị nhé: Giày chạy bộ RunLite 2 Pro size 38 màu đen, 1 đôi, giá 1.690.000đ, giao Long Biên, Hà Nội, thanh toán chuyển khoản. Dự kiến giao trong 2 ngày tới (06/11). Chị xác nhận giúp em thông tin trên đúng chưa để em lên đơn ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị kiểm tra giúp em thông tin trên đã đúng hết chưa ạ?"
+          "text": "Chị xác nhận giúp em thông tin trên đúng chưa để em lên đơn ạ?"
         }
       ],
       "facts_used": [
+        "product_advised",
+        "size",
+        "color",
         "delivery_area",
-        "payment",
-        "variant_sku",
-        "price_quoted_vnd"
+        "payment"
       ],
       "claims": [
         {
@@ -155,8 +176,14 @@
         }
       ],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -165,24 +192,29 @@
       "text": "chot don cho chi nhe",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn hàng cho chị, mã đơn OD600001. Tổng 1.690.000đ, thanh toán chuyển khoản, giao Long Biên Hà Nội, dự kiến nhận ngày 06/11. Em cảm ơn chị Hà đã đặt hàng tại shop, có gì cần hỗ trợ thêm chị nhắn lại nhé!",
+      "text": "Dạ em lên đơn ngay cho chị. Đơn hàng đã tạo thành công, dự kiến giao 06/11, chị chuyển khoản đủ 1.690.000đ khi nhận được thông tin thanh toán từ shop nhé. Cần hỗ trợ thêm chị nhắn em ạ, em cảm ơn chị nhiều.",
       "questions": [],
       "facts_used": [
+        "product_advised",
+        "size",
+        "color",
         "delivery_area",
-        "payment",
-        "variant_sku",
-        "price_quoted_vnd"
+        "payment"
       ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [
@@ -216,35 +248,46 @@
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1690000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-38-DEN",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn9"
+          "source": "call_2#turn8"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-06",
+          "spoken": "06/11"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "xac_nhan_mua_giay",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

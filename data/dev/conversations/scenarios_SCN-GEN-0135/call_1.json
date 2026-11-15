@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em sẽ hỗ trợ anh kiểm tra tình trạng đơn hàng áo phao lông vũ đã đặt nhé.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo phao lông vũ Warmly và đã từng mua Quạt đứng Senko TS16 bên em rồi ạ.",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -22,7 +22,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -31,22 +31,38 @@
       "text": "Alo, anh muốn hỏi về tình trạng đơn hàng áo phao lông vũ mà anh đã đặt.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh vui lòng chờ em kiểm tra lại giúp anh tình trạng các đơn hàng gần đây nhé.",
+      "text": "Dạ em kiểm tra giúp anh đơn hàng Áo phao lông vũ Warmly mã OD900802 của mình ạ. Hiện tại đơn hàng này đang xử lý, bên em sẽ cập nhật ngay khi có thông tin giao hàng anh nhé.",
       "questions": [],
       "facts_used": [
         "order_id"
       ],
-      "claims": [],
-      "tool_calls": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900802"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900802"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -56,20 +72,14 @@
       "facts_stated": {
         "order_id": "OD900802"
       },
-      "entities": [
-        {
-          "type": "order_id",
-          "value": "OD900802",
-          "spoken": "OD900802"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận mã đơn OD900802 của anh. Tuy nhiên, em thấy đơn này vẫn đang trong quá trình xử lý, chưa giao hàng ạ. Ngoài ra, em kiểm tra thấy đơn hàng gần nhất của anh là OD900803 đã giao thành công rồi ạ.",
+      "text": "Dạ đơn OD900802 của anh vẫn đang xử lý, hiện chưa giao hàng anh nhé. Khi đơn được bàn giao cho đơn vị vận chuyển, bên em sẽ gửi thông báo cho anh qua SMS hoặc Zalo.",
       "questions": [],
       "facts_used": [
         "order_id"
@@ -77,24 +87,17 @@
       "claims": [
         {
           "field": "order_id",
-          "value": "OD900803"
+          "value": "OD900802"
         },
         {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
-      "tool_calls": [
-        {
-          "name": "order.status",
-          "args": {
-            "order_id": "OD900803"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -103,31 +106,27 @@
       "text": "À, hôm trước anh có gọi và được biết là đơn đang xử lý.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi anh, đơn OD900802 của anh vẫn đang xử lý. Đơn OD900803 là quạt đứng Senko thì đã giao thành công cho anh rồi ạ.",
+      "text": "Dạ vâng anh, hiện trạng thái đơn vẫn giữ nguyên, vẫn đang xử lý nên chưa chuyển sang giao hàng ạ.",
       "questions": [],
       "facts_used": [
         "order_id"
       ],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD900803"
-        },
-        {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -142,7 +141,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận lại, đơn OD900803 của anh đã giao thành công rồi ạ. Còn đơn áo phao lông vũ OD900802 vẫn đang xử lý, chưa giao hàng anh nhé.",
+      "text": "Dạ em xác nhận lại, đơn Áo phao lông vũ Warmly mã OD900802 hiện chưa giao, vẫn đang xử lý anh nhé. Anh yên tâm, khi đơn chuyển trạng thái, bên em sẽ chủ động thông báo cho mình ạ.",
       "questions": [],
       "facts_used": [
         "order_id"
@@ -150,17 +149,17 @@
       "claims": [
         {
           "field": "order_id",
-          "value": "OD900803"
+          "value": "OD900802"
         },
         {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     }
