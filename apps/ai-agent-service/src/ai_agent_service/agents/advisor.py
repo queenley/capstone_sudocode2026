@@ -39,6 +39,7 @@ from __future__ import annotations
 import json
 import re
 import logging
+import os
 import time
 from datetime import timedelta
 from dataclasses import dataclass, field
@@ -73,9 +74,11 @@ from ..observability import stopwatch
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
 from ..components.context import skills as skill_book
-from ..mcp.tools import (ChainLookupMiddleware, LaneToolsMiddleware, StrictToolsMiddleware, ToolGuardMiddleware, CHAINED,
-                         envelope_of, parse_envelope, order_arguments, without_nulls)
+from ..mcp.tools import (ChainLookupMiddleware, LaneToolsMiddleware, ReplyPlanMiddleware, StrictToolsMiddleware,
+                         ToolGuardMiddleware, ADVISE, CHAINED, QUOTE, REPLY_ARG, SEARCH, STOCK, envelope_of,
+                         parse_envelope, order_arguments, product_advise, product_advise_on, without_nulls)
 from .base import BaseAgent
+from .policy import EARLY_INTENTS, NO_HANDOFF, band
 
 logger = logging.getLogger(__name__)
 
@@ -180,10 +183,21 @@ class AgentContext:
     review_flags: Callable[[], Awaitable[list[str]]] | None = field(default=None, repr=False, compare=False)
     #: This turn's agreement to an order: the authorized draft, and the read-back still to be said.
     consent: dict[str, Any] = field(default_factory=dict, repr=False, compare=False)
+    #: The run only warms the provider's prompt cache and the connection (:meth:`AdvisorAgent.warm`): no tool may run.
+    warming: bool = False
+    #: Lines the harness said in this answer from a tool's result: the model's next round goes on after them.
+    harness_said: list[str] = field(default_factory=list, repr=False, compare=False)
     #: The skills loaded for the task on: ``load_skill`` adds to it, the next model call reads it.
     skills: list[str] = field(default_factory=list, repr=False, compare=False)
-    judge: Callable[[str, Mapping[str, Any]], Awaitable[bool | None]] | None = field(default=None, repr=False,
-                                                                                       compare=False)
+    #: ``PolicyAgent.probability``: what the customer means for one action, None without an answer.
+    judge: Callable[[str, Mapping[str, Any]], Awaitable[float | None]] | None = field(default=None, repr=False,
+                                                                                        compare=False)
+    #: The PolicyAgent's answers to ``EARLY_INTENTS``, asked as the turn started (plan 002, step 3): awaited, not asked.
+    early_intents: Callable[[], Awaitable[Mapping[str, float]]] | None = field(default=None, repr=False, compare=False)
+    #: The same answers once they are in, for a model call that starts after them (plan 002, C4).
+    early_answers: dict[str, float] = field(default_factory=dict, repr=False, compare=False)
+    #: Every PolicyAgent probability this turn's actions were decided on, for the diagnostics and calibration.
+    intent_probabilities: dict[str, float | None] = field(default_factory=dict, repr=False, compare=False)
 
 
 @dataclass
@@ -211,6 +225,7 @@ class AdvisorEvent:
     """One thing a streamed run produced: a chunk of the answer, a tool round starting, its results, or the end."""
 
     kind: Literal["text", "tool_started", "tools", "done"]
+    #: For ``text``, the chunk; for ``tool_started``, the name of the tool called.
     text: str = ""
     draft: Draft | None = None
     #: For ``tools``: every tool call of the run so far, as :attr:`Draft.tool_results` lists them.
@@ -243,6 +258,23 @@ CHAT_NOTE = _NOTES["chat"]
 # over, and on a laptop's speakers the echo canceller then swallows them.
 SPOKEN_NOTE = _NOTES["spoken"]
 
+# Plan 002, C4: the early check is all but certain nobody asked for a person; said in the turn's part of the prompt,
+# so the tools offered, and the provider's cache of them, stay the same.
+NO_HANDOFF_NOTE = ("Hệ thống đã xét lượt này: khách không xin gặp người và không cần chuyển máy; không gọi "
+                   "handoff_transfer, trả lời bằng tool và tài liệu.")
+
+# Plan 002, B3: which tool a question that needs weighing goes to.
+ADVISE_NOTE = _NOTES["advise"]
+
+# Plan 002, A1: a line before a lookup, in the round that calls it, so the customer is not left in silence.
+PREAMBLE_NOTE = _NOTES["preamble"]
+
+
+def preamble() -> bool:
+    """``ADVISOR_PREAMBLE=1``: the advisor writes one short line before a lookup, in the same round (OpenAI calls these
+    tool preambles). The organisers' TTFA ends at the first audio played (``eval/huong-dan-do-latency.md``)."""
+    return os.environ.get("ADVISOR_PREAMBLE", "0").strip().lower() not in ("0", "false", "no", "off", "")
+
 
 #: Passages shown to the model per turn (section 4.2: five retrieved, three allowed in).
 KNOWLEDGE_SHOWN = 3
@@ -263,6 +295,10 @@ def lane_instruction(context: AgentContext) -> str:
         extra.append(SPOKEN_NOTE)
     else:
         extra.append(CHAT_NOTE)
+    if preamble() and context.lane in ("NEW", "CONTINUITY") and context.mode != "copilot":
+        extra.append(PREAMBLE_NOTE)
+    if product_advise_on() and context.lane in ("NEW", "CONTINUITY"):
+        extra.append(ADVISE_NOTE)
     return "\n".join([text, *extra]).strip()
 
 
@@ -307,8 +343,14 @@ def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str,
                                                     context.knowledge_note) if x)),
         Section("playbook", _knowledge_block("Kinh nghiệm xử lý đã được duyệt", playbook)),
         Section("tool_results", _tool_block(context.tool_results)),
+        Section("said", (f"Khách vừa nghe hệ thống báo: «{' '.join(context.harness_said)}». Kết quả đó khách đã biết: "
+                         "không nhắc lại việc đã làm, mã đơn hay giờ hẹn trong câu đó. Chỉ nói thêm điều khách chưa "
+                         "nghe và cần biết; không còn gì thì không viết gì thêm.") if context.harness_said else ""),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
         Section("blocked", _blocked_block(context)),
+        Section("no_handoff", NO_HANDOFF_NOTE if (context.early_answers.get("handoff") is not None
+                                                  and context.early_answers["handoff"] <= NO_HANDOFF
+                                                  and context.lane != "HANDOFF") else ""),
         Section("call_state", _state_block(context)),
     ]
     pack = assemble(sections, max_tokens=max_tokens)
@@ -489,8 +531,8 @@ class ContextPromptMiddleware(AgentMiddleware):
         if not skill_book.on_demand():
             # Every skill is in the prompt: nothing to load, and no model round spent on it.
             request = request.override(tools=[t for t in request.tools if getattr(t, "name", None) != LOAD_SKILL])
-        last = request.state.get("run_model_call_count", 0) >= self.model_limit - 1
-        if last:
+        last = self._is_last(request)
+        if last and not context.warming:
             turn += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "
                      "thiếu dữ liệu thì nói chưa kiểm tra được và xin đúng thông tin còn thiếu. "
                      "Không khẳng định thao tác thành công nếu chưa có kết quả tool thành công.")
@@ -504,7 +546,9 @@ class ContextPromptMiddleware(AgentMiddleware):
         return request.override(tool_choice="none") if last else request
 
     def _is_last(self, request: ModelRequest) -> bool:
-        return request.state.get("run_model_call_count", 0) >= self.model_limit - 1
+        context = getattr(getattr(request, "runtime", None), "context", None)
+        return (request.state.get("run_model_call_count", 0) >= self.model_limit - 1
+                or bool(getattr(context, "warming", False)))
 
     @staticmethod
     def _answer_only(response: Any) -> Any:
@@ -584,7 +628,8 @@ class ActionGuardMiddleware(AgentMiddleware):
                 envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": actions.EARLY_TRANSFER}}
                 return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
                                    additional_kwargs={"args": args, "blocked_by": "guardrail"})
-            args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
+            args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults,
+                                                 customer_said=context.customer_said)
         if name == "schedule_callback" and not args.get("customer_phone") and context.customer_phone:
             args["customer_phone"] = context.customer_phone
         state = getattr(request, "state", None) or {}
@@ -630,9 +675,11 @@ class ActionGuardMiddleware(AgentMiddleware):
             # PB-09 asks the order read back once before order.create, not a second yes after it: a customer who asked
             # for the order hears it read back in the same reply that places it (the user's decision, 2026-11-10).
             if context.judge is not None:
-                agreed = await context.judge("purchase", {
-                    "recent_messages": [{"speaker": who, "text": text[:600]} for who, text in context.recent],
-                    "order": record["read_back"]})
+                asked = {"recent_messages": [{"speaker": who, "text": text[:600]} for who, text in context.recent],
+                         "order": record["read_back"]}
+                # The early answer does not see the order: it may stand only for the very order the customer heard
+                # read back (a yes from earlier in the call read 0.98 on a later turn about a call back, 2026-11-15).
+                agreed = _agreed(await _verdict(context, "purchase", asked, early=heard))
             if agreed is None:  # no answer from the PolicyAgent: an order is placed only on a plain yes to what was just read back
                 agreed = heard and purchase.answer(
                     pending, call_id=context.call_id, channel=context.channel, turn_id=str(context.turn_id),
@@ -692,6 +739,37 @@ def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[di
     return list(lines.values())
 
 
+#: Reasons a person is needed whatever the PolicyAgent's doubt: a wrong "no" would leave the customer without one.
+PLAIN_HANDOFF_REASONS = frozenset({"cau_hoi_y_te", "khach_yeu_cau_gap_nguoi", "khieu_nai_nghiem_trong", "loi_he_thong",
+                                   "khach_mat_kien_nhan"})
+
+
+async def _verdict(context: AgentContext, intent: str, state: Mapping[str, Any], *, early: bool = True) -> str:
+    """The PolicyAgent's answer on what the customer means, by band (``policy.band``): yes, no, unsure, unanswered.
+
+    The answer asked as the turn started stands when it is a clear yes, or, for a transfer, when it is all but
+    certain none is wanted (``policy.NO_HANDOFF``); otherwise the action's own question is asked, with its facts.
+    Every probability is kept for the turn's diagnostics.
+    """
+    if early and context.early_intents is not None and intent in EARLY_INTENTS:
+        probability = (await context.early_intents()).get(intent)
+        if band(intent, probability) == "yes" or (intent == "handoff" and probability is not None
+                                                   and probability <= NO_HANDOFF):
+            logger.info("Intent %s taken from the turn's early check: %.2f", intent, probability)
+            context.intent_probabilities[f"{intent}:early"] = round(probability, 3)
+            return "yes" if band(intent, probability) == "yes" else "no"
+    assert context.judge is not None
+    probability = await context.judge(intent, state)
+    context.intent_probabilities[intent] = None if probability is None else round(probability, 3)
+    return band(intent, probability)
+
+
+def _agreed(verdict: str) -> bool | None:
+    """An action that needs the customer's yes: only a clear yes is one; unsure is a no, and the action asks the
+    customer to confirm; no answer at all leaves the deterministic fallback (None)."""
+    return {"yes": True, "unanswered": None}.get(verdict, False)
+
+
 async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, created: Sequence[Mapping[str, Any]],
                    state: Mapping[str, Any] | None = None) -> dict[str, bool | None]:
     """What the customer means, for the one action about to run, read by the PolicyAgent (section 4.4).
@@ -711,7 +789,7 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, cr
         shown = [p for p in shown_passages(context.knowledge)[0] if p.get("text")]
         documents = [str(p["text"])[:400] for p in shown if not p.get("earlier")]
         earlier = [str(p["text"])[:400] for p in shown if p.get("earlier")]
-        return {"handoff": await context.judge("handoff", {
+        verdict = await _verdict(context, "handoff", {
             "recent_messages": said,
             "reason_given": {"escalation_reason": brief.get("escalation_reason"),
                              "detail": brief.get("escalation_reason_detail")},
@@ -719,19 +797,24 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, cr
             **({"documents_read_earlier_in_this_call": earlier} if earlier else {}),
             "tools_called": [r["name"] for r in (*context.tool_results, *tool_results_of((state or {}).get("messages") or []))],
             "known_this_call": [f"{r.get('tool')}: {r.get('result')}"[:500] for r in context.earlier_results[-6:]],
-        })}
+        })
+        if verdict in ("yes", "no"):
+            return {"handoff": verdict == "yes"}
+        # Unsure, or no answer: a reason that needs a person goes through; "the documents do not say" goes through
+        # only when the search found nothing, else the passages are read first.
+        return {"handoff": brief.get("escalation_reason") in PLAIN_HANDOFF_REASONS or not documents}
     if name == "memory_request_deletion" and context.tier == "VERIFIED":
-        return {"delete": await context.judge("delete", {"recent_messages": said})}
+        return {"delete": _agreed(await _verdict(context, "delete", {"recent_messages": said}))}
     if name == "order_update":
         if args.get("action") == "update_address" and any(
                 o.get("order_id") == args.get("order_id") and o.get("no_address") for o in created):
             return {}  # the address this order still lacks: the customer already agreed to the order
         change = {k: args.get(k) for k in ("order_id", "action", "new_variant_sku", "new_address") if args.get(k)}
-        return {"change": await context.judge("change", {"recent_messages": said, "change": change})}
+        return {"change": _agreed(await _verdict(context, "change", {"recent_messages": said, "change": change}))}
     asked_skus = {line["sku"] for line in purchase.lines_of(args)}
     if name == "order_create" and any(asked_skus & set(o.get("skus") or [o.get("sku")]) for o in created):
-        return {"one_more": await context.judge("one_more", {"recent_messages": said,
-                                                             "already_ordered": args.get("sku")})}
+        return {"one_more": _agreed(await _verdict(context, "one_more", {"recent_messages": said,
+                                                                         "already_ordered": args.get("sku")}))}
     return {}
 
 
@@ -882,6 +965,9 @@ class AdvisorAgent(BaseAgent):
         from config, for offline tests."""
         super().__init__("advisor", provider=provider, model=model, generation=generation, llm=llm)
         self._tools = [*(tools or ()), *([load_skill] if tools else [])]
+        if product_advise_on() and {SEARCH, QUOTE, STOCK} <= {getattr(t, "name", None) for t in self._tools}:
+            # Plan 002, B3: the team's own tool; ChainLookupMiddleware answers it with the organisers' tools.
+            self._tools.append(tool(product_advise, parse_docstring=True))
         names = [tool.name for tool in self._tools]
         retry = [ModelRetryMiddleware(max_retries=retries, initial_delay=1.0, on_failure="error")] if retries else []
         openai = getattr(self.llm, "_llm_type", "") == "openai-chat"
@@ -890,13 +976,15 @@ class AdvisorAgent(BaseAgent):
             model=self.llm,
             tools=self._tools,
             middleware=[
-                ChainLookupMiddleware(self._tools, guard),
+                ChainLookupMiddleware(self._tools, guard, get_lanes()),
                 ContextPromptMiddleware(self.MODEL_CALLS_PER_RUN, split=openai),
                 *retry,
                 ModelCallLimitMiddleware(run_limit=self.MODEL_CALLS_PER_RUN, exit_behavior="error"),
                 ToolCallLimitMiddleware(run_limit=self.TOOL_CALLS_PER_RUN, exit_behavior="continue"),
                 LaneToolsMiddleware(get_lanes(), names),
                 *([StrictToolsMiddleware()] if openai else []),
+                # After the strict schemas it extends, before the guard that would drop the argument as undeclared.
+                ReplyPlanMiddleware(),
                 ActionGuardMiddleware(),
                 guard,
             ],
@@ -968,17 +1056,31 @@ class AdvisorAgent(BaseAgent):
                 if meta.get("langgraph_node") != "model" or not isinstance(message, AIMessage):
                     continue
                 calls = message.tool_call_chunks if isinstance(message, AIMessageChunk) else message.tool_calls
-                if calls:
-                    if message.id not in announced:
-                        announced.add(message.id or "")
-                        yield AdvisorEvent("tool_started")
-                    continue
+                # A line written before a lookup (``preamble``) shares the message with its tool calls: said too.
                 text = text_of(message, strip=False)
                 if text:
                     yield AdvisorEvent("text", text=text)
+                for call in calls or []:
+                    # Once per call, with its name (the first chunk of a call carries it).
+                    key = f"{message.id}:{call.get('index', call.get('id'))}"
+                    if call.get("name") and key not in announced:
+                        announced.add(key)
+                        yield AdvisorEvent("tool_started", text=str(call["name"]))
         except Exception as error:
             raise AdvisorFailure(error, self._draft_of(produced, started)) from error
         yield AdvisorEvent("done", draft=self._draft_of(produced, started))
+
+    async def warm(self) -> float:
+        """One model call with the rules, the skills and the tools a first turn sends, and no tool allowed to run.
+
+        A service that has just started has no connection to the provider and a prompt the provider has not cached:
+        the first customer's first token came 0.8 to 1.4 s later than the next one's (2026-11-14). This call pays
+        that before anyone is on the line. Returns its seconds.
+        """
+        started = time.perf_counter()
+        context = AgentContext(call_id="warm", lane="NEW", warming=True)
+        await self.draft([HumanMessage(content="Alo")], context)
+        return time.perf_counter() - started
 
     def _draft_of(self, produced: Sequence[Any], started: float) -> Draft:
         return Draft(
@@ -1008,6 +1110,12 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
             if call["name"] == LOAD_SKILL:
                 continue  # how the model reads a procedure, not a business tool: no trace, no evidence
             answer = answers.get(call["id"])
+            if call["name"] == ADVISE and answer is not None and answer.additional_kwargs.get("inner") is not None:
+                # The team's tool is the organisers' calls it made: those are what ran, and what the trace records.
+                results += [{"name": dotted(inner["name"]), "args": dict(inner.get("args") or {}),
+                             "result": parse_envelope(inner.get("content")), "blocked_by": None}
+                            for inner in answer.additional_kwargs["inner"]]
+                continue
             envelope = parse_envelope(answer.content) if answer is not None else None
             blocked_by = answer.additional_kwargs.get("blocked_by") if answer is not None else None
             if answer is None:
@@ -1019,10 +1127,15 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
                 envelope = {"ok": False, "error": {"code": "TOOL_CALL_LIMIT", "retryable": False,
                                                    "message": answer.content}}
                 blocked_by = "framework"
-            results.append({
+            args = (answer.additional_kwargs.get("args") if answer is not None else None) or call["args"]
+            result = {
                 "name": dotted(call["name"]),
-                "args": (answer.additional_kwargs.get("args") if answer is not None else None) or call["args"],
+                # The line written ahead for the customer is not an argument of the tool: not in the trace.
+                "args": {k: v for k, v in args.items() if k != REPLY_ARG},
                 "result": envelope,
                 "blocked_by": blocked_by,
-            })
+            }
+            if answer is not None and answer.additional_kwargs.get(REPLY_ARG):
+                result[REPLY_ARG] = answer.additional_kwargs[REPLY_ARG]
+            results.append(result)
     return results

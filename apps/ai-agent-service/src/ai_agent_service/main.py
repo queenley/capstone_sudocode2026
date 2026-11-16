@@ -100,6 +100,7 @@ async def lifespan(app: FastAPI):
     else:
         try:
             await harness.ready()
+            harness.spawn(harness.warm())
             harness.spawn(harness.remember_unfinished())
         except Exception as error:  # noqa: BLE001 - retried on the first turn
             logger.error("Agent warm-up failed, will retry on first request: %s", error)

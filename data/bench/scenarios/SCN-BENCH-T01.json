@@ -1,0 +1,41 @@
+{
+ "scenario_id": "SCN-BENCH-T01",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0389046172",
+ "customer_name": "Quang",
+ "honorific": "anh",
+ "notes": "Latency bench: many tools in one turn (search, stock, a two-unit quote, delivery, an order of lines).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "mua hai máy lọc không khí một lần",
+   "customer_turns": [
+    "Em ơi anh lấy một máy lọc không khí AirPure Pro cho phòng khách và một AirPure X cho phòng ngủ, giao về 12 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội, anh chuyển khoản, lên đơn luôn giúp anh."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AP-X",
+     "payment": "bank"
+    },
+    "also_ordered": [
+     "SKU-AP-PRO",
+     "SKU-AP-X"
+    ],
+    "total_match_vnd": 10135000,
+    "max_agent_questions": 1
+   },
+   "ground_truth_facts": {
+    "total_vnd": 10135000
+   },
+   "relevant_policy_ids": [
+    "KM-05",
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

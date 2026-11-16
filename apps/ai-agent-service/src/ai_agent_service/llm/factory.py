@@ -21,7 +21,9 @@ them is another ``init_chat_model``-style call in this same file.
 
 from __future__ import annotations
 
+import logging
 import os
+import time
 from threading import Lock
 from typing import Any
 
@@ -52,6 +54,30 @@ SUPPORTED_PROVIDERS = {
 # into the request body, so `max_retries: null` is the only way to call it.
 GENERATION_PARAMS = ("temperature", "max_tokens", "timeout", "max_retries", "reasoning_effort", "use_responses_api",
                      "service_tier", "store", "include", "output_version")
+
+logger = logging.getLogger(__name__)
+
+
+async def _sent(request: httpx.Request) -> None:
+    request.extensions["sent_at"] = time.perf_counter()
+
+
+def _answered(agent: str):
+    """Log where a call's wait went once its headers are in (a stream's first token comes ~30 ms later): the
+    server's own processing (``openai-processing-ms``) and the rest, network and queueing before it (2026-11-15:
+    a slow first token had 1 s outside the server's processing)."""
+
+    async def hook(response: httpx.Response) -> None:
+        sent = response.request.extensions.get("sent_at")
+        if sent is None:
+            return
+        headers_ms = int((time.perf_counter() - sent) * 1000)
+        server = response.headers.get("openai-processing-ms")
+        outside = headers_ms - int(server) if server and server.isdigit() else None
+        logger.info("LLM http %s: headers %d ms, server %s ms, outside %s ms, status %d, request %s", agent, headers_ms,
+                    server, outside, response.status_code, response.headers.get("x-request-id"))
+    return hook
+
 
 # One limiter per model of a provider, shared by every agent that calls it.
 #
@@ -144,8 +170,13 @@ class LLMFactory:
 
         if provider == "openai":
             # A call's turns are further apart than the client's default 5 s of keep-alive.
+            # One number was every timeout, connecting included: a connection that hangs held the turn for the whole
+            # minute. Connecting and waiting for the pool are short; reading keeps the configured time, since the
+            # same client serves models whose calls are long and not streamed (the MemoryAgent's).
             kwargs["http_async_client"] = httpx.AsyncClient(
-                limits=httpx.Limits(keepalive_expiry=120), timeout=config.get("timeout") or 60)
+                limits=httpx.Limits(keepalive_expiry=120),
+                timeout=httpx.Timeout(config.get("timeout") or 60, connect=3.0, pool=2.0),
+                event_hooks={"request": [_sent], "response": [_answered(agent_name)]})
 
         if rate_limited:
             limiter = limiter_for(provider, config.get("rate_limits") or {}, model)
@@ -174,6 +205,11 @@ class LLMFactory:
         if provider == "openai":
             # A client of our own turns this off by default, and without it a streamed call reports no tokens.
             kwargs["stream_usage"] = True
+            # ADVISOR_SERVICE_TIER: the advisor's processing tier for a bench or a run, without editing models.yaml
+            # (2026-11-15, 14 calls: priority cut the slowest first token from 1.78 s to 1.15 s, at twice the price).
+            tier = os.environ.get("ADVISOR_SERVICE_TIER", "").strip()
+            if tier and agent_name == "advisor":
+                kwargs["service_tier"] = tier
         else:
             for name in ("service_tier", "store", "include", "output_version"):
                 kwargs.pop(name, None)

@@ -27,6 +27,7 @@ import logging
 import time
 from typing import Any, Mapping, Sequence
 
+import httpx2
 import openai
 from pydantic import BaseModel
 
@@ -84,8 +85,18 @@ def _api() -> openai.AsyncOpenAI:
     """One client for the process, opened on first use. No retries underneath the limiter."""
     global _client
     if _client is None:
-        _client = openai.AsyncOpenAI(api_key=require_api_key("openai"), max_retries=0)
+        # The default pool drops an idle connection after 5 s: a turn later every check opened a new TLS connection
+        # inside its 1.5 s budget (audit of 2026-11-15). Kept two minutes, as the advisor's; connecting is bounded.
+        _client = openai.AsyncOpenAI(api_key=require_api_key("openai"), max_retries=0, http_client=openai.DefaultAsyncHttpxClient(
+            limits=httpx2.Limits(keepalive_expiry=120), timeout=httpx2.Timeout(10.0, connect=1.0)))
     return _client
+
+
+async def warm() -> float:
+    """Open the connection before the first check needs it: a model list, no model is run. Returns its seconds."""
+    started = time.perf_counter()
+    await _api().models.list()
+    return time.perf_counter() - started
 
 
 async def close() -> None:

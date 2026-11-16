@@ -7,7 +7,9 @@ import pytest
 from ai_agent_service.components.guardrails import actions
 from ai_agent_service.components.identity.resolver import Match, pick_by_name
 from ai_agent_service.components.intake import commerce, itn
+from ai_agent_service.mcp.tools import named_lookups
 from ai_agent_service.pipeline.hot.nodes import _handoff_product
+from langchain_core.messages import HumanMessage
 
 VN = timezone(timedelta(hours=7))
 SHARED = [Match("A", "Dung", "chị", None, None), Match("B", "Loan", "cô", None, None)]
@@ -51,6 +53,14 @@ def test_a_time_reads_its_day_and_part_of_day_from_the_sentence(said, moment):
 
 def test_tối_đa_is_not_evening():
     assert "T08:00" in itn.normalise("phòng tối đa 30 mét, 8 giờ sáng giao", datetime(2026, 10, 17, 10, tzinfo=VN))
+
+
+def test_prefetch_looks_up_the_variant_the_customer_names_and_never_the_parent():
+    said = "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen."
+    calls = named_lookups([HumanMessage(content=said)], said)
+    assert {c["args"]["sku"] for c in calls} == {"SKU-SN-RUN2-41-DEN"}
+    vague = "anh muốn đặt giày RunLite 2 Pro"
+    assert named_lookups([HumanMessage(content=vague)], vague) == []
 
 
 def test_a_product_sold_in_variants_is_not_ordered_by_its_parent_code():

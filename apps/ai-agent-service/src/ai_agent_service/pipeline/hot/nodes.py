@@ -23,13 +23,13 @@ from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
 from ...agents.advisor import AdvisorFailure, AgentContext, Draft, shown_passages, system_prompt, _seen_in
-from ...agents.policy import PolicyInput
+from ...agents.policy import EARLY_INTENTS, PolicyInput, early_intents_on
 from ...components.context import compact, focus
 from ...components.context.budget import tokens as count_tokens
 from ...components.guardrails import actions, fallback, purchase
 from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_CODE, ORDER_SUMMARY, GuardInput, check, clean, moved_callback,
                                            open_amounts)
-from ...config.config_manager import review_head_start
+from ...config.config_manager import get_lanes, review_head_start
 from .review import Reviews
 from ...components.context import skills as skill_book
 from ...components.guardrails.stream import SentenceSplitter
@@ -43,7 +43,7 @@ from ...observability import stopwatch
 from ...components.orchestration.rules import MODEL_FAILURES, RouteInput, decide
 from ...config.config_manager import handoff_auto_accept
 from ...mcp.servers import btc
-from ...mcp.tools import INFRASTRUCTURE_CODES
+from ...mcp.tools import INFRASTRUCTURE_CODES, REPLY_ARG, first_clause, reply_plan
 from . import call_state
 from .state import TURN_KEYS, HotContext, HotState
 
@@ -236,7 +236,6 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
             # number were never bound, and the order the call was for could not be placed).
             return await _bind_named(state, context, answer) or {}
         return {}
-
 
     started = time.perf_counter()
     keys = _keys(state, context, connection=unidentified)
@@ -549,17 +548,22 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         update.update(await _transfer(state, context, agent_context, [], summary=summary))
         return update
     turn_messages = messages or [HumanMessage(content="(Khách vừa bắt máy.)", id="opening")]
-    if (state.get("mode") or "speak") == "speak" and hasattr(context.advisor, "stream"):
-        update.update(await _streamed(state, context, turn_messages, agent_context))
-        return update
+    early, agent_context = _early_intents(context, agent_context)
     try:
-        with stopwatch.span("advisor"):
-            draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
-    except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
-        logger.exception("Advisor failed on call %s", state.get("call_id"))
-        produced = list(error.partial.tool_results) if isinstance(error, AdvisorFailure) else []
-        update.update(await _model_failed(state, context, agent_context, produced, error, summary=summary))
-        return update
+        if (state.get("mode") or "speak") == "speak" and hasattr(context.advisor, "stream"):
+            update.update(await _streamed(state, context, turn_messages, agent_context))
+            return update
+        try:
+            with stopwatch.span("advisor"):
+                draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
+        except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
+            logger.exception("Advisor failed on call %s", state.get("call_id"))
+            produced = list(error.partial.tool_results) if isinstance(error, AdvisorFailure) else []
+            update.update(await _model_failed(state, context, agent_context, produced, error, summary=summary))
+            return update
+    finally:
+        if early is not None and not early.done():
+            early.cancel()  # no write tool asked for it this turn
     update.update(_absorb(state, draft.tool_results))
     update["draft"] = {"text": draft.text, "model": draft.model, "model_calls": draft.model_calls,
                        "seconds": round(draft.seconds, 3)}
@@ -730,8 +734,38 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         deletion_asked=bool(state.get('deletion_awaiting_for')
                             and state['deletion_awaiting_for'] == state.get('customer_id')),
         recent=_recent(state),
-        judge=context.policy.judge if context.policy is not None else None,
+        judge=getattr(context.policy, "probability", None) if context.policy is not None else None,
     )
+
+
+def _early_intents(context: HotContext, agent_context: AgentContext) -> tuple[asyncio.Task | None, AgentContext]:
+    """Plan 002, step 3: what the customer means for the actions of the lane's write tools, asked now, beside the
+    advisor's first model round, so the check before a write tool finds it answered. Only with
+    ``ADVISOR_EARLY_INTENTS`` on and a lane that has write tools."""
+    policy = context.policy
+    if policy is None or not hasattr(policy, "probabilities") or not early_intents_on():
+        return None, agent_context
+    if not set(get_lanes().get(agent_context.lane) or ()) & actions.WRITE_TOOLS:
+        return None, agent_context
+    said = [{"speaker": who, "text": text[:600]} for who, text in agent_context.recent]
+
+    async def ask() -> Mapping[str, float]:
+        with stopwatch.span("policy"):
+            return await policy.probabilities(EARLY_INTENTS, {"recent_messages": said})
+
+    task = asyncio.create_task(ask())
+    early = replace(agent_context)
+
+    def keep(done: asyncio.Task) -> None:
+        # A model call that starts after the answers sees them (the C4 note): no wait is added for it.
+        if not done.cancelled() and done.exception() is None:
+            early.early_answers.update(done.result())
+    task.add_done_callback(keep)
+
+    async def answers() -> Mapping[str, float]:
+        return await asyncio.shield(task)
+    early = replace(early, early_intents=answers)
+    return task, early
 
 
 def _last_reply(state: HotState) -> str | None:
@@ -840,7 +874,8 @@ PRICED_TOOLS = frozenset({"pricing.get_quote", "pricing.quote_order", "catalog.s
 
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """A run's tool results added to the turn's, with today's quotes, the orders seen and the failure count."""
-    new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
+    # The line written ahead with a write tool's call was said or dropped this turn: it is not kept with the result.
+    new_results = [{**{k: v for k, v in r.items() if k != REPLY_ARG}, "turn": state.get("turn_no") or 0} for r in produced]
     codes, _ = _seen_in({}, new_results)
     quotes = dict(state.get("quotes") or {})
     order_quotes = dict(state.get("order_quotes") or {})
@@ -913,6 +948,14 @@ class _Attempt:
     correction: bool = False
     #: When the first token of the sentence being put together was generated, in ms of the turn.
     token_at: int | None = None
+    #: How many of :attr:`results` the harness has already told the customer about.
+    told: int = 0
+    #: The index in :attr:`said` of a first clause said ahead of the rest of its sentence (plan 002).
+    open_clause: int | None = None
+    #: Write tools whose success the customer heard in the line the model wrote with the call (plan 002).
+    planned: list[str] = field(default_factory=list)
+    #: The run ended on what the harness said for its write tools: no second model round.
+    ended_on_tools: bool = False
 
 
 def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
@@ -1005,6 +1048,14 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     draft = attempt.draft
     stats = {"model": getattr(draft, "model", None), "model_calls": getattr(draft, "model_calls", None),
              "seconds": round(getattr(draft, "seconds", 0.0), 3), "streamed": True}
+    if agent_context.intent_probabilities:
+        stats["intent_probabilities"] = dict(agent_context.intent_probabilities)
+    if attempt.planned or attempt.ended_on_tools:
+        # Plan 002: the write tools told in the model's own line, and whether the turn ended on them.
+        stats.update(planned_lines=list(attempt.planned), ended_on_tools=attempt.ended_on_tools)
+    elif reply_plan() and any(fallback.wire_name(r.get("name", "")) in fallback.REPLY_HOLES
+                              and (r.get("result") or {}).get("ok") for r in produced):
+        stats["fallback_round"] = True  # a write tool succeeded and the model still had to answer after it
     verdict: dict[str, Any] = {"passed": not attempt.reasons, "streamed": True, "sentences": len(attempt.said),
                                "hard": {"passed": not reasons, "reasons": reasons}}
     soft = _soft_summary(reviews.verdicts)
@@ -1044,7 +1095,8 @@ async def _stream_once(
     earlier: tuple[dict[str, Any], ...], timing: dict[str, int | None],
     attempt: _Attempt,
 ) -> _Attempt:
-    splitter = SentenceSplitter()
+    # Plan 002: on a call, the answer's first clause is said ahead of its sentence (the voice starts on it).
+    splitter = SentenceSplitter(first_clause=first_clause() and state.get("channel") == "hotline" and not attempt.said)
     streamed_text = False
     # Text written after a tool round is a new model message: it must not run on
     # into the last sentence before the tools ("…chờ chút nhé.Dạ đơn hàng…").
@@ -1056,11 +1108,30 @@ async def _stream_once(
             if _flagged(attempt):
                 return attempt
             if event.kind == "tool_started":
+                if splitter.holding:
+                    # What the model wrote before calling a tool is whole (a line before a lookup): said now, not
+                    # held for a space that never comes until the next round (2026-11-15: 958 ms to 2.489 ms).
+                    open_clause = splitter.open
+                    held_text = splitter.flush()
+                    if held_text and not await _offer(state, context, held_text, earlier + tuple(attempt.results),
+                                                      attempt, timing, kind="rest" if open_clause else "sentence"):
+                        return attempt
                 if timing["filler_ms"] is None and not attempt.said and context.emit is not None:
                     await context.emit("filler", fallback.LINES["filler"].format(who=_who(state)))
                     timing["filler_ms"] = _since(context)
+                held = fallback.hold_line(event.text, _who(state), str(state.get("turn_id") or ""))
+                if held and timing.get("hold_ms") is None and context.emit is not None:
+                    # A lookup: the answer needs the model's next round. The voice says this only if the caller
+                    # has heard nothing by its deadline (plan 002, A2).
+                    await context.emit("hold_line", held)
+                    timing["hold_ms"] = _since(context)
             elif event.kind == "tools":
                 attempt.results = list(event.results)
+                new_message = True
+                if any(r.get("blocked_by") == "missing_result" for r in attempt.results):
+                    continue  # a call of this round is still running: its result comes with the next event
+                fresh = attempt.results[attempt.told:]
+                attempt.told = len(attempt.results)
                 pending = _confirmation_draft(attempt.results)
                 if pending:
                     # This exact final question, rather than a model paraphrase, is what a later yes authorizes.
@@ -1075,7 +1146,17 @@ async def _stream_once(
                     # The customer agreed in this turn and has not heard the order: PB-09, read back once.
                     await _say(context, line, timing)
                     attempt.said.append(line)
-                new_message = True
+                whole = await _tell(state, context, fresh, view, earlier, timing, attempt, read_back=bool(line))
+                if attempt.reasons:
+                    return attempt
+                if whole:
+                    # Every tool of the round did what it was asked and the customer has heard it: the turn ends
+                    # here, as a confirmation question ends it, without the model's next round (plan 002).
+                    recorded = event.draft or Draft(text="", tool_results=[], model=None, model_calls=0, seconds=0)
+                    attempt.draft = replace(recorded, text=" ".join(unmarked(s) for s in attempt.said),
+                                            tool_results=attempt.results)
+                    attempt.ended_on_tools = True
+                    return attempt
             elif event.kind == "done":
                 attempt.draft = event.draft
                 attempt.results = list(event.draft.tool_results)
@@ -1092,19 +1173,95 @@ async def _stream_once(
                 timing["last_token_ms"] = at
                 if attempt.token_at is None:
                     attempt.token_at = at
-                for sentence in splitter.feed(text):
-                    if not await _offer(state, context, sentence, earlier + tuple(attempt.results), attempt, timing):
+                for sentence, kind in splitter.pieces(text):
+                    if not await _offer(state, context, sentence, earlier + tuple(attempt.results), attempt, timing,
+                                        kind=kind):
                         return attempt
                     attempt.token_at = at  # what follows this sentence in the same chunk began here
                 if not splitter.holding:
                     attempt.token_at = None
+        open_clause = splitter.open
         rest = splitter.flush()
         if rest:
-            await _offer(state, context, rest, earlier + tuple(attempt.results), attempt, timing)
+            await _offer(state, context, rest, earlier + tuple(attempt.results), attempt, timing,
+                         kind="rest" if open_clause else "sentence")
+        elif open_clause and attempt.open_clause is not None:
+            # The answer ended on its first clause: it is reviewed alone after all.
+            attempt.reviews.add(clean(unmarked(attempt.said[attempt.open_clause])), earlier + tuple(attempt.results))
         return attempt
     finally:
         await waited.aclose()
         await stream.aclose()
+
+
+async def _tell(state: HotState, context: HotContext, fresh: Sequence[dict[str, Any]], view: AgentContext,
+                earlier: tuple[dict[str, Any], ...], timing: dict[str, int | None], attempt: _Attempt, *,
+                read_back: bool) -> bool:
+    """Say what each tool with an effect in *fresh*, one round's results, did; True when that is the whole answer.
+
+    The line is the one the model wrote with the call (``reply``, plan 002), its holes filled from the result and
+    checked like any sentence; else the harness's fixed line for the result. It is the whole answer only with
+    ``ADVISOR_REPLY_PLAN`` on, when every call of the round succeeded and was told by the model's own line or by a
+    fixed line that says it all (:data:`fallback.WHOLE_LINES`). Otherwise the model's next round goes on from what
+    was said, as before. An order just read back gets no fixed line: the read-back said it.
+    """
+    who = _who(state)
+    results = earlier + tuple(attempt.results)
+    whole = bool(fresh) and reply_plan()
+    for result in fresh:
+        name = str(result.get("name") or "")
+        if fallback.wire_name(name) not in fallback.REPLY_HOLES:
+            whole = False  # a lookup in the same round: the model reads its result
+            continue
+        line = _planned(state, context, result, results)
+        own = line is not None
+        if not own:
+            line = None if (read_back and name == "order.create") else fallback.result_line(result, who)
+        if line is None:
+            whole = False
+            continue
+        complete = own or (name in fallback.WHOLE_LINES and fallback.outcome_of(result) in ("ok", "moved"))
+        if any(same_sentence(line, unmarked(said)) for said in attempt.said):
+            whole = whole and complete
+            continue
+        if own:
+            # The model's own words: said as any sentence of the answer is, reviewed by the PolicyAgent.
+            before = len(attempt.said)
+            if not await _offer(state, context, line, results, attempt, timing):
+                return False
+            if len(attempt.said) == before:
+                whole = False  # past the sentences allowed: not said
+                continue
+            attempt.planned.append(name)
+        else:
+            await _say(context, line, timing)
+            attempt.said.append(line)
+        view.harness_said.append(line)
+        whole = whole and complete
+    return whole
+
+
+def _planned(state: HotState, context: HotContext, result: Mapping[str, Any],
+             results: tuple[dict[str, Any], ...]) -> str | None:
+    """The line the model wrote with a write tool's call, filled from its success; None when it may not be said."""
+    if not reply_plan() or fallback.outcome_of(result) != "ok":
+        return None
+    name = str(result.get("name") or "")
+    data = (result.get("result") or {}).get("data") or {}
+    line = fallback.render(name, result.get(REPLY_ARG), data)
+    if line is None:
+        if result.get(REPLY_ARG):
+            logger.info("Call %s: the line written with %s could not be filled: %r", state.get("call_id"), name,
+                        result.get(REPLY_ARG))
+        return None
+    if name == "handoff.transfer" and not fallback.is_bridging(line):
+        return None  # the bridging line is what the customer must hear (respond adds it otherwise)
+    with stopwatch.span("guard"):
+        reasons = check(guard_input(state, context, unmarked(line), results)).reasons
+    if reasons:
+        logger.info("Call %s: the line written with %s was blocked: %s", state.get("call_id"), name, list(reasons))
+        return None
+    return line
 
 
 async def _waited(stream: Any) -> Any:
@@ -1189,8 +1346,14 @@ def same_sentence(one: str, other: str) -> bool:
 
 
 async def _offer(state: HotState, context: HotContext, sentence: str, results: tuple[dict[str, Any], ...],
-                 attempt: _Attempt, timing: dict[str, int | None]) -> bool:
-    """Check one sentence and say it; False when it was blocked."""
+                 attempt: _Attempt, timing: dict[str, int | None], *, kind: str = "sentence") -> bool:
+    """Check one sentence and say it; False when it was blocked.
+
+    *kind* ``clause`` is the first clause of the answer, said ahead (plan 002): the hard check reads it, the
+    PolicyAgent reads its whole sentence once the ``rest`` arrives, which the hard check reads whole as well.
+    """
+    if kind == "rest" and attempt.open_clause is not None:
+        return await _offer_rest(state, context, sentence, results, attempt, timing)
     spoken = unmarked(sentence)
     if not spoken and attempt.said:
         if attempt.last_spoken:
@@ -1208,6 +1371,12 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, sentence])
         return False
     spoken = clean(spoken)
+    if kind == "clause":
+        await _say(context, spoken, timing, token_at=attempt.token_at)
+        attempt.said.append(sentence)
+        attempt.open_clause = len(attempt.said) - 1
+        attempt.last_spoken = True
+        return True
     attempt.reviews.add(spoken, results)
     await attempt.reviews.head()
     if _flagged(attempt):
@@ -1218,6 +1387,27 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         return False
     await _say(context, spoken, timing, token_at=attempt.token_at)
     attempt.said.append(sentence)
+    attempt.last_spoken = True
+    return True
+
+
+async def _offer_rest(state: HotState, context: HotContext, rest: str, results: tuple[dict[str, Any], ...],
+                      attempt: _Attempt, timing: dict[str, int | None]) -> bool:
+    """The rest of a sentence whose first clause was said: checked as the whole sentence, said, reviewed whole."""
+    index, attempt.open_clause = attempt.open_clause, None
+    whole = f"{attempt.said[index]} {rest}"
+    with stopwatch.span("guard"):
+        reasons = list(check(guard_input(state, context, unmarked(whole), results)).reasons)
+    if reasons:
+        attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, rest])
+        attempt.reviews.add(clean(unmarked(attempt.said[index])), results)  # what was said is still reviewed
+        return False
+    attempt.reviews.add(clean(unmarked(whole)), results)
+    await attempt.reviews.head()
+    if _flagged(attempt):
+        return False
+    await _say(context, clean(unmarked(rest)), timing, token_at=attempt.token_at)
+    attempt.said[index] = whole
     attempt.last_spoken = True
     return True
 

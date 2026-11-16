@@ -207,8 +207,11 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     if tier in ("PROBABLE", "AMBIGUOUS"):
         reasons.append("Danh tính khách chưa được xác nhận; hỏi xác nhận trước khi tạo đơn.")
     sku, price = args.get("sku"), args.get("price_vnd")
-    if not sku or price is None:
-        return reasons + ["Thiếu sku hoặc price_vnd."]
+    if not sku:
+        return reasons + ["Thiếu sku."]
+    if price is None:
+        # The price is not the model's to write: it is today's quote of this call (plan 002).
+        return reasons + [f"Chưa có giá hôm nay của {sku} trong cuộc này: gọi pricing_get_quote cho {sku} rồi gọi lại order_create."]
     if parent := _parent_reason(sku):
         return reasons + [parent]
     if trusted is not None and sku not in trusted:
@@ -426,16 +429,34 @@ def deletion_succeeded(name: str, envelope: Mapping[str, Any]) -> bool:
     return False
 
 
-def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any]) -> dict[str, Any]:
+#: What the person taking the call does first, by the reason it was handed over: the brief's ``next_action`` when the
+#: model did not write one (``ADVISOR_SHORT_BRIEF``, plan 002 step 5).
+NEXT_ACTION = {
+    "cau_hoi_y_te": "Trả lời câu hỏi y tế của khách hoặc hướng khách tới chuyên gia phù hợp.",
+    "ngoai_pham_vi_tai_lieu": "Trả lời câu khách hỏi mà tài liệu của shop chưa có.",
+    "khach_yeu_cau_gap_nguoi": "Nhận cuộc gọi và hỏi khách cần hỗ trợ gì tiếp.",
+    "khieu_nai_nghiem_trong": "Xin lỗi khách và xử lý khiếu nại theo quy trình.",
+    "loi_he_thong": "Xin lỗi khách vì hệ thống trục trặc rồi trả lời tiếp câu khách đang hỏi.",
+    "khach_mat_kien_nhan": "Xin lỗi khách vì phải chờ và giải quyết ngay việc khách cần.",
+}
+NEXT_ACTION_DEFAULT = "Gọi lại khách và trả lời câu hỏi còn mở."
+
+
+def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any], *, customer_said: str | None = None) -> dict[str, Any]:
     """The model's brief with what the harness already knows filled in.
 
     The harness's values win for identity and time; the model's win for what
     only the conversation knows (reason, summary, open questions, next step).
+    Open questions the model left out are the customer's last words; the next
+    step left out follows from the reason.
     """
     filled = {k: v for k, v in known.items() if v is not None or k in ("product_advised", "price_quoted_vnd", "customer_name")}
     filled.update({k: v for k, v in brief.items() if k not in ("customer_phone", "generated_at", "customer_id")})
     questions = filled.get("open_questions")
     filled["open_questions"] = [questions] if isinstance(questions, str) else list(questions or [])
-    filled.setdefault("next_action", "Gọi lại khách và trả lời câu hỏi còn mở.")
+    if not filled["open_questions"] and customer_said and customer_said.strip():
+        filled["open_questions"] = [customer_said.strip()[:300]]
     filled.setdefault("escalation_reason", "khac")
+    if not filled.get("next_action"):
+        filled["next_action"] = NEXT_ACTION.get(str(filled["escalation_reason"]), NEXT_ACTION_DEFAULT)
     return filled

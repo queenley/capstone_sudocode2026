@@ -82,8 +82,8 @@ async def order_create(
 ) -> dict[str, Any]:
     """Place one order once the customer has asked to buy it.
 
-    One unit of one product: sku, qty and price_vnd, the final_price_vnd
-    pricing_get_quote gave for this sku today. More than one unit (two
+    One unit of one product: sku and qty; the price is today's
+    pricing_get_quote of this call, which the system fills in. More than one unit (two
     products, or two of one): one call with lines, the prices
     pricing_quote_order gave, one line per unit price (two units of one sku at
     different prices are two lines of qty 1). Any other price is refused.
@@ -95,11 +95,11 @@ async def order_create(
 
     Args:
         sku: The product sku or variant_sku being bought; leave it out with lines.
-        price_vnd: The unit price from pricing_get_quote, in VND; leave it out with lines.
+        price_vnd: The unit price, today's pricing_get_quote of this call: set by the system.
         qty: How many units; leave it out with lines.
         lines: An order of more than one unit: [{"sku", "qty", "price_vnd"}], each price_vnd one unit's
             final_price_vnd from pricing_quote_order.
-        promo_code: The promotion applied, as pricing_get_quote named it.
+        promo_code: Worked out by the system from the quote; leave it out.
         payment: COD, bank, momo or zalopay: what the customer chose, or what the
             Call Brief records. Leave it out when neither says: the order is not
             placed until the customer chooses, since a placed order's payment
@@ -160,7 +160,7 @@ async def schedule_callback(
 
     Args:
         callback_at: Date and time in Vietnam time, no offset, e.g. 2026-10-17T19:00.
-        note: What the call back is about.
+        note: Set by the system; leave it out.
         customer_phone: Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
     """

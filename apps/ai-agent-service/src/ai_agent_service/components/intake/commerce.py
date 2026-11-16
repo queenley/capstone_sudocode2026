@@ -373,6 +373,11 @@ def _model_in_context(text: str, previous: str) -> str | None:
     return next(iter(found)) if len(found) == 1 else None
 
 
+def named_products(text: str) -> set[str]:
+    """The catalogue products *text* names by their exact (spoken) name: what the harness may look up ahead."""
+    return _named_products(text)
+
+
 #: How a variant's colour code is said aloud.
 COLOUR_NAMES = {'den': 'đen', 'trang': 'trắng', 'xam': 'xám', 'be': 'be', 'navy': 'xanh navy'}
 
@@ -407,6 +412,21 @@ def variant_said(sku: str, text: str) -> str | None:
         return None
     matching = [v['variant_sku'] for v in variants if str(v.get('size')) == str(size) and v.get('color') == colour]
     return matching[0] if len(matching) == 1 else None
+
+
+def named_category(text: str) -> str | None:
+    """The catalogue category of the kind of product *text* names ("máy lọc không khí"); None unless one fits.
+
+    The longest kind said decides; a kind several categories share ("máy lọc": air or water) names none.
+    """
+    surface = f" {_surface(text)} "
+    groups = _kind_groups(*_index_keys())
+    kind = next((k for k in sorted(groups, key=len, reverse=True) if f" {k} " in surface), None)
+    if kind is None:
+        return None
+    category_of = {p['sku']: p.get('category') for p in _catalogue()['products']}
+    categories = {category_of.get(sku) for sku, _ in groups[kind]} - {None}
+    return categories.pop() if len(categories) == 1 else None
 
 
 def _product(text: str) -> str | None:

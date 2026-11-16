@@ -29,7 +29,8 @@ order-lookup:
   description: Dùng khi khách hỏi đơn đã đặt tới đâu, giao chưa, hay hỏi giỏ hàng và đơn trên tài khoản website.
   done_on: []
   body: |-
-    - Đơn đã đặt (tình trạng, giao chưa, tới đâu): gọi order_status, không đoán từ Call Brief hay lời trước; đọc trạng thái bằng tiếng Việt.
+    - Đơn đã đặt (tình trạng, giao chưa, tới đâu): gọi order_status, không đoán từ Call Brief hay lời trước; đọc trạng thái bằng tiếng Việt. Hỏi đơn đã đặt thì không đọc giỏ hàng: giỏ là thứ chưa đặt.
+    - order_status báo cần xác nhận danh tính và khách chưa nêu số: xin số điện thoại khách đã dùng đặt hàng, kèm "để em tiện tra đơn", rồi tra.
     - Có tool account_* là khách đã đăng nhập: giỏ hàng thì account_cart, tổng giỏ đọc đúng total_vnd; đơn đặt trên website (mã dạng #ABCD1234) thì account_orders; đơn qua hotline, Zalo vẫn tra bằng order_status.
     - Không có tool account_*: giỏ hàng chỉ biết qua dòng "(Giỏ hàng trên website …)" dưới lời khách; không có thì mời khách đăng nhập hoặc cho biết sản phẩm đang quan tâm.
 schedule-callback:
