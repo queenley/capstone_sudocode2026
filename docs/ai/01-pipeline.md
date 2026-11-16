@@ -167,6 +167,58 @@ Checkpoint đã được LangGraph lưu. Node này ghi transcript (đã che PII)
 
 ---
 
+## 1.2b Phiên bản 2: một vòng model mỗi lượt (nhánh `feature/harness-v2`)
+
+Bản 1 ở mục 1.2 thường cần hai vòng model cho một lượt: vòng một gọi tool, vòng hai đọc kết quả rồi trả lời. Bản 2 cố làm xong lượt trong **một** vòng: harness tra trước những gì chắc chắn cần, model gọi tool ghi kèm luôn câu sẽ nói khi tool thành công, và PolicyAgent phán ý khách song song từ đầu lượt. Mục tiêu là TTFA p95 ≤ 2,5 s của BTC. Bảy bước của đồ thị giữ nguyên; thay đổi nằm trong bước 4 (`advisor`) và lớp tool. Kế hoạch, số đo và lịch sử: [`docs/plan/002-mot-vong-model-moi-luot.md`](../plan/002-mot-vong-model-moi-luot.md).
+
+Mọi phần của bản 2 nằm sau công tắc môi trường, **mặc định tắt**, nên nhánh chạy như bản 1 cho tới khi bật. `main` giữ bản 1 để bench so sánh.
+
+Một lượt khi bật hết đi như sau:
+
+```mermaid
+flowchart TD
+    A["Khách nói"] --> B["perceive + load_context<br/>kb.search, Call Brief"]
+    B --> C["Tra trước<br/>sản phẩm có tên, nhu cầu, đơn đang chốt"]
+    B --> P["PolicyAgent phán ý khách<br/>(song song, từ đầu lượt)"]
+    C --> D["MỘT vòng model"]
+    D -->|"chỉ trả lời"| G["guard từng câu → nói"]
+    D -->|"gọi tool ghi + câu reply"| E["guard trước khi ghi<br/>(dùng kết quả PolicyAgent)"]
+    P --> E
+    E --> F["chạy tool → điền số vào câu reply"]
+    F --> G
+    F -.->|"tool lỗi / câu không dùng được"| R["thêm một vòng model"]
+    G --> H["persist, hết lượt"]
+```
+
+| Phần | Công tắc | Làm gì | Ở đâu |
+|---|---|---|---|
+| Tra trước | `ADVISOR_PREFETCH=1` | Trước vòng model, harness gọi `pricing_get_quote`, `inventory_check` cho tối đa 2 sản phẩm khách gọi đúng tên; `catalog_search` khi khách nêu loại hàng cùng diện tích hoặc ngân sách; báo giá lại sản phẩm của đơn đang chốt và `delivery_estimate` khi đã có địa chỉ. Tối đa 4 lần gọi. Sản phẩm có size, màu chỉ được tra khi lời khách nêu đủ size và màu, và tra bằng mã biến thể, không bằng mã sản phẩm chung | [`mcp/tools.py`](../../apps/ai-agent-service/src/ai_agent_service/mcp/tools.py) (`named_lookups`, `ahead_lookups`) |
+| Câu soạn sẵn trên tool ghi | `ADVISOR_REPLY_PLAN=1` | `order_create`, `order_update`, `schedule_callback`, `handoff_transfer`, `memory_request_deletion` có thêm tham số `reply`: câu model sẽ nói khi tool thành công. Số liệu chỉ đi qua chỗ trống (`{order_id}`, `{total_vnd}`, `{estimated_delivery}`, `{fee_vnd}`, `{callback_at}`...), harness điền từ kết quả tool; giờ hẹn điền dạng nói ("19 giờ tối thứ Sáu 16/10/2026"). Câu vẫn qua guard. Tool lỗi hoặc câu không dùng được thì model chạy thêm một vòng như bản 1 | [`mcp/tools.py`](../../apps/ai-agent-service/src/ai_agent_service/mcp/tools.py) (`ReplyPlanMiddleware`), [`guardrails/fallback.py`](../../apps/ai-agent-service/src/ai_agent_service/components/guardrails/fallback.py) (`REPLY_HOLES`) |
+| Ý khách hỏi sớm | `ADVISOR_EARLY_INTENTS=1` | Ở lượt có tool ghi, PolicyAgent được hỏi ngay từ đầu lượt về `purchase`, `handoff`, `delete`, `one_more`; guard trước khi ghi dùng câu trả lời đó thay vì hỏi lại sau khi model xong | [`agents/policy.py`](../../apps/ai-agent-service/src/ai_agent_service/agents/policy.py) (`EARLY_INTENTS`), [`agents/advisor.py`](../../apps/ai-agent-service/src/ai_agent_service/agents/advisor.py) (`_verdict`) |
+| Handoff Brief ngắn | `ADVISOR_SHORT_BRIEF=1` | Model chỉ viết lý do, chi tiết và tóm tắt; harness điền các trường còn lại của `handoff_brief.schema.json` từ state | `mcp/tools.py` (`short_brief`), `guardrails/actions.py` (`fill_handoff`) |
+| Câu mở trước khi tra | `ADVISOR_PREAMBLE=1` | Cùng vòng với lệnh gọi tool tra cứu, model viết một câu ngắn cho khách (không số, không kết quả, không hứa) để khách không chờ trong im lặng | `agents/advisor.py` (`preamble`), [`notes.yaml`](../../config/prompts/agent/advisor/notes.yaml) (`preamble`) |
+| Tư vấn theo nhu cầu | `ADVISOR_PRODUCT_ADVISE=1` | Thêm tool `product_advise`: một lần gọi trả các mẫu hợp nhu cầu kèm giá và tồn kho | `mcp/tools.py` (`product_advise_on`) |
+| Nói cụm đầu sớm | `ADVISOR_FIRST_CLAUSE=1` | Trên cuộc gọi thoại, cụm đầu của câu (trước dấu phẩy) được đưa sang giọng nói trước khi cả câu xong | `mcp/tools.py` (`first_clause`), [`guardrails/stream.py`](../../apps/ai-agent-service/src/ai_agent_service/components/guardrails/stream.py) |
+| Câu giữ lượt | `VOICE_HOLD_MS=1300` | Khách đã ngừng nói mà tool tra cứu chưa xong sau chừng ấy mili giây: phát câu giữ lượt harness đã chuẩn bị | [`api/routes/voice.py`](../../apps/ai-agent-service/src/ai_agent_service/api/routes/voice.py) |
+| Mức xử lý của nhà cung cấp | `ADVISOR_SERVICE_TIER=priority` | Gửi `service_tier` cho advisor (OpenAI): token đầu ổn định hơn, giá gấp đôi | [`llm/factory.py`](../../apps/ai-agent-service/src/ai_agent_service/llm/factory.py) |
+
+Bật hết khi chạy đánh giá hay bench (ví dụ đã dùng cho `evaluation/runs/fix-check-20261116`):
+
+```bash
+ADVISOR_PREFETCH=1 ADVISOR_REPLY_PLAN=1 ADVISOR_EARLY_INTENTS=1 ADVISOR_SHORT_BRIEF=1 ADVISOR_PREAMBLE=1 ADVISOR_PRODUCT_ADVISE=1 ADVISOR_FIRST_CLAUSE=1 ADVISOR_SERVICE_TIER=priority apps/ai-agent-service/.venv/bin/python run_eval.py --scenarios data/dev/scenarios --only SCN-GEN-0170 --no-baseline --out evaluation/runs/<tên>
+```
+
+Số đo đã có (chưa đủ để kết luận):
+
+| Phép đo | Kết quả | Nguồn |
+|---|---|---|
+| Bench voice `on4`, 14 lượt, bật hết | TTFA trung vị 1,63 s (tắt: 3,15 s); 11/14 lượt xong trong một vòng model | `docs/plan/002-mot-vong-model-moi-luot.md` mục 4i |
+| Evaluation 11 kịch bản nghi ngờ, bật hết | TTFT p95 2.729 ms, total p95 3.262 ms trên 128 lượt; tìm ra lỗi giờ hẹn "19:00" trong câu soạn sẵn (đã sửa) | [`docs/evaluation/tsr-fail-analysis-20261116.md`](../evaluation/tsr-fail-analysis-20261116.md) |
+
+Giới hạn: chưa có lần đánh giá ≥ 100 lượt với bản 2 để có p95 đúng như BTC chấm và để kiểm TSR, RQR, HR không xấu đi; chưa đo riêng từng công tắc.
+
+---
+
 ## 1.3 Sau cuộc gọi: `after_call`
 
 [pipeline/cold/after_call.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/cold/after_call.py). Chạy như tác vụ nền khi cuộc gọi kết thúc: nhân viên bấm kết thúc, Sales đóng conversation, hoặc **30 phút im lặng** (reconciler kiểm mỗi phút).

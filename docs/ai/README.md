@@ -4,7 +4,7 @@ Bộ tài liệu này giải thích **phần AI** của dự án: một nhân vi
 
 Mã nguồn chính: [`apps/ai-agent-service`](../../apps/ai-agent-service/). README kỹ thuật của service: [apps/ai-agent-service/README.md](../../apps/ai-agent-service/README.md).
 
-Nhánh `feature/harness-v2` có harness phiên bản 2 (một vòng model mỗi lượt) để bench so với bản này; tài liệu của nó nằm trên nhánh đó.
+**Phiên bản 2 (nhánh `feature/harness-v2`, 16/11/2026).** Harness một vòng model mỗi lượt: tra trước, câu soạn sẵn trên tool ghi, PolicyAgent phán ý từ đầu lượt, Handoff Brief do harness điền, câu giữ lượt khi gọi thoại. Mọi phần nằm sau công tắc `ADVISOR_*`, mặc định tắt; xem [Pipeline 1.2b](01-pipeline.md#12b-phiên-bản-2-một-vòng-model-mỗi-lượt-nhánh-featureharness-v2). Nhánh `main` giữ harness phiên bản 1 với cùng các bản sửa lỗi ngày 16/11, để bench hai bản trên cùng `run_eval.py`.
 
 ---
 
@@ -110,6 +110,7 @@ Ba ý chính để nhớ:
 | Vòng tự cải tiến (`components/improvement/*`, `pipeline/improve`), QA chấm rubric | có CLI `python -m ai_agent_service.pipeline.improve`, chạy offline, không trên đường chạy của khách; chưa có số đo trên `data/dev` (cập nhật 12/11/2026, xem [Vòng cải tiến](06-vong-cai-tien.md)) |
 | Chất lượng end-to-end | TSR M2 còn 25–40% trên các cohort nhỏ, xa ngưỡng 70% của BTC. Mọi nhãn còn là diagnostic, chưa có người duyệt |
 | Phân tích 178 cuộc fail TSR của `data/dev` (16/11) | 86 cuộc do agent đã sửa (nhận diện số dùng chung, mã biến thể, cần thanh toán + địa chỉ trước khi tạo đơn, ITN tiền và giờ hẹn, chuyển máy thừa, KM-02, đơn tách), 5 chưa sửa, 71 do dataset, 5 do extractor, 11 hỏng theo cuộc trước: [tsr-fail-analysis-20261116.md](../evaluation/tsr-fail-analysis-20261116.md) |
+| Harness phiên bản 2 | nhánh `feature/harness-v2`; bench voice 14 lượt: TTFA trung vị 1,63 s (bản 1: 3,15 s); chưa có lần đánh giá ≥ 100 lượt |
 | Đo các phương pháp cải tiến | đo 2×2 (Router, GapLoop, Reflection, Combined = hai phiên bản đã học), k = 3 lần mỗi cấu hình trên một bộ đo chung; có script và test, chưa chạy thật: [Vòng cải tiến 6b](06-vong-cai-tien.md#6b-đo-gaploop-reflection-và-combined-cùng-nhau-22-từ-16112026) |
 
 Chi tiết số liệu và giới hạn: [Đánh giá](05-danh-gia.md#6-kết-quả-đến-hiện-tại).
