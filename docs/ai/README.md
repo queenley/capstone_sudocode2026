@@ -4,6 +4,8 @@ Bộ tài liệu này giải thích **phần AI** của dự án: một nhân vi
 
 Mã nguồn chính: [`apps/ai-agent-service`](../../apps/ai-agent-service/). README kỹ thuật của service: [apps/ai-agent-service/README.md](../../apps/ai-agent-service/README.md).
 
+Nhánh `feature/harness-v2` có harness phiên bản 2 (một vòng model mỗi lượt) để bench so với bản này; tài liệu của nó nằm trên nhánh đó.
+
 ---
 
 ## Đọc theo thứ tự nào
@@ -87,7 +89,7 @@ Ba ý chính để nhớ:
 | **CallBrief** | Bản tóm tắt về khách quen, dựng từ bộ nhớ ở đầu cuộc gọi: đã tư vấn gì, báo giá bao nhiêu, còn vướng gì, không được hỏi lại gì |
 | **Fact ledger** | Sổ ghi các thông tin về khách (ngân sách, diện tích phòng, size...), có phiên bản và nguồn gốc |
 | **Hard guard** | Bộ kiểm tra câu trả lời bằng code (regex, so số) |
-| **Jev / PolicyAgent** | Bộ kiểm tra mềm bằng model đánh giá của TypeSafe, bắt lỗi chính sách mà regex không thấy |
+| **PolicyAgent** | Bộ kiểm tra mềm bằng model, bắt lỗi chính sách mà regex không thấy và đọc ý khách (mua, chuyển máy, xóa dữ liệu...). Dùng OpenAI Decisions từ 07/11/2026 (trước đó là Jev) |
 | **Safe line** | Câu an toàn khi không tin được bản nháp: "Dạ để em kiểm tra kỹ rồi phản hồi anh/chị ngay ạ." |
 | **Copilot** | Sau khi chuyển cho nhân viên, trợ lý không nói với khách nữa mà soạn gợi ý cho nhân viên |
 | **Token PII** | Chuỗi thay thế dữ liệu cá nhân, ví dụ `<PHONE_1>`, `<ADDR_1>`. Model không bao giờ thấy số thật |
@@ -97,7 +99,7 @@ Ba ý chính để nhớ:
 
 ---
 
-## Trạng thái hiện tại (25/10/2026)
+## Trạng thái hiện tại (25/10/2026, cập nhật 16/11/2026)
 
 | Phần | Trạng thái |
 |---|---|
@@ -107,5 +109,7 @@ Ba ý chính để nhớ:
 | Voice (VAD, Smart Turn, ASR, TTS, barge-in) | chạy được; WER 6,2% trên 674 lượt nói tổng hợp |
 | Vòng tự cải tiến (`components/improvement/*`, `pipeline/improve`), QA chấm rubric | có CLI `python -m ai_agent_service.pipeline.improve`, chạy offline, không trên đường chạy của khách; chưa có số đo trên `data/dev` (cập nhật 12/11/2026, xem [Vòng cải tiến](06-vong-cai-tien.md)) |
 | Chất lượng end-to-end | TSR M2 còn 25–40% trên các cohort nhỏ, xa ngưỡng 70% của BTC. Mọi nhãn còn là diagnostic, chưa có người duyệt |
+| Phân tích 178 cuộc fail TSR của `data/dev` (16/11) | 86 cuộc do agent đã sửa (nhận diện số dùng chung, mã biến thể, cần thanh toán + địa chỉ trước khi tạo đơn, ITN tiền và giờ hẹn, chuyển máy thừa, KM-02, đơn tách), 5 chưa sửa, 71 do dataset, 5 do extractor, 11 hỏng theo cuộc trước: [tsr-fail-analysis-20261116.md](../evaluation/tsr-fail-analysis-20261116.md) |
+| Đo các phương pháp cải tiến | đo 2×2 (Router, GapLoop, Reflection, Combined = hai phiên bản đã học), k = 3 lần mỗi cấu hình trên một bộ đo chung; có script và test, chưa chạy thật: [Vòng cải tiến 6b](06-vong-cai-tien.md#6b-đo-gaploop-reflection-và-combined-cùng-nhau-22-từ-16112026) |
 
 Chi tiết số liệu và giới hạn: [Đánh giá](05-danh-gia.md#6-kết-quả-đến-hiện-tại).

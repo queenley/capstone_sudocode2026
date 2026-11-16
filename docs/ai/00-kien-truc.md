@@ -400,7 +400,7 @@ flowchart LR
 
 - **`after_call`** ([after_call.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/cold/after_call.py)) là nơi chặn đầu độc bộ nhớ: chỉ ghi cho khách cuộc gọi đã xác nhận; `AMBIGUOUS` lúc gác máy thì không ghi cho ai. Bốn bước `extract` → `gate` → `commit` → `summarize`. Một finalizer sở hữu mỗi cuộc, và yêu cầu xóa dữ liệu chờ các lần ghi của nó xong.
 - **Đánh giá** dùng cùng đồ thị nóng và `after_call`, nhưng với database riêng `*_eval`, đồng hồ ảo và store ghi trace. Cách chạy: [evaluation/README.md](../../evaluation/README.md).
-- **Vòng cải tiến** không chạy trong service: nó tạo version mới của skills hoặc knowledge, cần duyệt, rồi được đo bằng `run_eval.py --profile gaploop|reflection|combined`. Chi tiết: [Vòng cải tiến](06-vong-cai-tien.md).
+- **Vòng cải tiến** không chạy trong service: nó tạo version mới của skills hoặc knowledge, cần duyệt, rồi được đo bằng `run_eval.py --profile gaploop|reflection|combined`. Từ 16/11 ba phương pháp và Router được đo cùng nhau theo thiết kế 2×2 (Combined là đúng hai phiên bản đã học), k = 3 lần mỗi cấu hình: `scripts/evaluation/ablation.py`. Chi tiết: [Vòng cải tiến](06-vong-cai-tien.md).
 
 ## 0.11 Khi thêm code: đặt ở đâu
 
