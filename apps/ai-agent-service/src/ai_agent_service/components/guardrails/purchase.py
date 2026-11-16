@@ -16,6 +16,7 @@ from typing import Any, Mapping
 from uuid import uuid4
 
 from ...config.database import derived_key
+from ..intake import commerce
 from ..intake.itn import format_vnd
 from ..intake.text import plain
 
@@ -170,7 +171,8 @@ def addressed(context: Any) -> str:
 
 
 def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
-          names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
+          names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None,
+          order_quotes: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """The order to read back, as it is said aloud: names and amounts, never a product code; with *delivery*,
     the day :func:`estimated_delivery` found."""
     order = payload(args)
@@ -181,6 +183,12 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
     arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""
     lines = lines_of(order)
     total = sum(line["price_vnd"] * line["qty"] for line in lines)
+    for line in lines:
+        # A variant is never among the searched products by its own code: its name, size and colour come from the
+        # catalogue, so the read-back names what is being bought (PB-09) instead of "1 sản phẩm đã chọn".
+        name = commerce.product_name(line["sku"])
+        if name and (not known.get(line["sku"]) or " size " in name):
+            known[line["sku"]] = name
     items = "; ".join(f"{line['qty']} sản phẩm {known.get(line['sku']) or 'đã chọn'}, đơn giá {format_vnd(line['price_vnd'])}"
                       for line in lines)
     question = (f"{addressed(context)} xác nhận đặt {items}, tổng {format_vnd(total)}, thanh toán {payment}{promo}, "
@@ -190,8 +198,11 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
     basket = [sku for sku in order.get("basket_skus") or [] if sku not in {line["sku"] for line in lines}]
     others = [known[sku] for sku in basket if known.get(sku)]
     if others:
-        prices = [(quotes or {}).get(sku) for sku in basket]
-        whole = "" if None in prices else f", tổng cả giỏ {format_vnd(total + sum(prices))}"
+        # The basket's total is the pricing.quote_order of all its machines: each machine's own quote misses the
+        # second-item promotion the two orders share (QT-01; "tổng cả giỏ 14.180.000đ" was read for a basket of
+        # 10.935.000đ, 2026-11-16). Without that quote, no total.
+        units = (order_quotes or {}).get(units_key([*lines, *({"sku": sku} for sku in basket)]))
+        whole = f", tổng cả giỏ {format_vnd(sum(int(price) for _, price in units))}" if units else ""
         question = f"Đơn này đi cùng {', '.join(others)}{whole}. " + question
         read_back = f"Đơn này đi cùng {', '.join(others)}{whole}. " + read_back
     if order.get("order_group"):

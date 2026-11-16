@@ -1,15 +1,15 @@
-﻿# Phần chung của gaploop.ps1, reflection.ps1, combined.ps1: một vòng cải tiến học và đo trên mẫu data/dev
+﻿# Phần chung của gaploop.ps1, reflection.ps1: một vòng cải tiến học và đo trên mẫu data/dev
 # (trộn GEN/ADV) cùng các bộ chứng minh gốc, chỉ cấu hình full (không baseline), rồi kết luận theo tiêu chí cố định.
 # Không gọi trực tiếp: dùng một trong ba script trên.
 param(
-    [Parameter(Mandatory)][ValidateSet("gap", "reflection", "combined")][string]$Kind,
+    [Parameter(Mandatory)][ValidateSet("gap", "reflection")][string]$Kind,
     [ValidateSet("learn", "answers", "measure", "verdict")][string]$Step = "learn",
     [Parameter(Mandatory)][string]$Name,
     [int]$Learn = 40,           # số kịch bản học lấy từ data/dev
     [int]$Frozen = 20,          # số kịch bản đo trước/sau lấy từ data/dev
     [double]$AdvShare = 0.5,    # tỉ lệ ADV: 0.5 = 50% general, 50% advance
     [int]$Seed = 1,             # cùng seed thì cùng mẫu
-    [int]$Runs = 2,             # số lần chạy frozen mỗi bên (trước/sau) để tách dao động
+    [int]$Runs = 3,             # k: số lần chạy frozen mỗi bên (trước/sau) để tách dao động (quyết định 16/11/2026)
     [string[]]$Proof = @()      # bộ chứng minh gốc của Reflection: budget, warranty, conduct
 )
 
@@ -26,7 +26,7 @@ if ($Name -in @("gap-loop", "budget", "warranty", "conduct")) { Write-Error "-Na
 function Run { & $py @args; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE } }  # một bước lỗi thì dừng
 
 # Bộ chứng minh gốc của từng loại vòng.
-$gapProof = $Kind -in @("gap", "combined")
+$gapProof = $Kind -eq "gap"
 if ($Kind -eq "gap") { $Proof = @() }
 elseif ($Proof.Count -eq 0) { $Proof = @("budget") }
 $proofArgs = @()

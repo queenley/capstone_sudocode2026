@@ -45,7 +45,7 @@ def test_a_deletion_needs_the_customers_agreement_read_by_jev():
 
 def test_one_more_order_of_the_same_product_is_read_by_jev():
     def create(wants_more, said="Giao ở quận 3 nhé"):
-        return actions.check("order_create", {"sku": "SKU-A", "price_vnd": 1_000_000, "qty": 1, "payment": "COD"},
+        return actions.check("order_create", {"sku": "SKU-A", "price_vnd": 1_000_000, "qty": 1, "payment": "COD", "address": "Quận 3"},
                              tier="VERIFIED", mode="speak", has_phone=True, quotes={"SKU-A": 1_000_000},
                              trusted=frozenset({"SKU-A"}), created=[{"order_id": "OD1", "sku": "SKU-A"}],
                              customer_said=said, intents={"one_more": wants_more})

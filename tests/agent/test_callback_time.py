@@ -30,7 +30,7 @@ def test_a_holiday_goes_to_the_tool_and_outside_the_hours_is_proposed(asked, pas
 
 
 def test_a_moved_call_back_must_be_told():
-    assert hard.moved_callback("Dạ em đã đặt lịch rồi ạ.", [BOOKED]) == clock.moment_label(clock.parse_local("2026-10-27T09:00"))
+    assert hard.moved_callback("Dạ em đã đặt lịch rồi ạ.", [BOOKED]) == clock.spoken_moment(clock.parse_local("2026-10-27T09:00"))
     assert hard.moved_callback("Dạ em dời sang 27/10 ạ.", [BOOKED]) is None
     assert hard.moved_callback("Dạ em gọi lại vào thứ Ba nhé.", [BOOKED]) is None
 

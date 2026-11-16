@@ -39,6 +39,7 @@ from datetime import date, datetime, time, timedelta
 from typing import NamedTuple
 
 from ..clock import day_label
+from .text import fold
 
 
 class Span(NamedTuple):
@@ -69,6 +70,9 @@ def _below_thousand(words: list[str]) -> int | None:
     """A number under 1000 from its words, or None if they do not form one."""
     if not words:
         return 0
+    if len(words) == 1 and words[0].isdigit() and int(words[0]) < 1000:
+        # Digits before a spoken scale: "5 triệu bảy trăm" (the recogniser wrote the first number as digits).
+        return int(words[0])
     value = 0
     rest = list(words)
     if "trăm" in rest:
@@ -254,6 +258,10 @@ def _spoken_numbers(text: str) -> str:
     cursor = 0
     for start, end in _runs(tokens):
         words = [_bare(t) for t in tokens[start:end]]
+        if words[0] in SCALES and start > 0 and re.fullmatch(r"\d{1,3}", tokens[start - 1]):
+            # "5 triệu bảy trăm" is 5.700.000: the digits before the scale are its head, not a number of their own.
+            start -= 1
+            words = [tokens[start]] + words
         bare = _digit_string(words)
         # "không năm triệu" is a negation before a number, not a zero.
         while len(words) > 1 and words[0] == "không" and not bare:
@@ -296,14 +304,39 @@ _DAY = r"thứ hai|thứ ba|thứ tư|thứ năm|thứ sáu|thứ bảy|chủ nh
 _PART = r"sáng|trưa|chiều|tối|đêm"
 _WEEK = r"(?:\s+tuần\s+(?:sau|tới|này))"
 DATE_PHRASE = re.compile(rf"\b({_DAY})({_WEEK})?\b", re.IGNORECASE)
+#: Words that may stand between the day and the time: "tối thứ bảy này tầm 10 giờ", "mai khoảng 8 giờ".
+_FILLER = r"(?:(?:vào\s+)?(?:lúc|tầm|khoảng|vào)\s+)?"
 #: A time with its part of the day and day on either side: "tối mai 8 giờ",
-#: "8 giờ tối mai", "chiều thứ bảy 3 giờ rưỡi", "tối nay lúc 8h30".
+#: "8 giờ tối mai", "chiều thứ bảy 3 giờ rưỡi", "tối nay lúc 8h30", "tối thứ bảy này tầm 10 giờ".
 MOMENT = re.compile(
-    rf"(?:\b(?P<part1>{_PART})\s+)?(?:\b(?P<day1>{_DAY}|mai|nay|mốt)(?P<week1>{_WEEK})?\s+)?(?:lúc\s+)?"
+    rf"(?:\b(?P<part1>{_PART})\s+)?(?:\b(?P<day1>{_DAY}|mai|nay|mốt)(?P<week1>{_WEEK})?(?:\s+này)?\s+)?{_FILLER}"
     rf"\b(?P<hour>\d{{1,2}})\s*(?:giờ|h)(?:\s*(?P<minute>\d{{1,2}}|rưỡi)\b)?"
     rf"(?:\s+(?P<part2>{_PART})\b)?(?:\s+(?P<day2>{_DAY}|mai|nay|mốt)\b(?P<week2>{_WEEK})?)?",
     re.IGNORECASE,
 )
+#: The same, typed without diacritics: "toi thu hai 19 10 tam 7 gio". Read only in a turn typed that way, where
+#: "toi" is far more often tối than tôi before a time.
+_PART_TONELESS = {"sang": "sáng", "trua": "trưa", "chieu": "chiều", "toi": "tối", "dem": "đêm"}
+_DAY_TONELESS = {"thu hai": "thứ hai", "thu ba": "thứ ba", "thu tu": "thứ tư", "thu nam": "thứ năm",
+                 "thu sau": "thứ sáu", "thu bay": "thứ bảy", "chu nhat": "chủ nhật", "hom nay": "hôm nay",
+                 "ngay mai": "ngày mai", "ngay kia": "ngày kia", "mai": "mai", "nay": "nay",
+                 # Number reading has already written "thu hai" as "thu 2".
+                 "thu 2": "thứ hai", "thu 3": "thứ ba", "thu 4": "thứ tư", "thu 5": "thứ năm", "thu 6": "thứ sáu",
+                 "thu 7": "thứ bảy"}
+_TONELESS_DAY = "|".join(sorted(_DAY_TONELESS, key=len, reverse=True))
+MOMENT_TONELESS = re.compile(
+    rf"(?:\b(?P<part1>{'|'.join(_PART_TONELESS)})\s+)?(?:\b(?P<day1>{_TONELESS_DAY})"
+    rf"(?:\s+(?P<dd>\d{{1,2}})[ /](?P<mm>\d{{1,2}}))?\s+)?(?:(?:luc|tam|khoang|vao)\s+)?"
+    rf"\b(?P<hour>\d{{1,2}})\s*(?:gio|h)(?:\s*(?P<minute>\d{{1,2}}|ruoi)\b)?"
+    rf"(?:\s+(?P<part2>{'|'.join(_PART_TONELESS)})\b)?",
+    re.IGNORECASE,
+)
+#: A date written out: "19/10", "ngày 11/11", "(19/10/2026)".
+_EXPLICIT_DATE = re.compile(r"(?<![\d/])(\d{1,2})/(\d{1,2})(?:/(\d{4}))?(?![\d/])")
+#: A part of the day said earlier in the clause, before a day: "Tối thứ Tư này, ngày 11/11, tầm 10 giờ". Not "tối đa".
+_PART_BEFORE_DAY = re.compile(rf"\b({_PART})\b(?=\s+(?:{_DAY}|mai|nay|mốt|ngày|này))", re.IGNORECASE)
+
+
 def _day(phrase: str, week: str | None, today: date) -> date:
     """The day a day phrase means, counted from *today*."""
     lower = phrase.lower()
@@ -332,23 +365,71 @@ def _clock(hour: int, minute: str | None, part: str | None) -> tuple[int, int] |
     return hour, minutes
 
 
+def _explicit_day(text: str, today: date) -> date | None:
+    """The last date written out in *text* ("ngày 11/11"), in the year that puts it today or later."""
+    found = None
+    for match in _EXPLICIT_DATE.finditer(text):
+        day, month, year = int(match[1]), int(match[2]), int(match[3]) if match[3] else None
+        try:
+            found = date(year or today.year, month, day)
+        except ValueError:
+            continue
+        if year is None and found < today:
+            try:
+                found = date(today.year + 1, month, day)
+            except ValueError:
+                continue
+    return found
+
+
+def _clause_before(text: str, at: int) -> str:
+    """The words of the sentence before *at*: what a time said there can lean on."""
+    return re.split(r"[.!?\n]", text[:at])[-1]
+
+
 def _moments(text: str, now: datetime) -> tuple[str, list[tuple[int, int]]]:
-    """Each time said, with the moment it means appended; and the spans consumed, for :func:`_dates`."""
+    """Each time said, with the moment it means appended; and the spans consumed, for :func:`_dates`.
+
+    What the time itself does not carry is read from the same sentence: a date written out ("Tối thứ Tư này,
+    ngày 11/11, tầm 10 giờ"), else a day said, and a part of the day said before that day."""
     today = now.date()
     spans: list[tuple[int, int]] = []
+    toneless = fold(text).lower() == text.lower()
+    pattern = MOMENT_TONELESS if toneless else MOMENT
 
     def replace(match: re.Match[str]) -> str:
-        clock = _clock(int(match.group("hour")), match.group("minute"), match.group("part1") or match.group("part2"))
+        groups = match.groupdict()
+        clause = _clause_before(text, match.start())
+        after = re.split(r"[.!?\n]", text[match.end():])[0][:20]
+        part = groups.get("part1") or groups.get("part2")
+        minute = groups.get("minute")
+        if toneless:
+            part = _PART_TONELESS.get((part or "").lower(), part)
+            minute = "rưỡi" if (minute or "").lower() == "ruoi" else minute
+        if not part:
+            before = _PART_BEFORE_DAY.findall(clause) if not toneless else []
+            part = before[-1] if before else None
+        clock = _clock(int(groups["hour"]), minute, part)
         if clock is None:
             return match.group(0)
-        phrase, week = (match.group("day1"), match.group("week1")) if match.group("day1") else (
-            match.group("day2"), match.group("week2"))
-        day = _day(phrase, week, today) if phrase else today
+        day = None
+        if groups.get("dd") and groups.get("mm"):
+            day = _explicit_day(f"{groups['dd']}/{groups['mm']}", today)
+        day = day or _explicit_day(clause + " " + match.group(0) + " " + after, today)
+        if day is None:
+            phrase, week = (groups.get("day1"), groups.get("week1")) if groups.get("day1") else (
+                groups.get("day2"), groups.get("week2"))
+            if phrase and toneless:
+                phrase = _DAY_TONELESS.get(phrase.lower(), phrase)
+            if not phrase and not toneless:
+                said = list(DATE_PHRASE.finditer(clause))
+                phrase, week = (said[-1].group(1), said[-1].group(2)) if said else (None, None)
+            day = _day(phrase, week, today) if phrase else today
         moment = datetime.combine(day, time(*clock), tzinfo=now.tzinfo)
         spans.append(match.span())
         return f"{match.group(0)} ({moment.isoformat(timespec='minutes')})"
 
-    return MOMENT.sub(replace, text), spans
+    return pattern.sub(replace, text), spans
 
 
 def _dates(text: str, now: datetime) -> str:
@@ -359,6 +440,8 @@ def _dates(text: str, now: datetime) -> str:
         after = text[match.end():match.end() + 40]
         if re.match(r"[^()]*\(\d{4}-\d{2}-\d{2}T", after):
             return match.group(0)
+        if re.match(r"[^.!?()]{0,12}\(?\d{1,2}/\d{1,2}", after):
+            return match.group(0)  # "thứ Hai (19/10)", "thứ Tư này, ngày 11/11": the date is already written out
         return f"{match.group(0)} ({day_label(_day(match.group(1), match.group(2), today))})"
 
     return DATE_PHRASE.sub(replace, text)

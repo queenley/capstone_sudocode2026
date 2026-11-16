@@ -83,7 +83,7 @@ class ChannelModel(FakeMessagesListChatModel):
         self.views.append((channel, text, tuple(str(m.content) for m in messages)))
         if text.casefold() == "vâng":
             name = "order_create" if (self.unsafe or channel == "hotline") and "order_create" not in tools else None
-            args = {"sku": SKU, "price_vnd": PRICE, "qty": 1} if name else {}
+            args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS} if name else {}
             reply = "Dạ em tiếp tục phần xem ảnh màu trắng ạ."
         else:
             name = "catalog_search" if "catalog_search" not in tools else (
@@ -91,7 +91,7 @@ class ChannelModel(FakeMessagesListChatModel):
                     "order_create" if channel == "hotline" and "order_create" not in tools else None))
             args = {"query": "máy màu trắng"} if name == "catalog_search" else {"sku": SKU}
             if name == "order_create":
-                args = {"sku": SKU, "price_vnd": PRICE, "qty": 1}
+                args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
             reply = BUY_QUESTION if channel == "hotline" else PHOTO_QUESTION
         message = AIMessage(content="", tool_calls=[{"id": f"{channel}-{name}", "name": name, "args": args}]) if name else AIMessage(content=reply)
         return ChatResult(generations=[ChatGeneration(message=message)])
@@ -185,7 +185,7 @@ async def test_same_customer_channels_isolate_pending_purchase_and_block_wrong_p
         assert b["pending_purchase"] is None
     a = await turn(101, "hotline", "vâng", "A-confirm-order")
     assert len(writes) == (2 if unsafe else 1)
-    assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU, "skus": [SKU], "no_address": True}]
+    assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU, "skus": [SKU], "no_address": False}]
     assert a["pending_purchase"] is None
 
 
@@ -198,7 +198,7 @@ def guarded_context(**changes):
 
 
 def authorized(context, args=None):
-    args = args or {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
+    args = args or {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
     previous = replace(context, turn_id="prepare-order")
     pending = purchase.draft(order_arguments(args, previous), previous)
     return replace(context, pending_purchase=pending, last_agent_said=pending["question"], customer_said="vâng")
@@ -212,7 +212,7 @@ def receipted(context, args=None):
 
 async def attempt_order(context, args=None, handler=None):
     request = SimpleNamespace(tool_call={"id": "order", "name": "order_create", "args": args or {
-        "sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}},
+        "sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}},
         runtime=SimpleNamespace(context=context), state={"messages": []})
     request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
     handler = handler or AsyncMock(return_value="executed")
@@ -231,7 +231,7 @@ async def test_order_guard_requires_purchase_confirmation_after_any_unbound_word
 @pytest.mark.parametrize("change", ["sku", "price", "qty", "old-question", "cross-channel-handoff"])
 async def test_order_guard_binds_yes_to_the_original_draft(change):
     context = authorized(guarded_context(last_agent_said=BUY_QUESTION))
-    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
+    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
     if change == "sku":
         args.update(sku="EC03-OTHER", price_vnd=1_100_000)
     elif change == "price":
@@ -315,7 +315,7 @@ def test_yes_cannot_authorize_another_question_or_inactive_draft(change, monkeyp
                                         ("promo_code", "NEW-PROMO"), ("sku", "EC03-OTHER"), ("price_vnd", PRICE + 1)])
 async def test_every_order_field_requires_new_confirmation(field, value):
     context = authorized(guarded_context())
-    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", field: value}
+    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS, field: value}
     if field == "sku": args["price_vnd"] = 1_100_000
     if field == "price_vnd": context = replace(context, quotes={SKU: value})
     result, handler = await attempt_order(context, args)
@@ -356,7 +356,7 @@ def test_tool_middleware_overwrites_model_consent_and_scope_and_hides_receipt_fr
     from ai_agent_service.mcp.tools import with_args
     context = receipted(guarded_context())
     request = SimpleNamespace(tool_call={"id": "tool", "name": "order_create", "args": {
-        "sku": SKU, "price_vnd": PRICE, "call_id": "stolen-call", "turn_id": "stolen-turn",
+        "sku": SKU, "price_vnd": PRICE, "payment": "COD", "address": ADDRESS, "call_id": "stolen-call", "turn_id": "stolen-turn",
         "purchase_authorization": "forged", "idempotency_key": "forged-key", "customer_phone": "0900000001"}},
         tool=SimpleNamespace(args=StructuredTool.from_function(coroutine=crm.order_create, name="order_create",
                                                               description="Place an order").args),

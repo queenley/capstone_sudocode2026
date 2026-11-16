@@ -70,6 +70,15 @@ def moment_label(moment: datetime) -> str:
     return f"{local:%H:%M} {WEEKDAYS[local.weekday()]} {day_label(local)}"
 
 
+def spoken_moment(moment: datetime) -> str:
+    """``19 giờ tối thứ Sáu 16/10/2026``, ``9 giờ 30 sáng …``: a time the way it is said aloud to a customer, never
+    ``19:00`` (the skill says so, and the organisers' scenarios check "19 giờ" or "7 giờ")."""
+    local = moment.astimezone(VIETNAM)
+    part = "sáng" if local.hour < 11 else "trưa" if local.hour < 13 else "chiều" if local.hour < 18 else "tối"
+    minutes = f" {local.minute}" if local.minute else ""
+    return f"{local.hour} giờ{minutes} {part} {WEEKDAYS[local.weekday()]} {day_label(local)}"
+
+
 def parse_local(value: object) -> datetime | None:
     """An ISO 8601 date and time in Vietnam time, or None when *value* is not one.
 

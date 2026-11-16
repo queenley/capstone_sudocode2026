@@ -25,6 +25,7 @@ from datetime import datetime
 from typing import Any, Mapping, Sequence
 
 from .. import btc_schemas, clock
+from ..intake import commerce
 from ..intake.itn import format_vnd
 from ..intake.text import plain
 from . import Verdict, purchase
@@ -111,11 +112,12 @@ def check(
     if mode == "copilot":
         return Verdict(False, ("Chế độ copilot: tư vấn viên thực hiện thao tác này, trợ lý chỉ gợi ý.",))
     checks = {
+        # What the order still lacks from the customer comes last: a reason about the order itself reads first.
         "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes,
                                               order_quotes=order_quotes or {}, trusted=trusted,
                                               created=created, customer_said=customer_said, placed=placed,
                                               said=f"{last_agent_said or ''} {customer_said or ''}",
-                                              wants_more=(intents or {}).get("one_more")),
+                                              wants_more=(intents or {}).get("one_more")) + _payment_reason(args),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
@@ -207,6 +209,8 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     sku, price = args.get("sku"), args.get("price_vnd")
     if not sku or price is None:
         return reasons + ["Thiếu sku hoặc price_vnd."]
+    if parent := _parent_reason(sku):
+        return reasons + [parent]
     if trusted is not None and sku not in trusted:
         reasons.append(f"Mã {sku} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search để lấy đúng mã trước.")
     elif sku not in quotes:
@@ -220,6 +224,33 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         return reasons + ["Số lượng phải là số nguyên dương."]
     qty = quantity
     return reasons + _cod_order(args, int(price) * qty, placed, said, quotes)
+
+
+def _payment_reason(args: Mapping[str, Any]) -> list[str]:
+    """An order is placed with the payment the customer chose and an address (PB-09 reads both back before
+    order.create). An order placed on an assumed COD cannot be changed afterwards: no tool changes an order's payment,
+    and the customer who then says "chuyển khoản" was told it had been changed (2026-11-16: 7 failed calls of the dev
+    run). An area ("Cần Thơ", "Quận 7") is an address."""
+    missing = [what for what, present in (("cách thanh toán (COD hay chuyển khoản)", args.get("payment")),
+                                          ("địa chỉ giao (khu vực là đủ)", args.get("address"))) if not present]
+    if not missing:
+        return []
+    return [f"Còn thiếu {' và '.join(missing)}: hỏi khách gộp một câu rồi mới gọi order_create; không tự chọn COD, "
+            "không tạo đơn rồi xin địa chỉ sau."]
+
+
+def _parent_reason(sku: str | None) -> str | None:
+    """Why *sku* cannot be ordered: a product sold in sizes and colours is ordered by its variant, never by the
+    product's code, which the shop's mock accepts at a price no variant has (2026-11-16: orders booked as
+    SKU-SN-RUN2 when the customer had said size 42, màu đen)."""
+    if not sku:
+        return None
+    variants = commerce.variants_of(sku)
+    if not variants:
+        return None
+    examples = ", ".join(v["variant_sku"] for v in variants[:3])
+    return (f"{sku} có nhiều size/màu: đặt bằng variant_sku đúng size và màu khách chọn (ví dụ {examples}), báo giá "
+            "lại cho đúng mã đó; khách chưa nói size hay màu thì hỏi khách.")
 
 
 def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trusted: frozenset[str] | None,
@@ -245,6 +276,9 @@ def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trus
         reasons.append("Danh tính khách chưa được xác nhận; hỏi xác nhận trước khi tạo đơn.")
     if any(line["qty"] < 1 for line in lines):
         return reasons + ["Số lượng mỗi dòng phải là số nguyên dương."]
+    parents = [reason for sku in sorted(skus) if (reason := _parent_reason(sku))]
+    if parents:
+        return reasons + parents
     unknown = sorted(sku for sku in skus if trusted is not None and sku not in trusted)
     if unknown:
         return reasons + [f"Mã {', '.join(unknown)} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search để "
@@ -285,6 +319,8 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
     if action in ("exchange_size", "exchange_product"):
         if not new:
             reasons.append("Đổi size hay đổi sản phẩm cần new_variant_sku.")
+        elif parent := _parent_reason(new):
+            reasons.append(parent)
         elif trusted is not None and new not in trusted:
             reasons.append(f"Mã {new} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search hoặc inventory_check trước.")
     if agreed is False:

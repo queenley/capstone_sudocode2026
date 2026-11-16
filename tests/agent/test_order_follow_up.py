@@ -28,7 +28,7 @@ def test_the_sales_lanes_can_correct_an_order_the_call_created():
 
 
 def create(sku="SKU-A", said="Giao ở quận 3 nhé", created=(), tier="VERIFIED"):
-    return actions.check("order_create", {"sku": sku, "price_vnd": 1_000_000, "qty": 1, "payment": "COD"},
+    return actions.check("order_create", {"sku": sku, "price_vnd": 1_000_000, "qty": 1, "payment": "COD", "address": "Quận 3"},
                          tier=tier, mode="speak", has_phone=True, quotes={"SKU-A": 1_000_000, "SKU-B": 1_000_000},
                          trusted=frozenset({"SKU-A", "SKU-B"}), customer_said=said, created=created)
 

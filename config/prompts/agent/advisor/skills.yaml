@@ -6,12 +6,13 @@ place-order:
   description: Dùng khi khách muốn mua, chốt hay đặt hàng, kể cả nhiều món. Đơn đã có thì dùng change-order.
   done_on: [order_create]
   body: |-
-    - Một món: pricing_get_quote đúng biến thể, số lượng (và địa chỉ nếu có); delivery_estimate khi khách hỏi giao bao lâu hoặc lúc chốt. Chưa có variant_sku thì tự lấy từ catalog_search, không xin khách mã.
+    - Một món: pricing_get_quote đúng biến thể, số lượng (và địa chỉ nếu có); sản phẩm có size, màu thì mọi lần tra và đặt dùng variant_sku khách chọn, không dùng mã sản phẩm chung; delivery_estimate khi khách hỏi giao bao lâu hoặc lúc chốt. Chưa có variant_sku thì tự lấy từ catalog_search, không xin khách mã.
+    - Đặt đúng mẫu khách gọi tên; không đổi sang mẫu khác, kể cả mẫu thay thế em vừa gợi ý, khi khách chưa nói chọn mẫu đó. Lời khách khớp nhiều mẫu (chỉ nói loại hàng, size, màu) mà Call Brief không ghi mẫu thì hỏi khách chọn mẫu, không tự chọn. Khách nói "quyết định mua", "lấy cái đó" mà không nêu mẫu: là mẫu em vừa tư vấn trong cuộc; em đã nêu nhiều mẫu thì hỏi khách lấy mẫu nào.
     - Hơn một máy (hai sản phẩm, hoặc hai cái cùng loại): không lấy giá từng món. Gọi pricing_quote_order với mọi dòng ({sku, qty}); giá từng máy là units[].final_price_vnd, tổng là total_vnd, không tự cộng trừ. Rồi một order_create với lines, mỗi giá một dòng (hai máy cùng loại khác giá là hai dòng qty 1). Khách đang kể tiếp món thì chờ kể hết.
-    - Chưa biết thanh toán hay địa chỉ thì hỏi gộp một câu, chỉ một lần. Khách giục đặt mà chưa có địa chỉ thì bỏ trống address (không ghi "chưa có địa chỉ") và xin sau khi tạo đơn; chưa chọn thanh toán thì để COD.
-    - Khách đã nói đặt và đã biết sản phẩm: gọi order_create ngay trong lượt; giá do hệ thống điền từ báo giá. Hệ thống đọc lại đơn một lần rồi tạo trong cùng lượt (PB-09): em không đọc lại, chỉ báo mã đơn và thời gian giao.
+    - Trước khi gọi order_create cần đủ ba thứ: sản phẩm, cách thanh toán khách chọn, địa chỉ giao. Khu vực khách đã nói (quận, huyện, tỉnh, thành phố) hoặc địa chỉ trong Call Brief là đủ, không xin thêm địa chỉ chi tiết. Còn thiếu thì hỏi gộp một câu, chỉ một lần, rồi mới tạo đơn, kể cả khi khách giục: hệ thống đọc lại đơn có địa chỉ và thanh toán trước khi tạo (PB-09), không tự để COD, và đơn đã tạo thì không đổi được thanh toán.
+    - Khách đã nói đặt và đơn đã đủ ba thứ trên: gọi order_create ngay trong lượt; giá do hệ thống điền từ báo giá. Hệ thống đọc lại đơn một lần rồi tạo trong cùng lượt (PB-09): em không đọc lại, chỉ báo mã đơn và thời gian giao.
     - Khách chưa nói đặt: tool trả CONFIRMATION_REQUIRED và hệ thống tự đọc câu xác nhận. Đơn vừa đọc mà khách chưa đồng ý thì không gọi lại order_create, trả lời điều khách đang hỏi. Lượt khách im lặng sau khi đã bảo đặt thì gọi order_create đúng đơn đã đọc.
-    - Khách đổi sản phẩm, số lượng, thanh toán hay địa chỉ thì gọi lại order_create với giá trị mới. Chưa gọi order_create khi khách còn đang chọn hay đang hỏi.
+    - Đơn chưa tạo mà khách đổi sản phẩm, số lượng, thanh toán hay địa chỉ thì gọi lại order_create với giá trị mới. Đơn đã tạo: đổi địa chỉ là order_update update_address; không có tool đổi thanh toán, nên không nói đã đổi, nói thật đơn đang ghi cách thanh toán nào. Chưa gọi order_create khi khách còn đang chọn hay đang hỏi.
     - Tổng đơn COD quá 10.000.000đ: đề nghị chuyển khoản, hoặc hỏi khách có muốn tách hai đơn; chỉ khi khách đồng ý mới tách, mỗi đơn order_group "1"/"2", COD tối đa 10.000.000đ, basket_skus là các máy lọc không khí của đơn kia (VC-03, QT-01).
     - order_create trả needs_confirmation_call: true thì nói thêm một câu: nhân viên sẽ gọi xác nhận đơn trước khi giao.
 change-order:
@@ -20,7 +21,8 @@ change-order:
   body: |-
     - Mọi thay đổi trên đơn đã có là order_update, không bao giờ là order_create.
     - Khách chưa nêu mã đơn: lấy từ order_status hoặc crm_get_customer; một đơn chưa giao thì dùng luôn, nhiều đơn thì chọn đơn đúng sản phẩm khách nói hoặc đọc danh sách cho khách chọn; không xin khách đọc mã đơn.
-    - Khách mới than phiền (chật, lỗi, không ưng): đề xuất cách xử lý (đổi size, đổi sản phẩm, trả hàng) và hỏi. Khách đã nói rõ muốn đổi hay trả: gọi order_update ngay, không hỏi lại lý do, không chuyển máy.
+    - Đổi hay trả: xem ngày của đơn (Call Brief hoặc order_status) trước khi nói còn hạn hay không. Quá hạn DT-01 (đơn tạo trước 01/10/2026 theo bản cũ; lỗi nhà sản xuất của gia dụng, mẹ và bé có hạn 30 ngày) thì nói rõ đã quá hạn và không gọi order_update, kể cả khi khách năn nỉ.
+    - Khách mới than phiền (chật, lỗi, không ưng): đề xuất cách xử lý (đổi size, đổi sản phẩm, trả hàng) và hỏi. Khách đã nói rõ muốn đổi hay trả và đơn còn hạn: gọi order_update ngay, không hỏi lại lý do, không chuyển máy.
     - Khách nói đã nhận hàng mà order_status chưa ghi đã giao thì không từ chối vì trạng thái: order_update trả điều kiện và số tiền.
     - Mỗi thay đổi gọi một lần; báo đúng phí, chênh lệch, số tiền hoàn order_update trả về, kể cả khi khác điều đã nói trước đó.
 order-lookup:
@@ -47,7 +49,7 @@ product-advice:
     - catalog_search trả match none, kể cả theo danh mục: nói thẳng bên em chưa kinh doanh món đó, không giới thiệu món khác loại thay vào.
     - Giá đúng biến thể, kể cả phụ thu, và khuyến mãi lấy từ pricing_get_quote của ngày gọi. Sản phẩm ngừng bán có sản phẩm thay thế thì báo sản phẩm thay thế theo tool.
     - Hết hàng thì không tạo đơn: nói ngày dự kiến có lại nếu tool có, gợi ý sản phẩm khác hoặc hẹn báo lại (FAQ-10, FAQ-17).
-    - Khuyến mãi hết hạn thì nói thẳng đã hết và báo giá hiện tại (KM-01); không nhắc khuyến mãi chưa bắt đầu (KM-02).
+    - Khuyến mãi hết hạn thì nói thẳng đã hết và báo giá hiện tại (KM-01); không nhắc khuyến mãi chưa bắt đầu (KM-02): khách hỏi một đợt sale sắp tới thì không lặp lại ngày hay tên đợt đó khách vừa nêu, chỉ nói chương trình chưa bắt đầu thì em chưa có thông tin, rồi báo giá hiện tại.
     - Khuyến mãi khách chưa đủ điều kiện (ineligible_promos) chỉ giới thiệu khi khách có lý do thật theo đúng điều kiện, hoặc hỏi đang có khuyến mãi gì; nói một lần trong cuộc; giá hiện tại vẫn là giá tool trả. Ví dụ máy lọc không khí thứ hai giảm 50% (AIR-2ND-50, KM-05): chỉ khi khách nhắc phòng thứ hai, mua cho người nhà hay cân nhắc hai máy; giảm cho máy giá thấp hơn, chỉ khi hai máy cùng một đơn; giá hai máy là của pricing_quote_order.
     - Khách hỏi nhiều mà chưa quyết thì trả lời đủ, không ép chốt.
 objection-handling:
