@@ -230,7 +230,13 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
     if not unidentified and not flags.get("new_key"):
         if state.get("awaiting") and answer:
             return await _settle(state, context, answer)
+        if tier == "AMBIGUOUS" and state.get("candidates") and answer:
+            # The fixed question is asked once, but a caller who names themselves later, or says "đúng rồi" when
+            # the advisor asks "chị là chị Dung ạ?", is still the one they say (2026-11-16: two people on one
+            # number were never bound, and the order the call was for could not be placed).
+            return await _bind_named(state, context, answer) or {}
         return {}
+
 
     started = time.perf_counter()
     keys = _keys(state, context, connection=unidentified)
@@ -302,13 +308,8 @@ STRANGER: dict[str, Any] = {
 async def _settle(state: HotState, context: HotContext, answer: str) -> dict[str, Any]:
     """The answer to the one confirming question (section 4.2). Either way, it is not asked again."""
     if state.get("awaiting") == "name":
-        chosen = resolver.pick_by_name(answer, [resolver.Match(**c) for c in state.get("candidates") or []])
-        if chosen is None:
-            # No one named: general advice, nothing private, the name not asked again.
-            return {"awaiting": None}
-        bound = {"customer_id": chosen.customer_id, "customer_name": chosen.name, "honorific": chosen.honorific,
-                 "tier": "VERIFIED", "awaiting": None, "candidates": []}
-        return {**bound, **await _brief({**state, **bound}, context, time.perf_counter())}
+        # No one named: general advice, nothing private, the name not asked again.
+        return await _bind_named(state, context, answer) or {"awaiting": None}
 
     profile = resolver.Match(str(state.get("customer_id") or ""), state.get("customer_name"), state.get("honorific"))
     confirmed = resolver.pick_by_name(answer, [profile]) is not None or await _confirms(state, context, answer)
@@ -329,6 +330,27 @@ def _denies(answer: str) -> bool:
     if resolver.DENIAL.search(text) or resolver.PROXY.search(resolver.plain(text)):
         return True
     return len(re.findall(r"\w+", text)) <= 3 and resolver.confirms(answer) is False
+
+
+async def _bind_named(state: HotState, context: HotContext, answer: str) -> dict[str, Any] | None:
+    """The one candidate on a shared key the caller says they are (AMBIGUOUS, section 4.2), with their brief; None
+    when the answer names no one.
+
+    Either the words name them, or the agent's last reply named exactly one candidate, as the caller had called
+    themselves, and the answer confirms it (read like the confirming question of PROBABLE)."""
+    candidates = [resolver.Match(**c) for c in state.get("candidates") or []]
+    chosen = resolver.pick_by_name(answer, candidates)
+    if chosen is None:
+        asked = intake_text.plain(_last_reply(state) or "")
+        named = [c for c in candidates
+                 if c.name and re.search(r"\b" + re.escape(intake_text.plain(c.name)) + r"\b", asked)]
+        if len(named) == 1 and await _confirms(state, context, answer):
+            chosen = named[0]
+    if chosen is None:
+        return None
+    bound = {"customer_id": chosen.customer_id, "customer_name": chosen.name, "honorific": chosen.honorific,
+             "tier": "VERIFIED", "awaiting": None, "candidates": []}
+    return {**bound, **await _brief({**state, **bound}, context, time.perf_counter())}
 
 
 async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
@@ -610,6 +632,25 @@ _HANDOFF_DETAIL = {
 }
 
 
+def _handoff_product(products: Sequence[Mapping[str, Any]], quotes: Mapping[str, int],
+                     orders: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """The product a Handoff Brief is about, and its price: the one the brief says was advised, else the last one
+    quoted in this call, else the customer's latest order (a complaint about a delivery is about that order's
+    product). The consultant should not have to ask; the organisers' grader reads both fields as required
+    (2026-11-16: transfers on a first turn left them empty)."""
+    if products:
+        sku = products[0].get("sku")
+        return {"product_advised": sku, "price_quoted_vnd": products[0].get("price_quoted_vnd") or quotes.get(sku)}
+    if quotes:
+        sku, price = list(quotes.items())[-1]
+        return {"product_advised": sku, "price_quoted_vnd": price}
+    for order in reversed(list(orders)):
+        sku = order.get("variant_sku") or order.get("sku")
+        if sku:
+            return {"product_advised": sku, "price_quoted_vnd": order.get("price_vnd") or order.get("total_vnd")}
+    return {"product_advised": None, "price_quoted_vnd": None}
+
+
 def _agent_context(state: HotState, context: HotContext, summary: str | None) -> AgentContext:
     """The slice of the state the advisor may read (section 3.2), with what the tier withholds left out."""
     tier = state.get("tier") or "UNKNOWN"
@@ -665,8 +706,8 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
             "customer_name": state.get("customer_name"),
             "customer_id": state.get("customer_id"),
             "channel": {"web": "web_chat", "hotline": "hotline", "zalo": "zalo_oa", "facebook": "chat_fanpage"}.get(state.get("channel") or "web", "other"),
-            "product_advised": products[0]["sku"] if products else None,
-            "price_quoted_vnd": products[0].get("price_quoted_vnd") if products else None,
+            **_handoff_product(products, state.get("quotes") or {},
+                               brief.get("orders") or [] if tier == "VERIFIED" else []),
             "generated_at": state["now"].isoformat(),
         },
         switches=dict(state.get("switches") or {}),

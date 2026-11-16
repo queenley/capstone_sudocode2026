@@ -79,7 +79,7 @@ async def test_head_start_waits_at_most_its_moment():
 
 
 def request_for(context, name="order_create", args=None):
-    request = SimpleNamespace(tool_call={"id": "t", "name": name, "args": args or {"sku": "S", "price_vnd": 1}},
+    request = SimpleNamespace(tool_call={"id": "t", "name": name, "args": args or {"sku": "S", "price_vnd": 1, "payment": "COD", "address": "Quận 3"}},
                               runtime=SimpleNamespace(context=context), state={"messages": []})
     request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
     return request

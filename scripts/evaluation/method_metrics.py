@@ -94,8 +94,38 @@ DEFAULT_COHORTS = {
 #: The organisers' columns -> the method that fills each; None: the agent has no such mode, the column says so.
 DEFAULT_COLUMNS = {
     "Baseline": "baseline", "Router": "router", "Subagent": None, "GapLoop": "gaploop5",
-    "Reflection": "reflection1", "GapLoop + Reflection": "combined1", "A/B Testing": None,
+    # combined1 was its own learning round (kb v5 + skills v1) and proved neither column: dropped 2026-11-16. The
+    # column is filled from a 2x2 measurement (scripts/evaluation/ablation.py), given with --ablation.
+    "Reflection": "reflection1", "GapLoop + Reflection": None, "A/B Testing": None,
 }
+
+
+ABLATION_COLUMNS = (("Router", "router"), ("GapLoop", "gaploop"), ("Reflection", "reflection"),
+                    ("GapLoop + Reflection", "combined"))
+
+
+def ablation_table(folder: Path) -> list[str]:
+    """The organisers' four metrics from ablation.json (run ablation_verdict.py first): per set, each column the mean
+    of its k runs with the [min-max] of those runs, so a difference smaller than the Router's own spread reads as one."""
+    path = folder / "ablation.json"
+    if not path.is_file():
+        return ["", f"## Ablation: chưa có {path} (chạy ablation_verdict.py)", ""]
+    data = json.loads(path.read_text(encoding="utf-8"))
+    lines = ["", f"## Bốn chỉ số theo phương pháp: đo 2x2 `{folder.name}` ({data['verdict']})", "",
+             "Mỗi ô: trung bình của k lần chạy [thấp nhất-cao nhất]. Cùng bộ kịch bản, cùng số lần chạy cho mọi cột; "
+             "chênh nhỏ hơn khoảng của Router là dao động.", ""]
+    for label, metrics in data["metrics"].items():
+        lines += [f"### {label}", "", "| Metrics | " + " | ".join(c for c, _ in ABLATION_COLUMNS) + " |",
+                  "|---|" + "---|" * len(ABLATION_COLUMNS)]
+        for name, key in (("Repeat-Question Rate (RQR)", "RQR"), ("Context Carryover Rate (CCR)", "CCR"),
+                          ("Task Success Rate (TSR)", "TSR"), ("Hallucination Rate (HR)", "HR")):
+            cells = []
+            for _, config in ABLATION_COLUMNS:
+                m = (metrics.get(config) or {}).get(key) or {}
+                cells.append("chưa đo" if m.get("mean") is None else f"{m['mean']} [{m['min']}-{m['max']}]")
+            lines.append(f"| {name} | " + " | ".join(cells) + " |")
+        lines.append("")
+    return lines
 
 
 def reference():
@@ -294,6 +324,8 @@ def main() -> int:
     p.add_argument("--judge", action="append", default=[], metavar="METHOD=JUDGE_DIR",
                    help="the --judge-run output of a method, when it is not <run>-judge beside the run")
     p.add_argument("--out", default=str(RUNS / "method-metrics"))
+    p.add_argument("--ablation", help="evaluation/runs/<name> of ablation.py: the Router, GapLoop, Reflection and "
+                                      "GapLoop + Reflection columns of the four metrics, k runs each on one suite")
     args = p.parse_args()
 
     pairs = lambda items, default: dict(i.split("=", 1) for i in items) if items else dict(default)
@@ -430,6 +462,8 @@ def main() -> int:
                          f"{fmt(r['HR'])} ({r['hr_wrong']}/{r['hr_claims']})"] for r in rows])
     if notes:
         lines += ["## Ghi chú", "", *[f"- {n}" for n in notes], ""]
+    if args.ablation:
+        lines += ablation_table(RUNS / args.ablation)
     (out / "summary.md").write_text("\n".join(lines), encoding="utf-8")
     sys.stdout.reconfigure(encoding="utf-8")
     print("\n".join(lines))

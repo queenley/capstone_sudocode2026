@@ -277,11 +277,34 @@ def _tier(text: str, view: GuardInput) -> list[str]:
     return reasons
 
 
+#: A sentence about a promotion: where the first day of one not started yet names it as surely as its code.
+PROMOTION_TALK = re.compile(r"chương trình|khuyến mãi|khuyến mại|\bsale\b|giảm giá|ưu đãi|\bdịp\b", re.IGNORECASE)
+
+
+def _start_day(start: str) -> re.Pattern[str] | None:
+    """"11/11", "11-11", "11 tháng 11" for a promotion starting 2026-11-11."""
+    try:
+        _year, month, day = (int(part) for part in start[:10].split("-"))
+    except ValueError:
+        return None
+    return re.compile(rf"(?<![\d/])0?{day}(?:\s*[/-]\s*0?|\s+tháng\s+){month}(?![\d/])", re.IGNORECASE)
+
+
 def _not_started(text: str, view: GuardInput) -> list[str]:
-    """KM-02: a code in the catalogue of promotions whose first day is after the day of the call."""
-    return [f"Không được nhắc chương trình {code} khi chưa bắt đầu (KM-02)."
-            for code, (start, _end) in view.promotions.items()
-            if view.on and start > view.on and re.search(rf"(?<![\w-]){re.escape(code)}(?![\w-])", text, re.IGNORECASE)]
+    """KM-02: a promotion whose first day is after the day of the call is never named, by its code or, in a sentence
+    about a promotion, by its first day ("chương trình 11/11": 2026-11-16, the customer had said the date and the
+    agent repeated it while refusing to talk about it)."""
+    reasons = []
+    for code, (start, _end) in view.promotions.items():
+        if not view.on or start <= view.on:
+            continue
+        named = re.search(rf"(?<![\w-]){re.escape(code)}(?![\w-])", text, re.IGNORECASE)
+        day = _start_day(start)
+        dated = day is not None and PROMOTION_TALK.search(text) and day.search(text)
+        if named or dated:
+            reasons.append(f"Không được nhắc chương trình {code} hay ngày bắt đầu của nó khi chưa bắt đầu (KM-02): "
+                           "nói chương trình sắp tới em chưa có thông tin, không lặp lại ngày khách nêu.")
+    return reasons
 
 
 def clean(text: str) -> str:
@@ -308,5 +331,5 @@ def moved_callback(text: str, results: Iterable[Mapping[str, Any]]) -> str | Non
         day = {f"{moment.day}/{moment.month}", f"{moment.day:02d}/{moment.month:02d}", f"{moment.day} tháng {moment.month}",
                clock.WEEKDAYS[moment.weekday()].lower()}
         if not any(phrase in said for phrase in day):
-            return clock.moment_label(moment)
+            return clock.spoken_moment(moment)
     return None

@@ -123,9 +123,28 @@ def pick_by_name(text: str, candidates: Sequence[Match]) -> Match | None:
         introduced = re.search(r"\b(?:toi|anh|chi|em|minh|co|chu|bac) (?:la|ten(?: la)?) "
                                r"(?:(?:anh|chi|em|co|chu|bac) )?" + name + r"\b", words)
         bare = re.fullmatch(r"(?:(?:da|vang) )?(?:(?:anh|chi|em|co|chu|bac) )?" + name + r"(?: day| ne| a| nhe| nghe)*", words)
-        if introduced or bare:
+        if introduced or bare or _here(text, candidate.name):
             hits.append(candidate)
     return hits[0] if len(hits) == 1 else None
+
+
+#: "chị Dung đây", "cô Loan nghe đây", "anh Nam nè": who is speaking, said anywhere in the turn.
+_HERE = r"\b(?:(?:anh|chị|em|cô|chú|bác) )?{name} (?:nghe |nói )?(?:đây|nè)(?!\w)"
+_HERE_TONELESS = r"\b(?:(?:anh|chi|em|co|chu|bac) )?{name} (?:nghe |noi )?(?:day|ne)\b"
+
+
+def _here(text: str, name: str) -> bool:
+    """Whether *text* says the speaker is *name* in passing ("Alo, chị Dung đây, hôm trước em tư vấn cho cô Loan"):
+    the other name is only mentioned. Read with diacritics when the text has them, since "đấy" (that) is not "đây"
+    (here); never after a denial ("không phải chị Dung đây")."""
+    lower = " ".join(re.findall(r"\w+", (text or "").lower()))
+    toneless = lower == plain(lower)
+    pattern = (_HERE_TONELESS.format(name=re.escape(plain(name))) if toneless
+               else _HERE.format(name=re.escape(name.lower())))
+    found = re.search(pattern, lower)
+    if found is None:
+        return False
+    return not re.search(r"\b(?:không|khong) (?:phải|phai)\s*$", lower[:found.start()])
 
 
 def pick_by_account(full_name: str | None, candidates: Sequence[Match]) -> Match | None:

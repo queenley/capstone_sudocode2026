@@ -272,7 +272,7 @@ async def test_an_order_the_customer_asked_for_is_read_back_and_placed_in_the_sa
         placed.append(request.tool_call["args"])
         return ToolMessage(json.dumps({"ok": True, "data": {"order_id": "OD1"}}), tool_call_id="1", name="order_create")
 
-    call = {"name": "order_create", "args": {"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD"}, "id": "1"}
+    call = {"name": "order_create", "args": {"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD", "address": "Quận 3"}, "id": "1"}
     ctx = order_context(judge=judge, trusted_skus=frozenset({"A"}), quotes={})
     state = {"messages": [ToolMessage(json.dumps({"ok": True, "data": {"sku": "A", "final_price_vnd": 100000}}),
                                       tool_call_id="q", name="pricing_get_quote")]}
@@ -295,9 +295,14 @@ def test_cod_limit_counts_the_basket_this_order_goes_with():
 
 
 def test_a_read_back_of_a_basket_gives_the_whole_total():
+    # The total is the quote of every machine together (the second-item promotion is in it), never a sum of the
+    # one-machine quotes.
     record = purchase.draft({"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD", "basket_skus": ["B"]},
-                            order_context(), quotes={"B": 50000})
-    assert "tổng cả giỏ 150.000đ" in record["read_back"] and "tổng cả giỏ 150.000đ" in record["question"]
+                            order_context(), quotes={"B": 50000}, order_quotes={"A|B": [["A", 100000], ["B", 25000]]})
+    assert "tổng cả giỏ 125.000đ" in record["read_back"] and "tổng cả giỏ 125.000đ" in record["question"]
+    alone = purchase.draft({"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD", "basket_skus": ["B"]},
+                           order_context(), quotes={"B": 50000})
+    assert "tổng cả giỏ" not in alone["read_back"]
 
 
 @pytest.mark.asyncio

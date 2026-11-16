@@ -43,6 +43,7 @@ async def test_two_purifiers_order_with_the_second_item_discount(mock_without_da
 
 
 def _check(args, placed=(), agent="", customer=""):
+    args = {"address": "Quận 3", **args}  # an order is placed with an address (PB-09)
     return actions.check("order_create", args, tier="VERIFIED", mode="speak", has_phone=True, quotes=QUOTES,
                          trusted=frozenset(QUOTES), placed=placed, last_agent_said=agent, customer_said=customer)
 
@@ -74,7 +75,7 @@ def test_the_same_sku_in_the_other_half_of_a_split_is_not_a_repeated_order():
     # Upstream's guard books a product once a call; a split (QT-01) of two units of one sku is two orders.
     first = _line("SKU-A", group="1")
     created = [{"order_id": "OD1", "sku": "SKU-A"}]
-    other_half = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD", "order_group": "2"}
+    other_half = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD", "order_group": "2", "address": "Quận 3"}
     assert actions.check("order_create", other_half, tier="VERIFIED", mode="speak", has_phone=True, quotes=QUOTES,
                          trusted=frozenset(QUOTES), placed=[first], created=created).passed
     repeat = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD"}

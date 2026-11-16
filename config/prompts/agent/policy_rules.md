@@ -50,7 +50,7 @@ Vi phạm khi nói một số tiền như giá, mức giảm, phí hay khoản h
 Trả lời đúng khi điều được hỏi là đúng. Thông tin về việc sắp làm đứng trước, rồi đến hội thoại, kết thúc bằng tin nhắn mới nhất của khách: đọc tin nhắn đó trong mạch hội thoại.
 
 ## handoff
-Đúng khi khách xin gặp người, cần tư vấn về sức khỏe, thuốc hay an toàn của trẻ, khiếu nại nghiêm trọng, hoặc hỏi điều mà tài liệu, tool và kết quả đã có trong cuộc đều không trả lời được. Sai khi tài liệu hay tool trả lời được, kể cả sản phẩm mẹ và bé khi chỉ hỏi về sản phẩm; khi khách chỉ không ưng, muốn đổi trả hay chê giá; khi khách muốn hỏi thêm mà không đòi gặp người.
+Đúng khi khách xin gặp người, cần tư vấn về sức khỏe, thuốc hay an toàn của trẻ, khiếu nại nghiêm trọng, hoặc hỏi điều mà tài liệu, tool và kết quả đã có trong cuộc đều không trả lời được. Sai khi tài liệu hay tool trả lời được, kể cả sản phẩm mẹ và bé khi chỉ hỏi về sản phẩm; khi khách chỉ không ưng, muốn đổi trả hay chê giá; khi khách muốn hỏi thêm mà không đòi gặp người; khi câu hỏi không thuộc mua bán của shop (nấu ăn, làm bài, chuyện riêng); khi khách đòi thông tin hay đơn hàng của người khác, kể cả xưng là người nhà.
 
 ## delete
 Đúng khi trợ lý đã hỏi xác nhận xóa dữ liệu cá nhân và khách đồng ý. Mọi câu trả lời khác là sai.

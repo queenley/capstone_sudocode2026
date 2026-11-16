@@ -590,6 +590,18 @@ class ActionGuardMiddleware(AgentMiddleware):
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
         order_quotes = {**context.order_quotes, **_order_quotes_in(state)}
+        if name == "order_create" and args.get("basket_skus") and args.get("sku"):
+            # Half of a split order (QT-01): its unit price is the quote made with the other half's machines, where the
+            # second-item promotion applies, not the one-machine quote (2026-11-16: the second order was refused). The
+            # model prices the basket either with pricing_get_quote(basket_skus) or with pricing_quote_order of all
+            # the machines; the run of 2026-11-16 did the latter.
+            together = _basket_quotes_in(state).get((args["sku"], frozenset(args["basket_skus"])))
+            if together is None:
+                units = (order_quotes or {}).get(purchase.units_key(
+                    [{"sku": args["sku"]}, *({"sku": sku} for sku in args["basket_skus"])]))
+                together = next((int(price) for sku, price in units or () if sku == args["sku"]), None)
+            if together is not None:
+                quotes = {**quotes, args["sku"]: together}
         if name == "order_create":
             args = _filled_order(args, context, quotes, order_quotes)
         codes, orders = _seen_in(state, context.tool_results)
@@ -609,7 +621,8 @@ class ActionGuardMiddleware(AgentMiddleware):
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
             delivery = purchase.estimated_delivery([*context.tool_results, *tool_results_of(state.get("messages") or [])])
-            record = purchase.draft(business_args, context, delivery, names=_names_in(state), quotes=quotes)
+            record = purchase.draft(business_args, context, delivery, names=_names_in(state), quotes=quotes,
+                                    order_quotes=order_quotes)
             pending = context.pending_purchase
             heard = bool(pending and pending.get("payload_hash") == record["payload_hash"]
                          and pending.get("owner") == record["owner"])
@@ -790,15 +803,37 @@ def _names_in(state: Mapping[str, Any]) -> dict[str, str]:
 
 
 def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
-    """Today's price per sku from the pricing results already in this run."""
+    """Today's price per sku from the pricing results already in this run; a quote made with a split order's other
+    machines (``basket_skus``) is that order's alone (:func:`_basket_quotes_in`)."""
     quotes: dict[str, int] = {}
+    together: set[str] = set()
     for message in state.get("messages") or []:
-        if isinstance(message, ToolMessage) and message.name == "pricing_get_quote":
+        for call in getattr(message, "tool_calls", None) or []:
+            if call.get("name") == "pricing_get_quote" and (call.get("args") or {}).get("basket_skus"):
+                together.add(call.get("id"))
+        if isinstance(message, ToolMessage) and message.name == "pricing_get_quote" and message.tool_call_id not in together:
             envelope = envelope_of(message) or {}
             data = envelope.get("data") or {}
             if envelope.get("ok") and data.get("sku") and data.get("final_price_vnd") is not None:
                 quotes[data["sku"]] = int(data["final_price_vnd"])
     return quotes
+
+
+def _basket_quotes_in(state: Mapping[str, Any]) -> dict[tuple[str, frozenset[str]], int]:
+    """Today's price per (sku, other machines of the split order) from the pricing calls made with ``basket_skus``."""
+    asked: dict[str, frozenset[str]] = {}
+    found: dict[tuple[str, frozenset[str]], int] = {}
+    for message in state.get("messages") or []:
+        for call in getattr(message, "tool_calls", None) or []:
+            basket = (call.get("args") or {}).get("basket_skus")
+            if call.get("name") == "pricing_get_quote" and basket:
+                asked[call.get("id")] = frozenset(basket)
+        if isinstance(message, ToolMessage) and message.name == "pricing_get_quote" and message.tool_call_id in asked:
+            envelope = envelope_of(message) or {}
+            data = envelope.get("data") or {}
+            if envelope.get("ok") and data.get("sku") and data.get("final_price_vnd") is not None:
+                found[(data["sku"], asked[message.tool_call_id])] = int(data["final_price_vnd"])
+    return found
 
 
 def _order_quotes_in(state: Mapping[str, Any]) -> dict[str, Any]:

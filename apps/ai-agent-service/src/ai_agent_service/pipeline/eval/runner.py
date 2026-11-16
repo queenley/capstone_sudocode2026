@@ -645,6 +645,9 @@ def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenar
         "streamed": bool(draft.get("streamed")),
         "guard_passed": guard.get("passed"),
         "policy": (guard.get("soft") or {}).get("decided_by"),
+        # The PolicyAgent's probabilities on what the customer meant (handoff, purchase, ...), early and per action:
+        # without them a transfer or an order the run should not have made cannot be explained (2026-11-16).
+        "intent_probabilities": draft.get("intent_probabilities"),
         "regenerations": state.get("regen_count") or 0,
         "blocked_drafts": [d.get("reasons") for d in state.get("blocked_drafts") or []],
         # What the agent was about to say, beside why it was stopped: diagnostics only, never the BTC trace.
