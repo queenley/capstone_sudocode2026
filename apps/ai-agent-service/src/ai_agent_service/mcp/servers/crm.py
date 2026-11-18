@@ -101,12 +101,12 @@ async def order_create(
             final_price_vnd from pricing_quote_order.
         promo_code: Worked out by the system from the quote; leave it out.
         payment: COD, bank, momo or zalopay: what the customer chose, or what the
-            Call Brief records. Leave it out when neither says: the order is not
-            placed until the customer chooses, since a placed order's payment
-            cannot be changed.
-        address: The delivery address the customer gave, or the Call Brief's; an
-            area (district, province) is enough. The order is not placed without one:
-            ask for it first (PB-09 reads it back before the order).
+            Call Brief records; COD when neither says (VC-03), never a reason to
+            ask before placing the order.
+        address: The delivery address the customer gave in this call, else the Call
+            Brief's ("giao về địa chỉ cũ" means the Call Brief's); an area (district,
+            province) is enough. Leave it out when neither has one: the order is
+            still placed, never held back to ask for it.
         basket_skus: Only for an order split in two with the customer's agreement (QT-01): the air purifiers
             of the other order, so the second-item promotion is counted once.
         order_group: Only for an order split with the customer's agreement: which of the orders this line is in.

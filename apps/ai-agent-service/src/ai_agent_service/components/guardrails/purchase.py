@@ -127,24 +127,6 @@ def _owner(context: Any) -> str:
     return hashlib.sha256(_json([context.customer_id, context.customer_phone]).encode()).hexdigest()
 
 
-def missing(args: Mapping[str, Any], order: Mapping[str, Any], delivery: str | None) -> list[str]:
-    """What the order still lacks before it may be read back (PB-09), in the words the model is told.
-
-    Product and today's price are the action guard's (a trusted code, the current quote); the quantity reads back as
-    1 unless said. The payment must be one the model passed, from the customer or the brief: :func:`payload` would
-    write COD for a missing one, and a read-back the customer answers by naming the payment is a read-back wasted
-    (eval2: 116 of 153 read-backs were answered with a missing field, not a yes).
-    """
-    gaps = []
-    if not args.get("payment"):
-        gaps.append("phương thức thanh toán khách chọn (COD hay chuyển khoản)")
-    if not order.get("address"):
-        gaps.append("địa chỉ giao hàng (lời khách hoặc Call Brief)")
-    if not delivery:
-        gaps.append("ngày giao dự kiến (gọi delivery_estimate với địa chỉ giao)")
-    return gaps
-
-
 def estimated_delivery(results: Any) -> str | None:
     """The day the latest successful ``delivery.estimate`` of the call gave, ``YYYY-MM-DD``."""
     for result in reversed(list(results or ())):
@@ -177,7 +159,9 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
     the day :func:`estimated_delivery` found."""
     order = payload(args)
     known = {**{p.get("sku"): p.get("name") for p in context.seen_products if p.get("name")}, **(names or {})}
-    address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
+    # No address in the call or the Call Brief: the order is placed without one (address is optional in the
+    # organisers' order.create); the read-back says the record has none rather than that the customer gave none.
+    address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa có trong hồ sơ"
     promo = f", mã khuyến mãi: {order['promo_code']}" if order["promo_code"] else ""
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
     arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""

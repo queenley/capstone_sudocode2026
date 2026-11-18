@@ -21,6 +21,28 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-18 · Cuộc gọi thoại: mọi con số viết bằng chữ số, không chỉ số tiền
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Trên kênh hotline, agent viết "tám phần trăm", "mười lăm ngày". Bộ chấm BTC so chuỗi `must_say_any` ("8%", "7 ngày"), nên câu đúng nội dung vẫn trượt.
+- **Bằng chứng:** `evaluation/runs/fix-a3-20261118-hard-v2`, SCN-HARD-04 call_1 turn 2, lý do "thiếu must_say_any: 8%".
+- **Sửa:** `config/prompts/agent/advisor/notes.yaml` `spoken`: câu "Số tiền vẫn viết bằng chữ số" đổi thành "Mọi con số (tiền, %, số ngày, số tháng) vẫn viết bằng chữ số (4.890.000đ, 8%, 15 ngày), không viết bằng chữ". Khớp quy tắc 17 của `rules.md`; ghi chú cũ chỉ nói số tiền nên model viết chữ cho phần còn lại.
+- **Đã kiểm:** không có test (prompt); YAML đọc được; bộ `tests/agent`: 1809 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** chạy lại hard-cases và 7 mẫu BTC trên kênh thoại.
+
+### 2026-11-18 · Đơn không chờ thanh toán hay địa chỉ: COD khi chưa chọn, địa chỉ cũ lấy từ Call Brief (đảo một phần A3)
+
+Loại: hard guard / prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Sau bản sửa A3 ngày 16/11, ở cuộc 2 của mẫu BTC, khách nói "lấy cái đó", "lên đơn cho chị" mà không nêu cách thanh toán hay địa chỉ. Agent hỏi COD hay chuyển khoản và khu vực giao, trong khi lượt đó là lượt cuối của kịch bản, nên đến hết cuộc vẫn chưa có đơn. SAMPLE-03 cũng trượt vì A3: cuộc 1 nói COD nhưng không nói địa chỉ, guard chặn đơn, nên cuộc 2 không còn đơn để `order.update`.
+- **Bằng chứng:** báo cáo của người dùng 18/11: TSR 7 mẫu BTC 28,6% (12/11: 85,7%), SAMPLE-01 đến 05 trượt cả khi chạy theo kịch bản viết sẵn. Bản cập nhật 11-2026 của BTC (trùng byte với `data/btc`): `schemas/tools.schema.json` có `address: string?`; `mock_tools.order_create` mặc định `payment="COD"`; `reference_eval.check_call` bỏ qua lệnh tạo đơn trả lỗi ("cod_limit_exceeded rồi tạo lại bằng chuyển khoản"); trace mẫu `eval/runs/full.jsonl` tạo đơn SAMPLE-01, 02, 04, 05 không có `payment`, `address`. CRM của BTC không có địa chỉ, chỉ có `region`.
+- **Sửa:** `components/guardrails/actions.py`: bỏ `_payment_reason`. `components/guardrails/purchase.py`: bỏ `missing` (không còn nơi gọi, viết ngược quyết định này); câu đọc lại khi không có địa chỉ là "chưa có trong hồ sơ". `config/prompts/agent/advisor/skills.yaml` `place-order` dòng 12: khách đã nói đặt thì tạo đơn; thanh toán theo lời khách hoặc Call Brief, chưa có thì COD (VC-03); địa chỉ theo lời khách, rồi Call Brief ("địa chỉ cũ"), không có thì bỏ trống. `mcp/servers/crm.py`: mô tả `payment`, `address` theo cùng ý. `agents/advisor.py` khối "Đơn đã tạo trong cuộc này": bỏ "đổi thanh toán thì gọi order_update" (không có tool đổi thanh toán, đây là nguồn câu "đã đổi sang chuyển khoản"). Giữ của A3: đơn đã tạo thì không nói đã đổi thanh toán (skill dòng 15); guard VC-03 cho COD trên 10 triệu.
+- **Đã kiểm:** `tests/agent/test_dev_run_fixes.py`: test cũ thay bằng `test_an_order_the_customer_asked_for_is_placed_without_a_payment_or_an_address`. Bộ `tests/agent`: 1809 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** hard-cases (5 kịch bản, một lần, bật hết công tắc v2): `evaluation/runs/fix-a3-20261118-hard-v2` TSR 80% (4/5), HR 0%, 0 vi phạm guardrail; TTFT p95 9.014 ms trên 19 lượt (dưới 100 lượt, chưa có ý nghĩa). Ca trượt SCN-HARD-04 call_1 không có đơn nên không do sửa này: kênh hotline, agent nói "tám phần trăm" thay vì "8%", thiếu `must_say_any`. Run cũ `base-40fea307-hard` (commit khác, bản 1) 5/5. 7 mẫu BTC và 20 kịch bản dev: chưa đo.
+- **Còn lại:** 7 ca A3 của dev (ADV-0017 c3, ADV-0078 c3, ADV-0099 c2, ADV-0105 c1, GEN-0034 c2, GEN-0061 c2, GEN-0234 c2): khách nói chốt rồi lượt sau mới nói chuyển khoản, đơn ghi COD nên có thể trượt lại. Người dùng chọn ưu tiên định dạng BTC (18/11).
+
 ### 2026-11-18 · Reflection vòng `reflection-2`: 3 dòng skill `conversation` (skills v1)
 
 Loại: skill (học tự động) · Trạng thái: bỏ · Chỉ số: TSR / CCR / HR
@@ -58,6 +80,7 @@ Loại: hard guard / skill · Trạng thái: đang đo (chưa sửa, chờ quy�
 - **Đã kiểm:** đọc trace, không chạy lại.
 - **Số đo:** chưa đo sau sửa.
 - **Còn lại:** chọn cách sửa: mặc định COD khi khách giục đặt mà chưa chọn (và dùng địa chỉ cũ trong bộ nhớ khi khách nói "giao về địa chỉ cũ"), hay giữ A3 và chấp nhận trượt mẫu BTC. Bộ test ẩn của BTC cùng định dạng với mẫu công khai.
+- **Cập nhật 18/11:** đã sửa theo hướng mặc định COD và địa chỉ từ Call Brief, xem mục "2026-11-18 · Đơn không chờ thanh toán hay địa chỉ".
 
 ### 2026-11-17 · Rubric judge: hỏi lại một lần khi trích dẫn không nguyên văn
 

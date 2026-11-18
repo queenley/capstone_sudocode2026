@@ -112,12 +112,11 @@ def check(
     if mode == "copilot":
         return Verdict(False, ("Chế độ copilot: tư vấn viên thực hiện thao tác này, trợ lý chỉ gợi ý.",))
     checks = {
-        # What the order still lacks from the customer comes last: a reason about the order itself reads first.
         "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes,
                                               order_quotes=order_quotes or {}, trusted=trusted,
                                               created=created, customer_said=customer_said, placed=placed,
                                               said=f"{last_agent_said or ''} {customer_said or ''}",
-                                              wants_more=(intents or {}).get("one_more")) + _payment_reason(args),
+                                              wants_more=(intents or {}).get("one_more")),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
@@ -227,19 +226,6 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         return reasons + ["Số lượng phải là số nguyên dương."]
     qty = quantity
     return reasons + _cod_order(args, int(price) * qty, placed, said, quotes)
-
-
-def _payment_reason(args: Mapping[str, Any]) -> list[str]:
-    """An order is placed with the payment the customer chose and an address (PB-09 reads both back before
-    order.create). An order placed on an assumed COD cannot be changed afterwards: no tool changes an order's payment,
-    and the customer who then says "chuyển khoản" was told it had been changed (2026-11-16: 7 failed calls of the dev
-    run). An area ("Cần Thơ", "Quận 7") is an address."""
-    missing = [what for what, present in (("cách thanh toán (COD hay chuyển khoản)", args.get("payment")),
-                                          ("địa chỉ giao (khu vực là đủ)", args.get("address"))) if not present]
-    if not missing:
-        return []
-    return [f"Còn thiếu {' và '.join(missing)}: hỏi khách gộp một câu rồi mới gọi order_create; không tự chọn COD, "
-            "không tạo đơn rồi xin địa chỉ sau."]
 
 
 def _parent_reason(sku: str | None) -> str | None:
