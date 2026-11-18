@@ -151,3 +151,20 @@ async def test_a_judged_sample_grades_only_the_chosen_scenarios(tmp_path, monkey
     assert [item["scenario_id"] for item in judged] == ["SC-K"]
     assert json.loads((tmp_path / "judged" / "judge-run.json").read_text(encoding="utf-8"))["only"] == ["SC-K"]
     assert await judge_agreement.judge_run(run, tmp_path / "missing", judge, only=["SC-Z"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_a_paraphrased_quote_is_asked_once_more_and_still_checked_exactly():
+    """2026-11-15: about three calls in four were voided by paraphrased evidence. One retry names it; the check stays exact."""
+    rows = [{"turn": 1, "customer_text": "Còn mẫu X không em?", "agent_text": "Dạ chị Hoa, máy lọc 4.890.000₫ ạ.", "tool_calls": []}]
+    ids = applicable(SCENARIO, "call_2", rows)
+    paraphrase = Judgment(verdicts=[Criterion(criterion_id=key, verdict="PASS", evidence="agent báo đúng giá") for key in ids])
+    exact = Judgment(verdicts=[Criterion(criterion_id=key, verdict="PASS", evidence="máy lọc 4.890.000₫") for key in ids])
+    writer = SimpleNamespace(ainvoke=AsyncMock(side_effect=[paraphrase, exact]))
+    result = await BtcJudge(SimpleNamespace(with_structured_output=lambda _: writer)).grade(SCENARIO, "call_2", rows)
+    assert result["status"] == "COMPLETE" and result["retried"] is True
+    assert writer.ainvoke.await_count == 2 and "agent báo đúng giá" in writer.ainvoke.await_args.args[0]
+    writer = SimpleNamespace(ainvoke=AsyncMock(side_effect=[paraphrase, paraphrase]))
+    result = await BtcJudge(SimpleNamespace(with_structured_output=lambda _: writer)).grade(SCENARIO, "call_2", rows)
+    assert result["status"] == "INCOMPLETE" and writer.ainvoke.await_count == 2
+    assert "NGUYÊN VĂN" in writer.ainvoke.await_args_list[0].args[0]

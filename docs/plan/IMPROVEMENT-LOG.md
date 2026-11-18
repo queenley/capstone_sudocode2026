@@ -21,6 +21,83 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-18 · Reflection vòng `reflection-2`: 3 dòng skill `conversation` (skills v1)
+
+Loại: skill (học tự động) · Trạng thái: bỏ · Chỉ số: TSR / CCR / HR
+
+- **Vấn đề:** Vòng Reflection mới học từ lỗi trên 40 kịch bản dev cộng 4 kịch bản budget, đề xuất skill mới cho agent.
+- **Bằng chứng:**
+  - Run `evaluation/runs/reflection-2/`.
+  - Có 169 lỗi, 63+3 thẻ bài học, gom thành 3 đề xuất, đều vào skill `conversation`:
+    - dùng lựa chọn đã biết khi chốt đơn (18 khách);
+    - hỏi lại món khi khách chưa nói rõ (3 khách);
+    - giữ danh xưng khách đã tự xưng (3 khách).
+- **Sửa:** Không sửa code. Skill được publish thành skills v1 nhưng chỉ lưu ở `evaluation/runs/reflection-2/learned/`. Agent vẫn ở v0.
+- **Đã kiểm:** Người dùng chưa duyệt. Việc duyệt do `scripted-eval` làm.
+- **Số đo:**
+  - R0/R1 trên 7 kịch bản frozen, mỗi bên 1 lần:
+    - TSR giữ 80.0 → 80.0.
+    - CCR giảm 52.4 → 42.9.
+    - HR price tăng 10.5 → 14.3.
+    - Sửa được 1 lỗi, làm hỏng 4.
+  - Full `data/dev` với v1 bị dừng ở 190/409 kịch bản, theo yêu cầu người dùng để tiết kiệm. Báo cáo ở `full-dev/report.partial-190.json`.
+    - TSR 71.1 (135/190), hard 66.7.
+    - Trace chưa được trích nhãn vì run dừng trước bước extract, nên RQR, CCR và HR của v1 không dùng được.
+  - So TSR với v0 trên cùng kịch bản, v0 là run cùng ngày, cùng code:
+    - 15 kịch bản của `20261117-judge/dev`: 73.3 → 66.7. Hỏng SCN-ADV-0009 call_1.
+    - 24 kịch bản của `learn-reflection-2` (trong mẫu học): 70.8 → 66.7. Sửa SCN-ADV-0131 call_2; hỏng SCN-ADV-0010 call_2, SCN-ADV-0053 call_1 và call_2.
+- **Còn lại:**
+  - Không áp v1 vào agent.
+  - Muốn có CCR, RQR và HR cho 190 kịch bản thì phải chạy `--relabel` trên trace. Bước này tốn tiền gọi extractor.
+
+### 2026-11-17 · Mẫu BTC trượt vì agent đòi thanh toán và địa chỉ trước khi tạo đơn
+
+Loại: hard guard / skill · Trạng thái: đang đo (chưa sửa, chờ quyết định) · Chỉ số: TSR
+
+- **Vấn đề:** ở cuộc 2 của `SAMPLE-01`, `02`, `04`, `05`, khách nói "lấy cái đó", "lên đơn cho chị" nhưng không nói cách thanh toán; agent hỏi COD hay chuyển khoản và khu vực giao, đến lượt chốt cuối vẫn chưa tạo đơn. `SAMPLE-03` trượt tương tự với `order.update`.
+- **Bằng chứng:** `evaluation/runs/20261117-judge/btc` (theo kịch bản viết sẵn): TSR mẫu BTC 28,6% (2/7, chỉ `SAMPLE-06`, `07` đạt), trong khi ngày 12/11 là 85,7% (cohort cùng 7 mẫu, khác commit). Ví dụ `SAMPLE-02 call_2 turn 3–4`, `SAMPLE-04 call_2 turn 3–4`. Simulator cho cùng kết quả ở cả 3 seed (`20261117-sim-btc5`). Trên 20 kịch bản dev cùng ngày TSR 75% (15/20), hard-cases 100% (5/5): bộ dev có khách nói cách thanh toán, mẫu BTC thì không.
+- **Sửa:** chưa. Nguyên nhân khớp với sửa A3 ngày 16/11 (`f7fbd2ba`: guard bắt hỏi khi `order_create` thiếu `payment` hoặc `address`; skill `place-order` bỏ "chưa chọn thì để COD"). `success_if` của mẫu BTC chỉ đối chiếu `sku` và `price_vnd`.
+- **Đã kiểm:** đọc trace, không chạy lại.
+- **Số đo:** chưa đo sau sửa.
+- **Còn lại:** chọn cách sửa: mặc định COD khi khách giục đặt mà chưa chọn (và dùng địa chỉ cũ trong bộ nhớ khi khách nói "giao về địa chỉ cũ"), hay giữ A3 và chấp nhận trượt mẫu BTC. Bộ test ẩn của BTC cùng định dạng với mẫu công khai.
+
+### 2026-11-17 · Rubric judge: hỏi lại một lần khi trích dẫn không nguyên văn
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: rubric J01–J12 (tỉ lệ cuộc gọi COMPLETE), kappa với người
+
+- **Vấn đề:** judge đánh giá đòi trích dẫn khớp chính xác (nhóm cố ý giữ, `test_the_evaluation_judge_keeps_its_exact_quote`), nhưng model hay diễn giải. Ngày 15/11 khoảng 3/4 cuộc gọi bị INCOMPLETE nên không dùng được để đo kappa. Ngoài ra trích dẫn một chữ ("x") vẫn được tính là có trong transcript.
+- **Bằng chứng:** mục 15/11 bên dưới (388 cuộc gọi; 501 trích dẫn diễn giải); thử `dev-1/r1-dev-1`: 4/20 COMPLETE.
+- **Sửa:** `components/evaluation/judge.py`: thêm `QUOTE_RULE` vào cuối prompt của BTC (evidence chép nguyên văn ≥ 4 từ, PASS vì không làm sai thì trích câu agent liên quan nhất); khi đủ tiêu chí mà có trích dẫn không khớp, hỏi lại một lần kèm danh sách trích dẫn không tìm thấy (`RETRY`), ghi `retried: true`; trích dẫn phải có ít nhất 2 từ. Luật so khớp vẫn là khớp chính xác.
+- **Đã kiểm:** `tests/agent/test_rubric_judge.py::test_a_paraphrased_quote_is_asked_once_more_and_still_checked_exactly`; `test_rubric_judge.py`, `test_gap_review_and_judge.py`, `test_approval_agent.py` qua. Chạy khô `--judge-run` → `--judge-sample` → `--judge-agreement` với judge giả trên trace mẫu của BTC: đủ ba bước, ra `agreement.json`.
+- **Số đo:** `evaluation/runs/20261117-judge` (mẫu BTC 7, `data/hard-cases` 5, 20 kịch bản dev mỗi kịch bản một persona; `full`, advisor `gpt-5.6-luna`, extractor `product-extractor-v13`, judge `gpt-4.1-mini`): 51/53 cuộc gọi COMPLETE (96%; ngày 15/11 khoảng 25% trên cohort khác), 3 cuộc được hỏi lại. 200 cặp (cuộc, tiêu chí): 197 PASS, 3 FAIL. Số judge trước sửa không so trực tiếp được với số sau (đổi prompt là đổi dụng cụ đo).
+- **Còn lại:**
+  - Phiếu mù 60 cặp (`evaluation/runs/20261117-judge/human-review`) rút ngẫu nhiên ra 60/60 PASS: kappa sẽ không tính được hoặc vô nghĩa. Cần chọn: chỉ báo % đồng thuận (rubric BTC cho phép), rút phiếu phân tầng gồm cả 3 FAIL, hoặc chấm thêm cấu hình `baseline_no_memory` để có nhiều FAIL hơn (tốn phí).
+  - Người chấm tay phiếu mù.
+
+### 2026-11-17 · Simulator khách theo spec BTC, chạy nhiều seed (`run_eval.py --simulate`)
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR theo seed (trung bình, độ lệch, biên độ ≤ 10 điểm)
+
+- **Vấn đề:** BTC chấm simulator theo 8 luật, độ lặp lại qua 3 seed (biên độ TSR ≤ 10 điểm trên 5 kịch bản) và không rò nhãn. Lõi 8 luật (`agents/simulator.py`) vẫn còn nhưng lệnh chạy nhiều seed (`pipeline/improve measure --seeds`) bị gỡ ngày 07/11 (commit `b5ab1f00`); `WAITING-FOR-USER.md` vẫn ghi lệnh đã gỡ.
+- **Bằng chứng:** `git show b5ab1f00 --stat` (xóa `pipeline/improve/explore.py`); không còn chỗ nào gọi `SimulatorAgent`.
+- **Sửa:**
+  - `pipeline/eval/simulate.py` mới: mỗi seed chơi từng kịch bản qua agent thật với khách mô phỏng, chỉ cấu hình `full`, ghi `seed-<n>.jsonl` theo schema trace BTC, chấm bằng `reference_eval.py` nguyên bản, ghi `simulator.jsonl` (log bắt buộc của spec) và `summary.json` (TSR từng seed, trung bình, độ lệch chuẩn, biên độ, `within_10_points`).
+  - Mỗi seed có thread checkpoint riêng và cache observer riêng; model persona nhận `seed` của provider.
+  - Agent có lượt chốt cuối (`customer_text` rỗng) như run thường, trừ khi khách bỏ đi, hết lượt hay đã chuyển máy.
+  - Kiểm rò rỉ trước khi gọi model: prompt persona không được chứa `must_not_ask`, `success_if`, `must_carry_over`, `ground_truth_facts`, `memory_expectation` (trừ slot khách vốn biết); có rò thì không chạy.
+  - `pipeline/eval/cli.py`: `--simulate`, `--seeds` (mặc định 0 1 2); từ chối `--config`, `--judge`, `--relabel`, `--no-extract`, `--resume`; không ghi đè thư mục có sẵn.
+  - Docstring `agents/simulator.py` cập nhật: vòng khám phá đã gỡ, người dùng duy nhất là `--simulate`.
+  - `Session.observe` gọi `Extractor.label()` theo chữ ký trước 07/11 (`customer_text=`, `agent_text=`), làm lần chạy thật đầu tiên dừng ở lượt 1 (`evaluation/runs/20261117-sim-smoke.failed-observe-api`). Nay đưa đúng `scorers.turn_input` (lời agent, tool đã gọi, ngày cuộc gọi); test `test_the_observer_is_given_the_extractor_input_of_today`.
+- **Đã kiểm:** `tests/agent/test_simulate_seeds.py` (35 test: không rò nhãn trên 7 mẫu BTC và 20 kịch bản dev đầu, bắt được nhãn bị chèn, tóm tắt và ngưỡng 10 điểm, chấm bằng script BTC, từ chối tùy chọn sai, không ghi đè, thread và seed riêng); `test_improvement_loop.py` qua. Toàn bộ `tests/`: 1.945 qua, 18 bỏ qua, 3 hỏng có từ trước trong `tests/agent/test_extractor_v9.py` (file chưa theo dõi).
+  - Lõi kernel (người dùng duyệt 17/11): `challenge` của persona là phản ứng của luật 3, trừ 1 kiên nhẫn, hết kiên nhẫn thì khách bỏ đi (luật 2). Trước đó một khách không đồng ý lặp một câu 10 lần tới hết 12 lượt (`evaluation/runs/20261117-sim-smoke.before-challenge-rule`). Test `test_a_challenge_costs_patience_and_the_customer_leaves_when_it_runs_out`, `test_a_hold_costs_nothing`.
+  - `Session.reply` trả None sau câu chào khi khách đã bỏ đi; trước đó vòng chơi hỏi lõi thêm một lần và dừng với "The call is over" (`evaluation/runs/20261117-sim-btc5.failed-call-over`). Lỗi có từ trước, lộ ra khi khách bỏ đi thường hơn.
+- **Số đo:** `evaluation/runs/20261117-sim-btc5` (`SAMPLE-01`–`05`, seed 0 1 2, advisor `gpt-5.6-luna`, simulator `gpt-4.1-mini`): 30 cuộc, 0 lỗi; TSR 0 / 0 / 0 (biên độ 0, đạt ngưỡng 10 điểm nhưng không có thông tin). Kết thúc: 20 do agent, 7 khách bỏ đi, 3 hết lượt. Cùng 5 mẫu chạy theo kịch bản viết sẵn (`20261117-judge/btc`) cũng trượt cả 5, cùng lý do (không có `order.create`/`order.update` khớp), nên 0% là của agent, không phải của simulator: xem mục "Mẫu BTC trượt vì đòi thanh toán" bên dưới.
+- **Còn lại:**
+  - Đo lại độ lặp lại sau khi sửa lỗi tạo đơn của agent: với TSR 0 ở mọi seed, biên độ 0 không chứng minh gì.
+  - Khách nói lời `customer_turns` sạch, nên kịch bản đầu vào ASR (`SAMPLE-06`) không mang lỗi ASR khi mô phỏng.
+  - Nhãn câu hỏi/claim trong lượt mô phỏng do observer của simulator gắn (bộ trích của sản phẩm trên model simulator), không phải extractor của evaluation.
+  - Provider coi `seed` là cố gắng tốt nhất, không bảo đảm lặp lại từng chữ.
+
 ### 2026-11-16 · Giờ hẹn nói "19 giờ tối", không "19:00"
 
 Loại: harness / tool · Trạng thái: đang đo · Chỉ số: TSR

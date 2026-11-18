@@ -1,11 +1,11 @@
-"""SimulatorAgent: the customer of the improvement loop's exploration. ``docs/design.md`` sections 9.8 and 10.3.
+"""SimulatorAgent: the organisers' customer simulator. ``docs/design.md`` sections 9.8 and 10.3.
 
-**Not the evaluation's simulator.** The evaluation keeps its own, a measuring
-instrument no round changes. This one plays the customer only while the
-exploration (``pipeline/improve``) tries hints on the learning set, so the
-two never share code, a model (this one is ``agents.simulator``), an
-observer, a cache or a database, and the frozen test set never meets this
-one.
+It was written for the improvement loop's exploration, removed on 2026-11-07
+(commit ``b5ab1f00``). Its one user now is ``run_eval.py --simulate``
+(``pipeline/eval/simulate.py``): the specification's repeatability test,
+several seeds on a cohort, each seed with its own observer cache, in the
+evaluation's database. No improvement round reads what it plays, and the
+official numbers never come from it: they play ``customer_turns`` as written.
 
 It follows the organisers' specification (``simulator/customer_simulator_spec.md``)
 so a hint that works here works against the customer the official runs play:
@@ -255,6 +255,17 @@ class Customer:
             elif seen.reaction in ("hold", "challenge"):
                 reaction = seen.reaction
                 self.reactions.append(reaction)
+                # A challenge is the specification's rule 3 reaction ("khách phản ứng", patience -= 1), whatever the
+                # persona disputes. Without it a customer who never accepts the agent's answer repeated the same
+                # line to the twelve-turn limit (2026-11-17, SAMPLE-01 call_2) instead of leaving (rule 2).
+                if reaction == "challenge" and 3 not in rules:
+                    rules.append(3)
+                    self.patience = max(0, self.patience - 1)
+                    self.committed = False
+                    if self.patience == 0:
+                        rules.append(2)
+                        self._finish("tu_choi", "customer")
+                        return self._log(rules, f"Thôi để {self.honorific} xem lại.", reaction)
                 said.append(seen.persona_line if self._own_words(seen.persona_line) else (self.last_said or line))
             else:
                 self.next_line += 1
@@ -442,20 +453,34 @@ class Session:
         self.dialogue.append(("customer", self.last_line))
         return self.last_line
 
-    async def observe(self, agent_text: str) -> dict[str, Any]:
-        """The agent's questions and claims, as the trace carries them."""
+    async def observe(self, agent_text: str, tool_calls: Sequence[Mapping[str, Any]] = (), *,
+                      today: str | None = None) -> dict[str, Any]:
+        """The agent's questions and claims, as the trace carries them.
+
+        The observer is the product's extractor, shown what the evaluation shows it for a turn
+        (``scorers.turn_input``: the reply, the tools called, the call's day); no earlier call, so ``facts_used``
+        stays the evaluation's to label.
+        """
         if self.agent.observer is None:
             return {"questions": [], "claims": [], "set_aside": []}
-        labels = await self.agent.observer.label(customer_text=self.last_line, agent_text=agent_text)
+        from ..components.evaluation.scorers import turn_input
+
+        data = turn_input(agent_text, [dict(call) for call in tool_calls], today=today)
+        labels = await self.agent.observer.label(data)
         if labels.get("error") and not DAILY_QUOTA.search(str(labels["error"])):
             logger.warning("Simulator observer failed once; retrying")
             await asyncio.sleep(RETRY_PAUSE_S)
-            labels = await self.agent.observer.label(customer_text=self.last_line, agent_text=agent_text)
+            labels = await self.agent.observer.label(data)
         return labels
 
     async def reply(self, agent_text: str, tool_calls: Sequence[Mapping[str, Any]],
                     labels: Mapping[str, Any]) -> str | None:
         """The customer's next line after *agent_text* and its tools, or None when they are done."""
+        if self.customer.ended:
+            # The customer left with a parting line ("Thôi để chị xem lại", rules 2 and 3); the agent's answer to it
+            # ends the call. Asking the kernel again raised "The call is over" (2026-11-17).
+            self.dialogue.append(("agent", agent_text))
+            return None
         for tool in tool_calls:
             self.prices |= money_in(tool.get("result"))
         stated = [c["value"] for c in labels.get("claims") or []
