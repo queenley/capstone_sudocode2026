@@ -5,7 +5,7 @@
 - Vòng Reflection học lại từ lỗi của agent trên 44 kịch bản và đề xuất 3 dòng skill mới cho skill `conversation`. Các dòng này được publish thành **skills v1**.
 - Kết luận: **v1 không làm agent tốt hơn v0, nên không áp vào agent.**
   - Trên 7 kịch bản frozen, TSR giữ nguyên 80%, còn CCR và độ bịa giá đều xấu đi.
-  - Trên các kịch bản trùng với run v0 cùng ngày, TSR giảm 4–7 điểm.
+  - Trên 190 kịch bản `data/dev`, v1 đạt TSR 66.3. Trên các kịch bản trùng với run v0 cùng ngày, TSR giảm 4–13 điểm.
 - Agent hiện vẫn ở v0. Skill đã học chỉ được cất ở `evaluation/runs/reflection-2/learned/`.
 
 ## Cách chạy
@@ -59,16 +59,30 @@
 
 ## Chạy full `data/dev` với v1 (dừng ở 190/409)
 
-| Bộ so sánh | v0 TSR | v1 TSR |
-|---|---|---|
-| 190 kịch bản đã chạy | — | **71.1** (135/190); kịch bản khó 66.7 |
-| 15 kịch bản trùng với run v0 `20261117-judge/dev` | 73.3 | 66.7 |
-| 24 kịch bản trùng với tập học | 70.8 | 66.7 |
+Trace của v1 được gắn nhãn lại bằng `run_eval.py --relabel` với extractor `product-extractor-v13`, cùng bản với các run v0, nên mọi chỉ số đều so được. Run gắn nhãn: `evaluation/runs/reflection-2/relabel-190b`. Không có lượt lỗi hay lượt thiếu nhãn.
 
-- v0 là run cùng ngày, cùng code.
-- Tập 24 kịch bản là các kịch bản agent đã học từ chính chúng, nên v1 lẽ ra phải có lợi thế ở đây.
+**v1 trên 190 kịch bản đã chạy:**
 
-Các lượt đổi kết quả:
+| TSR | TSR kịch bản khó | RQR | CCR | HR |
+|---|---|---|---|---|
+| **66.3** (126/190) | 61.9 | 4.4 | 50.4 | 7.7 |
+
+- Bảng của `run_eval` ghi HR giá và khuyến mãi là 10.7.
+- Bản đầu của báo cáo này ghi TSR 71.1. Con số đó tính trên trace chưa có nhãn, nên các điều kiện cần nhãn (ví dụ "không được hỏi lại") không kiểm được. Số đúng là 66.3.
+
+**So với v0 trên cùng kịch bản** (v0 là run cùng ngày, cùng code, cùng extractor):
+
+| Bộ so sánh | | TSR | RQR | CCR | HR |
+|---|---|---|---|---|---|
+| 15 kịch bản trùng với `20261117-judge/dev` | v0 | 73.3 | 0.0 | 66.0 | 5.7 |
+| | v1 | 60.0 | 14.8 | 59.6 | 3.5 |
+| 24 kịch bản trùng với tập học | v0 | 70.8 | 9.5 | 47.4 | 8.0 |
+| | v1 | 66.7 | 5.8 | 49.5 | 8.4 |
+
+- Trên 15 kịch bản không nằm trong tập học, v1 kém hơn ở TSR (giảm 13 điểm), RQR (tăng gấp nhiều lần) và CCR; chỉ HR tốt hơn.
+- Trên 24 kịch bản trong tập học, nơi v1 lẽ ra phải có lợi thế, RQR và CCR nhích tốt lên một chút, nhưng TSR vẫn giảm.
+
+Các lượt đổi TSR (đo trước khi gắn nhãn lại):
 - **Bị làm hỏng:**
   - SCN-ADV-0009 call_1: thiếu câu báo hết hạn bảo hành.
   - SCN-ADV-0010 call_2: không gọi đúng `order.update`.
@@ -81,7 +95,7 @@ Lỗi bị làm hỏng phần lớn ở bước tạo hoặc sửa đơn. Đây 
 ## Giới hạn
 
 - Mẫu nhỏ, mỗi bên chỉ chạy 1 lần, nên số liệu còn nhiễu. Tuy vậy, cả ba phép so sánh đều cho thấy v1 không tốt hơn v0.
-- Run full bị dừng trước bước trích nhãn, nên **v1 chỉ có TSR**; RQR, CCR và HR không dùng được. Muốn có đủ thì phải chạy `run_eval.py --relabel` trên trace, bước này tốn thêm tiền gọi extractor.
+- Run full bị dừng trước bước trích nhãn; nhãn được gắn bù bằng `--relabel` trên một bản cắt còn 190 kịch bản đã chạy xong (`full-dev-190`).
 - Việc duyệt skill là tự động (`scripted-eval`), chưa có người xem.
 - Không có run v0 trên toàn bộ 409 kịch bản `data/dev` cùng code, nên không so được trên cả tập.
 
@@ -89,5 +103,5 @@ Lỗi bị làm hỏng phần lớn ở bước tạo hoặc sửa đơn. Đây 
 
 - `evaluation/runs/reflection-2/measure.log`: log của bước học, duyệt và R0/R1.
 - `evaluation/runs/reflection-2/learned/`: skills v1 đã học.
-- `evaluation/runs/reflection-2/full-dev/report.partial-190.json`: báo cáo BTC trên 190 kịch bản.
+- `evaluation/runs/reflection-2/relabel-190b/report.json`: báo cáo BTC trên 190 kịch bản, đã gắn nhãn.
 - `docs/plan/IMPROVEMENT-LOG.md`: mục ngày 2026-11-18.

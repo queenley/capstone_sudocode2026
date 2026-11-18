@@ -41,14 +41,12 @@ Loại: skill (học tự động) · Trạng thái: bỏ · Chỉ số: TSR / C
     - HR price tăng 10.5 → 14.3.
     - Sửa được 1 lỗi, làm hỏng 4.
   - Full `data/dev` với v1 bị dừng ở 190/409 kịch bản, theo yêu cầu người dùng để tiết kiệm. Báo cáo ở `full-dev/report.partial-190.json`.
-    - TSR 71.1 (135/190), hard 66.7.
-    - Trace chưa được trích nhãn vì run dừng trước bước extract, nên RQR, CCR và HR của v1 không dùng được.
-  - So TSR với v0 trên cùng kịch bản, v0 là run cùng ngày, cùng code:
-    - 15 kịch bản của `20261117-judge/dev`: 73.3 → 66.7. Hỏng SCN-ADV-0009 call_1.
-    - 24 kịch bản của `learn-reflection-2` (trong mẫu học): 70.8 → 66.7. Sửa SCN-ADV-0131 call_2; hỏng SCN-ADV-0010 call_2, SCN-ADV-0053 call_1 và call_2.
-- **Còn lại:**
-  - Không áp v1 vào agent.
-  - Muốn có CCR, RQR và HR cho 190 kịch bản thì phải chạy `--relabel` trên trace. Bước này tốn tiền gọi extractor.
+    - Gắn nhãn bù bằng `--relabel` (extractor v13) ở `relabel-190b`. Không có lượt lỗi.
+    - Kết quả: TSR 66.3 (126/190), hard 61.9, RQR 4.4, CCR 50.4, HR 7.7.
+  - So với v0 trên cùng kịch bản (cùng ngày, cùng code, cùng extractor), theo thứ tự TSR / RQR / CCR / HR:
+    - 15 kịch bản của `20261117-judge/dev`: v0 73.3 / 0.0 / 66.0 / 5.7, v1 60.0 / 14.8 / 59.6 / 3.5.
+    - 24 kịch bản của `learn-reflection-2` (trong mẫu học): v0 70.8 / 9.5 / 47.4 / 8.0, v1 66.7 / 5.8 / 49.5 / 8.4.
+- **Còn lại:** Không áp v1 vào agent.
 
 ### 2026-11-17 · Mẫu BTC trượt vì agent đòi thanh toán và địa chỉ trước khi tạo đơn
 
