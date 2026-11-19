@@ -4,6 +4,7 @@ Hai cách chạy:
 
 - **Docker Compose**: máy local, hoặc cả hệ thống trên **một máy chủ cloud (VM)**. Xem mục 0 ngay dưới.
 - **AWS**: thiết kế ở [aws-plan.md](aws-plan.md); Terraform (`infra/terraform/aws`), compose AWS và hai workflow GitHub Actions, hướng dẫn từng bước ở [aws-terraform-cicd.md](aws-terraform-cicd.md) (dữ liệu mẫu trên AWS: mục 2 của trang đó). Chưa apply trên tài khoản thật.
+- **ASR và TTS trên GPU Colab** (agent vẫn chạy local, nối qua tunnel; để thử và đo, chưa đủ ổn định cho demo): [colab-gpu.md](colab-gpu.md), script trong `infra/colab/`.
 - **Cloud có quản lý (GKE, Cloud SQL)**: mục 1–4. Gồm ba thành phần, và **không thành phần nào tự triển khai ứng dụng**:
 
 - `infra/terraform/gcp`: GKE Autopilot private node, Cloud SQL PostgreSQL HA có backup, Memorystore Redis HA (TLS), Artifact Registry, một secret rỗng trong Secret Manager, VPC peering và Cloud NAT. **Có phát sinh chi phí.**
