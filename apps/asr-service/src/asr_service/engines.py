@@ -178,6 +178,19 @@ CATALOG: dict[str, tuple[str, type, str]] = {
         FasterWhisper,
         "phowhisper-small",
     ),
+    # Larger PhoWhisper (VinAI), CTranslate2 conversions, for a GPU host (asr-service with ASR_DEVICE=cuda). Their
+    # folders are filled by the host's own download (no fetch entry yet); a folder without tokenizer.json takes the
+    # multilingual Whisper tokenizer, which PhoWhisper keeps.
+    "phowhisper-medium": (
+        "PhoWhisper medium · faster-whisper",
+        FasterWhisper,
+        "phowhisper-medium",
+    ),
+    "phowhisper-large": (
+        "PhoWhisper large · faster-whisper",
+        FasterWhisper,
+        "phowhisper-large",
+    ),
     "whisper-turbo": (
         "Whisper large-v3-turbo · faster-whisper",
         FasterWhisper,
@@ -224,12 +237,12 @@ def metadata(name: str) -> dict:
             pass
     options = ({"decoding_method": "modified_beam_search", "max_active_paths": 4} if name.endswith("-beam4") else
                {"decoding_method": "greedy_search"} if name.startswith("zipformer") else
-               {"beam_size": 1, "temperature": 0.0, "language": "vi", "condition_on_previous_text": False} if name in {"phowhisper-small", "whisper-turbo"} else
+               {"beam_size": 1, "temperature": 0.0, "language": "vi", "condition_on_previous_text": False} if CATALOG[name][1] is FasterWhisper else
                {"decoding_method": "CTC greedy", "streaming": False, "language_model": None})
     return {"model": name, "device": DEVICE, "threads": THREADS, "packages": packages, "decoder_options": options,
             "artifact": json.loads(path.read_text()) if path.is_file() else None,
             "implementation_sha256": __import__("hashlib").sha256(Path(__file__).read_bytes()).hexdigest(),
-            "hotwords_supported": name in {"phowhisper-small", "whisper-turbo"}}
+            "hotwords_supported": CATALOG[name][1] is FasterWhisper}
 
 
 def load(name: str) -> float:

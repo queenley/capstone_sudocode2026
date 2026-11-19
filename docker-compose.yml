@@ -193,6 +193,9 @@ services:
       ADVISOR_PREAMBLE: ${ADVISOR_PREAMBLE:-0}
       ADVISOR_PRODUCT_ADVISE: ${ADVISOR_PRODUCT_ADVISE:-0}
       VOICE_HOLD_MS: ${VOICE_HOLD_MS:-0}
+      # 1 keeps what each voice call's microphone sent, at 16 kHz, in runs/voice/ inside the container: for diagnosing
+      # a microphone or the recogniser (docker compose cp ai-agent-service:/app/agent/runs/voice .). Off in production.
+      VOICE_RECORD: ${VOICE_RECORD:-0}
       ADVISOR_FIRST_CLAUSE: ${ADVISOR_FIRST_CLAUSE:-0}
       ADVISOR_SERVICE_TIER: ${ADVISOR_SERVICE_TIER:-}
       # A profile of apps/ai-agent-service/config/models.yaml ("local": every agent on Gemini's free
@@ -211,6 +214,8 @@ services:
       # voice.tts in apps/ai-agent-service/config/models.yaml. The Admin page can still switch.
       VOICE_TTS: ${VOICE_TTS:-}
       OPENAI_TTS_MODEL: ${OPENAI_TTS_MODEL:-gpt-4o-mini-tts}
+      # VOICE_TTS=gemini:<voice> (Kore, Aoede, Leda, Zephyr): Gemini's speech model on GOOGLE_API_KEY.
+      GEMINI_TTS_MODEL: ${GEMINI_TTS_MODEL:-gemini-3.8-flash-lite-tts}
       # VOICE_TTS=elevenlabs: speaks with the agent voices of evaluation/data-generation/config/voices.yaml,
       # by the caller's region (CRM); unknown callers hear VOICE_DEFAULT_REGION, VOICE_GENDER.
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
@@ -220,6 +225,9 @@ services:
       # Where calls are recognised: the asr-service container, or a GPU host elsewhere.
       ASR_DENOISER: ${ASR_DENOISER:-none}
       ASR_URL: ${ASR_URL:-http://asr-service:8500}
+      # VOICE_TTS=remote:<engine>[:<voice>]: the team's TTS server on a GPU host (Colab), serving ZeroTTS or VieNeu.
+      TTS_URL: ${TTS_URL:-}
+      TTS_API_KEY: ${TTS_API_KEY:-}
       ASR_API_KEY: ${ASR_API_KEY:-}
       # Phone hotline (profile "hotline"): the bridge proves itself with this key to pass the caller's number.
       HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:-local-hotline-bridge-change-me}

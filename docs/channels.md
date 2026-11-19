@@ -137,6 +137,7 @@ Nhận dạng giọng nói luôn chạy cục bộ. Giọng đọc câu trả l�
 | `VOICE_TTS` | Chạy ở đâu | Tốc độ (Docker 4 CPU) | Chi phí | Tải về |
 |---|---|---|---|---|
 | `openai:coral` (hoặc `nova`, `sage`, `shimmer`…) | API OpenAI, dùng `OPENAI_API_KEY` | khoảng 1–3 giây mỗi câu, các câu đọc song song | trả theo số ký tự | không tải gì |
+| `gemini:Kore` (hoặc `Aoede`, `Leda`, `Zephyr`) | API Gemini, dùng `GOOGLE_API_KEY`, model `GEMINI_TTS_MODEL` (mặc định `gemini-3.8-flash-lite-tts`) | khoảng 0,6–0,7 giây tới tiếng đầu, sinh nhanh hơn tốc độ phát (đo 19/11 trên laptop) | trả theo token | không tải gì |
 | `elevenlabs:` | API ElevenLabs, dùng `ELEVENLABS_API_KEY` | khoảng 0,6 giây mỗi câu (lần đầu 3–5 giây) | trả theo số ký tự, đắt hơn OpenAI | không tải gì |
 | `vieneu:` | CPU trong container | 10–15 giây mỗi câu, chiếm CPU của nhận dạng | miễn phí | ~1,4 GB lần đầu dùng |
 | (để trống) | theo `voice.tts` trong `apps/ai-agent-service/config/models.yaml` (`vieneu:`) | | | |

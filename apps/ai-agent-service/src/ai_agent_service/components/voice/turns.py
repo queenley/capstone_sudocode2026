@@ -128,7 +128,10 @@ class TurnConfig:
     max_silence_ms: int = 1200  # the turn ends after this much silence whatever Smart Turn said
     silence_ms: int = 700  # the fixed endpoint when mode == "silence"
     barge_in_ms: int = 400  # continuous speech that interrupts the agent
-    preroll_ms: int = 320  # audio kept from before the speech onset
+    # Audio kept from before the speech onset. Silero passes a soft first syllable late: on a real microphone
+    # (2026-11-19, call 20) "máy lọc không khí" became "không khí" with 320 ms; 800 ms gave the whole phrase to both
+    # Zipformer models. It is audio already in hand, so it costs no wait.
+    preroll_ms: int = 800
     max_turn_s: int = 30
 
 

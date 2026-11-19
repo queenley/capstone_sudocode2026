@@ -491,7 +491,7 @@ class Session:
         if self.hold_ms:
             self.spawn(self._hold(turn_id, event.speech_end))
         await self.send({"type": "state", "state": "thinking"})
-        await self.send({"type": "transcript", "turn": turn_id, "text": text, "raw": heard.text,
+        await self.send({"type": "transcript", "turn": turn_id, "text": self._shown(text), "raw": heard.text,
                          "corrections": applied, "asr_ms": int(heard.seconds * 1000),
                          "audio_seconds": round(heard.audio_seconds, 2), "endpointing": event.reason,
                          "removed_words": decision.removed_words, "policy_version": POLICY_VERSION})
@@ -511,6 +511,17 @@ class Session:
             await self.send({"type": "reply", "turn": turn_id, "text": outcome.content, "superseded": True})
             return
         await self._answer(turn_id, outcome)
+
+    def _shown(self, text: str) -> str:
+        """The caller's words as the page shows them: numbers written as numbers (a phone number read digit by digit
+        shows as 0984726714), as the harness itself reads them. What the agent receives is unchanged."""
+        from ...components import clock
+        from ...components.intake import itn, text as intake_text
+
+        try:
+            return itn.normalise(intake_text.clean(text)[0], clock.at(self.row.get("business_day") or options.business_day()))
+        except Exception:  # noqa: BLE001 - the words as heard rather than none
+            return text
 
     async def _take(self, turn_id: str, text: str | None, arrived: float, *, emit: Any = None) -> harness.Outcome:
         """One turn through the harness, one at a time, under the call's lease."""
@@ -622,6 +633,8 @@ class Session:
         order: asyncio.Queue[Any] = asyncio.Queue()
         pumps: list[asyncio.Task[None]] = []
 
+        from ...components.voice.tts import for_voice
+
         async def pump(kind: str, text: str, out: "asyncio.Queue[Any]") -> None:
             try:
                 ready = self.hold_audio.get((id(self.voice), text)) if kind == "hold" else None
@@ -629,7 +642,7 @@ class Session:
                     for speech in ready:
                         out.put_nowait(speech)
                     return
-                async for speech in self.voice.stream(text):
+                async for speech in self.voice.stream(for_voice(text)):
                     out.put_nowait(speech)
             finally:
                 out.put_nowait(None)
@@ -657,6 +670,10 @@ class Session:
                 while (speech := await out.get()) is not None:
                     if turn_id in self.cancelled:
                         return
+                    if kind == "sentence" and offset == 0.0:
+                        # The words go with their voice: the page shows a sentence as it starts to play, not the whole
+                        # reply when the turn ends (2026-11-19: text lagged the voice by seconds).
+                        await self.send({"type": "reply_part", "turn": turn_id, "index": index, "text": text})
                     chunks.append({"sentence": index, "offset": offset, "duration": speech.duration})
                     offset += speech.duration or 0.0
                     await self.send({"type": "audio", "turn": turn_id, "seq": seq, "sentence": index, "mime": speech.mime,
@@ -688,7 +705,9 @@ class Session:
         """A hold line's audio, made while the lookup runs, so saying it costs no synthesis (plan 002, A2)."""
         key = (id(self.voice), text)
         if key not in self.hold_audio:
-            self.hold_audio[key] = [speech async for speech in self.voice.stream(text)]
+            from ...components.voice.tts import for_voice
+
+            self.hold_audio[key] = [speech async for speech in self.voice.stream(for_voice(text))]
 
     async def _hold(self, turn_id: str, speech_end: float) -> None:
         """The turn's hold deadline: ``VOICE_HOLD_MS`` after the caller stopped."""
