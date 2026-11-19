@@ -21,6 +21,107 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-19 · Đơn đã tạo nhưng báo lỗi: tool ghi được chờ 10 giây, bản sao lên website chạy nền
+
+Loại: harness / tool · Trạng thái: đang đo · Chỉ số: TSR (tạo đơn trên kênh voice)
+
+- **Vấn đề:** Cuộc gọi voice 27: khách đọc số điện thoại, `order.create` trả TIMEOUT hai lần ("did not answer within 2s"), cầu dao khóa tool 60 giây, agent nói "hệ thống phản hồi chậm" rồi chuyển máy. Thực tế đơn 149.000đ đã ghi vào `commerce.orders` lúc 16:10:31,34, chỉ 70 ms sau khi agent bỏ chờ.
+- **Bằng chứng:** Log agent 16:10:31,275 "Circuit open for tool order_create … after TIMEOUT"; bảng `commerce.orders` có đơn tạo lúc 16:10:31,34. `crm.order_create` chờ `shop_orders.mirror_create` (tạo khách trên website, có băm mật khẩu) trước khi trả kết quả.
+- **Sửa:**
+  - `mcp/tools.py` `ToolGuardMiddleware`: tool ghi (`WRITE_TOOLS`) được chờ `WRITE_TIMEOUT` = 10 giây; tool tra cứu giữ 2 giây.
+  - `mcp/servers/crm.py`: bản sao lên website chạy nền (task giữ tham chiếu trong `_MIRRORS`), `order_create` trả kết quả ngay khi đơn đã tạo.
+- **Đã kiểm:** `tests/agent/test_log_regressions.py::test_a_write_tool_is_given_long_enough_to_answer_and_a_lookup_keeps_two_seconds`. Bộ `tests/agent`: 1862 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo lại trên cuộc gọi thật.
+- **Còn lại:** Ở cùng cuộc, agent hỏi địa chỉ trước khi biết số điện thoại của khách lạ (skill `place-order` không cần địa chỉ), nên mất thêm một lượt; chưa sửa.
+
+### 2026-11-19 · Voice: chữ của agent hiện theo từng câu cùng lúc với tiếng; số trong lời khách hiện bằng chữ số
+
+Loại: voice / giao diện · Trạng thái: đang đo · Chỉ số: trải nghiệm (không có chỉ số BTC)
+
+- **Vấn đề:** Trên trang gọi, chữ của agent chỉ hiện khi cả lượt xong, chậm hơn tiếng vài giây. Lời khách hiện số điện thoại bằng chữ ("không chín tám bốn…").
+- **Bằng chứng:** `api/routes/voice.py` chỉ gửi `reply` sau `_take`, trong khi audio stream từng câu. `transcript` gửi văn bản trước ITN; ITN chỉ chạy trong harness. Kiểm `itn.normalise`: chuỗi trên ra `0984726714`.
+- **Sửa:**
+  - `api/routes/voice.py`: gửi `reply_part` khi mẩu audio đầu tiên của mỗi câu được gửi; `transcript` gửi `_shown(text)` (đã qua ITN). Văn bản đưa vào harness không đổi.
+  - `apps/web/src/features/voice/voice-call.tsx`: `reply_part` nối vào dòng của agent; `reply` thay toàn bộ dòng đó thay vì thêm dòng trùng.
+- **Đã kiểm:** Bộ `tests/agent` qua. Kiểm kiểu của web chạy trong `next build` của image (build thành công).
+- **Số đo:** chưa đo.
+- **Còn lại:** Câu giữ lượt (`VOICE_HOLD_MS`) vẫn tính từ lúc khách ngừng nói để đo TTFA đúng như BTC. Với ASR qua Colab (1,2–1,8 giây), câu này bật gần như mọi lượt và có lúc đi liền với câu mở trước tra cứu của model; chưa sửa.
+
+### 2026-11-19 · ASR và TTS chạy trên GPU Colab (engine giọng `remote`, PhoWhisper large/medium trong asr-service)
+
+Loại: voice / hạ tầng · Trạng thái: đang đo · Chỉ số: WER/CER, TTFA
+
+- **Vấn đề:** Laptop Intel không có GPU dùng được trong Docker: VieNeu trên CPU có RTF 3–4; ASR Zipformer sai nhiều ở tên tiếng Anh.
+- **Bằng chứng:** Bộ 120 câu TTS (4 giọng OpenAI, bản sạch và bản điện thoại, không commit): `phowhisper-large` WER 10,1%/10,4%, CER 3,7%/3,7%; `zipformer-30m` 10,2%/10,7%, CER 6,2%/7,9%; `phowhisper-medium` 10,6%/12,1%; `whisper-turbo` 10,9%/14,3% (còn bịa câu khi audio nhiễu). Một câu 4,2 giây qua tunnel: `phowhisper-large` 1,0–1,25 giây. TTS trên T4: VieNeu v3 Turbo (`device="cuda"`) tiếng đầu khoảng 170 ms trên Colab, khoảng 450 ms qua tunnel, RTF 0,82–0,94; ZeroTTS tiếng đầu khoảng 330 ms, RTF 0,88–0,91.
+- **Sửa:**
+  - `apps/asr-service/src/asr_service/engines.py`: thêm `phowhisper-medium`, `phowhisper-large`.
+  - `components/voice/tts.py`: engine `RemoteVoice` (`remote:<engine>[:<voice>]`, `TTS_URL`, `TTS_API_KEY`).
+  - `docker-compose.yml`, `.env.example`: `TTS_URL`, `TTS_API_KEY`.
+  - Máy chủ TTS và script cài đặt Colab nằm ngoài repo (scratchpad).
+- **Đã kiểm:** `tests/agent/test_voice_transport.py::test_remote_voice_reads_the_rate_the_server_names_and_sends_quarter_second_wav_chunks`; test ASR qua.
+- **Số đo:** chưa đo TTFA trên cuộc gọi thật. Riêng ASR qua Colab đã thêm 1–2 giây mỗi lượt, nên TTFA khó đạt 2,5 giây.
+- **Còn lại:** Colab miễn phí tắt phiên sau một thời gian (16:29 phiên `voice` bị tắt, phải tạo lại). Muốn demo ổn định cần máy GPU thuê.
+
+### 2026-11-19 · Voice: giữ 800 ms trước khi khách bắt đầu nói (preroll), để ASR không mất âm đầu
+
+Loại: voice (cắt lượt) · Trạng thái: đang đo · Chỉ số: độ đúng ASR trên cuộc gọi thật
+
+- **Vấn đề:** Cuộc gọi thật: khách nói "máy lọc không khí", ASR ghi "không khí"; agent nhận câu cụt.
+- **Bằng chứng:** Ghi âm `VOICE_RECORD=1`, cuộc 20 (không commit). Năng lượng tiếng bắt đầu ở giây 26,75, nhưng `TurnDetector` mở lượt ở 27,49 vì Silero cho âm đầu nhẹ qua muộn, nên lượt bắt đầu từ 27,33 (preroll 320 ms). Phát lại bản ghi qua `TurnDetector`: preroll 320 ms ra "không khí" với cả hai model; 800 ms ra "máy lọc không khí" với cả `zipformer-30m` và `zipformer-2025`. Câu "25 mét vuông" giữ nguyên ở mọi mức.
+- **Sửa:** `components/voice/turns.py`: `TurnConfig.preroll_ms` từ 320 lên 800. Phần đệm là audio đã có từ trước nên không thêm thời gian chờ.
+- **Đã kiểm:** Bộ `tests/agent`: 1944 qua, 1 fail sẵn ở `test_improve_runner.py`. Image đã build lại; trong container `preroll_ms` là 800.
+- **Số đo:** chưa đo trên nhiều cuộc gọi thật (mới có 1 bản ghi).
+- **Còn lại:** Câu "bạn bán gì" vẫn sai ở mọi mức preroll ("mày bán gì", "mang gì"); đây là lỗi của model, cần thêm bản ghi để so `zipformer-30m` với `zipformer-2025` trên giọng thật. Rủi ro: preroll dài có thể kéo theo tiếng vọng từ loa của agent nếu khách nói ngay sau khi agent dừng.
+
+### 2026-11-19 · Giọng đọc Gemini Flash TTS (`gemini:<voice>`), ghi âm cuộc gọi để chẩn đoán ASR
+
+Loại: tính năng (voice) · Trạng thái: đang đo · Chỉ số: TTFA, chất lượng giọng (nghe)
+
+- **Vấn đề:** Trên laptop Intel không có GPU, VieNeu sinh audio chậm hơn tốc độ phát 3–4 lần nên giọng đứt quãng. Một lượt đo được TTFA 33,3 giây (cuộc 16), và lúc khởi động phải mất 580 giây để nạp. Người dùng chê `openai:coral` đọc tiếng Việt nghe lạ. Log ASR có cuộc không thu được tiếng (cuộc 17, mức âm 0,0) và cuộc mức âm quá nhỏ (cuộc 18, 0,002–0,01, VAD tối đa 0,35).
+- **Bằng chứng:**
+  - VieNeu đo trong container: RTF 2,84–3,97.
+  - Bench Gemini TTS (`workbench/latency`, 3 lần mỗi model, cùng một câu): `gemini-3.8-flash-lite-tts` cho tiếng đầu sau 0,7 giây, sinh 8,9 giây audio trong 1,8 giây. `gemini-3.8-flash-tts` 1,1 giây; `gemini-3.1-flash-tts-preview` 0,9 giây; `gemini-2.5-flash-preview-tts` 7,0 giây.
+  - ASR trên `data/dev/asr_test` (24 cuộc, 34 phút, ghép theo đoạn): `zipformer-30m` WER 7,9% CER 3,7% RTF 0,029; `zipformer-30m-beam4` 7,8%/3,7%/0,038; `zipformer-2025` 9,0%/4,0%/0,042. Model hiện tại đã là tốt nhất trong số có trên máy; `phowhisper-small` thiếu `tokenizer.json` nên không nạp được.
+- **Sửa:**
+  - `components/voice/tts.py`: thêm engine `GeminiVoice` (`gemini:<voice>`, mặc định Kore). Model lấy từ `GEMINI_TTS_MODEL`, mặc định `gemini-3.8-flash-lite-tts`. Stream pcm 24 kHz, gửi từng mẩu 0,25 giây để lọt giới hạn frame của gateway. Có trong danh sách chọn giọng khi có `GOOGLE_API_KEY`.
+  - `docker-compose.yml`, `.env.example`: thêm `GEMINI_TTS_MODEL` và `VOICE_RECORD` (ghi audio mic vào `runs/voice/` của container).
+  - `docs/channels.md`: thêm một dòng vào bảng giọng.
+- **Đã kiểm:**
+  - `tests/agent/test_voice_transport.py::test_gemini_voice_streams_its_pcm_as_small_wav_chunks_and_is_offered_with_a_google_key`.
+  - Trong container: voice sẵn sàng sau 8,8 giây (VieNeu 580 giây). 3 lần đọc một câu: tiếng đầu sau 0,85–1,03 giây, xong trong 1,5–2,1 giây cho 4,7–5,3 giây audio, không khựng lần nào.
+- **Số đo:** chưa đo TTFA trên cuộc gọi thật.
+- **Còn lại:** Người dùng nghe thử và chọn giọng. Ghi âm cuộc gọi thật để xác định lỗi nhận dạng là do mic hay do model. Lượt đầu sau khi máy rảnh lâu (connection và prompt cache nguội) có TTFA 6,6 giây (cuộc 19 turn 2).
+
+### 2026-11-19 · Guard COD: máy đã nằm trong đơn nhiều dòng không bị cộng lần nữa
+
+Loại: hard guard · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Khi tạo đơn mới có `basket_skus`, `_cod_order` cộng thêm giá các máy trong giỏ chưa đặt. Nếu máy đó đã nằm trong một đơn nhiều dòng (`lines`) đặt trước trong cuộc, nó vẫn bị tính là chưa đặt: `placed_lines` ghi `sku` của đơn nhiều dòng là chuỗi ghép ("A,B"), nên phép loại trừ không khớp. Hậu quả: guard chặn sai với lý do "COD vượt 10.000.000đ".
+- **Bằng chứng:** Tái hiện offline: đơn đã đặt gồm 4.890.000đ + 1.590.000đ, thêm máy 1.095.000đ đi cùng giỏ → guard báo 12.465.000đ. Lần chạy `router` ngày 15/11, SCN-ADV-0060 call_2 turn 3 cũng báo "COD vượt 10.000.000đ" khi tổng chỉ 5.985.000đ (code lúc đó khác, đơn một món nay đã tính đúng).
+- **Sửa:** `components/guardrails/actions.py` `_cod_order`: tập `done` lấy mọi `skus` của đơn đã đặt, không lấy chuỗi `sku` ghép.
+- **Đã kiểm:** `tests/agent/test_order_lines.py::test_a_basket_product_already_in_a_placed_order_of_lines_is_not_counted_twice_for_cod`. Bộ `tests/agent`: 1857 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Không gỡ trượt của SCN-ADV-0060 call_2. Ca này là nhãn trái BTC (xem mục dưới).
+
+### 2026-11-19 · Rà nhãn dev theo BTC: chốt đơn, thanh toán, máy thứ hai, trả hàng (không sửa agent)
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Sau mục 18/11 (COD khi khách chưa nói), 7 ca A3 của `data/dev` có thể trượt lại. Câu hỏi: agent hay nhãn đúng với BTC?
+- **Bằng chứng:**
+  - BTC: `mock_tools.order_create` mặc định `payment="COD"`. Trace mẫu `eval/runs/full.jsonl` gọi `order.create` ngay ở lượt khách giục chốt (SAMPLE-01 turn 3 "lên đơn", SAMPLE-02 turn 3 "chị lấy cái đó"), không hỏi thanh toán.
+  - `order.update` chỉ có `exchange_size | exchange_product | return | update_address`: không đổi được thanh toán, không hủy.
+  - KM-05: AIR-2ND-50 chỉ áp khi hai máy trong cùng một đơn.
+  - SAMPLE-03: khách nói rõ "em làm thủ tục đổi cho anh nhé" rồi mới `order.update`.
+- **Kết luận:** agent hiện tại đúng BTC. Các nhãn sau trái BTC:
+  - **7 ca A3:** SCN-ADV-0017 c3, ADV-0078 c3, ADV-0099 c2, ADV-0105 c1, GEN-0034 c2, GEN-0061 c2, GEN-0234 c2. Khách nói chốt hoặc đặt trước rồi mới nói chuyển khoản, nhãn vẫn đòi `payment: bank`.
+  - **SCN-ADV-0060 c2:** khách chốt máy X ở turn 2, thêm Mini ở turn 3, nhãn đòi Mini giá giảm 50% (1.095.000đ). Theo KM-05, máy khác đơn thì không được giảm.
+  - **SCN-ADV-0071 c2:** khách chỉ hỏi có trả được không và hoàn bao nhiêu, chưa lần nào đồng ý trả, nhãn đòi `order.update return`.
+- **Sửa:** Không sửa agent. Cách sửa nhãn đề xuất: đưa câu thanh toán lên trước câu chốt, hoặc ghi `payment: COD`; ADV-0060 c2 gộp hai máy trước câu chốt; ADV-0071 c2 thêm câu khách đồng ý trả.
+- **Đã kiểm:** Đọc nguồn BTC và transcript `router` ngày 15/11 (`docs/evaluation/conversations.csv`); không chạy model.
+- **Số đo:** chưa đo
+- **Còn lại:** Nhãn là của người làm dữ liệu (`build_dev_r4.py`): cần họ đồng ý trước khi sửa. 20 ca khác cùng kiểu "chốt trước, chuyển khoản sau" vẫn qua ngày 16/11 vì PolicyAgent chưa cho tạo đơn ở câu đầu; đó là may, không phải thiết kế.
+
 ### 2026-11-18 · Cuộc gọi thoại: mọi con số viết bằng chữ số, không chỉ số tiền
 
 Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR
