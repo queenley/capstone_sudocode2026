@@ -131,10 +131,18 @@ async def order_create(
     from ...runtime import shop_orders
 
     if shop_orders.enabled():
-        await asyncio.to_thread(shop_orders.mirror_create, result, {
+        # In the background: the copy creates the website customer (a password hash) and takes seconds, and the order
+        # is placed already (2026-11-19, call 27: the copy pushed order_create past its limit). A failure only logs.
+        task = asyncio.create_task(asyncio.to_thread(shop_orders.mirror_create, result, {
             "customer_phone": customer_phone, "sku": sku, "qty": qty, "price_vnd": price_vnd, "lines": lines,
-            "payment": payment, "address": address})
+            "payment": payment, "address": address}))
+        _MIRRORS.add(task)
+        task.add_done_callback(_MIRRORS.discard)
     return result
+
+
+#: Website copies still being written: kept referenced so the event loop does not drop them midway.
+_MIRRORS: set = set()
 
 
 def _lines(lines: list[dict[str, Any]] | None) -> list[dict[str, Any]] | None:

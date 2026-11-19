@@ -120,3 +120,29 @@ def test_order_lookup_uses_verified_caller_without_exposing_phone_to_model(tier,
     request.override = lambda **changes: SimpleNamespace(**{**vars(request),**changes})
     adjusted = ToolGuardMiddleware(['crm_get_customer'],retries=0)._with_context(request)
     assert adjusted.tool_call['args']==expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("name, limit", [("order_create", 10.0), ("schedule_callback", 10.0), ("pricing_get_quote", 2.0)])
+async def test_a_write_tool_is_given_long_enough_to_answer_and_a_lookup_keeps_two_seconds(monkeypatch, name, limit):
+    """2026-11-19, call 27: an order placed 70 ms after a 2 s limit was reported to the customer as failed."""
+    from types import SimpleNamespace
+
+    from ai_agent_service.mcp import tools
+
+    seen = []
+
+    async def wait_for(awaitable, timeout):
+        seen.append(timeout)
+        return await awaitable
+
+    guard = tools.ToolGuardMiddleware([name], retries=0)
+    monkeypatch.setattr(guard, "_with_context", lambda request: request)
+    monkeypatch.setattr(tools.asyncio, "wait_for", wait_for)
+    request = SimpleNamespace(tool_call={"id": "t", "name": name, "args": {}})
+
+    async def handler(_request):
+        return ToolMessage(content='{"ok": true, "data": {}}', tool_call_id="t")
+
+    await guard.awrap_tool_call(request, handler)
+    assert seen == [limit]

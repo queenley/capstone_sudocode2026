@@ -99,6 +99,17 @@ def test_an_order_placed_with_lines_counts_once_with_its_total():
                                                "payment": "COD", "order_group": None}]
 
 
+def test_a_basket_product_already_in_a_placed_order_of_lines_is_not_counted_twice_for_cod():
+    placed = actions.placed_lines([{
+        "name": "order.create", "result": {"ok": True, "data": {"order_id": "OD1"}},
+        "args": {"lines": [{"sku": "A", "qty": 1, "price_vnd": 4_890_000}, {"sku": "B", "qty": 1, "price_vnd": 1_590_000}]}}])
+    quotes = {"A": 4_890_000, "C": 1_095_000}
+    # 6.480.000đ placed + 1.095.000đ now: under the limit; A is in the placed order, not a product still to come.
+    assert actions._cod_order({"sku": "C", "price_vnd": 1_095_000, "basket_skus": ["A"]}, 1_095_000, placed, "", quotes) == []
+    assert actions._cod_order({"sku": "C", "price_vnd": 1_095_000, "basket_skus": ["A", "D"]}, 1_095_000, placed, "",
+                              {**quotes, "D": 3_000_000})
+
+
 @pytest.mark.asyncio
 async def test_a_turn_with_no_words_is_the_customer_still_on_the_line():
     from types import SimpleNamespace

@@ -168,7 +168,8 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
     same = [p for p in placed if p.get("order_group") == group and p.get("payment") == "COD"]
     total = line + sum(int(p["price_vnd"]) * int(p["qty"]) for p in same)
     if group is None:  # the rest of the basket this order goes with, not yet placed
-        done = {p.get("sku") for p in same} | {args.get("sku")}
+        # An order of lines placed earlier holds every one of its skus, not the joined target string.
+        done = {sku for p in same for sku in (p.get("skus") or [p.get("sku")])} | {args.get("sku")}
         total += sum(int((quotes or {}).get(sku) or 0) for sku in args.get("basket_skus") or [] if sku not in done)
     if total <= COD_LIMIT_VND:
         return []

@@ -284,6 +284,9 @@ class ToolGuardMiddleware(AgentMiddleware):
     #: Section 6.1: seconds per call, by tool; everything else gets DEFAULT_TIMEOUT.
     TIMEOUTS = {"kb_search": 3.0, "kb_upsert": 3.0}
     DEFAULT_TIMEOUT = 2.0
+    #: A write that times out may still land on the server (2026-11-19, call 27: an order placed 70 ms after its 2 s
+    #: limit, the customer told it failed and transferred). A write is given long enough to answer.
+    WRITE_TIMEOUT = 10.0
 
     def __init__(
         self,
@@ -316,7 +319,8 @@ class ToolGuardMiddleware(AgentMiddleware):
             )
         request = self._with_context(request)
 
-        limit = self._timeout or self.TIMEOUTS.get(name, self.DEFAULT_TIMEOUT)
+        limit = self._timeout or self.TIMEOUTS.get(
+            name, self.WRITE_TIMEOUT if name in WRITE_TOOLS else self.DEFAULT_TIMEOUT)
         attempt = 0
         while True:
             attempt += 1
