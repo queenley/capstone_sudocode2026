@@ -1,0 +1,88 @@
+# EKS on AWS (docs/deployment/eks-architecture.md), on top of overlays/production (the after-call worker, PDBs).
+# The infrastructure is infra/terraform/aws-eks; its output "overlay" fills the __PLACEHOLDERS__ here:
+#
+#   terraform -chdir=infra/terraform/aws-eks output -json overlay > overlay.json
+#   python scripts/deployment/render_deployment.py --environment aws-production --registry <ecr> --tag <sha> \
+#     --terraform-output overlay.json
+#
+# The renderer refuses to write a manifest with a placeholder left in it.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: telesales-production
+resources:
+  - ../production
+  - secrets.yaml
+  - storage.yaml
+  - mcp.yaml
+  - asr.yaml
+  - zalo-mock.yaml
+  - scaling.yaml
+  - ingress.yaml
+  - network-policy.yaml
+configMapGenerator:
+  - name: telesales-config
+    behavior: merge
+    literals:
+      - CORS_ORIGINS=https://__DOMAIN__
+      - SHOP_PUBLIC_URL=https://__DOMAIN__
+      - AWS_REGION=__REGION__
+      - JOBS_QUEUE_URL=__JOBS_QUEUE_URL__
+      # ElastiCache Serverless speaks TLS only. The gateway's rate limit and the OTP limits (REDIS_URL), and the
+      # agent's limiter, load signal, spend ledger and kb:changed (AGENT_REDIS_URL): one Valkey.
+      - REDIS_URL=rediss://__VALKEY_ENDPOINT__:__VALKEY_PORT__/0
+      - AGENT_REDIS_URL=rediss://__VALKEY_ENDPOINT__:__VALKEY_PORT__/0
+      # The most agent pods the ScaledObject allows: each pod's share of the model limits if Valkey goes away.
+      - MODEL_LIMITER_PODS=10
+      # MCP servers as their own Deployment (mcp.yaml), over HTTP: the agent pods stay light.
+      - MCP_TRANSPORT=http
+      - MCP_MEMORY_URL=http://mcp-servers:8801/mcp
+      - MCP_CATALOG_URL=http://mcp-servers:8802/mcp
+      - MCP_CRM_URL=http://mcp-servers:8803/mcp
+      - MCP_ORDER_URL=http://mcp-servers:8804/mcp
+      - MCP_KNOWLEDGE_URL=http://mcp-servers:8805/mcp
+      - MCP_ACCOUNT_URL=http://mcp-servers:8806/mcp
+      - LANGFUSE_HOST=__LANGFUSE_HOST__
+      # Voice messages and calls are recognised by asr-service (asr.yaml).
+      - ASR_URL=http://asr-service:8500
+      # The voice calls are spoken with OpenAI's voice. VOICE_TTS at build time only chooses what is installed
+      # (apps/ai-agent-service/Dockerfile); the agent reads this one at run time, and without it falls back to the
+      # local VieNeu voice, which a cloud build does not install: the call then closes with 1011.
+      - VOICE_TTS=openai:coral
+      # The Zalo channel talks to the Zalo mock (zalo-mock.yaml), with the mock's own keys: they open nothing but the
+      # mock. A real Official Account: delete these six, and put its keys in the app secret instead.
+      - ZALO_APP_ID=mock-app
+      - ZALO_OA_ID=mock-oa
+      - ZALO_OA_SECRET_KEY=mock-oa-secret
+      - ZALO_ACCESS_TOKEN=mock-access-token
+      - ZALO_OPENAPI_URL=http://zalo-mock:8090
+      - ZALO_OAUTH_URL=http://zalo-mock:8090
+patches:
+  - path: agent-patch.yaml
+  # On EKS the cluster has Pod Identity, not IRSA: KEDA's operator reads the queue's length with its own role
+  # (infra/terraform/aws-eks/identity.tf, keda_identity).
+  - target: {kind: TriggerAuthentication, name: ai-agent-worker-sqs}
+    patch: |-
+      - op: replace
+        path: /spec/podIdentity/identityOwner
+        value: keda
+  # The Ingress checks /health (the gateway's); web has no such page, so its target group checks / instead.
+  - target: {kind: Service, name: web}
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value: {alb.ingress.kubernetes.io/healthcheck-path: /}
+  # web proxies /zalo-mock/* to the mock for a signed-in admin, its cookie signed with APP_SECRET
+  # (apps/web/src/lib/zalo-mock-session.ts).
+  - target: {kind: Deployment, name: web}
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: ZALO_MOCK_URL, value: "http://zalo-mock:8090"}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: ZALO_MOCK_SECRET, valueFrom: {secretKeyRef: {name: telesales-secrets, key: APP_SECRET}}}
+  # Replicas are the autoscalers' (scaling.yaml) from here on.
+  - target: {kind: Deployment, name: "(api-gateway|web|commerce-service|identity-service|sales-service|ai-agent-service)"}
+    patch: |-
+      - op: remove
+        path: /spec/replicas

@@ -1432,3 +1432,24 @@ footer.call-controls button.hangup { background: var(--danger); color: var(--on-
   .call-evidence { max-height: 60vh; }
   .call-transcript-pane { height: auto; min-height: max(620px, 85vh); }
 }
+
+/* The assistant's steps during a turn (components/ui/StepTrail.tsx): live with a spinner, then folded. */
+.steps { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); }
+.steps ol, ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.steps-done > summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; user-select: none; }
+.steps-done > summary::-webkit-details-marker { display: none; }
+.steps-done > summary::before { content: ""; width: 0; height: 0; border-left: 4px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .15s ease; }
+.steps-done[open] > summary::before { transform: rotate(90deg); }
+.steps-done > summary:hover { color: var(--ink); }
+.steps-done > ol { margin-top: 4px; padding-left: 12px; border-left: 1px solid var(--line); }
+.steps-line { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.steps-label { min-width: 0; overflow-wrap: anywhere; }
+.steps-tool { font-size: 11px; opacity: .75; white-space: nowrap; }
+.steps-mark { flex: none; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid currentColor; }
+.steps-running .steps-mark { border-color: var(--line); border-top-color: var(--brand); animation: steps-spin .8s linear infinite; }
+.steps-running { color: var(--ink); }
+.steps-ok .steps-mark { background: var(--brand); border-color: var(--brand); }
+.steps-error .steps-mark { border-color: var(--danger); }
+.steps-error .steps-label { color: var(--danger); }
+@keyframes steps-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .steps-running .steps-mark { animation: none; } }

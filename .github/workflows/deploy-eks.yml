@@ -1,0 +1,167 @@
+# Release to EKS (docs/deployment/eks-cicd.md): build and push the 8 images at this commit, open the cluster's API to
+# this runner, render the manifests, migrate, roll out, seed, smoke test, then close the API again. Started by hand
+# (Actions > Deploy EKS > Run workflow); a person approves the aws-production environment before AWS is touched.
+#
+# Rollback: run it with image_tag set to an earlier release's tag: no build, no migration and no seed, only the
+# rollout of those images with this commit's manifests.
+name: Deploy EKS
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Roll out an existing tag (12 characters of a commit) instead of building this commit"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write # OIDC to AWS
+
+concurrency:
+  group: deploy-eks
+  cancel-in-progress: false # never stop a release halfway
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: aws-production
+    timeout-minutes: 90
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'ap-southeast-1' }}
+      OVERLAY_PARAMETER: ${{ vars.EKS_OVERLAY_PARAMETER || '/telesales-production/overlay' }}
+      NAMESPACE: telesales-production
+      BUILD: ${{ inputs.image_tag == '' }}
+    steps:
+      # The manifests are always this commit's; a rollback changes only the images' tag.
+      - uses: actions/checkout@v4
+
+      - name: Tag
+        env:
+          WANTED: ${{ inputs.image_tag }}
+        run: |
+          if [ -n "$WANTED" ] && ! [[ "$WANTED" =~ ^[A-Za-z0-9_.-]+$ ]]; then echo "::error::bad image_tag"; exit 1; fi
+          echo "TAG=${WANTED:-${GITHUB_SHA::12}}" >> "$GITHUB_ENV"
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_EKS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 5400
+
+      - name: Read the values Terraform wrote (infra/terraform/aws-eks/github.tf)
+        run: |
+          set -euo pipefail
+          mkdir -p reports/generated
+          aws ssm get-parameter --name "$OVERLAY_PARAMETER" --query Parameter.Value --output text > reports/generated/overlay.json
+          {
+            echo "REGISTRY=$(jq -r .ecr_registry reports/generated/overlay.json)"
+            echo "CLUSTER=$(jq -r .cluster reports/generated/overlay.json)"
+            echo "DOMAIN=$(jq -r .domain reports/generated/overlay.json)"
+          } >> "$GITHUB_ENV"
+
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push the images
+        if: env.BUILD == 'true'
+        env:
+          # Voice calls need the voice packages (VAD, end-of-turn detection, TTS): without them the agent never
+          # hears a turn end. 0 only for a text-only shop.
+          AGENT_WITH_VOICE: ${{ vars.AGENT_WITH_VOICE || '1' }}
+          VOICE_TTS: ${{ vars.VOICE_TTS || 'openai:coral' }}
+          HOTLINE_NUMBER: ${{ vars.HOTLINE_NUMBER || '1900 6868' }}
+          ZALO_OA_ID: ${{ vars.ZALO_OA_ID }}
+        run: |
+          set -euo pipefail
+          build() {  # name, Dockerfile, build args...
+            local repo="telesales-$1" dockerfile="$2"; shift 2
+            if aws ecr describe-images --repository-name "$repo" --image-ids imageTag="$TAG" >/dev/null 2>&1; then
+              echo "$repo:$TAG already in ECR (tags are immutable): skipped"; return
+            fi
+            # One manifest, no attestation index: an IMMUTABLE tag refuses the second PUT (eks-deploy.md 2.4).
+            docker buildx build --push --provenance=false --sbom=false -f "$dockerfile" -t "$REGISTRY/$repo:$TAG" \
+              --cache-from "type=gha,scope=$repo" --cache-to "type=gha,mode=max,scope=$repo" "$@" .
+          }
+          build backend-common packages/backend-common/Dockerfile
+          build gateway        apps/api-gateway/Dockerfile
+          build commerce       apps/commerce-service/Dockerfile
+          build identity       apps/identity-service/Dockerfile
+          build sales          apps/sales-service/Dockerfile
+          build ai-agent       apps/ai-agent-service/Dockerfile \
+            --build-arg "WITH_VOICE=$AGENT_WITH_VOICE" --build-arg "VOICE_TTS=$VOICE_TTS"
+          # NEXT_PUBLIC_* are baked into the browser bundle. Without the voice URL the browser dials
+          # wss://<domain>:8000, a port the ALB does not open, and a call never connects.
+          build web            apps/web/Dockerfile --build-arg "NEXT_PUBLIC_VOICE_URL=https://$DOMAIN" \
+            --build-arg "NEXT_PUBLIC_HOTLINE=$HOTLINE_NUMBER" --build-arg "NEXT_PUBLIC_ZALO_OA_ID=$ZALO_OA_ID"
+          build asr            apps/asr-service/Dockerfile
+
+      - name: Check every image is in ECR
+        run: |
+          set -euo pipefail
+          for repo in backend-common gateway commerce identity sales ai-agent web asr; do
+            aws ecr describe-images --repository-name "telesales-$repo" --image-ids imageTag="$TAG" >/dev/null \
+              || { echo "::error::telesales-$repo:$TAG is not in ECR"; exit 1; }
+          done
+
+      - name: Render the manifests
+        run: |
+          python3 scripts/deployment/render_deployment.py --environment aws-production \
+            --registry "$REGISTRY" --tag "$TAG" --terraform-output reports/generated/overlay.json
+
+      # The API is open to cluster_admin_cidrs only; this run adds its own address and the last step takes it out.
+      - name: Open the cluster's API to this runner
+        run: |
+          set -euo pipefail
+          ip=$(curl -fsS https://checkip.amazonaws.com | tr -d '[:space:]')
+          before=$(aws eks describe-cluster --name "$CLUSTER" --query 'cluster.resourcesVpcConfig.publicAccessCidrs' --output json)
+          echo "CIDRS_BEFORE=$(jq -c . <<<"$before")" >> "$GITHUB_ENV"
+          echo "RUNNER_CIDR=$ip/32" >> "$GITHUB_ENV"
+          wanted=$(jq -r --arg ip "$ip/32" '. + [$ip] | unique | join(",")' <<<"$before")
+          bash scripts/deployment/eks_endpoint.sh "$CLUSTER" "$wanted"
+          aws eks update-kubeconfig --name "$CLUSTER" >/dev/null
+          for _ in $(seq 1 30); do kubectl version >/dev/null 2>&1 && break; sleep 10; done
+          kubectl get nodes
+
+      - name: Node pools first (the migration Job needs a node)
+        run: kubectl apply -f reports/generated/deployment.yaml -l telesales/part=cluster
+
+      - name: Migrate
+        if: env.BUILD == 'true'
+        run: |
+          set -euo pipefail
+          kubectl get namespace "$NAMESPACE" >/dev/null 2>&1 || kubectl create namespace "$NAMESPACE"
+          kubectl get secret telesales-migration-secrets -n "$NAMESPACE" >/dev/null \
+            || { echo "::error::create telesales-migration-secrets once by hand (eks-deploy.md 2.6)"; exit 1; }
+          kubectl delete job telesales-migrate -n "$NAMESPACE" --ignore-not-found --wait=true
+          sed "s#image: telesales-backend-common:dev#image: $REGISTRY/telesales-backend-common:$TAG#" infra/kubernetes/migrate-job.yaml \
+            | kubectl apply -n "$NAMESPACE" -f -
+          kubectl wait --for=condition=complete job/telesales-migrate -n "$NAMESPACE" --timeout=15m \
+            || { kubectl logs -n "$NAMESPACE" job/telesales-migrate --tail=50 || true; exit 1; }
+
+      - name: Roll out
+        run: |
+          set -euo pipefail
+          kubectl apply -f reports/generated/deployment.yaml
+          for deployment in $(kubectl get deploy -n "$NAMESPACE" -o name); do
+            kubectl rollout status "$deployment" -n "$NAMESPACE" --timeout=10m
+          done
+
+      - name: Seed the demo data (safe to repeat)
+        if: env.BUILD == 'true'
+        run: |
+          set -euo pipefail
+          cm=$(kubectl get deploy api-gateway -n "$NAMESPACE" -o jsonpath='{.spec.template.spec.containers[0].envFrom[0].configMapRef.name}')
+          kubectl delete job telesales-seed -n "$NAMESPACE" --ignore-not-found --wait=true
+          sed -e "s#image: telesales-backend-common:dev#image: $REGISTRY/telesales-backend-common:$TAG#" \
+              -e "s#name: telesales-config}#name: $cm}#" infra/kubernetes/seed-job.yaml | kubectl apply -n "$NAMESPACE" -f -
+          kubectl wait --for=condition=complete job/telesales-seed -n "$NAMESPACE" --timeout=10m
+          kubectl logs -n "$NAMESPACE" job/telesales-seed --tail=5
+
+      - name: Smoke test
+        run: |
+          curl -fsS --retry 6 --retry-delay 10 -o /dev/null -w "https://$DOMAIN/ %{http_code}\n" "https://$DOMAIN/"
+          echo "Released \`$TAG\` to https://$DOMAIN" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Close the cluster's API again
+        if: always() && env.CIDRS_BEFORE != ''
+        run: bash scripts/deployment/eks_endpoint.sh "$CLUSTER" "$(jq -r 'join(",")' <<<"$CIDRS_BEFORE")"

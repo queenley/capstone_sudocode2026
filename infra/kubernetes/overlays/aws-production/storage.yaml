@@ -1,0 +1,32 @@
+# EFS for what every agent pod shares: skills, improvement state, knowledge versions (as /mnt/efs on EC2). One
+# access point owned by uid 1000 (infra/terraform/aws-eks/data.tf); the EFS CSI driver is an EKS add-on there.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-agent
+provisioner: efs.csi.aws.com
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: telesales-agent-data
+spec:
+  capacity: {storage: 5Gi}
+  volumeMode: Filesystem
+  accessModes: [ReadWriteMany]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-agent
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: __EFS_ID__::__EFS_ACCESS_POINT__
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agent-data
+spec:
+  accessModes: [ReadWriteMany]
+  storageClassName: efs-agent
+  volumeName: telesales-agent-data
+  resources:
+    requests: {storage: 5Gi}

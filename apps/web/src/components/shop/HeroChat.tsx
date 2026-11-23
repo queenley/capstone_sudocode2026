@@ -29,8 +29,14 @@ const KEEP = 4; // messages on the card at once: two exchanges
 
 type Line = { id: number; who: "me" | "bot"; text: string; words?: number };
 
+/** The card's first state, in the server HTML too: one exchange, so the first screen never shows an empty card. */
+const FIRST: Line[] = [
+  { id: 0, who: "me", text: SCRIPT[0].q },
+  { id: 1, who: "bot", text: SCRIPT[0].a },
+];
+
 export default function HeroChat() {
-  const [lines, setLines] = useState<Line[]>([]);
+  const [lines, setLines] = useState<Line[]>(FIRST);
   const [typing, setTyping] = useState(false);
   const card = useRef<HTMLDivElement>(null);
 
@@ -67,9 +73,9 @@ export default function HeroChat() {
       });
     const push = (line: Line) => setLines((all) => [...all, line].slice(-KEEP));
     (async () => {
-      let id = 0;
-      await wait(900); // after the hero's own entrance
-      for (let turn = 0; !gone; turn = (turn + 1) % SCRIPT.length) {
+      let id = FIRST.length;
+      await wait(2400); // the first exchange is already on the card: read it, then the next question
+      for (let turn = 1; !gone; turn = (turn + 1) % SCRIPT.length) {
         const { q, a } = SCRIPT[turn];
         push({ id: id++, who: "me", text: q });
         await wait(700);

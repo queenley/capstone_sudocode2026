@@ -35,6 +35,7 @@ from src.db.models import (
     Product,
     now,
 )
+from src.identity import otp_limits
 from src.identity.service import IdentityService, aware
 from src.security.auth import password_hash, password_matches
 from src.security.service import normalize_identifier
@@ -55,8 +56,8 @@ def local_phone(value):
 
 
 class AccountService:
-    def __init__(self, db, security):
-        self.db, self.security = db, security
+    def __init__(self, db, security, client_ip=None):
+        self.db, self.security, self.client_ip = db, security, client_ip
 
     # ── who owns a phone ───────────────────────────────────────────────
 
@@ -84,6 +85,9 @@ class AccountService:
         settings = self.security.settings
         if settings.environment == "production" and not settings.otp_url:
             raise HTTPException(503, "Configure an OTP delivery provider before enabling accounts")
+        # The same limits as a chat's identification (identity/otp_limits.py): every code is a paid SMS.
+        otp_limits.check(self.db, digest=self._digest("phone", phone), purpose=purpose, client_ip=self.client_ip,
+                         redis_url=settings.redis_url)
         code = str(secrets.randbelow(900000) + 100000)
         challenge = Challenge(
             conversation_id=None,

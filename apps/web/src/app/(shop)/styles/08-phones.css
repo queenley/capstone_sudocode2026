@@ -1,0 +1,122 @@
+/* ---------- phones and small tablets ----------
+   The chat becomes a full screen sheet and its button a round icon that leaves the
+   page's last line visible; listings, the cart and the forms rearrange for one hand. */
+.s-chat-fab-icon {
+  display: none;
+  width: 24px;
+  height: 24px;
+}
+@media (max-width: 860px) {
+  .s-listing-bar {
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+  .s-listing-bar > span,
+  .s-filter-toggle {
+    white-space: nowrap;
+  }
+  .s-sort {
+    margin-left: auto !important;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 600px) {
+  .s-main {
+    padding-bottom: 84px; /* the last line stays clear of the chat button */
+  }
+  .s-chat-fab {
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    justify-content: center;
+  }
+  .s-chat-fab-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .s-chat-fab-icon {
+    display: block;
+  }
+  .s-chat-fab-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 9px;
+    height: 9px;
+  }
+  .s-chat {
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+  .s-chat-foot {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+  html.s-chat-open,
+  html.s-chat-open body {
+    overflow: hidden;
+  }
+  /* 16px stops iOS Safari zooming into a field when it is tapped. */
+  .s-form input,
+  .s-form select,
+  .s-form textarea,
+  .s-search input,
+  .s-chat-input textarea,
+  .s-sort select {
+    font-size: 16px;
+  }
+  .s-sort {
+    font-size: 0; /* the select says what it sorts by; the label word goes */
+  }
+  .s-cart-line {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-areas:
+      "art info"
+      "art qty"
+      "price price";
+    gap: 8px 12px;
+    align-items: center;
+  }
+  .s-cart-line > .s-art {
+    grid-area: art;
+    align-self: start;
+  }
+  .s-cart-line-info {
+    grid-area: info;
+  }
+  .s-cart-line > .s-qty {
+    grid-area: qty;
+    justify-self: start;
+  }
+  .s-cart-line-price {
+    grid-area: price;
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .s-auth-card,
+  .s-account-section {
+    padding: 18px;
+  }
+  .s-page-title {
+    font-size: 26px;
+  }
+  .s-empty-state h1 { font-size: 30px; }
+  .s-wrap { padding-left: 16px; padding-right: 16px; }
+  .s-search input { min-width: 0; }
+}
+

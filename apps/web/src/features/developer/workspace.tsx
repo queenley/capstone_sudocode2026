@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import StaffTopbar from "@/components/staff/StaffTopbar";
 import { api, ChatMessage, CreateCatalogSkuInput } from "@/services/api";
 import AdminTools from "@/features/admin/admin-tools";
 import AgentConsole from "./agent-console";
@@ -60,20 +61,7 @@ export default function Workspace({ role }: { role: string }) {
   }
   return (
     <main className="shell workspace">
-      <header className="topbar">
-        <Link className="logo" href="/">
-          Quivo
-        </Link>
-        <nav>
-          <Link href="/login">Sign in</Link>
-          {["agent", "admin", "seller", "developer"].map((r) => (
-            <Link key={r} href={"/" + r}>
-              {r}
-            </Link>
-          ))}
-          <Link href="/calls">calls</Link>
-        </nav>
-      </header>
+      <StaffTopbar current={"/" + role} />
       <div className="section-heading">
         <div>
           <p className="eyebrow">Internal workspace</p>

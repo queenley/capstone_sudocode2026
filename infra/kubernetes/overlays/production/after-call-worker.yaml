@@ -1,0 +1,88 @@
+# After-call work off the API (apps/ai-agent-service/src/ai_agent_service/runtime/jobs.py, .../worker.py):
+# ai-agent-service sends one SQS message per ended call; ai-agent-worker runs after_call (MemoryAgent, QaAgent)
+# and the one-minute sweep. Needs, from Terraform (infra/terraform/aws-eks: queue.tf and identity.tf):
+# - the queue URL in JOBS_QUEUE_URL (kustomization.yaml of this overlay, filled by render_deployment.py);
+# - two EKS Pod Identity associations, made by identity.tf: service account ai-agent-service -> send,
+#   ai-agent-worker -> receive and delete;
+# - KEDA 2.13 or later in the cluster (the ScaledObject below).
+# Staging keeps the base: no JOBS_QUEUE_URL, so the API runs after_call and the sweep itself.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-agent-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-agent-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-agent-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-ai-agent-worker}
+  template:
+    metadata:
+      labels: {app: telesales-ai-agent-worker}
+    spec:
+      serviceAccountName: ai-agent-worker
+      # The batch in hand finishes after SIGTERM (worker.consume); one after_call takes well under this.
+      terminationGracePeriodSeconds: 180
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: ai-agent-worker
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.worker]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          # The worker process plus its MCP server subprocesses (the knowledge server loads the embedding model);
+          # no voice models.
+          resources:
+            requests: {cpu: 250m, memory: 1Gi}
+            limits: {cpu: '2', memory: 2Gi}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: models, mountPath: /app/models}
+            - {name: runs, mountPath: /app/agent/runs}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: models, emptyDir: {}}
+        - {name: runs, emptyDir: {}}
+---
+# KEDA reads the queue's length with the worker's own Pod Identity role (GetQueueAttributes is in its policy).
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: ai-agent-worker-sqs
+spec:
+  podIdentity:
+    provider: aws
+    identityOwner: workload
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: ai-agent-worker
+spec:
+  scaleTargetRef: {name: ai-agent-worker}
+  # At least one: the sweep runs here, and a call the customer simply left sends no message.
+  minReplicaCount: 1
+  maxReplicaCount: 6
+  pollingInterval: 15
+  cooldownPeriod: 300
+  triggers:
+    - type: aws-sqs-queue
+      authenticationRef: {name: ai-agent-worker-sqs}
+      metadata:
+        queueURL: __JOBS_QUEUE_URL__
+        queueLength: "5" # messages per replica: one receive batch (WORKER_BATCH)
+        awsRegion: __REGION__
+        scaleOnInFlight: "true"

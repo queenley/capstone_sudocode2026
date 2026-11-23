@@ -14,7 +14,7 @@ from src.db.models import (
 from src.identity.service import IdentityService
 from src.memory.service import MemoryService
 from src.security.service import mask
-from .shared import bearer, resources
+from .shared import bearer, client_ip, resources
 from src.api.schemas import (
     NewConversation,
     Identification,
@@ -116,7 +116,7 @@ def identify(conversation_id: UUID, data: Identification, request: Request):
             db, str(conversation_id), bearer(request), lock=True
         )
         result = IdentityService(db, security).challenge(
-            conv, data.kind, data.value, data.consent
+            conv, data.kind, data.value, data.consent, client_ip=client_ip(request)
         )
         db.commit()
         return result

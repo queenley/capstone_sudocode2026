@@ -187,7 +187,11 @@ async def get_call(call_id: int, request: Request) -> dict[str, Any]:
     except CallError as error:
         raise _http(error) from error
     visible = sum(1 for t in turns if t["speaker"] == "customer")
-    return {**_call(row, visible), "held_by_you": row.get("accepted_by") == actor.id, "turns": [
+    from ...runtime import steps
+
+    # The tool steps of the turn in progress (runtime/steps.py), from any pod; [] between turns.
+    return {**_call(row, visible), "held_by_you": row.get("accepted_by") == actor.id,
+            "live_steps": await steps.live(call_id), "turns": [
         {"id": t["id"], "turn_id": t["turn_id"], "speaker": t["speaker"], "content": t["content"],
          "meta": t["meta"] or {}, "created_at": t["created_at"].isoformat()} for t in turns]}
 

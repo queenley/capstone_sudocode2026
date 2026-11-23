@@ -1,4 +1,19 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: telesales-production
-resources: [../../base, availability.yaml]
+resources: [../../base, availability.yaml, after-call-worker.yaml]
+# After-call work goes to SQS and ai-agent-worker (after-call-worker.yaml). render_deployment.py fills the
+# __PLACEHOLDERS__ from Terraform (infra/terraform/aws-eks, output "overlay") or from --set.
+configMapGenerator:
+  - name: telesales-config
+    behavior: merge
+    literals:
+      - JOBS_QUEUE_URL=__JOBS_QUEUE_URL__
+      - AWS_REGION=__REGION__
+patches:
+  # The API's Pod Identity role may send to the queue (infra/terraform/aws-eks/identity.tf, agent_identity).
+  - target: {kind: Deployment, name: ai-agent-service}
+    patch: |-
+      - op: add
+        path: /spec/template/spec/serviceAccountName
+        value: ai-agent-service

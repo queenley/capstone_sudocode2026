@@ -21,12 +21,12 @@ Lấy từ `docker-compose.yml` và `infra/kubernetes/base/workloads.yaml`:
 | `web` (Next.js) | `apps/web/Dockerfile` | thành phần duy nhất cần ra Internet, cùng `/api/*` của gateway |
 | `api-gateway` :8000 | `apps/api-gateway/Dockerfile` | giới hạn 120 request/phút mỗi IP cho `/api/*` (Redis nếu có `REDIS_URL`, không thì đếm trong tiến trình); SSE và WebSocket đi qua |
 | `identity-service` :8200, `sales-service` :8300, `commerce-service` :8100 | Dockerfile riêng | PostgreSQL |
-| `*-events` workers (4) | `packages/backend-common/Dockerfile` | chỉ cần khi bật Kafka (profile `async`) |
+| `*-events` workers (4) | `packages/backend-common/Dockerfile` | đọc bảng outbox trên PostgreSQL và xử lý thẳng; deploy không dùng Kafka |
 | `ai-agent-service` :8400 | `apps/ai-agent-service/Dockerfile` (`WITH_VOICE=1` khi cần thoại) | request 1Gi / limit 3Gi RAM, voice thêm khoảng 1,5Gi; 6 tiến trình con MCP qua stdio; gọi model qua Internet; tự tạo bảng trong schema `agent` khi khởi động; skills và trạng thái cải tiến là file (`/app/agent/data/skills`, `/app/agent/data/improvement`) |
 | `asr-service` :8500 | `apps/asr-service/Dockerfile` | CPU được, GPU thì nhanh hơn (`ASR_DEVICE=cuda`); đặt `ASR_API_KEY` |
 | PostgreSQL 16 | `postgres:16` | một database `app_db`, nhiều schema; agent cần quyền `CREATE` |
 | Redis 7 | `redis:7-alpine` | chỉ cho rate limit của gateway |
-| Kafka | `apache/kafka:3.9.1`, profile `async` | tùy chọn |
+| Kafka | `apache/kafka:3.9.1`, profile `async` | **chỉ local**; không có trong file deploy nào (cloud, AWS, Kubernetes) |
 | LiveKit + LiveKit SIP + `hotline-bridge` | profile `hotline` | UDP công khai: SIP 5060, RTP 40000–40100 và 40200–40300, TCP 7881 (`infra/livekit/livekit.yaml`) |
 | Qdrant | profile `retrieval` | **không triển khai**: không code nào dùng ([0.9](../ai/00-kien-truc.md#09-kho-tri-thức-embedding-lưu-ở-đâu-có-dùng-qdrant-không)) |
 
@@ -335,7 +335,7 @@ Các điểm nghẽn này đúng với mọi cách triển khai, dù là compose
 |---|---|---|---|---|
 | 1 | **Giới hạn của provider model** (request và token mỗi phút) | Đây là trần thật của hệ thống: mỗi lượt gọi advisor, có thể kèm PolicyAgent, và mỗi cuộc gọi kết thúc gọi MemoryAgent và QaAgent. Rate limiter nằm **trong từng tiến trình** (`_LIMITERS` trong [factory.py](../../apps/ai-agent-service/src/ai_agent_service/llm/factory.py)), nên N máy cùng bắn tới N lần giới hạn trong `config/models.yaml` | Ngắn hạn: chia `rate_limits` cho số máy tối đa. Dài hạn: limiter dùng chung qua ElastiCache. Xin nâng quota ở provider | có, cho limiter dùng chung |
 | 2 | **Số tiến trình và kết nối database mỗi agent** | Mỗi vai MCP tự mở tiến trình stdio riêng ([client.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/client.py)): tới 13 tiến trình, mỗi cái một pool PostgreSQL tối đa 2 kết nối ([server_base.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/server_base.py)), cộng pool API tối đa 5 ([db.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/db.py)): khoảng 31 kết nối mỗi agent | Chạy MCP server thành service riêng, client gọi qua HTTP (`MCP_<SERVER>_URL`, cổng 8801–8806). Thêm RDS Proxy | không: đã có chế độ HTTP |
-| 3 | **Việc nền chạy trong tiến trình API** | `after_call` chạy bằng task asyncio, và mỗi agent chạy vòng đối soát 60 giây một lần (`_reconcile_forever` trong [main.py](../../apps/ai-agent-service/src/ai_agent_service/main.py)) | Tách worker riêng kéo việc từ hàng đợi (SQS) | có |
+| 3 | **Việc nền chạy trong tiến trình API** | `after_call` chạy bằng task asyncio, và mỗi agent chạy vòng quét 60 giây một lần ([runtime/jobs.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/jobs.py)) | **Đã có**: đặt `JOBS_QUEUE_URL` thì việc này sang `ai_agent_service.worker` đọc SQS. Trên stack EC2 vẫn chạy trong API, vì container không lấy được credential của máy (hop limit 1); dùng trên EKS với Pod Identity ([eks-architecture.md](eks-architecture.md)) | đã sửa |
 | 4 | **Tùy chọn runtime theo tiến trình** | Đổi từ Agent Console chỉ áp cho tiến trình nhận request | Lưu tùy chọn trong PostgreSQL và đọc lại định kỳ | có, nếu cần đổi lúc chạy |
 | 5 | **Cuộc gọi thoại** | WebSocket giữ suốt cuộc gọi; VAD và Smart Turn chạy trong agent, ASR ở `asr-service` | Scale agent theo số cuộc gọi đang mở, không theo CPU. ASR trên GPU | không, chỉ cần metric |
 | 6 | **PostgreSQL ghi** | Mỗi lượt ghi checkpoint LangGraph, `agent.turns`, `conversation.messages`; lease cuộc gọi là một `UPDATE` có điều kiện ([calls.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/calls.py)) | Scale dọc instance RDS | có, nếu cần read replica |
@@ -343,6 +343,8 @@ Các điểm nghẽn này đúng với mọi cách triển khai, dù là compose
 Mỗi bước nâng cấp nên đo trước và sau với cùng tải: `run_eval.py --performance --sessions <mức>` cho p95 TTFT và số phiên giữ được, cộng CloudWatch cho CPU, RAM và số kết nối RDS. Chưa có số đo nào cho các bước này.
 
 ### 7.2 Kiến trúc đầy đủ trên EKS
+
+Bản chi tiết (thành phần, ElastiCache dùng vào việc gì, bảo mật, chi phí, bật/tắt khi demo): [eks-architecture.md](eks-architecture.md).
 
 Khi đã có các tín hiệu ở bảng trên, chuyển sang EKS. Câu hỏi sơ đồ trả lời: **sau khi gỡ các điểm nghẽn, mỗi phần scale theo tín hiệu nào?**
 

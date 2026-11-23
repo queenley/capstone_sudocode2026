@@ -34,7 +34,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from ...components import knowledge
-from ...components.knowledge import corpus
+from ...components.knowledge import corpus, notify
 from ...components.knowledge.search import Hit, KnowledgeBase, Result
 from ...config.config_manager import get_knowledge_config, kb_dir
 from ..server_base import SCHEMA_LOCK, Server, ToolFailure, apply_schema, current_role, database
@@ -175,9 +175,20 @@ async def _stamp_now() -> tuple[Any, ...]:
     return row["n"], row["at"]
 
 
+_listener: asyncio.Task[None] | None = None
+
+
+def mark_stale() -> None:
+    """``kb:changed`` arrived (components/knowledge/notify.py): the next search checks the stamp at once."""
+    global _checked
+    _checked = 0.0
+
+
 async def base() -> KnowledgeBase:
     """The index, rebuilt when ``kb_chunks`` changed since it was built."""
-    global _kb, _stamp, _checked
+    global _kb, _stamp, _checked, _listener
+    if _listener is None or _listener.done():
+        _listener = asyncio.create_task(notify.listen(mark_stale))
     now = time.monotonic()
     if _kb is not None and now - _checked < REFRESH_SECONDS:
         return _kb
@@ -338,6 +349,7 @@ async def kb_upsert(
              json.dumps(provenance, ensure_ascii=False), "draft" if revoke else "live", revoke),
         )
     _checked = 0.0  # this process rebuilds on its next search
+    await notify.publish(f"kb_upsert {chunk_id}")  # and every other one, now rather than within ten seconds
     return {"chunk_id": chunk_id, "revoked": revoke, "scope": "demo"}
 
 

@@ -4,6 +4,7 @@
 // quoted again right before it is placed (`expected_*` must match), and stock
 // for all lines is reserved together or not at all.
 import Link from "next/link";
+import EmptyState from "@/components/shop/EmptyState";
 import { useEffect, useRef, useState } from "react";
 import VerifyPhone from "@/components/shop/VerifyPhone";
 import TransferInfo, { Transfer } from "@/components/shop/TransferInfo";
@@ -358,12 +359,11 @@ export default function CheckoutPage() {
 
   if (!lines.length)
     return (
-      <div className="s-wrap s-page s-empty-state">
-        <h1>Chưa có sản phẩm để đặt</h1>
-        <Link className="s-btn" href="/">
-          Tiếp tục mua sắm
-        </Link>
-      </div>
+      <EmptyState
+        title="Chưa có sản phẩm để đặt"
+        line="Giỏ hàng đang trống. Thêm sản phẩm vào giỏ rồi quay lại đây để đặt hàng."
+        actions={<Link className="s-btn" href="/">Tiếp tục mua sắm</Link>}
+      />
     );
 
   const canPay = payment === "cod" ? codAllowed : transferAllowed;
@@ -385,7 +385,7 @@ export default function CheckoutPage() {
     <div className="s-wrap s-page">
       <h1 className="s-page-title">Đặt hàng</h1>
       <p className="s-lead">4 bước để hoàn tất đơn hàng. Các mục bắt buộc được ghi rõ bên dưới.</p>
-      <Link className="s-link-btn s-back-link" href="/gio-hang">← Chỉnh sửa giỏ hàng</Link>
+      <Link className="s-link-btn s-back-link" href="/gio-hang"><Icon name="arrow-left" size={16} /> Chỉnh sửa giỏ hàng</Link>
       {error && <div ref={errorNotice} className="s-alert" role="alert" tabIndex={-1}>{error}</div>}
       {catalogError && <div className="s-alert" role="alert">{catalogError} <button className="s-link-btn" onClick={retryCatalog}>Thử lại thông tin sản phẩm</button></div>}
       <div className="s-cart">

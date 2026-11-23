@@ -39,6 +39,9 @@ evaluation/data-generation/**/*.py[cod]
 !.github/workflows/
 .github/workflows/*
 !.github/workflows/offline-checks.yml
+# EKS: deploy by hand with approval, and an offline Terraform check (docs/deployment/eks-cicd.md)
+!.github/workflows/deploy-eks.yml
+!.github/workflows/terraform-eks.yml
 
 # Evaluation runs: local evidence and the store of real agent turns to re-label, may hold customer data
 evaluation/runs/
@@ -73,3 +76,11 @@ data/dev/asr_elevenlabs/
 
 # taste-skill's working files beside a page (its deal history, found photos, browser profiles).
 .taste-skill/
+
+# Deployment (docs/deployment/eks-deploy.md). Secret values and local Terraform artefacts: never in git.
+# The app secret's values, written for aws secretsmanager put-secret-value (section 2.3); delete it after upload.
+telesales-app.json
+*.tfplan
+infra/terraform/**/crash*.log
+infra/terraform/**/.terraform.tfstate.lock.info
+# Kept in git on purpose: infra/terraform/**/.terraform.lock.hcl (pins provider versions) and backend.hcl.example.

@@ -126,7 +126,14 @@ class TokenTrackingCallback(BaseCallbackHandler):
         input_tokens, output_tokens = self._tokens_from(response)
         if input_tokens or output_tokens:
             self.rate_limiter.record_request(input_tokens, output_tokens)
-            token_ledger.record(self.agent_name, input_tokens, output_tokens, cached_tokens(response))
+            token_ledger.record(self.agent_name, input_tokens, output_tokens, cached_tokens(response),
+                                cost_usd=self._cost(input_tokens, output_tokens))
+
+    def _cost(self, input_tokens: int, output_tokens: int) -> float:
+        """This call's price at the limiter's rates (config/models.yaml), cache discounts not applied."""
+        limiter = self.rate_limiter
+        return (input_tokens * float(getattr(limiter, "input_token_price", 0.0) or 0.0)
+                + output_tokens * float(getattr(limiter, "output_token_price", 0.0) or 0.0))
 
     @staticmethod
     def _tokens_from(response: LLMResult) -> tuple[int, int]:

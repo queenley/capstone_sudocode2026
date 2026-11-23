@@ -42,6 +42,15 @@ def private_improvement_store(tmp_path, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def otp_limits_off(monkeypatch):
+    """The functional tests ask for codes seconds apart, as no person does; tests/test_otp_limits.py sets the
+    limits it checks (src/identity/otp_limits.py)."""
+    monkeypatch.setenv("OTP_COOLDOWN_SECONDS", "0")
+    monkeypatch.setenv("OTP_PER_HOUR_IDENTIFIER", "1000")
+    monkeypatch.setenv("OTP_PER_HOUR_IP", "1000")
+
+
+@pytest.fixture(autouse=True)
 def offline_network(monkeypatch):
     """Tests may use local dependencies; provider and other public network calls are forbidden."""
     connect = socket.socket.connect

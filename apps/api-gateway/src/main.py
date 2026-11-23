@@ -224,6 +224,10 @@ async def proxy(path: str, request: Request):
         if key.lower() in {"authorization", "content-type", "accept", "x-request-id", "x-zevent-signature"}
     }
     headers["x-request-id"] = request.state.request_id
+    # The address the rate limit counted, for the services' own per-address limits (identity: OTP). Any value the
+    # client sent under this name was dropped above with every other header not on the list.
+    if request.client:
+        headers["x-client-ip"] = request.client.host
     body = bytearray()
     async for chunk in request.stream():
         body.extend(chunk)

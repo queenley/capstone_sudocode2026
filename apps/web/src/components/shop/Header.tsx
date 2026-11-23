@@ -7,6 +7,7 @@ import { categoryName, DEPARTMENTS } from "@/lib/catalog";
 import { firstName, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { shopContext } from "@/lib/shop-context";
+import Icon from "@/components/ui/Icon";
 
 // The storefront's bar: taste-skill's nav-split (public/assets/system.css, .nav--split). The departments
 // on the left, each opening a full-width panel of its categories on hover; Quivo's logo in the middle;
@@ -96,13 +97,18 @@ export default function Header() {
           <div className="nav__item"><Link className="nav__link" href="/khuyen-mai" aria-current={current("/khuyen-mai")}>Khuyến mãi</Link></div>
         </nav>
         <div className="nav__actions">
-          <Link className="nav__link" href="/tim-kiem" aria-current={current("/tim-kiem")}>Tìm</Link>
-          <Link className="nav__link" href={status === "signed-in" ? "/tai-khoan" : "/dang-nhap"}
-            aria-label={status === "signed-in" ? "Tài khoản của tôi" : "Đăng nhập hoặc đăng ký"}>
-            {status === "signed-in" ? firstName(account) : "Đăng nhập"}
+          {/* Each action an icon and its word (shop.css, "header actions"); the cart's count a small badge. */}
+          <Link className="nav__link s-nav-act" href="/tim-kiem" aria-current={current("/tim-kiem")}>
+            <Icon name="search" size={18} /><span>Tìm</span>
           </Link>
-          <Link className="nav__link" href="/gio-hang" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
-            Giỏ hàng{count > 0 && <> (<span key={count} className="nav__count">{count}</span>)</>}
+          <Link className="nav__link s-nav-act" href={status === "signed-in" ? "/tai-khoan" : "/dang-nhap"}
+            aria-label={status === "signed-in" ? "Tài khoản của tôi" : "Đăng nhập hoặc đăng ký"}>
+            <Icon name="user" size={18} /><span>{status === "signed-in" ? firstName(account) : "Đăng nhập"}</span>
+          </Link>
+          <Link className="nav__link s-nav-act" href="/gio-hang" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
+            <span className="s-nav-act__icon"><Icon name="cart" size={18} />
+              {count > 0 && <span key={count} className="nav__count">{count}</span>}
+            </span><span>Giỏ hàng</span>
           </Link>
           {/* <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}</button> */}
         </div>

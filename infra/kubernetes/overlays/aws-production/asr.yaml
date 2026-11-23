@@ -1,0 +1,56 @@
+# Speech recognition for voice messages and calls (apps/asr-service), on CPU, as the asr-service of
+# docker-compose.yml: the agent sends each utterance to ASR_URL (kustomization.yaml). Zipformer 30M int8 runs on a
+# 2-vCPU node. The weights are fetched once into the shared EFS volume (subPath asr-models) and reused by every
+# replica and restart. Only the agent pods may call it (network-policy.yaml), so it has no ASR_API_KEY.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asr-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-asr}
+  template:
+    metadata:
+      labels: {app: telesales-asr}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      nodeSelector:
+        karpenter.sh/nodepool: general
+      containers:
+        - name: asr-service
+          image: telesales-asr:dev
+          ports: [{containerPort: 8500}]
+          env:
+            - {name: ASR_DEVICE, value: cpu}
+            - {name: ASR_PRELOAD, value: zipformer-30m}
+            - {name: ASR_FETCH_MODELS, value: zipformer-30m}
+            - {name: ASR_THREADS, value: "2"}
+          volumeMounts:
+            - {name: models, mountPath: /models, subPath: asr-models}
+          # The first start downloads the weights; /health/ready answers 503 until they are loaded.
+          startupProbe:
+            httpGet: {path: /health/ready, port: 8500}
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8500}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health, port: 8500}
+            periodSeconds: 20
+          resources:
+            requests: {cpu: 500m, memory: 1536Mi}
+            limits: {cpu: '2', memory: 3Gi}
+      volumes:
+        - name: models
+          persistentVolumeClaim: {claimName: agent-data}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: asr-service
+spec:
+  selector: {app: telesales-asr}
+  ports:
+    - {name: http, port: 8500, targetPort: 8500}

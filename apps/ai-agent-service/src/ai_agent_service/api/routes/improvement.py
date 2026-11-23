@@ -137,6 +137,16 @@ async def history(request: Request, purpose: str | None = Query(default=None, ma
         return {"runs": await evaluations.list_runs(conn, purpose=purpose, limit=limit)}
 
 
+@router.get("/evaluations/{run_id}/scenarios")
+async def history_scenarios(run_id: str, request: Request) -> dict[str, Any]:
+    """Each scenario of one ingested run: passed or not, the organisers' reasons, turns, tool calls, TTFT."""
+    staff(request, READ)
+    if len(run_id) > 200:
+        raise HTTPException(422, "run_id too long")
+    async with connection() as conn:
+        return {"run_id": run_id, "scenarios": await evaluations.list_scenarios(conn, run_id)}
+
+
 # ── the round's pipeline on Airflow ───────────────────────────────────────
 
 

@@ -1,0 +1,57 @@
+/* The developer console's live view (features/developer/live-monitor.tsx): the theme's tokens only (theme.css). */
+.console-tabs { margin: 8px 0 4px; }
+.console-eval { margin-top: 16px; }
+.live { display: grid; gap: 16px; margin-top: 16px; }
+.live-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.live-state { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+.live-state--connected .status-dot { animation: live-pulse 1.6s ease-in-out infinite; }
+.live-state--reconnecting .status-dot, .live-state--paused .status-dot { background: var(--warn); }
+.live-state--error { color: var(--danger-ink); }
+.live-state--error .status-dot { background: var(--danger); }
+@keyframes live-pulse { 50% { box-shadow: 0 0 0 7px var(--brand-soft-2); } }
+@media (prefers-reduced-motion: reduce) { .live-state--connected .status-dot { animation: none; } }
+.live-btn { min-height: 40px; padding: 0 14px; border-radius: var(--radius); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer; }
+.live-btn[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); }
+.live-bar label.live-check { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; margin: 0; white-space: nowrap; }
+.live-bar label.live-check input { width: auto; margin: 0; }
+.console-stats.live-tiles { grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; }
+.console-stats.live-tiles article strong { font-size: 22px; }
+.console-stats.live-tiles article.is-warn { border-color: var(--warn); background: var(--warn-soft); }
+.live-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.live-feed-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.live-feed-head h2 { margin: 0; }
+.live-scroll { overflow: auto; max-height: 620px; margin-top: 8px; }
+.live-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.live-table th { position: sticky; top: 0; background: var(--surface); text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 8px; border-bottom: 1px solid var(--line); }
+.live-table td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.live-table tbody tr { cursor: pointer; }
+.live-table tbody tr:hover, .live-table tbody tr.is-selected { background: var(--brand-soft); }
+.live-table tbody tr.is-problem td:first-child { box-shadow: inset 3px 0 0 var(--danger); }
+.live-table tbody tr:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.live-table.live-mini { font-size: 13px; }
+.live-table.live-mini tbody tr { cursor: default; }
+.live-tool { display: inline-block; margin: 0 4px 4px 0; padding: 1px 6px; border-radius: 6px; background: var(--surface-3); font-family: var(--font-mono); font-size: 11px; }
+.live-tool.is-failed { background: var(--danger-soft); color: var(--danger-ink); }
+.live-ok { color: var(--brand-ink); font-weight: 500; }
+.live-bad { color: var(--danger-ink); font-weight: 500; }
+.live-warn { color: var(--warn-ink, var(--warn)); font-weight: 500; }
+.live-detail { position: sticky; top: 16px; display: grid; gap: 12px; }
+.live-detail h2 { margin: 0; font-size: 18px; }
+.live-detail h3 { margin: 8px 0 4px; font-size: 14px; color: var(--ink-2); }
+.live-link { color: var(--brand-ink); font-weight: 500; }
+.live-facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 14px; }
+.live-facts dt { color: var(--muted); }
+.live-facts dd { margin: 0; }
+.live-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13px; }
+.live-stages li { display: grid; grid-template-columns: 96px 1fr 64px; gap: 8px; align-items: center; }
+.live-bar-track { height: 6px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.live-bar-track i { display: block; height: 100%; background: var(--brand); border-radius: inherit; }
+.live-tool-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13px; }
+.live-tools-summary ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13px; }
+.live-tools-summary li { display: flex; justify-content: space-between; gap: 8px; }
+@media (max-width: 1100px) {
+  .console-stats.live-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .live-grid { grid-template-columns: minmax(0, 1fr); }
+  .live-detail { position: static; }
+}
+@media (max-width: 640px) { .console-stats.live-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

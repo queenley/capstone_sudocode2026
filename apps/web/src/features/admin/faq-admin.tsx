@@ -92,11 +92,11 @@ export default function FaqAdmin({
   const [message, setMessage] = useState("");
   const load = useCallback(
     async (signal?: AbortSignal) => {
-      setListing(
-        await api<Listing>("/api/developer/faq", token, undefined, undefined, {
-          signal,
-        }),
-      );
+      const got = await api<Partial<Listing>>("/api/developer/faq", token, undefined, undefined, {
+        signal,
+      });
+      // A reply without a list reads as an empty one, not as a crash of the whole admin page.
+      setListing({ day: got?.day ?? "", entries: got?.entries ?? [], promotions: got?.promotions ?? [] });
     },
     [token],
   );
@@ -184,7 +184,7 @@ export default function FaqAdmin({
       <p>
         Agent chỉ đọc mục đã bật và đang trong thời gian đợt. Giá, mã khuyến mãi
         và tồn kho luôn lấy từ tool, nên không ghi trong câu trả lời.
-        {listing && ` Ngày nghiệp vụ: ${listing.day}.`}
+        {listing?.day && ` Ngày nghiệp vụ: ${listing.day}.`}
       </p>
       {message && <p role="status">{message}</p>}
       {listing && !listing.entries.length && <p>Chưa có mục FAQ nào.</p>}

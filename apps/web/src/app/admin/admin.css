@@ -496,3 +496,42 @@
 }
 .ad-policy > header, .ad-policy-doc > .ad-policy-doc__head { justify-content: flex-start; height: auto; padding: 0; border: 0; }
 .ad-policy-doc__head { justify-content: space-between !important; }
+
+/* ---------- the evaluation dashboard's tabs, tiles and tables (features/admin/evaluation) ---------- */
+.ad-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.ad-tabs [role="tab"] {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ad-tabs [role="tab"]:hover { color: var(--ink); }
+.ad-tabs [role="tab"].is-active { color: var(--brand-ink); border-bottom-color: var(--brand); }
+.ad-tabs [role="tab"]:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; border-radius: 6px; }
+.ad-tiles { margin-bottom: 0; }
+.ad-tiles .sl-kpi { flex-direction: column; gap: 4px; }
+.ad-tiles .sl-kpi strong { font-size: 24px; line-height: 1.2; }
+.ad-scroll { overflow-x: auto; }
+.ad-quality th[scope="row"], .ad-compare th[scope="row"] { font-weight: 500; text-align: left; white-space: nowrap; }
+.ad-compare .ad-group th { background: var(--surface-2); color: var(--ink-2); text-align: left; }
+.ad-good { color: var(--brand-ink); font-weight: 500; }
+.ad-bad { color: var(--danger-ink); font-weight: 500; }
+.sl-badge.ad-badge-pass { background: var(--brand-soft); color: var(--brand-ink); }
+.sl-badge.ad-badge-fail { background: var(--danger-soft); color: var(--danger-ink); }
+.ad-reasons { margin: 0; padding-left: 16px; font-size: 13px; color: var(--ink-2); }
+.ad-reasons code { font-size: 12px; }
+.ad-filters label.ad-check { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; min-height: 44px; white-space: nowrap; }
+.ad-filters label.ad-check input { width: auto; margin: 0; }
+
+/* /admin/zalo: the Zalo mock in a frame (features/admin/zalo-mock.tsx). */
+.zalo-mock-frame { display: block; width: 100%; height: min(78vh, 820px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.zalo-mock-open { margin: 8px 0 0; font-size: 13px; }

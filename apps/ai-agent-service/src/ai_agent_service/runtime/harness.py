@@ -38,6 +38,7 @@ from ..agents.memory import MemoryAgent
 from ..agents.policy import PolicyAgent
 from ..agents.qa import QaAgent
 from ..components import clock
+from ..llm import token_ledger
 from ..observability import stopwatch
 from ..components.handoff.render import REASONS
 from ..components.intake import itn, pii
@@ -45,10 +46,11 @@ from ..components.intake import text as intake_text
 from ..components.memory.brief import used_slots
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
+from . import steps
 from ..pipeline.cold.after_call import after_call, _remember, requested_deletion
 from ..pipeline.hot.graph import build_graph
 from ..pipeline.hot.state import HotContext
-from . import options, vault as vaults
+from . import load, options, vault as vaults
 from .db import checkpointer, connection, require_writable_call
 
 logger = logging.getLogger(__name__)
@@ -175,7 +177,13 @@ class Outcome:
     state: dict[str, Any] | None = None
 
 
-async def run_turn(
+async def run_turn(row: dict[str, Any], **kwargs: Any) -> Outcome:
+    """Take one turn (:func:`_run_turn`), counted as this pod's load while it runs (``runtime/load.py``)."""
+    with load.turn():
+        return await _run_turn(row, **kwargs)
+
+
+async def _run_turn(
     row: dict[str, Any],
     *,
     content: str | None,
@@ -240,16 +248,26 @@ async def run_turn(
         "input_mode": input_mode,
     }
     watch, token = stopwatch.started()
+    usage, usage_token = token_ledger.turn_started()
+
+    async def step_sink(step: dict[str, Any]) -> None:
+        # Tool steps hold no customer text (runtime/steps.py), so they skip the PII restore that sentences get.
+        if emit is not None:
+            await emit("step", json.dumps(step, ensure_ascii=False))
     try:
-        state = await built.graph.ainvoke(turn_input, config=thread(call_id), context=context)
+        with steps.bound(call_id, step_sink) as turn_steps:
+            state = await built.graph.ainvoke(turn_input, config=thread(call_id), context=context)
     except Exception as error:  # noqa: BLE001 - the page and the call both need to hear about it
         logger.exception("Turn failed on call %s", call_id)
         if content is not None:
             await _store_customer_fallback(call_id, turn_id, content, vault, now)
         await vaults.save(call_id, vault)
+        await steps.clear(call_id)
         return Outcome("error", turn_id, error=f"{type(error).__name__}: {error}"[:300])
     finally:
         stopwatch.stopped(token)
+        token_ledger.turn_stopped(usage_token)
+        await load.add_spend(str(row.get("conversation_id") or call_id), usage.get("cost_usd"))
     await vaults.save(call_id, vault, customer_id=state.get("customer_id"))
 
     if content is not None and row["channel"] == "web" and memory and state.get("tier") == "VERIFIED":
@@ -273,11 +291,14 @@ async def run_turn(
     }
     suggestion = state.get("suggestion")
     if (row.get("mode") or "speak") == "copilot":
-        await _patch_meta(call_id, turn_id, "customer", {"latency": latency})
+        await _patch_meta(call_id, turn_id, "customer", {"latency": latency, "usage": usage, "steps": turn_steps})
+        await steps.clear(call_id)
         return Outcome("waiting", turn_id, meta={"suggestion": bool(suggestion)}, latency=latency, state=state)
     reply = state.get("reply") or {}
     text = reply.get("text") or ""
-    await _patch_meta(call_id, turn_id, "agent", {"latency": latency})
+    # The turn's model calls, tokens and cost by agent (llm/token_ledger): read live by the developer console.
+    await _patch_meta(call_id, turn_id, "agent", {"latency": latency, "usage": usage, "steps": turn_steps})
+    await steps.clear(call_id)
     shown = pii.for_customer(text, vault)
     meta = {"lane": state.get("lane"), "tier": state.get("tier"), "used_brief_lines": reply.get("used_lines") or [],
             "facts_used": used_slots(reply.get("used_lines") or [], state.get("brief_lines") or [],

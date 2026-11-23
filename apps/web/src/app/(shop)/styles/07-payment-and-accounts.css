@@ -1,0 +1,161 @@
+/* ---------- payment ---------- */
+.s-pay-options {
+  display: grid;
+  gap: 10px;
+}
+.s-pay-option {
+  display: flex !important;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1.5px solid var(--s-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 0 !important;
+  cursor: pointer;
+  background: var(--surface);
+}
+.s-pay-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.s-pay-option small {
+  color: var(--s-muted);
+}
+.s-pay-option.active {
+  border-color: var(--s-brand);
+  background: var(--surface-3);
+}
+.s-pay-option.off {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.s-transfer {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  align-items: center;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 16px;
+  margin: 14px 0;
+}
+.s-transfer img {
+  width: 220px;
+  height: 220px;
+  border-radius: 10px;
+  background: var(--surface-3);
+}
+.s-transfer dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 14px;
+}
+.s-transfer dt {
+  color: var(--s-muted);
+}
+.s-transfer dd {
+  margin: 0;
+}
+.s-transfer p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .s-transfer {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+/* ---------- accounts: đăng nhập, đăng ký, tài khoản ---------- */
+.s-auth {
+  display: grid;
+  place-items: start center;
+}
+.s-auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+.s-auth-card .s-form {
+  max-width: none;
+}
+.s-auth-foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--s-line);
+  font-size: 14px;
+  color: var(--s-muted);
+  text-align: center;
+}
+.s-password {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s-password input {
+  flex: 1;
+}
+.s-small {
+  font-size: 13px;
+}
+.s-subtitle {
+  font-size: 16px;
+  margin: 26px 0 8px;
+}
+.s-ok {
+  color: var(--brand-ink);
+  font-weight: 500;
+  font-size: 14px;
+}
+.s-alert-info {
+  background: var(--brand-soft);
+  color: var(--ink-2);
+  border-color: var(--brand-line);
+}
+.s-btn-inline {
+  flex: 0 0 auto;
+  width: auto;
+}
+.s-account-tile {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--s-line);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.s-account-tile:hover {
+  border-color: var(--brand-line);
+  box-shadow: var(--shadow-sm);
+}
+.s-account-tile span {
+  font-size: 13px;
+  color: var(--s-muted);
+}
+.s-account-section {
+  margin-top: 26px;
+  padding: 22px;
+  border: 1px solid var(--s-line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.s-account-section h2 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+

@@ -24,7 +24,7 @@ from src.db.models import (
 from src.memory.service import MemoryService
 from src.db.models import CartItem, Challenge, ToolExecution, ProcessedEvent
 from src.identity.accounts import AccountService
-from .shared import bearer, resources
+from .shared import bearer, client_ip, resources
 
 router = APIRouter(prefix="/api")
 
@@ -79,7 +79,7 @@ class CartInput(BaseModel):
 def _accounts(request, run, *, commit=True):
     db, security = resources(request)
     with db:
-        result = run(AccountService(db, security), db, security)
+        result = run(AccountService(db, security, client_ip=client_ip(request)), db, security)
         if commit:
             db.commit()
         return result

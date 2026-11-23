@@ -17,7 +17,7 @@ from typing import Any, Literal, Mapping, Sequence
 from ...config.config_manager import btc_data_dir
 from ..improvement.gap import gate
 from ..intake import pii
-from . import corpus, promotions
+from . import corpus, notify, promotions
 
 Status = Literal["draft", "live"]
 
@@ -124,6 +124,7 @@ async def save(conn: Any, chunk_id: str | None, entry: Mapping[str, Any], *, sta
                               entry.get("valid_to") or None, json.dumps(provenance, ensure_ascii=False), status,
                               status != "live"))
     row = await (await conn.execute(ONE, (chunk_id,))).fetchone()
+    await notify.publish(f"faq save {chunk_id}")  # the connection is autocommit: the row is already in
     return view(row, on)
 
 
@@ -134,6 +135,7 @@ async def delete(conn: Any, chunk_id: str) -> None:
     if row["scope"] == "release":
         raise ReadOnly(chunk_id)
     await conn.execute(DELETE, (chunk_id,))
+    await notify.publish(f"faq delete {chunk_id}")
 
 
 def promotion_choices() -> Sequence[dict[str, Any]]:
