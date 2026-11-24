@@ -19,6 +19,7 @@ resources:
   - scaling.yaml
   - ingress.yaml
   - network-policy.yaml
+  - improve.yaml
 configMapGenerator:
   - name: telesales-config
     behavior: merge
@@ -48,6 +49,9 @@ configMapGenerator:
       # (apps/ai-agent-service/Dockerfile); the agent reads this one at run time, and without it falls back to the
       # local VieNeu voice, which a cloud build does not install: the call then closes with 1011.
       - VOICE_TTS=openai:coral
+      # The weekly improvement round runs as CronJobs (improve.yaml); /admin's pipeline view and its "Chạy vòng mới"
+      # button drive them through the Kubernetes API (runtime/k8s_pipeline.py), not Airflow.
+      - IMPROVE_RUNNER=kubernetes
       # The Zalo channel talks to the Zalo mock (zalo-mock.yaml), with the mock's own keys: they open nothing but the
       # mock. A real Official Account: delete these six, and put its keys in the app secret instead.
       - ZALO_APP_ID=mock-app

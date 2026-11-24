@@ -317,6 +317,30 @@ Kênh Zalo chạy với Zalo mock ([zalo-mock.yaml](../../infra/kubernetes/overl
 
 Dùng OA thật: bỏ sáu dòng `ZALO_*` trong ConfigMap của [kustomization.yaml](../../infra/kubernetes/overlays/aws-production/kustomization.yaml), đưa khóa thật vào secret app (mục 2.3), và bỏ `zalo-mock.yaml` khỏi `resources`.
 
+### 2.11 Vòng cải tiến hằng tuần (CronJob)
+
+Trên EKS không có Airflow. Hai CronJob trong [improve.yaml](../../infra/kubernetes/overlays/aws-production/improve.yaml) chạy đúng các lệnh của DAG, qua [infra/improve/run.py](../../infra/improve/run.py), bằng image `telesales-improve`. `deploy-eks.yml` build image này cùng 8 image còn lại.
+
+| CronJob | Lịch (giờ Việt Nam) | Làm gì | Tốn phí model |
+|---|---|---|---|
+| `improve-learn` | thứ Hai 02:00 | `restate_gaps`, rồi `weekly_learn`: đo R0, Reflection học, nộp đề xuất | có |
+| `improve-tick` | 10:00, 16:00, 22:00 | `weekly-status`; khi mọi đề xuất đã duyệt thì `weekly-measure` (R1) | chỉ khi đo |
+
+- Không bước nào tự duyệt hay tự bật version. Admin duyệt và bật trên `/admin` → **Cải tiến hằng tuần**.
+- **Nút bấm tay:** khung **Pipeline cải tiến (Kubernetes)** có nút **Chạy vòng mới** cho tuần đã chọn và **Chạy lại từ đây**. Agent tạo Job từ template của CronJob qua Kubernetes API ([runtime/k8s_pipeline.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/k8s_pipeline.py)), dùng Role `improve-runner`. ConfigMap đặt `IMPROVE_RUNNER=kubernetes` để bật chế độ này. Khi đang có Job cải tiến chạy thì nút từ chối.
+- Pod chỉ đọc secret `telesales-secrets`, không đọc `telesales-config`, vì `MCP_TRANSPORT=http` sẽ đưa tool call của bài đo vào MCP và database thật của shop.
+- Database đo: `EVAL_DATABASE_URL` trong secret app (mục 2.3). Không đặt thì lệnh tự tạo `app_db_eval` cạnh `app_db`, nên role app cần quyền `CREATEDB`. Nếu không có quyền đó, tạo database một lần bằng tay rồi đặt `EVAL_DATABASE_URL`.
+- Muốn có trần chi tiêu: tạo ledger ([evaluation/README.md](../../evaluation/README.md)) trên EFS, dưới `runs/`, rồi đặt `EVAL_BUDGET_DB=/opt/telesales/evaluation/runs/<file>` trong secret app.
+- Thử trước bằng `tick`, vì bước này chỉ đọc trạng thái:
+
+  ```powershell
+  kubectl create job improve-tick-try --from=cronjob/improve-tick -n telesales-production
+  kubectl logs -f job/improve-tick-try -n telesales-production
+  ```
+
+- Tạm dừng lịch mà vẫn bấm tay được: `kubectl patch cronjob improve-learn -n telesales-production -p '{"spec":{"suspend":true}}'`.
+- Nạp một run đánh giá chạy ở máy vào trang **Đánh giá**: chép thư mục run vào pod agent, rồi chạy `main(['--ingest', <dir>, '--purpose', 'dev_full'])` của `ai_agent_service.pipeline.eval.cli`. Lệnh này ghi vào Aurora qua `DATABASE_URL` của pod.
+
 ## 3. Phát hành bản mới
 
 Có thể phát hành bằng GitHub Actions thay cho các lệnh dưới: [eks-cicd.md](eks-cicd.md). Workflow chạy đúng các bước 2.4–2.7 và seed.

@@ -22,7 +22,7 @@ from src.api.routes.shared import staff
 
 from ...components.context import skills as skill_book
 from ...components.improvement import review, skill_versions
-from ...runtime import airflow_pipeline, evaluations
+from ...runtime import airflow_pipeline, evaluations, k8s_pipeline
 from ...runtime.db import connection
 
 router = APIRouter(prefix="/api/developer", tags=["improvement"])
@@ -147,18 +147,30 @@ async def history_scenarios(run_id: str, request: Request) -> dict[str, Any]:
         return {"run_id": run_id, "scenarios": await evaluations.list_scenarios(conn, run_id)}
 
 
-# ── the round's pipeline on Airflow ───────────────────────────────────────
+# ── the round's pipeline: Airflow locally, CronJobs on EKS ─────────────────
 
 
 class PipelineRun(BaseModel):
     week: str | None = Field(default=None, max_length=10)
 
 
+def _runner() -> str | None:
+    """Which scheduler drives the round: Kubernetes when IMPROVE_RUNNER says so, else Airflow when configured."""
+    if k8s_pipeline.configured():
+        return "kubernetes"
+    return "airflow" if airflow_pipeline.configured() else None
+
+
 @router.get("/improvement/pipeline")
 async def pipeline(request: Request) -> dict[str, Any]:
-    """The weekly round's blocks and the latest runs, each block's state (runtime/airflow_pipeline.py)."""
+    """The weekly round's blocks and the latest runs, each block's state (runtime/airflow_pipeline.py,
+    runtime/k8s_pipeline.py)."""
     staff(request, READ)
-    return await airflow_pipeline.status()
+    if _runner() == "kubernetes":
+        async with connection() as conn:
+            rounds = {str(r["name"]): r for r in await evaluations.list_rounds(conn, limit=12)}
+        return await k8s_pipeline.status(rounds)
+    return {**await airflow_pipeline.status(), "runner": "airflow"}
 
 
 @router.post("/improvement/pipeline/runs")
@@ -166,10 +178,12 @@ async def pipeline_run(body: PipelineRun, request: Request) -> dict[str, Any]:
     """Start the round by hand (paid model calls). It files proposals; it never approves or switches one on."""
     staff(request, ADMIN)
     reviewer = _reviewer(request)
-    if not airflow_pipeline.configured():
-        raise HTTPException(503, "Airflow chưa được bật (AIRFLOW_URL)")
+    runner = _runner()
+    if runner is None:
+        raise HTTPException(503, "Chưa có Airflow (AIRFLOW_URL) hay CronJob cải tiến (IMPROVE_RUNNER=kubernetes)")
+    module = k8s_pipeline if runner == "kubernetes" else airflow_pipeline
     try:
-        return await airflow_pipeline.trigger(body.week, by=reviewer)
+        return await module.trigger(body.week, by=reviewer)
     except airflow_pipeline.PipelineError as error:
         raise HTTPException(502, str(error)) from error
 
@@ -178,10 +192,15 @@ async def pipeline_run(body: PipelineRun, request: Request) -> dict[str, Any]:
 async def pipeline_rerun(run_id: str, block: str, request: Request) -> dict[str, Any]:
     """One block of a run again, and every block after it."""
     staff(request, ADMIN)
-    _reviewer(request)
-    if not airflow_pipeline.configured():
-        raise HTTPException(503, "Airflow chưa được bật (AIRFLOW_URL)")
+    reviewer = _reviewer(request)
+    runner = _runner()
+    if runner is None:
+        raise HTTPException(503, "Chưa có Airflow (AIRFLOW_URL) hay CronJob cải tiến (IMPROVE_RUNNER=kubernetes)")
+    if len(run_id) > 200:
+        raise HTTPException(422, "run_id too long")
     try:
+        if runner == "kubernetes":
+            return await k8s_pipeline.rerun(run_id, block, by=reviewer)
         return await airflow_pipeline.rerun(run_id, block)
     except airflow_pipeline.PipelineError as error:
         raise HTTPException(502, str(error)) from error

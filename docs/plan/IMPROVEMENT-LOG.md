@@ -21,6 +21,29 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-24 · Vòng cải tiến hằng tuần chạy trên EKS, có nút bấm tay trên /admin
+
+Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Chỉ số: số vòng cải tiến chạy được trên production
+
+- **Vấn đề:** trên EKS, tab **Cải tiến hằng tuần** báo "Airflow chưa bật" và nút "Chạy vòng mới" không làm gì. Không có CronJob cải tiến, và `deploy-eks.yml` không build image `telesales-improve`. Tab **Đánh giá** trống, vì các run chỉ nằm trên máy dev.
+- **Bằng chứng:** `infra/kubernetes` không có `kind: CronJob`; `AIRFLOW_URL` trống trên EKS; `eval_runs` trên Aurora chưa có dòng nào.
+- **Sửa:**
+  - [improve.yaml](../../infra/kubernetes/overlays/aws-production/improve.yaml) thêm CronJob `improve-learn` (thứ Hai 02:00) và `improve-tick` (10:00, 16:00, 22:00) chạy `infra/improve/run.py`. Pod chỉ đọc secret app và gắn EFS (`skills`, `improvement`, `kb`, `runs`). Thêm Role `improve-runner` cho service account của agent.
+  - [runtime/k8s_pipeline.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/k8s_pipeline.py): khi `IMPROVE_RUNNER=kubernetes`, nút "Chạy vòng mới" và "Chạy lại từ đây" tạo Job từ template của CronJob. Block 1–2 lấy trạng thái của Job; block 3–4 lấy trạng thái của vòng `weekly-<tuần>`.
+  - Route `/improvement/pipeline*` chọn Kubernetes hoặc Airflow. Giao diện hiện "Pipeline cải tiến (Kubernetes)".
+  - `deploy-eks.yml` build và kiểm image `telesales-improve`.
+  - Đã ingest 4 run lên Aurora: `eval_3` và `rerun-20261116` (purpose `dev_full`), `rerun-20261116-trial` và `gap-dev-try` (purpose `adhoc`). Cả 4 đều dùng `product-extractor-v13`.
+- **Đã kiểm:**
+  - `tests/agent/test_k8s_pipeline.py` 6 test qua. Các test Airflow, runner và DAG cũ vẫn qua (25 test).
+  - 46 test improvement/pipeline/route qua, `tsc` của web qua.
+  - `kubectl kustomize` overlay `aws-production` render được.
+- **Số đo:** chưa đo. Chưa chạy CronJob nào trên cluster.
+- **Còn lại:**
+  - Cần deploy lại để có image và CronJob.
+  - Database đo: đặt `EVAL_DATABASE_URL`, hoặc cho role app quyền `CREATEDB`.
+  - Nên đặt `EVAL_BUDGET_DB` trước khi chạy `learn` (bước này tốn phí).
+  - Chạy thử `tick` trước.
+
 ### 2026-11-22 · Gọi thoại trên EKS không trả lời; thẻ sản phẩm lặp dưới mỗi câu
 
 Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Chỉ số: cuộc gọi thoại có lượt trả lời; số thẻ sản phẩm mỗi cuộc chat

@@ -1,4 +1,4 @@
-# Release to EKS (docs/deployment/eks-cicd.md): build and push the 8 images at this commit, open the cluster's API to
+# Release to EKS (docs/deployment/eks-cicd.md): build and push the 9 images at this commit, open the cluster's API to
 # this runner, render the manifests, migrate, roll out, seed, smoke test, then close the API again. Started by hand
 # (Actions > Deploy EKS > Run workflow); a person approves the aws-production environment before AWS is touched.
 #
@@ -94,11 +94,13 @@ jobs:
           build web            apps/web/Dockerfile --build-arg "NEXT_PUBLIC_VOICE_URL=https://$DOMAIN" \
             --build-arg "NEXT_PUBLIC_HOTLINE=$HOTLINE_NUMBER" --build-arg "NEXT_PUBLIC_ZALO_OA_ID=$ZALO_OA_ID"
           build asr            apps/asr-service/Dockerfile
+          # The weekly improvement round's CronJobs (infra/kubernetes/overlays/aws-production/improve.yaml).
+          build improve        infra/improve/Dockerfile
 
       - name: Check every image is in ECR
         run: |
           set -euo pipefail
-          for repo in backend-common gateway commerce identity sales ai-agent web asr; do
+          for repo in backend-common gateway commerce identity sales ai-agent web asr improve; do
             aws ecr describe-images --repository-name "telesales-$repo" --image-ids imageTag="$TAG" >/dev/null \
               || { echo "::error::telesales-$repo:$TAG is not in ECR"; exit 1; }
           done

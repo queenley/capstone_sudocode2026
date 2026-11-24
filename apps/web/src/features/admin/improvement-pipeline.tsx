@@ -1,7 +1,7 @@
 "use client";
-// The weekly round's pipeline on Airflow, block by block (admin.css, "the round's pipeline"): what ran, what runs,
+// The weekly round's pipeline (Airflow locally, two CronJobs on EKS), block by block (admin.css, "the round's pipeline"): what ran, what runs,
 // what failed, for the latest runs; an admin starts a round by hand or runs one block again (with the blocks after
-// it). The API (runtime/airflow_pipeline.py) checks the role and talks to Airflow; nothing here approves a proposal
+// it). The API (runtime/airflow_pipeline.py, runtime/k8s_pipeline.py) checks the role and talks to the scheduler; nothing here approves a proposal
 // or switches a version on, as the DAG never does.
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/services/api";
@@ -18,6 +18,7 @@ type Run = {
 };
 type Pipeline = {
   available: boolean;
+  runner?: "airflow" | "kubernetes" | null;
   airflow_ui: string | null;
   dag_id: string;
   blocks: { id: string; label: string; detail: string }[];
@@ -91,22 +92,31 @@ export default function ImprovementPipeline({ token, onNotice }: { token: string
       onNotice(done);
       await load();
     } catch (e) {
-      onNotice(e instanceof Error ? e.message : "Airflow không nhận lệnh");
+      onNotice(e instanceof Error ? e.message : "Bộ lập lịch không nhận lệnh");
     } finally {
       setBusy(false);
     }
   }
 
   if (data === null) return <p className="sl-muted" role="status">Đang tải pipeline…</p>;
+  const k8s = data.runner === "kubernetes";
   return (
     <section className="sl-panel ad-pipeline" aria-labelledby="ad-pipeline-title">
       <header className="ad-pipeline__head">
         <div>
-          <h2 id="ad-pipeline-title">Pipeline cải tiến (Airflow)</h2>
-          <p className="ad-lead">
-            DAG <code>{data.dag_id}</code> chạy mỗi thứ Hai 02:00. Bấm tay để chạy vòng mới hoặc chạy lại một bước; mọi đề
-            xuất vẫn chờ admin duyệt, không có gì tự bật.
-          </p>
+          <h2 id="ad-pipeline-title">Pipeline cải tiến ({k8s ? "Kubernetes" : "Airflow"})</h2>
+          {k8s ? (
+            <p className="ad-lead">
+              CronJob <code>improve-learn</code> chạy mỗi thứ Hai 02:00; <code>improve-tick</code> chạy 10:00, 16:00, 22:00
+              và đo version ứng viên khi mọi đề xuất đã được duyệt. Bấm tay để chạy vòng mới ngay; mọi đề xuất vẫn chờ admin
+              duyệt, không có gì tự bật.
+            </p>
+          ) : (
+            <p className="ad-lead">
+              DAG <code>{data.dag_id}</code> chạy mỗi thứ Hai 02:00. Bấm tay để chạy vòng mới hoặc chạy lại một bước; mọi đề
+              xuất vẫn chờ admin duyệt, không có gì tự bật.
+            </p>
+          )}
         </div>
         {data.airflow_ui && (
           <a className="ad-pipeline__ui" href={data.airflow_ui} target="_blank" rel="noreferrer">Mở Airflow ↗</a>
@@ -115,9 +125,10 @@ export default function ImprovementPipeline({ token, onNotice }: { token: string
 
       {!data.available ? (
         <p className="ad-pipeline__off">
-          Airflow chưa bật. Chạy{" "}
+          Chưa có bộ lập lịch. Local: chạy{" "}
           <code>docker compose -f docker-compose.yml -f infra/airflow/docker-compose.airflow.yml up -d --build airflow ai-agent-service</code>{" "}
-          rồi tải lại trang.
+          rồi tải lại trang. EKS: CronJob trong <code>infra/kubernetes/overlays/aws-production/improve.yaml</code> và{" "}
+          <code>IMPROVE_RUNNER=kubernetes</code>.
         </p>
       ) : (
         <div className="ad-pipeline__controls">
@@ -151,7 +162,12 @@ export default function ImprovementPipeline({ token, onNotice }: { token: string
         </div>
       )}
       {data.error && <p className="sl-alert" role="alert">{data.error}</p>}
-      {data.paused && !run && <p className="sl-muted">DAG đang tạm dừng: chạy tay sẽ bật lại lịch hằng tuần.</p>}
+      {data.paused && !run && (
+        <p className="sl-muted">
+          {k8s ? "CronJob improve-learn đang tạm dừng (suspend): bấm tay vẫn chạy được, lịch hằng tuần thì không."
+            : "DAG đang tạm dừng: chạy tay sẽ bật lại lịch hằng tuần."}
+        </p>
+      )}
 
       <ol className="ad-flow" aria-label="Các bước của vòng cải tiến">
         {data.blocks.map((block, index) => {

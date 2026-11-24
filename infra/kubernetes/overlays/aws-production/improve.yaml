@@ -1,0 +1,138 @@
+# The weekly improvement round on EKS, in place of Airflow (infra/airflow/README.md): the same commands, from
+# infra/improve/run.py in the telesales-improve image (infra/improve/Dockerfile).
+#
+#   improve-learn  Monday 02:00 Asia/Ho_Chi_Minh: restate_gaps, then weekly_learn (R0, Reflection, proposals). PAID.
+#   improve-tick   10:00, 16:00, 22:00: weekly-status, then weekly-measure once every proposal is decided.
+#
+# Neither approves a proposal or switches a version on: the admin does both in /admin. The admin's "Chạy vòng mới"
+# creates a Job from improve-learn's template (runtime/k8s_pipeline.py), with the Role below.
+#
+# The pods read the app's secret only, never telesales-config: its MCP_TRANSPORT=http would send an evaluation's
+# tool calls to the shop's MCP servers and so to the shop's database. An evaluation runs its own MCP servers (stdio)
+# on the *_eval database: EVAL_DATABASE_URL in the app secret, else app_db_eval, created on first use.
+# The round's files (skills versions, review files, its runs) live on the agent's EFS, so the agent sees what it wrote.
+#
+# Pause the schedule without deleting anything: kubectl patch cronjob improve-learn -p '{"spec":{"suspend":true}}'
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: improve-learn
+spec:
+  schedule: "0 2 * * 1"
+  timeZone: Asia/Ho_Chi_Minh
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 4
+  failedJobsHistoryLimit: 4
+  jobTemplate:
+    metadata:
+      labels: {telesales/improve: improve-learn}
+    spec:
+      backoffLimit: 0              # a model call is paid: a failed round is looked at, not retried blindly
+      activeDeadlineSeconds: 21600 # 6 hours, as the DAG's execution_timeout
+      ttlSecondsAfterFinished: 2419200 # 28 days: the admin's pipeline view lists them
+      template:
+        metadata:
+          labels: {app: telesales-improve}
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          nodeSelector:
+            karpenter.sh/nodepool: general
+          securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+          containers:
+            - name: improve
+              image: telesales-improve:dev
+              args: [learn]
+              envFrom:
+                - secretRef: {name: telesales-secrets}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {drop: [ALL]}
+              # The agent in process with its six MCP servers (stdio), as an evaluation runs it.
+              resources:
+                requests: {cpu: '1', memory: 2Gi}
+                limits: {cpu: '2', memory: 4Gi}
+              volumeMounts:
+                - {name: agent-data, mountPath: /opt/telesales/apps/ai-agent-service/data/skills, subPath: skills}
+                - {name: agent-data, mountPath: /opt/telesales/apps/ai-agent-service/data/improvement, subPath: improvement}
+                - {name: agent-data, mountPath: /opt/telesales/apps/ai-agent-service/data/kb, subPath: kb}
+                - {name: agent-data, mountPath: /opt/telesales/evaluation/runs, subPath: runs}
+          volumes:
+            - name: agent-data
+              persistentVolumeClaim: {claimName: agent-data}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: improve-tick
+spec:
+  schedule: "0 10,16,22 * * *"
+  timeZone: Asia/Ho_Chi_Minh
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 4
+  jobTemplate:
+    metadata:
+      labels: {telesales/improve: improve-tick}
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 25200 # weekly-measure is up to 6 hours
+      ttlSecondsAfterFinished: 604800
+      template:
+        metadata:
+          labels: {app: telesales-improve}
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          nodeSelector:
+            karpenter.sh/nodepool: general
+          securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+          containers:
+            - name: improve
+              image: telesales-improve:dev
+              args: [tick]
+              envFrom:
+                - secretRef: {name: telesales-secrets}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {drop: [ALL]}
+              resources:
+                requests: {cpu: '1', memory: 2Gi}
+                limits: {cpu: '2', memory: 4Gi}
+              volumeMounts:
+                - {name: agent-data, mountPath: /opt/telesales/apps/ai-agent-service/data/skills, subPath: skills}
+                - {name: agent-data, mountPath: /opt/telesales/apps/ai-agent-service/data/improvement, subPath: improvement}
+                - {name: agent-data, mountPath: /opt/telesales/apps/ai-agent-service/data/kb, subPath: kb}
+                - {name: agent-data, mountPath: /opt/telesales/evaluation/runs, subPath: runs}
+          volumes:
+            - name: agent-data
+              persistentVolumeClaim: {claimName: agent-data}
+---
+# The admin's buttons: the agent reads the two CronJobs and creates, lists and reads the Jobs (runtime/k8s_pipeline.py).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: improve-runner
+rules:
+  - apiGroups: [batch]
+    resources: [cronjobs]
+    resourceNames: [improve-learn, improve-tick]
+    verbs: [get]
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [get, list, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: improve-runner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: improve-runner
+subjects:
+  - kind: ServiceAccount
+    name: ai-agent-service
+    namespace: telesales-production
