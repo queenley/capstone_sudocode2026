@@ -39,6 +39,18 @@ Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Ch
     - Giá trị tốt nhất chỉ được tô trong các cột cùng chữ.
     - Hiện có hai nhãn: A (`30863a29`) gồm Router `eval_3` và GapLoop; B (`912320ad`, sau khi sửa nhãn D1–D7, 68 file khác) gồm Reflection và hai run Kết hợp. Các trace `*-relabel` còn INCOMPLETE.
     - Cả 4 run trong `full-dev` có manifest INCOMPLETE vì có 1–3 lượt chưa gán nhãn, dù đủ 4.600 lượt.
+  - Chấm lại cùng nhãn, không gọi model ([regrade_on_labels.py](../../scripts/evaluation/regrade_on_labels.py)): `reference_eval.py` của BTC chấm trace của 5 run trên nhãn hiện tại của `data/dev/scenarios` (`912320ad`). Đã ingest 5 run `*-labels-20261124` với purpose `dev_full`; 5 bản gốc chuyển sang `adhoc` (chỉ đổi cột `purpose`).
+
+    | Phương pháp | TSR | CCR | RQR | HR |
+    |---|---|---|---|---|
+    | Baseline (không bộ nhớ, `eval_3`) | 59,2% | 34,5% | 18,5% | 12,8% |
+    | Router (`eval_3`) | 66,7% | 49,5% | 6,7% | 11,6% |
+    | GapLoop | 66,5% | 51,5% | 5,4% | 10,4% |
+    | Reflection | 73,3% | 53,3% | 4,5% | 11,2% |
+    | Kết hợp (`combined`) | 67,5% | 50,7% | 4,1% | 10,8% |
+    | Kết hợp (`gaploop_reflection`) | 69,2% | 52,5% | 5,0% | 11,0% |
+
+    Router và GapLoop chạy trước đợt sửa nhãn D1–D7. Kịch bản nào chỉ đổi lời khách thì câu trả lời vẫn là trả lời cho lời khách cũ, giống lần chấm lại `eval_3` ngày 16/11.
 - **Đã kiểm:**
   - `tests/agent/test_k8s_pipeline.py` 6 test qua. Các test Airflow, runner và DAG cũ vẫn qua (25 test).
   - 46 test improvement/pipeline/route qua, `tsc` của web qua.

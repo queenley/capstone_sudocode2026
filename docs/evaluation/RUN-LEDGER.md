@@ -359,3 +359,18 @@ Nhãn `data/dev` đổi ở nhóm 32–34 của `build_dev_r4.py` (DISPUTES.md D
 - Sau đó, cùng ngày, thêm nhóm 36 (D5: `must_say_any` nhận cách nói tương đương), 37 (D4: tuổi thọ màng lọc theo SP-AIR-01, bỏ cấm giá 2.445.000, GEN-0213 theo catalogue) và 38 (D7: lời khách, không đổi điểm trace cũ). `eval_3` với nhãn D1–D7: TSR full **66,7%** (62,1 trước sửa), baseline **59,2%** (55,5); HR, CCR, RQR như sau D1. 17 cuộc thêm thành qua, từng cuộc đọc lại câu agent khớp đúng ý nhãn. Frozen 20: Baseline 65→65%, Router 65→75%, GapLoop 65→70%, Reflection 60→60%, Kết hợp 60→65%.
 
 Bằng chứng: `evaluation/runs/eval_3-rescore-20261116/` (`report-old-labels.json`, `report-new-labels.json` chỉ D1, `report-new-labels-d1-d7.json`), `evaluation/runs/labels-20261116/` (cohort nhãn mới), `evaluation/runs/method-metrics-labels-20261116/`.
+
+## 24/11/2026 — Router, GapLoop, Reflection, Kết hợp trên cùng nhãn (không gọi model)
+
+[`scripts/evaluation/regrade_on_labels.py`](../../scripts/evaluation/regrade_on_labels.py) chấm lại trace của `eval_3` (Router, kèm baseline), `full-dev/gaploop`, `full-dev/reflection`, `full-dev/combined`, `full-dev/gaploop_reflection` bằng `reference_eval.py` trên `data/dev/scenarios` hiện tại (cohort `912320ad`, 409 kịch bản, `product-extractor-v13`). Lời agent giữ nguyên; `--relabel` không dùng được cho việc này vì nó giữ nhãn đóng băng của run.
+
+| Phương pháp | TSR | CCR | RQR | HR |
+|---|---|---|---|---|
+| Baseline | 59,2% (242/409) | 34,5% | 18,5% (207/1120) | 12,8% (557/4355) |
+| Router | 66,7% (273/409) | 49,5% | 6,7% (71/1065) | 11,6% (543/4699) |
+| GapLoop | 66,5% (272/409) | 51,5% | 5,4% (55/1024) | 10,4% (485/4649) |
+| Reflection | 73,3% (300/409) | 53,3% | 4,5% (44/970) | 11,2% (556/4955) |
+| Kết hợp (`combined`) | 67,5% (276/409) | 50,7% | 4,1% (39/952) | 10,8% (508/4717) |
+| Kết hợp (`gaploop_reflection`) | 69,2% (283/409) | 52,5% | 5,0% (49/989) | 11,0% (529/4828) |
+
+Router và baseline khớp số 16/11 với nhãn D1–D7. Đã ingest vào dashboard production với purpose `dev_full` (run_id `*-labels-20261124`); bản gốc chuyển `adhoc`. Bằng chứng: `evaluation/runs/regrade-dev409-20261124/`, `evaluation/runs/method-metrics-dev409-20261124/` (không trong git).
