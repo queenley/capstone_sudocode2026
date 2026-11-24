@@ -1,13 +1,14 @@
 "use client";
 // The evaluation history of the scored runs `run_eval.py --ingest` kept (docs/plan/001, part D), in five tabs:
 // the organisers' four rates week by week, performance (latency, tokens, cost), quality (errors, guardrails),
-// a comparison of two runs, and each scenario of one run. The pieces are in ./evaluation.
+// Router, GapLoop, Reflection and Kết hợp side by side, a comparison of two runs, and each scenario of one run. The pieces are in ./evaluation.
 //
 // Only runs of one cohort (same scenario files) and one extractor are shown together: numbers of different cohorts
 // or extractors are not comparable (evaluation/README.md), so the cohort is a filter, never a mixed line.
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/services/api";
 import { cohortKey, PURPOSE, Round, Run } from "./evaluation/model";
+import Methods from "./evaluation/methods";
 import Scenarios from "./evaluation/scenarios";
 import { Compare, Overview, Performance, Quality } from "./evaluation/views";
 
@@ -15,6 +16,7 @@ const TABS = [
   { id: "overview", label: "Bốn chỉ số" },
   { id: "performance", label: "Hiệu năng" },
   { id: "quality", label: "Chất lượng" },
+  { id: "methods", label: "So sánh phương pháp" },
   { id: "compare", label: "So sánh hai run" },
   { id: "scenarios", label: "Theo kịch bản" },
 ] as const;
@@ -85,23 +87,25 @@ export default function EvaluationDashboard({ token, onNotice }: { token: string
             ))}
           </select>
         </label>
-        <label>
-          Bộ kịch bản và extractor
-          <select value={chosenCohort} onChange={(e) => setCohort(e.target.value)}>
-            {cohorts.map(([key, r]) => (
-              <option key={key} value={key}>
-                {r.n_scenarios ?? "?"} kịch bản · {r.extractor_version || "extractor ?"} · {(r.cohort_sha256 || "?").slice(0, 8)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {tab !== "methods" && (
+          <label>
+            Bộ kịch bản và extractor
+            <select value={chosenCohort} onChange={(e) => setCohort(e.target.value)}>
+              {cohorts.map(([key, r]) => (
+                <option key={key} value={key}>
+                  {r.n_scenarios ?? "?"} kịch bản · {r.extractor_version || "extractor ?"} · {(r.cohort_sha256 || "?").slice(0, 8)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         {tab === "overview" && (
           <button className="sl-btn sl-btn-small ad-btn-quiet" onClick={() => setAsTable((v) => !v)} aria-pressed={asTable}>
             {asTable ? "Xem biểu đồ" : "Xem bảng"}
           </button>
         )}
       </div>
-      {cohorts.length > 1 && (
+      {cohorts.length > 1 && tab !== "methods" && (
         <p className="sl-muted">
           Có {cohorts.length} bộ kịch bản/extractor khác nhau: mỗi lần chỉ vẽ một bộ, vì số của hai bộ không so được.
         </p>
@@ -125,6 +129,7 @@ export default function EvaluationDashboard({ token, onNotice }: { token: string
         {tab === "overview" && <Overview points={points} switches={switches} asTable={asTable} />}
         {tab === "performance" && <Performance points={points} switches={switches} />}
         {tab === "quality" && <Quality points={points} />}
+        {tab === "methods" && <Methods key={chosenPurpose} runs={ofPurpose} />}
         {tab === "compare" && <Compare key={chosenCohort} points={ofCohort} />}
         {tab === "scenarios" && <Scenarios key={chosenCohort} points={ofCohort} token={token} />}
       </div>

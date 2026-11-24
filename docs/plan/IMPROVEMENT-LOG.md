@@ -33,6 +33,12 @@ Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Ch
   - Route `/improvement/pipeline*` chọn Kubernetes hoặc Airflow. Giao diện hiện "Pipeline cải tiến (Kubernetes)".
   - `deploy-eks.yml` build và kiểm image `telesales-improve`.
   - Đã ingest 4 run lên Aurora: `eval_3` và `rerun-20261116` (purpose `dev_full`), `rerun-20261116-trial` và `gap-dev-try` (purpose `adhoc`). Cả 4 đều dùng `product-extractor-v13`.
+  - Ingest thêm 4 run đủ 409 kịch bản trong `full-dev` (purpose `dev_full`): `gaploop`, `reflection`, `combined`, `gaploop_reflection`.
+  - Tab **Đánh giá → So sánh phương pháp** ([methods.tsx](../../apps/web/src/features/admin/evaluation/methods.tsx)) hiện Router, GapLoop, Reflection và Kết hợp cạnh nhau, mỗi run một cột.
+    - Mỗi cột mang chữ của bộ kịch bản/nhãn.
+    - Giá trị tốt nhất chỉ được tô trong các cột cùng chữ.
+    - Hiện có hai nhãn: A (`30863a29`) gồm Router `eval_3` và GapLoop; B (`912320ad`, sau khi sửa nhãn D1–D7, 68 file khác) gồm Reflection và hai run Kết hợp. Các trace `*-relabel` còn INCOMPLETE.
+    - Cả 4 run trong `full-dev` có manifest INCOMPLETE vì có 1–3 lượt chưa gán nhãn, dù đủ 4.600 lượt.
 - **Đã kiểm:**
   - `tests/agent/test_k8s_pipeline.py` 6 test qua. Các test Airflow, runner và DAG cũ vẫn qua (25 test).
   - 46 test improvement/pipeline/route qua, `tsc` của web qua.
