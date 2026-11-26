@@ -16,18 +16,18 @@
 // The Call Brief, and the handoff brief when the assistant handed over, sit at
 // the top of the conversation: what the consultant reads before answering.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { Logo } from "@/components/brand/Logo";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+import StaffTopbar from "@/components/staff/StaffTopbar";
 import { api, AgentCall, AgentCallDetail, AgentTurn } from "@/services/api";
 import CallEvidence, { ProductLinks, productsOf } from "@/features/sales/call-evidence";
 import { reasonLabel } from "@/features/sales/handoff-reasons";
 import Icon from "@/components/ui/Icon";
+import StepTrail, { type TurnStep } from "@/components/ui/StepTrail";
 import { HandoffBell } from "@/features/sales/handoff-alerts";
 import { groupCalls, groupOf } from "@/features/sales/call-groups";
 
 const QUEUE_EVERY_MS = 5000;
 const CALL_EVERY_MS = 3000;
+const STEPS_EVERY_MS = 1000;
 const CHANNEL: Record<string, string> = {
   web: "Web chat",
   zalo: "Zalo",
@@ -56,6 +56,8 @@ export default function CallConsole({
   const [calls, setCalls] = useState<AgentCall[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<AgentCallDetail | null>(null);
+  /** The assistant is taking a turn on the open call: its steps are read more often. */
+  const working = !!detail?.live_steps?.length;
   const [error, setError] = useState("");
   const [draft, setDraft] = useState("");
   const [draftFrom, setDraftFrom] = useState<"own" | "edited">("own");
@@ -185,9 +187,10 @@ export default function CallConsole({
     setSending(false);
     if (!connected || selectedId == null) return;
     void refreshCall(selectedId);
-    const timer = setInterval(() => refreshCall(selectedId), CALL_EVERY_MS);
+    // While the assistant is taking a turn, read its steps every second; otherwise every CALL_EVERY_MS.
+    const timer = setInterval(() => refreshCall(selectedId), working ? STEPS_EVERY_MS : CALL_EVERY_MS);
     return () => clearInterval(timer);
-  }, [connected, selectedId, refreshCall]);
+  }, [connected, selectedId, refreshCall, working]);
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: "nearest" });
@@ -308,20 +311,9 @@ export default function CallConsole({
       {!embedded && (
         <>
         <a className="skip-link" href="#calls-content">Đến nội dung chính</a>
-        <header className="topbar">
-          <Link className="logo" href="/" aria-label="Quivo, về cửa hàng">
-            <Logo height={30} title="" />
-          </Link>
-          <nav aria-label="Điều hướng nhân viên">
-            <Link href="/ban-hang">Bán hàng</Link>
-            <Link href="/agent">Hộp thư</Link>
-            <Link href="/calls" aria-current="page">Cuộc gọi</Link>
-            <Link href="/admin">Quản trị</Link>
-            <Link href="/developer">Kỹ thuật</Link>
-          </nav>
+        <StaffTopbar current="/calls">
           <HandoffBell token={connected ? token : ""} onOpen={open} />
-          <ThemeToggle />
-        </header>
+        </StaffTopbar>
         </>
       )}
       {embedded ? (
@@ -496,6 +488,12 @@ export default function CallConsole({
                 {turns.map((t) => (
                   <TurnBubble key={t.id} turn={t} />
                 ))}
+                {!!detail.live_steps?.length && (
+                  <div className="message outgoing">
+                    <small>Trợ lý AI · đang xử lý</small>
+                    <StepTrail steps={detail.live_steps} done={false} detail />
+                  </div>
+                )}
                 <div ref={bottom} />
               </div>
 
@@ -799,6 +797,8 @@ function TurnBubble({ turn }: { turn: AgentTurn }) {
         .map((tool) => LOOKED_UP[tool.name.replace("_", ".")] || tool.name))]
     : [];
   const products = agent ? productsOf([turn]) : [];
+  // Each tool call of the turn, in order, with its time (runtime/steps.py; saved on the turn that ends it).
+  const steps = Array.isArray(turn.meta?.steps) ? (turn.meta.steps as TurnStep[]) : [];
   // The web cart the shop adds under a customer's words for the assistant (api/routes/conversations.py, cart_note):
   // a consultant reads the words alone, and the cart as links.
   const cartAt = turn.speaker === "customer" ? turn.content.indexOf(CART_NOTE) : -1;
@@ -827,6 +827,14 @@ function TurnBubble({ turn }: { turn: AgentTurn }) {
       {cart.length > 0 && <ProductLinks products={cart} compact />}
       {products.length > 0 && <ProductLinks products={products} compact />}
       {looked.length > 0 && <small className="turn-tools">Đã tra: {looked.join(", ")}</small>}
+      {steps.length > 0 && (
+        <StepTrail
+          steps={steps}
+          done
+          detail
+          elapsedMs={(turn.meta?.latency as { total_ms?: number } | undefined)?.total_ms}
+        />
+      )}
     </div>
   );
 }

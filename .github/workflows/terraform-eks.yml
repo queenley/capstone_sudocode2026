@@ -1,0 +1,31 @@
+# infra/terraform/aws-eks: format and validate on every push and pull request that touches it, without AWS.
+# plan and apply stay by hand (docs/deployment/eks-deploy.md 2.2): the state and the account are the operator's.
+name: Terraform EKS
+on:
+  push:
+    paths: [infra/terraform/aws-eks/**, .github/workflows/terraform-eks.yml]
+  pull_request:
+    paths: [infra/terraform/aws-eks/**, .github/workflows/terraform-eks.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/terraform/aws-eks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.4
+      - run: terraform fmt -check -recursive -diff
+      - run: terraform init -backend=false
+      - run: terraform validate
+      - name: The manifests still build
+        working-directory: .
+        run: |
+          kubectl kustomize infra/kubernetes/overlays/aws-production > /dev/null
+          kubectl kustomize infra/kubernetes/overlays/aws-cluster > /dev/null

@@ -85,3 +85,12 @@ export function productMentions(text: string, products: ShopProduct[], max = 4):
     .filter((product) => !seen.has(product.ref) && seen.add(product.ref))
     .slice(0, max);
 }
+
+/** The products *text* names that none of the *earlier* messages named: a product gets its card once per chat, under
+ *  the first message that names it (components/shop/ChatProducts.tsx). */
+export function newMentions(text: string, earlier: string[], products: ShopProduct[], max = 4): ShopProduct[] {
+  const shown = new Set(earlier.flatMap((before) => productMentions(before, products, Infinity).map((p) => p.ref)));
+  return productMentions(text, products, Infinity)
+    .filter((product) => !shown.has(product.ref))
+    .slice(0, max);
+}

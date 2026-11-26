@@ -11,14 +11,18 @@ Tokens, not cost. Async-safe enough for the distiller's ``asyncio.gather`` Pass 
 """
 from __future__ import annotations
 
+import contextvars
 import threading
-from typing import Dict
+from typing import Any, Dict
 
 _LOCK = threading.Lock()
 _LEDGER: Dict[str, Dict[str, int]] = {}
+# The turn being taken (runtime/harness.run_turn): its model calls, by agent, for the turn's ``meta.usage`` that
+# the developer console reads live. A mutable dict, so the graph's child tasks (which copy the context) add to it.
+_TURN: contextvars.ContextVar[Dict[str, Any] | None] = contextvars.ContextVar("turn_usage", default=None)
 
 
-def record(agent: str, input_tokens: int, output_tokens: int, cached_tokens: int = 0) -> None:
+def record(agent: str, input_tokens: int, output_tokens: int, cached_tokens: int = 0, cost_usd: float = 0.0) -> None:
     """Add one completed LLM call's token usage under ``agent``; *cached_tokens* are part of *input_tokens*."""
     key = (agent or "unknown").strip() or "unknown"
     with _LOCK:
@@ -27,6 +31,24 @@ def record(agent: str, input_tokens: int, output_tokens: int, cached_tokens: int
         entry["input"] += int(input_tokens or 0)
         entry["output"] += int(output_tokens or 0)
         entry["cached"] += int(cached_tokens or 0)
+        turn = _TURN.get()
+        if turn is not None:
+            for bucket in (turn, turn["by_agent"].setdefault(key, {"calls": 0, "input": 0, "output": 0, "cached": 0, "cost_usd": 0.0})):
+                bucket["calls"] += 1
+                bucket["input"] += int(input_tokens or 0)
+                bucket["output"] += int(output_tokens or 0)
+                bucket["cached"] += int(cached_tokens or 0)
+                bucket["cost_usd"] = round(bucket["cost_usd"] + float(cost_usd or 0.0), 8)
+
+
+def turn_started() -> tuple[Dict[str, Any], contextvars.Token]:
+    """Count this turn's model calls from now on; pass the token to :func:`turn_stopped`."""
+    usage: Dict[str, Any] = {"calls": 0, "input": 0, "output": 0, "cached": 0, "cost_usd": 0.0, "by_agent": {}}
+    return usage, _TURN.set(usage)
+
+
+def turn_stopped(token: contextvars.Token) -> None:
+    _TURN.reset(token)
 
 
 def snapshot() -> Dict[str, Dict[str, int]]:

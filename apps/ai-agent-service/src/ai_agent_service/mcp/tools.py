@@ -404,14 +404,20 @@ class ToolGuardMiddleware(AgentMiddleware):
     # ── hooks ─────────────────────────────────────────────────────────────
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
-        today = getattr(getattr(getattr(request, "runtime", None), "context", None), "now", None)
-        return with_hints(with_status_words(request.tool_call["name"], await self._guarded_call(request, handler), today))
+        from ..runtime import steps  # the turn's live steps (chat, staff console); late: runtime imports mcp
 
-    async def _guarded_call(self, request: Any, handler: Any) -> Any:
         call = request.tool_call
         name = call["name"]
+        today = getattr(getattr(getattr(request, "runtime", None), "context", None), "now", None)
         if name not in self._guarded:
-            return await handler(request)
+            return with_hints(with_status_words(name, await handler(request), today))
+        async with steps.tool(name) as step:
+            result = await self._guarded_call(request, handler, call, name)
+            envelope = envelope_of(result)
+            step["ok"] = envelope is None or bool(envelope.get("ok", True))
+            return with_hints(with_status_words(name, result, today))
+
+    async def _guarded_call(self, request: Any, handler: Any, call: Any, name: str) -> Any:
         if self._is_open(name):
             return self._envelope_message(
                 call, "CIRCUIT_OPEN", f"{name} is paused after repeated failures", retryable=False
@@ -972,6 +978,16 @@ class ToolBox:
         return name in self._tools
 
     async def call(self, name: str, /, **args: Any) -> dict[str, Any]:
+        from ..runtime import steps  # the turn's live steps (chat, staff console); late: runtime imports mcp
+
+        if name not in self._tools:
+            return await self._call(name, **args)
+        async with steps.tool(name) as step:
+            envelope = await self._call(name, **args)
+            step["ok"] = bool(envelope.get("ok"))
+            return envelope
+
+    async def _call(self, name: str, /, **args: Any) -> dict[str, Any]:
         tool = self._tools.get(name)
         if tool is None:
             return {"ok": False, "error": {"code": "NO_TOOL", "retryable": False, "message": f"{name} is not available"}}

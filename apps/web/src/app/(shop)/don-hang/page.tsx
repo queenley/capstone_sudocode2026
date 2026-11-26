@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import VerifyPhone from "@/components/shop/VerifyPhone";
+import Icon from "@/components/ui/Icon";
 import TransferInfo from "@/components/shop/TransferInfo";
 import { api } from "@/services/api";
 import { money } from "@/lib/catalog";
@@ -137,34 +138,37 @@ export default function OrdersPage() {
 
   if (!token)
     return (
-      <div className="s-wrap s-page s-narrow">
-        <h1 className="s-page-title">Đơn hàng của tôi</h1>
+      <div className="s-wrap s-page">
+        <header className="s-page-head">
+          <h1 className="s-page-title">Đơn hàng của tôi</h1>
+          <p className="s-lead">Xem đơn bằng tài khoản, hoặc tra cứu nhanh bằng số điện thoại đã dùng khi đặt.</p>
+        </header>
         {notice && <p role="status">{notice}</p>}
-        <p className="s-lead">
-          Đăng nhập để xem đơn hàng, giỏ hàng và lịch sử mua sắm của bạn.
-        </p>
-        <div className="s-row">
-          <Link className="s-btn" href="/dang-nhap?next=/don-hang">
-            Đăng nhập
-          </Link>
-          <Link
-            className="s-btn s-btn-ghost s-btn-inline"
-            href="/dang-ky?next=/don-hang"
-          >
-            Đăng ký
-          </Link>
+        {/* Two ways in, side by side on a desktop (shop.css, "two ways in"). */}
+        <div className="s-ways">
+          <section className="s-panel" aria-labelledby="way-account">
+            <span className="s-panel-icon"><Icon name="user" size={22} /></span>
+            <h2 id="way-account">Có tài khoản Quivo</h2>
+            <p className="s-muted">Đăng nhập để xem mọi đơn hàng, giỏ hàng và lịch sử mua sắm trên mọi thiết bị.</p>
+            <div className="s-row">
+              <Link className="s-btn" href="/dang-nhap?next=/don-hang">Đăng nhập</Link>
+              <Link className="s-btn s-btn-outline" href="/dang-ky?next=/don-hang">Tạo tài khoản</Link>
+            </div>
+          </section>
+          <section className="s-panel" aria-labelledby="way-phone">
+            <span className="s-panel-icon"><Icon name="phone" size={22} /></span>
+            <h2 id="way-phone">Tra cứu bằng số điện thoại</h2>
+            <p className="s-muted">Nhập số đã đặt hàng, chúng tôi gửi mã xác minh để bạn xem đơn.</p>
+            {error && <div className="s-alert">{error}</div>}
+            <VerifyPhone
+              onVerified={() => {
+                const t = customerToken();
+                setToken(t);
+                load(t);
+              }}
+            />
+          </section>
         </div>
-        <h2 className="s-subtitle">
-          Hoặc tra cứu nhanh bằng số điện thoại đã đặt hàng
-        </h2>
-        {error && <div className="s-alert">{error}</div>}
-        <VerifyPhone
-          onVerified={() => {
-            const t = customerToken();
-            setToken(t);
-            load(t);
-          }}
-        />
       </div>
     );
 

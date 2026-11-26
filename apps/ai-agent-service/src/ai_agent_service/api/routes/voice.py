@@ -58,7 +58,7 @@ from ...components import voice as voice_component
 from ...components.voice.recognition import process as process_recognition
 from ...components.voice.policy import POLICY_VERSION
 from ...config.config_manager import ROOT
-from ...runtime import calls, harness, options, platform
+from ...runtime import calls, harness, load, options, platform
 from ...runtime.calls import Actor
 
 logger = logging.getLogger(__name__)
@@ -89,6 +89,12 @@ async def warm() -> dict[str, Any]:
 
 @router.websocket("/conversations/{conversation_id}/voice")
 async def voice_call(ws: WebSocket, conversation_id: str) -> None:
+    """One voice call, counted as this pod's load while the socket is open (runtime/load.py)."""
+    with load.voice_call():
+        await _voice_call(ws, conversation_id)
+
+
+async def _voice_call(ws: WebSocket, conversation_id: str) -> None:
     await ws.accept()
     try:
         raw = await asyncio.wait_for(ws.receive_text(), timeout=10)

@@ -1,0 +1,108 @@
+# Who scales on what (eks-architecture.md 2.2). The agent waits on the model most of the time, so its CPU says
+# nothing: it scales on the turns and voice calls in progress over every pod, which GET /internal/load adds up
+# from Valkey (runtime/load.py). The worker scales on the queue (overlays/production/after-call-worker.yaml).
+# The stateless HTTP services scale on CPU.
+#
+# The per-pod targets are first figures, not measurements: measure them with
+# `run_eval.py --performance --sessions <n>` and set them here (section 3.6).
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: ai-agent-service
+spec:
+  scaleTargetRef: {name: ai-agent-service}
+  minReplicaCount: 2
+  maxReplicaCount: 10 # = MODEL_LIMITER_PODS in kustomization.yaml
+  pollingInterval: 15
+  cooldownPeriod: 300 # a voice call lasts minutes: never scale in under one
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies: [{type: Pods, value: 1, periodSeconds: 120}]
+  triggers:
+    - type: metrics-api
+      name: turns
+      metadata:
+        url: http://ai-agent-service.telesales-production.svc:8400/internal/load
+        valueLocation: turns
+        targetValue: "6" # turns in progress per pod
+    - type: metrics-api
+      name: voice-calls
+      metadata:
+        url: http://ai-agent-service.telesales-production.svc:8400/internal/load
+        valueLocation: calls
+        targetValue: "4" # open voice WebSockets per pod
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mcp-servers
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: mcp-servers}
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-gateway
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: api-gateway}
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: web}
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: commerce-service
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: commerce-service}
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: identity-service
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: identity-service}
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sales-service
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: sales-service}
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}

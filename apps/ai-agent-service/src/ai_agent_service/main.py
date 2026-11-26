@@ -7,8 +7,10 @@ the process, so the cause can be read):
 2. the agent schema, its call tables and the LangGraph checkpointer (``runtime.db``);
 3. the MCP servers and the hot graph (``runtime.harness.ready``), then
    ``after_call`` for calls that ended without being remembered;
-4. background: voice models (download once, then load) and the reconciler that
-   hangs up calls whose platform conversation was closed or went idle.
+4. background: voice models (download once, then load) and, without a job queue
+   (``runtime/jobs.py``), the one-minute sweep that
+   hangs up calls whose platform conversation was closed or went idle. With
+   ``JOBS_QUEUE_URL`` set, ``after_call`` and the sweep run in ``ai_agent_service.worker``.
 
 Routes: customer turns (``/api/conversations/{id}/turns|stream|voice``), the
 staff console (``/api/agent/*``), developer/admin (``/api/developer/*``).
@@ -28,12 +30,12 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from src.core.service_runtime import configure_service, database_ready
 
-from .api.routes import agent_calls, channels, conversations, developer, improvement, voice, privacy, welcome
+from .api.routes import agent_calls, channels, conversations, developer, improvement, live, voice, privacy, welcome
 from .components import voice as voice_component
 from .llm import tracing
 from .mcp import client as mcp_client
 from .observability.turns import TurnTracker
-from .runtime import alerts, calls, db, harness, platform
+from .runtime import alerts, db, harness, jobs, load
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -42,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 VERSION = "1.0.0"
 STARTED_AT = datetime.now(timezone.utc)
-RECONCILE_SECONDS = 60
+
 
 
 class StampArrival:
@@ -72,19 +74,6 @@ async def _prepare_voice() -> None:
     logger.info("Voice ready in %.1f s: %s, %s", time.perf_counter() - started, loaded["asr"], loaded["tts"])
 
 
-async def _reconcile_forever(app: FastAPI) -> None:
-    """Remember calls whose conversation Sales closed, and calls left idle."""
-    while True:
-        await asyncio.sleep(RECONCILE_SECONDS)
-        try:
-            open_ids = await calls.open_conversation_ids()
-            closed = await platform.closed_conversations(app, open_ids)
-            await calls.reconcile(closed)
-            await harness.remember_unfinished()
-        except Exception:  # noqa: BLE001 - try again next minute
-            logger.exception("Call reconciliation failed")
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database = configure_service(app)
@@ -101,10 +90,17 @@ async def lifespan(app: FastAPI):
         try:
             await harness.ready()
             harness.spawn(harness.warm())
-            harness.spawn(harness.remember_unfinished())
+            if not jobs.queued():
+                harness.spawn(harness.remember_unfinished())
         except Exception as error:  # noqa: BLE001 - retried on the first turn
             logger.error("Agent warm-up failed, will retry on first request: %s", error)
-        harness.spawn(_reconcile_forever(app))
+        # This pod's turns and voice calls, for KEDA (runtime/load.py; a no-op without AGENT_REDIS_URL).
+        harness.spawn(load.publish_forever())
+        # With a queue (JOBS_QUEUE_URL) the worker remembers calls and sweeps; this process only answers turns.
+        if jobs.queued():
+            logger.info("After-call work goes to the queue; ai_agent_service.worker runs it")
+        else:
+            harness.spawn(jobs.sweep_forever(app))
         app.state.alerts_stop = alerts.start(os.getenv("KAFKA_BROKERS"))
     if not voice_component.status()["missing_packages"]:
         harness.spawn(_prepare_voice())
@@ -126,6 +122,7 @@ app.include_router(conversations.router)
 app.include_router(voice.router)
 app.include_router(agent_calls.router)
 app.include_router(developer.router)
+app.include_router(live.router)
 app.include_router(improvement.router)
 app.include_router(channels.router)
 app.include_router(privacy.router)
@@ -154,6 +151,15 @@ async def health() -> dict[str, Any]:
         "tracing": {"status": "on" if tracing.is_configured() else "off"},
     }
     return report
+
+
+@app.get("/internal/load")
+async def fleet_load() -> dict[str, Any]:
+    """Turns in progress and open voice calls over every pod (runtime/load.py): what KEDA's metrics-api scaler reads.
+
+    Counts only, no customer data. The gateway never routes ``/internal``; inside the cluster a NetworkPolicy lets
+    only KEDA reach it."""
+    return await load.fleet()
 
 
 @app.get("/health/ready")

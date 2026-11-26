@@ -1,5 +1,10 @@
 "use client";
 import Link from "next/link";
+import EmptyState from "@/components/shop/EmptyState";
+import Icon from "@/components/ui/Icon";
+
+/** Orders from this total ship free (store policy, chinh-sach#giao-hang). */
+const FREE_SHIPPING = 2_000_000;
 import { useEffect, useState } from "react";
 import ProductArt from "@/components/product/ProductArt";
 import { money, variantLabel } from "@/lib/catalog";
@@ -19,14 +24,13 @@ export default function CartPage() {
 
   if (!lines.length)
     return (
-      <div className="s-wrap s-page s-empty-state">
-        <h1>Giỏ hàng trống</h1>
-        <p>Hãy chọn vài sản phẩm, hoặc hỏi trợ lý để được gợi ý.</p>
-        <Link className="s-btn" href="/">
-          Tiếp tục mua sắm
-        </Link>
+      <EmptyState
+        title="Giỏ hàng trống"
+        line="Hãy chọn vài sản phẩm, hoặc hỏi trợ lý để được gợi ý."
+        actions={<Link className="s-btn" href="/">Tiếp tục mua sắm</Link>}
+      >
         <OpenOrders />
-      </div>
+      </EmptyState>
     );
 
   return (
@@ -70,7 +74,7 @@ export default function CartPage() {
               <div className="s-cart-line-price">
                 {item.row && <b>{money(Number(item.row.sale_price) * item.qty)}</b>}
                 <button className="s-link-btn s-danger" aria-label={`Xóa ${item.row?.name || item.sku} khỏi giỏ`} onClick={() => cart.remove(item.sku)}>
-                  Xóa
+                  <Icon name="trash" size={16} /> Xóa
                 </button>
               </div>
             </div>
@@ -90,8 +94,18 @@ export default function CartPage() {
           )}
           <div className="s-summary-row">
             <span>Phí giao hàng</span>
-            <span>{!items ? "—" : subtotal >= 2_000_000 ? "Miễn phí" : "Tính khi xác nhận"}</span>
+            <span>{!items ? "—" : subtotal >= FREE_SHIPPING ? "Miễn phí" : "Tính khi xác nhận"}</span>
           </div>
+          {/* How far the cart is from free delivery: a bar and one line, so the shopper knows before checkout. */}
+          {items && (
+            <div className="s-ship-meter" role="status">
+              <Icon name="truck" size={18} />
+              <div>
+                <p>{subtotal >= FREE_SHIPPING ? "Đơn của bạn được miễn phí giao hàng." : `Mua thêm ${money(FREE_SHIPPING - subtotal)} để được miễn phí giao hàng.`}</p>
+                <span className="s-ship-meter__bar" aria-hidden="true"><i style={{ width: `${Math.min(100, (subtotal / FREE_SHIPPING) * 100)}%` }} /></span>
+              </div>
+            </div>
+          )}
           <div className="s-summary-total">
             <span>Tổng cộng</span>
             <b>{items ? money(subtotal) : "—"}</b>
@@ -102,8 +116,12 @@ export default function CartPage() {
             <Link className="s-btn s-btn-lg s-btn-block" href="/thanh-toan">Tiến hành đặt hàng</Link>
           )}
           {problems.length > 0 && <p className="s-warn">Điều chỉnh số lượng các sản phẩm không đủ hàng để tiếp tục.</p>}
-          <Link className="s-link-btn" href="/">
-            ← Tiếp tục mua sắm
+          <ul className="s-summary-trust">
+            <li><Icon name="card" size={16} /> Trả khi nhận hàng cho đơn dưới 10.000.000₫</li>
+            <li><Icon name="return" size={16} /> Đổi trả trong 7 ngày</li>
+          </ul>
+          <Link className="s-link-btn s-back-link" href="/">
+            <Icon name="arrow-left" size={16} /> Tiếp tục mua sắm
           </Link>
         </aside>
       </div>

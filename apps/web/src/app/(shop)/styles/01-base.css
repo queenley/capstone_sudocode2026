@@ -1,0 +1,162 @@
+/* Storefront styles. Every class starts with "s-" so the staff pages
+   (globals.css) are unaffected. Colours are the tokens of theme.css; the
+   --s-* names are the shop's own words for them. */
+
+/* The shop's names for the tokens, page-wide: the chat widget and the app pages read them. */
+:root {
+  --s-bg: var(--bg);
+  --s-card: var(--surface);
+  --s-ink: var(--ink);
+  --s-muted: var(--muted);
+  --s-brand: var(--brand);
+  --s-brand-dark: var(--brand-strong);
+  --s-accent: var(--brand-soft-2);
+  --s-sale: var(--danger);
+  --s-line: var(--line);
+  --s-good: var(--brand-ink);
+  --s-warn: var(--warn-ink);
+  --s-radius: var(--radius-lg);
+  --s-shadow: var(--shadow);
+}
+/* .s-root: an app page of the storefront (ShopMain wraps every page but the home page) and the chat
+   widget; the home page is the kit's own (public/assets). */
+.s-root {
+  background: var(--s-bg);
+  color: var(--s-ink);
+  font-family: var(--font-sans);
+}
+.s-root h1,
+.s-root h2,
+.s-root h3 {
+  letter-spacing: -0.025em;
+}
+/* globals.css styles bare <footer> elements for the staff pages; undo it here
+   with zero specificity, so the shop's own footer classes still apply. */
+:where(.s-root) footer {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.s-main {
+  flex: 1;
+  min-width: 0;
+  scroll-margin-top: 180px;
+}
+.s-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.s-root label {
+  margin: 10px 0;
+}
+.s-root input[type="checkbox"],
+.s-root input[type="radio"] {
+  width: auto;
+  margin: 0 8px 0 0;
+  accent-color: var(--s-brand);
+}
+.s-root select {
+  font: inherit;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: var(--surface);
+  color: var(--s-ink);
+}
+
+/* ---------- buttons ---------- */
+.s-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  background: var(--brand);
+  color: var(--on-brand);
+  border: 1px solid var(--brand);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 1px 2px rgb(var(--shadow-rgb) / 0.08), 0 4px 12px rgb(5 150 105 / 0.18);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+.s-btn:hover:not(:disabled) {
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+  opacity: 1;
+}
+.s-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.s-btn-lg {
+  padding: 13px 24px;
+  font-size: 16px;
+}
+.s-btn-block {
+  width: 100%;
+}
+.s-btn-outline {
+  background: var(--surface);
+  color: var(--brand-ink);
+  border-color: var(--brand-line);
+  box-shadow: none;
+}
+.s-btn-outline:hover:not(:disabled) {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+}
+.s-btn-ghost {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+  border-color: var(--brand-line);
+  box-shadow: none;
+  width: 100%;
+  font-size: 14px;
+  padding: 9px 12px;
+}
+.s-btn-ghost:hover:not(:disabled) {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+}
+.s-btn.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.s-link-btn {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  color: var(--brand-ink);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 14px;
+}
+.s-link-btn:hover:not(:disabled) {
+  opacity: 0.8;
+}
+.s-danger {
+  color: var(--danger-ink);
+}
+.s-icon-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--on-brand);
+  border: 0;
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+}
+

@@ -1,0 +1,30 @@
+# One public ALB (AWS Load Balancer Controller): HTTPS on the shop's name, /api/* to the gateway (REST, SSE and the
+# voice WebSocket), everything else to the web. The idle timeout covers an SSE answer and a quiet voice call;
+# HTTP redirects to HTTPS. Nothing else in the cluster faces the Internet.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: telesales
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: __CERTIFICATE_ARN__
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=300,routing.http.drop_invalid_header_fields.enabled=true
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+spec:
+  ingressClassName: alb
+  rules:
+    - host: __DOMAIN__
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service: {name: api-gateway, port: {number: 8000}}
+          - path: /
+            pathType: Prefix
+            backend:
+              service: {name: web, port: {number: 80}}

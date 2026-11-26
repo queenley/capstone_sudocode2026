@@ -1,4 +1,5 @@
-"""A finished evaluation run, read from its directory as one record for the evaluation history.
+"""A finished evaluation run, read from its directory as one record for the evaluation history: the four rates, the
+performance (latency, tokens, cost, with and without after_call), the quality counts and one row per scenario.
 
 ``run_eval.py --ingest`` keeps it in the database (:mod:`ai_agent_service.runtime.evaluations`) so the admin's
 dashboard can draw each week's numbers (``docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md``, parts B and D).
@@ -76,7 +77,8 @@ def _rate(section: Mapping[str, Any] | None, key: str, sub: str | None) -> float
 
 
 def _performance(directory: Path) -> dict[str, float]:
-    """p95 latency and per-turn tokens and cost of the ``full`` trace; empty when the run has none to read."""
+    """p50 and p95 latency, and per-turn tokens and cost of the ``full`` trace, with and without the after-call
+    work; empty when the run has none to read."""
     from . import performance
 
     try:
@@ -85,17 +87,103 @@ def _performance(directory: Path) -> dict[str, float]:
         return {}
     found: dict[str, float] = {}
     for name in ("ttft", "total", "call_brief"):
-        stats = (figures.get("latency") or {}).get(name)
-        if stats and isinstance(stats.get("p95_ms"), (int, float)):
-            found[f"{name}_p95_ms"] = float(stats["p95_ms"])
-    spent = figures.get("tokens_per_turn") or {}
-    if isinstance(spent.get("total"), (int, float)):
-        found["tokens_per_turn"] = float(spent["total"])
+        stats = (figures.get("latency") or {}).get(name) or {}
+        for cut in ("p50", "p95"):
+            if isinstance(stats.get(f"{cut}_ms"), (int, float)):
+                found[f"{name}_{cut}_ms"] = float(stats[f"{cut}_ms"])
     model = ((figures.get("advisor") or {}).get("model"))
-    cost = (spent.get("cost_usd") or {}).get(model) if model else None
-    if isinstance(cost, (int, float)):
-        found["cost_per_turn_usd"] = float(cost)
+    for key, suffix in (("tokens_per_turn", ""), ("with_after_call", "_with_after_call")):
+        spent = figures.get(key) or {}
+        if isinstance(spent.get("total"), (int, float)):
+            found[f"tokens_per_turn{suffix}"] = float(spent["total"])
+        if isinstance(spent.get("cached_share"), (int, float)):
+            found[f"cached_share{suffix}"] = float(spent["cached_share"])
+        # Priced only when the advisor's model is in the price table: never another model's price.
+        cost = (spent.get("cost_usd") or {}).get(model) if model else None
+        if isinstance(cost, (int, float)):
+            found[f"cost_per_turn{suffix}_usd"] = float(cost)
     return found
+
+
+#: Counts of manifest.json ``problems`` kept per configuration (pipeline/eval/report.py, ``problems``).
+PROBLEMS = ("failed_turns", "unlabelled_turns", "after_call_failed", "schema_errors", "scenarios_rejected",
+            "scenarios_stopped", "safe_lines", "policy_skipped", "extraction_dropped_items", "turns")
+
+
+def _quality(section: Mapping[str, Any] | None) -> dict[str, float]:
+    """The report's figures beside the four rates: guardrail violations by kind, the hard cases' TSR, turns per
+    call and calls to close."""
+    found: dict[str, float] = {}
+    section = section or {}
+    guard = section.get("guardrail_violations")
+    if isinstance(guard, Mapping):
+        if isinstance(guard.get("total"), (int, float)):
+            found["guardrail_violations"] = float(guard["total"])
+        for kind, count in (guard.get("by_type") or {}).items():
+            if isinstance(count, (int, float)):
+                found[f"guardrail_{kind}"] = float(count)
+    tsr = section.get("task_success_rate")
+    hard = tsr.get("hard_cases") if isinstance(tsr, Mapping) else None
+    if isinstance(hard, Mapping) and isinstance(hard.get("value"), (int, float)):
+        found["TSR_hard_cases"] = float(hard["value"])
+    if isinstance(section.get("avg_turns_per_call"), (int, float)):
+        found["avg_turns_per_call"] = float(section["avg_turns_per_call"])
+    close = section.get("calls_to_close")
+    if isinstance(close, Mapping) and isinstance(close.get("value"), (int, float)):
+        found["calls_to_close"] = float(close["value"])
+    return found
+
+
+def _problems(manifest: Mapping[str, Any], config: str) -> dict[str, float]:
+    counts = (manifest.get("problems") or {}).get(config) or {}
+    return {name: float(counts[name]) for name in PROBLEMS if isinstance(counts.get(name), (int, float))}
+
+
+def _tool_failed(call: Mapping[str, Any]) -> bool:
+    result = call.get("result")
+    return bool(call.get("error")) or (isinstance(result, Mapping) and (bool(result.get("error")) or result.get("ok") is False))
+
+
+def scenarios(directory: Path, report: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """One row per scenario of each configuration: passed or not (the organisers' TSR), why, and what it took.
+
+    The trace gives the turns, tool calls, failed tool calls and p95 TTFT; the report's ``failures`` the verdict."""
+    out: list[dict[str, Any]] = []
+    for config, name, section in (("full", "full.jsonl", report.get("system")),
+                                  ("baseline_no_memory", "baseline.jsonl", report.get("baseline"))):
+        trace = directory / name
+        if not trace.is_file():
+            continue
+        tsr = (section or {}).get("task_success_rate")
+        failed: dict[str, list[dict[str, Any]]] = {}
+        for item in (tsr.get("failures") if isinstance(tsr, Mapping) else None) or []:
+            failed.setdefault(str(item.get("scenario")), []).append(
+                {"call": item.get("call"), "reasons": list(item.get("reasons") or []), "hard_case": item.get("hard_case")})
+        by: dict[str, dict[str, Any]] = {}
+        with trace.open(encoding="utf-8") as lines:
+            for line in lines:
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                sid = str(row.get("scenario_id"))
+                seen = by.setdefault(sid, {"turns": 0, "calls": set(), "tool_calls": 0, "tool_errors": 0, "ttft": []})
+                seen["turns"] += 1
+                seen["calls"].add(row.get("call"))
+                tools = [t for t in row.get("tool_calls") or [] if isinstance(t, Mapping)]
+                seen["tool_calls"] += len(tools)
+                seen["tool_errors"] += sum(1 for t in tools if _tool_failed(t))
+                ttft = (row.get("latency") or {}).get("ttft_ms")
+                if isinstance(ttft, (int, float)):
+                    seen["ttft"].append(float(ttft))
+        for sid, seen in sorted(by.items()):
+            ttft = sorted(seen["ttft"])
+            out.append({
+                "config": config, "scenario_id": sid, "passed": sid not in failed,
+                "failures": failed.get(sid, []), "calls": len(seen["calls"]), "turns": seen["turns"],
+                "tool_calls": seen["tool_calls"], "tool_errors": seen["tool_errors"],
+                "ttft_p95_ms": ttft[round(0.95 * (len(ttft) - 1))] if ttft else None,
+            })
+    return out
 
 
 def _started(manifest: Mapping[str, Any], directory: Path) -> datetime:
@@ -133,6 +221,10 @@ def summary(directory: Path, *, purpose: str = "adhoc", round_name: str | None =
             if value is not None:
                 metrics.append({"config": config, "metric": name, "value": value})
     metrics += [{"config": "full", "metric": name, "value": value} for name, value in _performance(directory).items()]
+    for config, section in (("full", report.get("system")), ("baseline_no_memory", report.get("baseline"))):
+        if section is not None:
+            found = {**_quality(section), **_problems(manifest, config)}
+            metrics += [{"config": config, "metric": name, "value": value} for name, value in found.items()]
     run = {
         "run_id": str(manifest.get("run_id") or directory.name),
         "directory": str(directory),
@@ -152,4 +244,4 @@ def summary(directory: Path, *, purpose: str = "adhoc", round_name: str | None =
         "finished_at": manifest.get("finished_at"),
         "week": week_of(started_at).isoformat(),
     }
-    return {"run": run, "metrics": metrics}
+    return {"run": run, "metrics": metrics, "scenarios": scenarios(directory, report)}

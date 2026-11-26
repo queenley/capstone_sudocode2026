@@ -19,7 +19,14 @@ import {
 import { cart } from "@/lib/cart";
 import { shopContext } from "@/lib/shop-context";
 import { HOTLINE } from "@/lib/contact";
-import Icon from "@/components/ui/Icon";
+import Icon, { IconName } from "@/components/ui/Icon";
+
+const PERKS: { icon: IconName; text: string; href: string }[] = [
+  { icon: "truck", text: "Giao 1–4 ngày, miễn phí cho đơn từ 2.000.000₫", href: "/chinh-sach#giao-hang" },
+  { icon: "card", text: "Trả khi nhận hàng cho đơn dưới 10.000.000₫", href: "/chinh-sach#thanh-toan" },
+  { icon: "return", text: "Đổi trả trong 7 ngày", href: "/chinh-sach#doi-tra" },
+  { icon: "shield", text: "Bảo hành chính hãng", href: "/chinh-sach#bao-hanh" },
+];
 
 type Quote = CatalogRow & { total: string; discount: string; promotions: { name: string; description: string; type: string }[] };
 
@@ -222,11 +229,13 @@ export default function ProductPage() {
             <span><Icon name="chat" /> Hỏi trợ lý về sản phẩm này</span>
             <small>Giá theo khu vực, đổi máy cũ, so sánh với mẫu khác…</small>
           </button>
+          {/* The four terms a buyer checks before paying, each an icon and a link to its policy section. */}
           <ul className="s-perks">
-            <li><Link href="/chinh-sach#giao-hang">Giao nhanh, miễn phí cho đơn từ 2.000.000₫</Link></li>
-            <li><Link href="/chinh-sach#thanh-toan">Thanh toán khi nhận hàng (COD) cho đơn dưới 10.000.000₫</Link></li>
-            <li><Link href="/chinh-sach#doi-tra">Đổi trả trong 7 ngày</Link></li>
-            <li><Link href="/chinh-sach#bao-hanh">Chính sách bảo hành</Link></li>
+            {PERKS.map((perk) => (
+              <li key={perk.href}>
+                <Link href={perk.href}><span className="s-perk-icon"><Icon name={perk.icon} size={18} /></span>{perk.text}</Link>
+              </li>
+            ))}
           </ul>
           {/* Opening hours of the switchboard (thong-bao-lich-nghi.md, LN-01). */}
           <p className="s-support">

@@ -6,14 +6,15 @@
 #
 #   gaploop     kb v5 của gaploop-5             (--profile gaploop: chỉ tri thức, skills gốc)
 #   reflection  skills v2 của reflection-1      (--profile reflection: chỉ skills, tri thức gốc)
-#   combined    kb v5 của gaploop-5 + skills v2 của reflection-1 (--profile combined): đúng hai phiên bản của hai
-#               cột riêng, không phải vòng học combined_1 (đã bỏ, quyết định 16/11/2026)
+#   combined    kb v5 + skills v1 của combined_1 (--profile combined)
+#   gaploop_reflection  kb v5 của gaploop-5 + skills v2 của reflection-1: ghép đúng hai bản của hai dòng trên
+#               (--profile combined)
 #
 # Không chạy baseline: cột Baseline đã có từ eval_3. Kết quả: evaluation\runs\full-dev\<method>[-trial]\.
 # Agent không được publish gì: tri thức và skills đang bật vẫn là v0 (knowledge.yaml, active.json); phiên bản
 # chỉ được chọn qua --kb-version / --skills-version của lần chạy này. Hai phương pháp không chạy song song được.
 param(
-    [Parameter(Mandatory)][ValidateSet("gaploop", "reflection", "combined")][string]$Method,
+    [Parameter(Mandatory)][ValidateSet("gaploop", "reflection", "combined", "gaploop_reflection")][string]$Method,
     [string[]]$Only = @(),
     [switch]$Resume   # chạy tiếp run bị dừng (DB mất, máy ngủ): giữ kịch bản đã xong, chỉ chạy phần còn lại
 )
@@ -25,28 +26,35 @@ $kbDir = "apps\ai-agent-service\data\kb"
 $skillsDir = "apps\ai-agent-service\data\skills"
 
 $plan = @{
-    gaploop    = @{ KbRound = "gaploop-5"; Kb = 5;     SkillsRound = $null;          Skills = $null }
-    reflection = @{ KbRound = $null;       Kb = $null; SkillsRound = "reflection-1"; Skills = 2 }
-    combined   = @{ KbRound = "gaploop-5"; Kb = 5;     SkillsRound = "reflection-1"; Skills = 2 }
+    gaploop            = @{ KbFrom = "gaploop-5";  Kb = 5;     SkillsFrom = $null;          Skills = $null; Profile = "gaploop" }
+    reflection         = @{ KbFrom = $null;        Kb = $null; SkillsFrom = "reflection-1"; Skills = 2;     Profile = "reflection" }
+    combined           = @{ KbFrom = "combined_1"; Kb = 5;     SkillsFrom = "combined_1";   Skills = 1;     Profile = "combined" }
+    gaploop_reflection = @{ KbFrom = "gaploop-5";  Kb = 5;     SkillsFrom = "reflection-1"; Skills = 2;     Profile = "combined" }
 }[$Method]
+$kbLearned = "evaluation\runs\$($plan.KbFrom)\learned"
+$skillsLearned = "evaluation\runs\$($plan.SkillsFrom)\learned"
 
-# Chỉ chạy khi agent đang bật bản gốc: knowledge.yaml ở version 0 và không có phiên bản skills (thư mục rỗng thì được).
-# Các file kb v1..v5 đã được commit vào data/kb từ 15/11/2026, nên có file không có nghĩa là đang bật.
-$active = Select-String -Path "apps\ai-agent-service\config\knowledge.yaml" -Pattern '^version:\s*(\d+)' | Select-Object -First 1
+# Chỉ chạy khi agent đang ở bản gốc: không có kb v>0, không có phiên bản skills (thư mục rỗng thì được).
+$stray = @(Get-ChildItem "$kbDir\v*.jsonl" | Where-Object { $_.Name -ne "v0.jsonl" })
 $skillFiles = @(if (Test-Path $skillsDir) { Get-ChildItem $skillsDir -File })
-if (($active -and $active.Matches[0].Groups[1].Value -ne "0") -or $skillFiles.Count) {
-    "Agent không ở v0: knowledge.yaml version $(if ($active) { $active.Matches[0].Groups[1].Value }), $(($skillFiles).Name -join ', '). Rollback trước."
+if ($stray.Count -or $skillFiles.Count) {
+    "Agent không ở v0: $(($stray + $skillFiles).Name -join ', '). Rollback trước."
     exit 2
 }
 
 $name = if ($Only.Count) { "$Method-trial" } else { $Method }
 $out = "evaluation\runs\full-dev\$name"
 if (Test-Path "$out\full.manifest.json") {
-    if ((Get-Content "$out\full.manifest.json" -Raw -Encoding utf8 | ConvertFrom-Json).finished_at) {
+    # finished_at được ghi cả khi run INCOMPLETE (có kịch bản lỗi): chỉ COMPLETE mới là xong, còn lại dùng -Resume.
+    if ((Get-Content "$out\full.manifest.json" -Raw -Encoding utf8 | ConvertFrom-Json).status -eq "COMPLETE") {
         "== $out đã chạy xong, không chạy lại."; exit 0
     }
 }
 if ($Resume -and -not (Test-Path "$out\full.manifest.json")) { "Không có run để chạy tiếp ở $out."; exit 2 }
+if (-not $Resume -and (Test-Path "$out\full.jsonl")) {
+    # Đã có kịch bản chạy xong: đừng trả tiền lại cho chúng.
+    "== $out đã có run dở: chạy lại với -Resume."; exit 2
+}
 if (-not $Resume -and (Test-Path $out) -and (Get-ChildItem $out).Count) {
     Move-Item $out ("$out.stopped-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
 }
@@ -55,20 +63,18 @@ New-Item -ItemType Directory -Force $out | Out-Null
 $copied = @()
 try {
     $cmd = @("run_eval.py", "--scenarios", "data\dev\scenarios", "--config", "full", "--out", "$out\full.jsonl",
-             "--profile", $Method, "--purpose", "adhoc")
+             "--profile", $plan.Profile, "--purpose", "adhoc")
     if ($null -ne $plan.Kb) {
-        $source = "evaluation\runs\$($plan.KbRound)\learned\kb\v$($plan.Kb).jsonl"
-        $target = "$kbDir\v$($plan.Kb).jsonl"
-        if (Test-Path $target) {
-            # Bản đã commit phải giống từng byte bản vòng GapLoop đã học.
-            if ((Get-FileHash $source).Hash -ne (Get-FileHash $target).Hash) { "$target khác $source"; exit 2 }
-        } else { Copy-Item $source $target; $copied += $target }
+        foreach ($file in Get-ChildItem "$kbLearned\kb\v*.jsonl") {
+            Copy-Item $file.FullName "$kbDir\$($file.Name)"; $copied += "$kbDir\$($file.Name)"
+        }
         $cmd += @("--kb-version", $plan.Kb)
     }
     if ($null -ne $plan.Skills) {
         New-Item -ItemType Directory -Force $skillsDir | Out-Null
-        $file = "evaluation\runs\$($plan.SkillsRound)\learned\skills\v$($plan.Skills).yaml"
-        Copy-Item $file "$skillsDir\v$($plan.Skills).yaml"; $copied += "$skillsDir\v$($plan.Skills).yaml"
+        foreach ($file in Get-ChildItem "$skillsLearned\skills\v*.yaml") {
+            Copy-Item $file.FullName "$skillsDir\$($file.Name)"; $copied += "$skillsDir\$($file.Name)"
+        }
         Set-Content "$skillsDir\active.json" '{"version": 0}' -Encoding utf8   # đang bật vẫn là v0
         $copied += "$skillsDir\active.json"
         $cmd += @("--skills-version", $plan.Skills)
@@ -76,7 +82,7 @@ try {
     foreach ($id in $Only) { $cmd += @("--only", $id) }
     # --resume lấy cohort, profile và phiên bản từ manifest của run; chỉ cần file phiên bản có mặt.
     if ($Resume) { $cmd = @("run_eval.py", "--resume", "$out\full.jsonl") }
-    "== $Method : kb $($plan.Kb) ($($plan.KbRound)) skills $($plan.Skills) ($($plan.SkillsRound)) -> $out"
+    "== $Method : kb $($plan.Kb) ($($plan.KbFrom)) skills $($plan.Skills) ($($plan.SkillsFrom)) -> $out"
     & $py @cmd
     $code = $LASTEXITCODE
     if (Test-Path "$out\full.jsonl") {

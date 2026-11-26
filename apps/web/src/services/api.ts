@@ -1,3 +1,5 @@
+import type { TurnStep } from "@/components/ui/StepTrail";
+
 /** GET /api/agent/welcome: authenticated agent memory, with no call/message side effect. */
 export type ReturningCustomerWelcome = {
   returning: boolean;
@@ -197,6 +199,8 @@ export type AgentTurn = {
 
 export type AgentCallDetail = AgentCall & {
   held_by_you: boolean;
+  /** The tool steps of the turn the assistant is taking now (runtime/steps.py); empty between turns. */
+  live_steps?: TurnStep[];
   turns: AgentTurn[];
 };
 
@@ -234,7 +238,12 @@ export async function streamTurn(
   selectedSku: string,
   onText: (text: string) => void,
   cartLines: ChatCartLine[] | null = null,
-  options: { signal?: AbortSignal; turnId?: string } = {},
+  options: {
+    signal?: AbortSignal;
+    turnId?: string;
+    /** Each tool step as it starts and ends (label only): components/ui/StepTrail.tsx. */
+    onStep?: (step: TurnStep) => void;
+  } = {},
 ): Promise<TurnResult> {
   const response = await fetch(
     `/backend/api/conversations/${session.conversation_id}/stream`,
@@ -295,6 +304,7 @@ export async function streamTurn(
           text += payload.text;
           onText(text);
         }
+        if (name === "step") options.onStep?.(payload as TurnStep);
         if (name === "done") {
           result = payload;
           break;

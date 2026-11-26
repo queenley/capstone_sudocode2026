@@ -35,6 +35,7 @@ from ..config.config_manager import require_api_key
 from . import tracing
 from .callback_handler import TokenTrackingCallback
 from .spend_guard import StopSwitch
+from . import shared_limiter
 from .websocket import SocketClient
 from .rate_limiter import AdvancedTokenRateLimiter
 
@@ -97,7 +98,11 @@ def limiter_for(provider: str, config: dict[str, Any], model: str | None = None)
     key = f"{provider}/{model}" if model else provider
     with _LIMITERS_LOCK:
         if key not in _LIMITERS:
-            _LIMITERS[key] = AdvancedTokenRateLimiter.from_config(provider=key, config=config)
+            # Across pods when AGENT_REDIS_URL names a Valkey (llm/shared_limiter.py), else this process.
+            shared = shared_limiter.client()
+            _LIMITERS[key] = (shared_limiter.SharedTokenRateLimiter.from_config_shared(
+                key, config, client=shared, pods=shared_limiter.pods()) if shared is not None
+                else AdvancedTokenRateLimiter.from_config(provider=key, config=config))
         return _LIMITERS[key]
 
 

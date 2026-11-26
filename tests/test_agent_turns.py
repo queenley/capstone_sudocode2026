@@ -119,6 +119,32 @@ def test_stream_sends_each_checked_sentence_once_as_it_is_said(client, streaming
     assert "".join(deltas) == done["reply"]
 
 
+def test_stream_shows_each_tool_step_as_a_label_only(client, streaming_agent, monkeypatch):
+    from conftest import StreamingAgent
+
+    original = StreamingAgent.take_turn
+
+    async def with_steps(self, row, *, emit=None, **kwargs):
+        if emit is not None:
+            for status in ("running", "ok"):
+                await emit("step", json.dumps({"id": 1, "tool": "crm_get_customer", "label": "Đang xem thông tin khách hàng",
+                                               "status": status, "ms": 12 if status == "ok" else None}))
+        return await original(self, row, emit=emit, **kwargs)
+
+    monkeypatch.setattr(StreamingAgent, "take_turn", with_steps)
+    from ai_agent_service.runtime import calls
+    monkeypatch.setattr(calls, "take_turn", streaming_agent.take_turn)
+    c, h = conversation(client)
+    response = client.post(f"/api/conversations/{c}/stream", headers=h, json={"message": "Tư vấn giúp em"})
+    events = [block.split("\n") for block in response.text.strip().split("\n\n")]
+    shown =[json.loads(lines[1].removeprefix("data: ")) for lines in events if lines[0] == "event: step"]
+    assert shown == [{"id": 1, "label": "Đang xem thông tin khách hàng", "status": "running"},
+                     {"id": 1, "label": "Đang xem thông tin khách hàng", "status": "ok"}]
+    assert "crm_get_customer" not in response.text, "the shop never sees a tool's name"
+    names = [lines[0] for lines in events if lines[0].startswith("event:")]
+    assert names.index("event: step") < names.index("event: delta") and names[-1] == "event: done"
+
+
 def test_consultant_reply_from_the_call_console_reaches_the_chat(client, agent, monkeypatch):
     from ai_agent_service.runtime import calls
 

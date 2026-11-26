@@ -3,7 +3,7 @@
 Hai cách chạy:
 
 - **Docker Compose**: máy local, hoặc cả hệ thống trên **một máy chủ cloud (VM)**. Xem mục 0 ngay dưới.
-- **AWS**: thiết kế ở [aws-plan.md](aws-plan.md); Terraform (`infra/terraform/aws`), compose AWS và hai workflow GitHub Actions, hướng dẫn từng bước ở [aws-terraform-cicd.md](aws-terraform-cicd.md) (dữ liệu mẫu trên AWS: mục 2 của trang đó). Chưa apply trên tài khoản thật.
+- **AWS**: thiết kế ở [aws-plan.md](aws-plan.md); Terraform (`infra/terraform/aws`), compose AWS và hai workflow GitHub Actions, hướng dẫn từng bước ở [aws-terraform-cicd.md](aws-terraform-cicd.md) (dữ liệu mẫu trên AWS: mục 2 của trang đó). Chưa apply trên tài khoản thật. Kiến trúc EKS để scale nhiều khách: [eks-architecture.md](eks-architecture.md); deploy lên EKS và cách tắt hết service: [eks-deploy.md](eks-deploy.md); phát hành EKS bằng GitHub Actions: [eks-cicd.md](eks-cicd.md).
 - **ASR và TTS trên GPU Colab** (agent vẫn chạy local, nối qua tunnel; để thử và đo, chưa đủ ổn định cho demo): [colab-gpu.md](colab-gpu.md), script trong `infra/colab/`.
 - **Cloud có quản lý (GKE, Cloud SQL)**: mục 1–4. Gồm ba thành phần, và **không thành phần nào tự triển khai ứng dụng**:
 
@@ -11,7 +11,7 @@ Hai cách chạy:
 - `infra/kubernetes`: manifest Kustomize, overlay theo môi trường, Job migration.
 - `infra/argocd`: ví dụ GitOps; phải thay repo URL trước khi dùng.
 
-Terraform không tạo giá trị cho secret, user database, Kafka, Qdrant, ingress hay domain.
+Terraform không tạo giá trị cho secret, user database, Qdrant, ingress hay domain. Deploy không dùng Kafka: sự kiện outbox chạy thẳng trên PostgreSQL, việc sau cuộc gọi đi qua SQS khi bật `jobs_queue_enabled` (EKS).
 
 ## 0. Docker Compose: local và cloud
 
@@ -149,7 +149,7 @@ Trước khi render, đổi `CORS_ORIGINS=https://example.invalid` trong `infra/
 
 ## 5. Mở ra Internet
 
-Web và gateway đều là Service nội bộ. Hãy chọn ingress/load balancer HTTPS và domain, rồi chỉ expose web; web server gọi gateway trong cluster. Kafka production (dùng dịch vụ managed, hoặc tự vận hành có replication và backup) và Qdrant không do Terraform tạo. Trước khi đồng bộ ArgoCD, thay repo URL, image và cách nạp secret.
+Web và gateway đều là Service nội bộ. Hãy chọn ingress/load balancer HTTPS và domain, rồi chỉ expose web; web server gọi gateway trong cluster. Qdrant không do Terraform tạo; deploy không cần Kafka. Trước khi đồng bộ ArgoCD, thay repo URL, image và cách nạp secret.
 
 ## OTP webhook
 

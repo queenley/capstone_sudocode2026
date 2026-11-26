@@ -4,6 +4,7 @@ from datetime import timedelta, timezone
 from fastapi import HTTPException
 from sqlalchemy import select
 from src.db.models import Challenge, Customer, CustomerIdentity, Outbox, now
+from src.identity import otp_limits
 from src.security.service import normalize_identifier
 
 
@@ -15,7 +16,7 @@ class IdentityService:
     def __init__(self, db, security):
         self.db, self.security = db, security
 
-    def challenge(self, conversation, kind, value, consent):
+    def challenge(self, conversation, kind, value, consent, client_ip=None):
         if not consent:
             raise HTTPException(422, "Identity and memory consent is required")
         if (
@@ -26,11 +27,15 @@ class IdentityService:
                 503, "Configure an OTP delivery provider before enabling identification"
             )
         value = normalize_identifier(kind, value)
+        identifier = self.security.digest(kind + ":" + value)
+        # One code a minute for this step, five an hour per number, twenty per address (identity/otp_limits.py).
+        otp_limits.check(self.db, digest=identifier, purpose="conversation", client_ip=client_ip,
+                         redis_url=self.security.settings.redis_url)
         code = str(secrets.randbelow(900000) + 100000)
         challenge = Challenge(
             conversation_id=conversation.id,
             kind=kind,
-            identifier_digest=self.security.digest(kind + ":" + value),
+            identifier_digest=identifier,
             encrypted_value=self.security.encrypt(value),
             code_digest=self.security.digest(code),
             expires_at=now() + timedelta(minutes=5),

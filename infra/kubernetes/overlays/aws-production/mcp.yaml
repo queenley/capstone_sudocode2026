@@ -1,0 +1,159 @@
+# The six MCP servers as one Deployment over HTTP (MCP_TRANSPORT=http, ports 8801-8806, mcp/client.py HTTP_URLS),
+# instead of thirteen stdio subprocesses inside every agent pod: about 31 database connections per agent pod become
+# one pool per server here (eks-architecture.md 1.2).
+#
+# Security: over HTTP a call's role is a header (mcp/server_base.py, ROLE_HEADER), so only the agent and the worker
+# may reach these ports. network-policy.yaml enforces that; without it any pod could claim any role.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-servers
+spec:
+  selector:
+    matchLabels: {app: telesales-mcp}
+  template:
+    metadata:
+      labels: {app: telesales-mcp}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      nodeSelector:
+        karpenter.sh/nodepool: general
+      containers:
+        - name: memory
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.mcp.servers.memory, --transport, http, --host, 0.0.0.0, --port, "8801"]
+          ports: [{containerPort: 8801}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          env:
+            - {name: FASTMCP_STATELESS_HTTP, value: "true"} # no session to lose (the Service comment below)
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe: {tcpSocket: {port: 8801}}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+        - name: catalog
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.mcp.servers.catalog, --transport, http, --host, 0.0.0.0, --port, "8802"]
+          ports: [{containerPort: 8802}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          env:
+            - {name: FASTMCP_STATELESS_HTTP, value: "true"} # no session to lose (the Service comment below)
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe: {tcpSocket: {port: 8802}}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+        - name: crm
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.mcp.servers.crm, --transport, http, --host, 0.0.0.0, --port, "8803"]
+          ports: [{containerPort: 8803}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          env:
+            - {name: FASTMCP_STATELESS_HTTP, value: "true"} # no session to lose (the Service comment below)
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe: {tcpSocket: {port: 8803}}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+        - name: order
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.mcp.servers.order, --transport, http, --host, 0.0.0.0, --port, "8804"]
+          ports: [{containerPort: 8804}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          env:
+            - {name: FASTMCP_STATELESS_HTTP, value: "true"} # no session to lose (the Service comment below)
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe: {tcpSocket: {port: 8804}}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+        - name: knowledge
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.mcp.servers.knowledge, --transport, http, --host, 0.0.0.0, --port, "8805"]
+          ports: [{containerPort: 8805}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          env:
+            - {name: FASTMCP_STATELESS_HTTP, value: "true"} # no session to lose (the Service comment below)
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          # The local embedding model (about 470 MB) loads here, downloaded once into /app/models.
+          resources:
+            requests: {cpu: 250m, memory: 1Gi}
+            limits: {cpu: '2', memory: 2Gi}
+          readinessProbe: {tcpSocket: {port: 8805}, initialDelaySeconds: 20}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: models, mountPath: /app/models}
+        - name: account
+          image: telesales-ai-agent:dev
+          command: [python, -m, ai_agent_service.mcp.servers.account, --transport, http, --host, 0.0.0.0, --port, "8806"]
+          ports: [{containerPort: 8806}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          env:
+            - {name: FASTMCP_STATELESS_HTTP, value: "true"} # no session to lose (the Service comment below)
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe: {tcpSocket: {port: 8806}}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: models, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-servers
+spec:
+  selector: {app: telesales-mcp}
+  # The servers run stateless (FASTMCP_STATELESS_HTTP): with sessions, a replica that restarts or a request on
+  # another replica answers 404 "Session not found", and the agent does not open a new session, so every tool
+  # fails until the agent restarts. The affinity stays as a cheap second guard.
+  sessionAffinity: ClientIP
+  sessionAffinityConfig: {clientIP: {timeoutSeconds: 10800}}
+  ports:
+    - {name: memory, port: 8801, targetPort: 8801}
+    - {name: catalog, port: 8802, targetPort: 8802}
+    - {name: crm, port: 8803, targetPort: 8803}
+    - {name: order, port: 8804, targetPort: 8804}
+    - {name: knowledge, port: 8805, targetPort: 8805}
+    - {name: account, port: 8806, targetPort: 8806}

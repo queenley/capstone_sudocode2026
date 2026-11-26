@@ -1,0 +1,121 @@
+# Who may talk to whom (eks-architecture.md section 4). Default: nothing comes in. Then:
+# - the ALB (pods' IPs as targets) reaches web and the gateway;
+# - only the gateway (and web's server side) reaches the services;
+# - only the agent and the worker reach the MCP servers: over HTTP a call's role is a header (mcp.yaml), so this
+#   policy is what keeps a pod from claiming the admin role;
+# - only the agent and the worker reach the ASR service (asr.yaml);
+# - only web (an admin's page) and the agent (Zalo's OA API) reach the Zalo mock, which reaches the gateway's webhook;
+# - only KEDA reaches the agent's /internal/load (the same port as the API: the gateway never routes /internal).
+# Egress is open: the model APIs, Aurora, Valkey, SQS and EFS are all outside the namespace.
+# Needs the VPC CNI's network policy agent (vpc-cni enableNetworkPolicy, on by default in recent add-on versions).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: from-the-load-balancer
+spec:
+  podSelector:
+    matchExpressions:
+      - {key: app, operator: In, values: [telesales-web, telesales-gateway]}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - ipBlock: {cidr: 10.40.0.0/16} # the VPC (vpc_cidr): the ALB's nodes live in its public subnets
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: services-from-the-gateway
+spec:
+  podSelector:
+    matchExpressions:
+      - {key: app, operator: In, values: [telesales-commerce, telesales-identity, telesales-sales, telesales-ai-agent]}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: {matchLabels: {app: telesales-gateway}}
+        - podSelector: {matchLabels: {app: telesales-web}}
+        # the events workers deliver to the agent (identity deletions, src/identity/deletion.py)
+        - podSelector:
+            matchExpressions:
+              - {key: app, operator: In, values: [telesales-identity-events, telesales-ai-agent-events]}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agent-load-from-keda
+spec:
+  podSelector: {matchLabels: {app: telesales-ai-agent}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: keda}}
+      ports: [{port: 8400, protocol: TCP}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mcp-from-the-agent-only
+spec:
+  podSelector: {matchLabels: {app: telesales-mcp}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - {key: app, operator: In, values: [telesales-ai-agent, telesales-ai-agent-worker]}
+      ports:
+        - {port: 8801, protocol: TCP}
+        - {port: 8802, protocol: TCP}
+        - {port: 8803, protocol: TCP}
+        - {port: 8804, protocol: TCP}
+        - {port: 8805, protocol: TCP}
+        - {port: 8806, protocol: TCP}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: asr-from-the-agent-only
+spec:
+  podSelector: {matchLabels: {app: telesales-asr}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - {key: app, operator: In, values: [telesales-ai-agent, telesales-ai-agent-worker]}
+      ports: [{port: 8500, protocol: TCP}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: zalo-mock-from-web-and-agent
+spec:
+  podSelector: {matchLabels: {app: telesales-zalo-mock}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - {key: app, operator: In, values: [telesales-web, telesales-ai-agent, telesales-ai-agent-worker]}
+      ports: [{port: 8090, protocol: TCP}]
+---
+# The mock posts each Zalo event to the gateway's webhook, as Zalo would from outside.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-from-zalo-mock
+spec:
+  podSelector: {matchLabels: {app: telesales-gateway}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: {matchLabels: {app: telesales-zalo-mock}}
+      ports: [{port: 8000, protocol: TCP}]

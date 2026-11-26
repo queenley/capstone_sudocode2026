@@ -23,6 +23,7 @@ import { account as accountStore, useAccount } from "@/lib/account";
 import { newKey } from "@/lib/cart-items";
 import ReturningWelcome from "@/components/shop/ReturningWelcome";
 import Icon from "@/components/ui/Icon";
+import StepTrail, { mergeStep, type TurnStep } from "@/components/ui/StepTrail";
 import { clock, MAX_SECONDS, VoiceRecorder, voiceSupported } from "@/lib/voice-note";
 
 /** The cart in this browser with the names the shop shows, for the assistant ("giỏ hàng tôi có gì").
@@ -88,6 +89,9 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   const [status, setStatus] = useState("");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  /** The tool steps of the turn being answered, as they happen; then kept, folded, under the reply they led to. */
+  const [liveSteps, setLiveSteps] = useState<TurnStep[]>([]);
+  const [doneSteps, setDoneSteps] = useState<Map<string, { steps: TurnStep[]; ms: number }>>(() => new Map());
   const [error, setError] = useState("");
   const [call, setCall] = useState<VoiceCall | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
@@ -258,6 +262,9 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
     setText("");
     setError("");
     setBusy(true);
+    setLiveSteps([]);
+    const startedAt = performance.now();
+    let turnSteps: TurnStep[] = [];
     try {
       const s = await ensure();
       if (version !== revision.current) return;
@@ -268,7 +275,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
         ...(shown ? [{ speaker: "customer", text: shown }] : []),
         ...(human ? [] : [{ speaker: "assistant", text: "" }]),
       ]);
-      await streamTurn(
+      const result = await streamTurn(
         s,
         content,
         sku,
@@ -281,9 +288,23 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
             );
         },
         await cartForChat(),
-        { signal: controller.signal, turnId: pending.current!.id },
+        {
+          signal: controller.signal,
+          turnId: pending.current!.id,
+          onStep: (step) => {
+            if (version !== revision.current) return;
+            turnSteps = mergeStep(turnSteps, step);
+            setLiveSteps(turnSteps);
+          },
+        },
       );
       if (version !== revision.current) return;
+      const reply = typeof result?.reply === "string" ? result.reply : "";
+      if (reply && turnSteps.length) {
+        const kept = { steps: turnSteps, ms: Math.round(performance.now() - startedAt) };
+        setDoneSteps((old) => new Map(old).set(reply, kept));
+      }
+      setLiveSteps([]);
       pending.current = null;
       await refresh(s);
     } catch (e) {
@@ -291,6 +312,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       if ([401, 403, 404, 422].includes((e as { status?: number }).status || 0))
         pending.current = null;
       setError(e instanceof Error ? e.message : "Không gửi được tin nhắn");
+      setLiveSteps([]);
       setLines((old) =>
         old.length &&
         old[old.length - 1].speaker === "assistant" &&
@@ -551,6 +573,18 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                     {SPEAKER[line.speaker] || line.speaker}
                   </span>
                 )}
+                {line.speaker === "assistant" &&
+                  (busy && i === lines.length - 1 ? (
+                    <StepTrail steps={liveSteps} done={false} />
+                  ) : (
+                    doneSteps.has(line.text) && (
+                      <StepTrail
+                        steps={doneSteps.get(line.text)!.steps}
+                        done
+                        elapsedMs={doneSteps.get(line.text)!.ms}
+                      />
+                    )
+                  ))}
                 {line.speaker === "customer" && (line.voice || line.text.includes(VOICE_MARK)) ? (
                   <CustomerWords line={line} audio={audio.current} />
                 ) : (
@@ -578,6 +612,10 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                   !(busy && i === lines.length - 1) && (
                     <ChatProducts
                       text={line.text}
+                      earlier={lines
+                        .slice(0, i)
+                        .filter((before) => before.speaker !== "customer" && before.speaker !== "system")
+                        .map((before) => before.text)}
                       onShow={
                         i === lines.length - 1
                           ? () =>

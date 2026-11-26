@@ -1,6 +1,6 @@
 // The admin workspace's sections, one route each (app/admin/<slug>/page.tsx), and the icons its sidebar draws.
 
-export type AdminPageId = "knowledge" | "policies" | "skills" | "improvement" | "evaluation" | "proposals" | "catalog" | "staff";
+export type AdminPageId = "knowledge" | "policies" | "skills" | "improvement" | "evaluation" | "proposals" | "catalog" | "staff" | "zalo";
 
 export type AdminPage = { id: AdminPageId; href: string; label: string; hint: string };
 
@@ -13,6 +13,7 @@ export const ADMIN_PAGES: AdminPage[] = [
   { id: "proposals", href: "/admin/de-xuat", label: "Đề xuất từ hội thoại", hint: "Đề xuất từ hội thoại; chỉ thành kiến thức khi có người duyệt" },
   { id: "catalog", href: "/admin/san-pham", label: "Sản phẩm", hint: "Thêm sản phẩm vào catalog" },
   { id: "staff", href: "/admin/nhan-su", label: "Nhân sự & kho", hint: "Tài khoản nhân viên, tồn kho, khuyến mãi" },
+  { id: "zalo", href: "/admin/zalo", label: "Zalo mock", hint: "Chat với cửa hàng như người dùng Zalo, không cần OA thật" },
 ];
 
 const svg = {
@@ -35,6 +36,7 @@ const ICONS = {
   staff: <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" />,
   sales: <path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z" />,
   console: <path d="M4 17l6-6-6-6M12 19h8" />,
+  zalo: <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-4-.9L3 20l1.3-3.9A8 8 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z" />,
   logout: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />,
 };
 

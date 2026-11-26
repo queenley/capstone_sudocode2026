@@ -386,6 +386,161 @@ Loại: harness · Trạng thái: đang đo · Chỉ số: TSR
 - **Số đo:** chưa đo
 - **Còn lại:** Model phải gọi `pricing_get_quote` với `basket_skus`.
 
+### 2026-11-22 · Gọi thoại trên EKS không trả lời; thẻ sản phẩm lặp dưới mỗi câu
+
+Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Chỉ số: cuộc gọi thoại có lượt trả lời; số thẻ sản phẩm mỗi cuộc chat
+
+- **Vấn đề:** (1) gọi thoại trên `quivo.io.vn`: khách nói xong chờ mãi, trợ lý không trả lời. (2) Chat shop: cùng một sản phẩm hiện thẻ dưới mọi câu trả lời nhắc tới nó.
+- **Bằng chứng:** (1) `/health` của agent: `voice: unavailable`, thiếu `soxr`, `transformers`, không có VAD và Smart Turn (image build `WITH_VOICE=0`); web build không có `NEXT_PUBLIC_VOICE_URL`, nên `voiceOrigin()` trả `wss://<domain>:8000`, cổng ALB không mở; log agent và gateway không có kết nối thoại nào. (2) `ChatProducts` tìm sản phẩm trong từng câu riêng lẻ.
+- **Sửa:** (1) image agent `WITH_VOICE=1 VOICE_TTS=openai:coral`, web `NEXT_PUBLIC_VOICE_URL=https://quivo.io.vn`; vòng build ở eks-deploy.md 2.4 và `deploy-eks.yml` có sẵn hai thiết lập này (`AGENT_WITH_VOICE` mặc định `1`). (2) `lib/mentions.ts` thêm `newMentions`: một sản phẩm chỉ có thẻ dưới câu đầu tiên nhắc tới nó trong cuộc chat.
+- **Đã kiểm:** (2) `unit/chat-additions.spec.ts` 3 test qua, cả bộ unit web 18 qua, `tsc` qua.
+- **Số đo:** chưa đo.
+- **Thêm khi deploy:** cuộc gọi đóng với `1011` (`VieNeu-TTS is not installed here`): `VOICE_TTS` lúc chạy trống nên agent rơi về giọng VieNeu chạy tại chỗ; ConfigMap thêm `VOICE_TTS=openai:coral`.
+- **Đã kiểm thêm:** trên EKS (agent `r4`, web `r7`): `/health` voice `ok` (VAD, Smart Turn); bundle web có `quivo.io.vn`; một cuộc gọi qua `wss://quivo.io.vn` với câu mẫu `SCN-ADV-0001 call_1 turn_1`: lời chào có tiếng, nhận dạng đúng, hết lượt sau `endpoint_ms` 384, trả lời có tiếng, `ttfa_ms` 4347.
+- **Còn lại:** chưa thử bằng micro trên trình duyệt thật.
+
+### 2026-11-22 · Các bước trợ lý đang làm, hiện trực tiếp trên chat và màn hình nhân viên
+
+Loại: tính năng (giao diện, runtime) · Trạng thái: đang đo · Chỉ số: thời gian khách chờ mà không thấy gì
+
+- **Vấn đề:** khi trợ lý gọi tool, khách chỉ thấy "Đang soạn câu trả lời…" tới khi có câu đầu; nhân viên không biết trợ lý đang tra gì cho tới khi lượt xong.
+- **Bằng chứng:** `api/routes/conversations.py` chỉ chuyển `sentence` ra SSE; `ToolGuardMiddleware` và `ToolBox` không báo gì ra ngoài.
+- **Sửa:** `runtime/steps.py`: mỗi lệnh gọi tool (advisor qua `ToolGuardMiddleware.awrap_tool_call`, harness qua `ToolBox.call`) mở một bước rồi đóng ok hoặc lỗi kèm thời gian; harness gắn sink theo lượt (contextvar), lưu `meta.steps` vào lượt. SSE thêm sự kiện `step` cho shop **chỉ có nhãn** (`for_customer`: không tên tool, tham số hay kết quả). Bước đang chạy ghi vào Valkey `steps:{<call>}` (2 phút) để `GET /calls/{id}` trả `live_steps` từ mọi pod. Web: `components/ui/StepTrail.tsx` hiện từng bước có vòng quay, xong thì thu gọn thành "Đã tra cứu N bước · x s" (bấm để mở); chat shop chỉ nhãn, màn hình nhân viên thêm tên tool và ms, đọc lại mỗi giây khi trợ lý đang chạy. Không hiện "reasoning" của model: advisor chạy `reasoning_effort: none`, và bật tóm tắt suy luận là đổi hành vi agent, cần đề xuất và lần đo.
+- **Đã kiểm:** `tests/agent/test_turn_steps.py` (8) và test SSE mới trong `tests/test_agent_turns.py` (stream có `step` trước `delta`, không lộ tên tool): 20 qua. Cả bộ với venv agent: 1815 qua; 35 lỗi còn lại ở ASR và ngân sách đánh giá, phần không đổi. `tsc` qua.
+- **Số đo:** chưa đo.
+- **Còn lại:** chưa chụp màn hình; chưa có test giao diện cho `StepTrail`.
+
+### 2026-11-22 · Zalo mock trên EKS, chỉ admin đăng nhập mới mở được
+
+Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Chỉ số: một tin Zalo đi hết vòng webhook → trả lời
+
+- **Vấn đề:** kênh Zalo không thử được trên EKS: không có mock, stack EC2 cũ bảo vệ mock bằng một mật khẩu HTTP Basic chung.
+- **Sửa:** `overlays/aws-production/zalo-mock.yaml` (image backend-common, `--base-path /zalo-mock`); ConfigMap trỏ kênh Zalo của agent về mock với khóa của mock; web có `/admin/zalo` (mục mới trong admin): trang gửi token admin tới `/zalo-mock-session`, server web hỏi `GET /api/admin/users` (chỉ admin được 200) rồi đặt cookie `HttpOnly; Secure; SameSite=Strict` ký HMAC bằng `APP_SECRET`, 8 giờ; `/zalo-mock/*` chỉ chuyển tới mock khi cookie hợp lệ, không thì về `/admin/zalo`. NetworkPolicy: mock chỉ nhận từ web và agent, gateway nhận webhook từ mock.
+- **Đã kiểm:** `tsc` qua, kustomize render được.
+- **Số đo:** chưa đo.
+- **Còn lại:** khóa của mock nằm trong ConfigMap (công khai trong repo); dùng OA thật phải bỏ sáu dòng `ZALO_*` đó và đưa khóa thật vào secret.
+
+### 2026-11-22 · CI/CD cho EKS bằng GitHub Actions
+
+Loại: tính năng (hạ tầng) · Trạng thái: đang đo · Chỉ số: một lần phát hành chạy hết từ GitHub
+
+- **Vấn đề:** không có đường phát hành tự động lên EKS. `deploy-aws.yml` và `terraform-aws.yml` dành cho stack EC2 và bị `.gitignore` loại; `ci.yml` cũng bị loại và gọi `scripts.evaluation.evaluate` không còn tồn tại.
+- **Bằng chứng:** `git check-ignore -v .github/workflows/*.yml`: chỉ `offline-checks.yml` được theo dõi. Tài khoản chưa có OIDC provider cho GitHub.
+- **Sửa:** `.github/workflows/deploy-eks.yml` (bấm tay, environment `aws-production` có người duyệt; build 8 image, migrate, rollout, seed, smoke test; quay lui bằng `image_tag`). `scripts/deployment/eks_endpoint.sh` mở API cluster cho IP runner rồi trả lại. `infra/terraform/aws-eks/github.tf`: OIDC provider, role `github-deploy` qua OIDC, access entry admin, tham số SSM `/telesales-production/overlay` (`outputs.tf` dùng chung `local.overlay`). `terraform-eks.yml` kiểm fmt, validate và render overlay. Bỏ `ci.yml`. Hướng dẫn: `docs/deployment/eks-cicd.md`.
+- **Đã kiểm:** YAML hai workflow đọc được; `bash -n` script qua, chạy trên cluster thật ở nhánh không đổi; `terraform validate` qua, plan 6 to add.
+- **Số đo:** chưa đo (chưa có lần chạy trên GitHub).
+- **Còn lại:** chưa `actionlint`; chưa có plan Terraform tự động cho PR; mỗi lần phát hành dài thêm khoảng 10 phút do mở và đóng API.
+
+### 2026-11-22 · Valkey trên ElastiCache Serverless: lệnh nhiều khóa phải cùng slot
+
+Loại: tính năng (runtime, hạ tầng) · Trạng thái: xong · Chỉ số: `/internal/load` trả 200; ScaledObject Ready
+
+- **Vấn đề:** trên EKS, `GET /internal/load` lỗi 500 nên KEDA không co giãn `ai-agent-service`. Cùng nguyên nhân, limiter dùng chung và giới hạn OTP âm thầm rơi về chế độ dự phòng (mỗi pod tự giới hạn; đếm OTP trong bảng).
+- **Bằng chứng:** log `ai-agent-service`: `redis.exceptions.ClusterCrossSlotError: Keys in request don't hash to the same slot`. ElastiCache Serverless là cluster; Redis cục bộ thì không, nên test cũ không thấy.
+- **Sửa:** `runtime/load.py` thay `MGET` bằng từng `GET` trong một pipeline. `llm/shared_limiter.py` đặt khóa `ratelimit:{<provider>}:...`. `identity/otp_limits.py` đặt khóa `{otp}:...` và chỉ truyền khóa IP khi có IP (khóa rỗng `""` cũng nằm ở slot khác). Thêm: KEDA của worker dùng role Pod Identity riêng (`keda_identity`, `identityOwner: keda`) vì `workload` đòi annotation IRSA; Service `mcp-servers` đặt `sessionAffinity: ClientIP` vì session MCP qua HTTP nằm trong từng replica (`Session not found`). Chưa đủ: sau lần rollout thêm ASR, pod MCP khởi động lại, mọi lệnh gọi tool trả 404 và agent ngắt mạch tool ("hệ thống tra cứu đang chậm"). Sửa gốc: server chạy stateless (`FASTMCP_STATELESS_HTTP=true`, fastmcp 4.0.5); đã kiểm: `tools/list` với session id bịa trả 200 trên cả 6 server, và chat → `rollout restart deploy/mcp-servers` → chat tiếp vẫn trả giá thật, log toàn 200.
+- **Đã kiểm:** Redis 7 chế độ cluster một node trong Docker tái hiện `CROSSSLOT` với `MGET`; trên nó `tests/agent/test_shared_limiter.py` 5 test qua, `load.fleet()` cộng đúng 3 pod, script OTP chạy với 3 và 2 khóa và chặn lần gửi lại. `tests/test_otp_limits.py`, `test_live_console.py`, `test_jobs_queue.py`, `test_shared_limiter.py`: 20 qua, 4 bỏ qua. Trên EKS (image `775e87f57740-r2`): `/internal/load` trả `{"turns":0,"calls":0,"pods":2,"shared":true}`, hai ScaledObject `READY True`, 19 pod Running.
+- **Số đo:** `/internal/load` 500 → 200; ScaledObject Ready 0/2 → 2/2.
+- **Còn lại:** khóa limiter và OTP đổi tên, nên đếm cũ trong Valkey bị bỏ (hết hạn sau tối đa 1 giờ). Chưa có test tự động chạy trên Redis cluster; `LIMITER_TEST_REDIS_URL` trỏ vào một Redis cluster thì test limiter kiểm luôn điều này. Image `-r2` chứa code chưa commit.
+
+### 2026-11-20 · Trang Đánh giá: hiệu năng, chất lượng, so sánh hai run, từng kịch bản
+
+Loại: evaluation (dashboard) · Trạng thái: xong · Chỉ số: số chỉ số lưu mỗi run
+
+- **Vấn đề:** trang Đánh giá của admin chỉ vẽ TSR, CCR, RQR, HR. Lịch sử chỉ giữ p95 và chi phí mỗi lượt, không có lượt lỗi, guardrail, after_call, hay kết quả từng kịch bản.
+- **Bằng chứng:** `evaluation/runs/rerun-20261116`: `report.json` đã có `guardrail_violations`, `hard_cases`, `calls_to_close`, `failures`; `manifest.json` có `problems`; nhưng `pipeline/eval/history.py` không lưu chúng.
+- **Sửa:** `history.py` thêm p50, token và chi phí kể cả `after_call`, tỷ lệ cache, các con số chất lượng, và danh sách kịch bản; bảng mới `eval_scenarios`; route `GET /api/developer/evaluations/{run_id}/scenarios`. Giao diện tách thành `features/admin/evaluation/` (model, biểu đồ dùng chung, các tab, kịch bản), có năm tab.
+- **Đã kiểm:** `tests/agent/test_eval_history_dashboard.py` (3 test) qua; trên run thật: 54 chỉ số, 41 kịch bản full, 11 trượt (khớp TSR 30/41); e2e cũ của dashboard qua; `tsc` qua.
+- **Số đo:** chỉ số lưu mỗi run 13 → 54.
+- **Còn lại:** run đã ingest trước đây phải `run_eval.py --ingest` lại mới có số mới.
+
+### 2026-11-20 · Trang dev: theo dõi từng lượt trực tiếp, token và chi phí theo lượt
+
+Loại: tính năng (theo dõi) · Trạng thái: xong · Chỉ số: độ trễ hiển thị lượt mới
+
+- **Vấn đề:** trang dev chỉ có 100 lượt gần nhất, phải bấm làm mới; không biết token, chi phí của từng lượt, không link được sang Langfuse.
+- **Bằng chứng:** `meta` của lượt không có token (`llm/token_ledger.py` chỉ cộng dồn cả tiến trình).
+- **Sửa:** `token_ledger` thêm bộ đếm theo lượt (contextvar), callback tính chi phí theo giá trong `config/models.yaml`, harness lưu `meta.usage`. `api/routes/live.py`: `/live/turns`, `/live/stream` (SSE, tự nối lại), `/live/summary`. Trang dev có tab Trực tiếp, Cấu hình & độ trễ, Đánh giá; chọn Langfuse làm nơi xem trace chi tiết (đã tích hợp), không dùng Kibana.
+- **Đã kiểm:** `tests/agent/test_live_console.py` (4 test) qua; chụp màn hình 1440 và 390 với dữ liệu giả; `tsc` qua.
+- **Số đo:** lượt mới hiện sau tối đa 1,5 giây (chu kỳ đọc của stream), trước là khi bấm làm mới.
+- **Còn lại:** chi phí theo giá niêm yết, chưa trừ giảm giá cache.
+
+### 2026-11-20 · Sửa app cho EKS: limiter dùng chung, tín hiệu tải, kb:changed, giới hạn OTP, sổ chi tiêu
+
+Loại: tính năng (hạ tầng, runtime) · Trạng thái: đang đo · Chỉ số: số 429 khi nhiều pod, SMS OTP mỗi số
+
+- **Vấn đề:** `eks-architecture.md` mục 3.1, 3.2, 3.3, 3.6, 3.7: limiter trong từng tiến trình (N pod bắn N lần giới hạn); không có tín hiệu tải cho KEDA; tri thức mới tới pod khác sau tới 10 giây; không gì chặn xin mã OTP liên tục.
+- **Bằng chứng:** đọc code (`llm/factory.py` `_LIMITERS`, `identity/service.py` `challenge`).
+- **Sửa:** `llm/shared_limiter.py` (Lua trên Valkey, nghỉ sau 429 dùng chung, hỏng thì chia hạn mức theo `MODEL_LIMITER_PODS`); `runtime/load.py` và `GET /internal/load`; `components/knowledge/notify.py` (`kb:changed`, giữ kiểm 10 giây làm dự phòng); `identity/otp_limits.py` (60 giây mỗi bước, 5 mã mỗi giờ mỗi số, 20 mỗi giờ mỗi IP; không có Redis thì đếm bảng `challenges`), gateway gửi `X-Client-IP`. Sổ chi tiêu chỉ đếm. Tất cả bật bằng `AGENT_REDIS_URL` hoặc `REDIS_URL`, local không đổi.
+- **Đã kiểm:** `test_shared_limiter.py` (5 test, trên Redis tạm), `test_otp_limits.py` (3 test); script Lua của OTP thử trên Redis thật. Toàn bộ `tests`: 289 trượt, đúng 289 test đã trượt trước lượt này, 1.488 qua.
+- **Số đo:** `chưa đo`; cần chạy tải trên cluster.
+- **Còn lại:** ngưỡng chi tiêu chuyển nhân viên hoặc đổi model là đổi hành vi agent, cần duyệt và chạy evaluation; đổi bản release tri thức vẫn cần restart.
+
+### 2026-11-20 · Terraform EKS và overlay aws-production
+
+Loại: tính năng (hạ tầng) · Trạng thái: đang đo · Chỉ số: chưa có
+
+- **Vấn đề:** kiến trúc EKS mới có tài liệu, chưa có hạ tầng hay manifest.
+- **Bằng chứng:** `docs/deployment/eks-architecture.md` mục 6.
+- **Sửa:** `infra/terraform/aws-eks` (VPC 3 AZ, EKS 1.34 với node group hệ thống và Karpenter, Aurora Serverless v2, ElastiCache Serverless Valkey, EFS, SQS và DLQ cùng cảnh báo, ECR, Secrets Manager, Pod Identity cho từng workload, Helm add-on). Hàng đợi chuyển từ stack EC2 sang đây. `overlays/aws-production` (Ingress ALB, KEDA theo `/internal/load`, HPA, NetworkPolicy, MCP qua HTTP, External Secrets, EFS cùng init container chép dữ liệu) và `overlays/aws-cluster` (NodePool, EC2NodeClass). `render_deployment.py` thêm `aws-production` và `--terraform-output`. Hướng dẫn deploy và tắt theo ba mức: [eks-deploy.md](../deployment/eks-deploy.md); biến `nat_gateway` để bỏ NAT khi đã xóa cluster. Rà lại trang deploy, sửa bốn lỗi: gateway đọc `REDIS_URL` từ secret nhưng secret không có (ExternalSecret giờ ghép khóa này); Job migration không có node vì NodePool apply sau (`overlays/aws-cluster` có nhãn `telesales/part=cluster` để apply trước); ALB kiểm `/health` cả cho web vốn không có trang đó (Service `web` kiểm `/`); `render_deployment.py` đọc được `overlay.json` có BOM. Terraform tự tạo chứng chỉ ACM (`acm.tf`, xác thực qua Route 53 hoặc in bản ghi để thêm tay); `karpenter_version` mặc định `1.14.3` (LTS, hỗ trợ Kubernetes 1.34). Tên miền `quivo.click` do Terraform mua qua Route 53 Domains (`domain.tf`, `register_domain`, `domain_contact` chỉ trong tfvars); chứng chỉ xác thực trong hosted zone của nó. Sau đó đổi sang `quivo.io.vn` (mua ở nhà đăng ký Việt Nam; tài khoản Free plan không mua được trong Route 53): Terraform tạo hosted zone (`create_hosted_zone`, output `name_servers`), `register_domain` mặc định tắt. Apply lần đầu: chỉ lấy AZ không cần opt-in (Local Zone `han-1a` làm EKS và NAT lỗi); node group lỗi `not eligible for Free Tier` nên node hệ thống đổi sang `m7i-flex.large`, hai NodePool chỉ on-demand `m7i-flex.large`/`c7i-flex.large` (Free plan không có Spot), pool `spot` đổi tên `general` và pod chọn pool bằng `karpenter.sh/nodepool`. Provider Helm dùng danh sách repo riêng trong `.terraform/helm` (repo `istio` trên máy chưa có cache làm mọi chart lỗi `no cached repo found`); role IAM của Load Balancer Controller bỏ `name_prefix` vì vượt 38 ký tự. Policy của Karpenter vượt 6.144 ký tự nên chuyển sang inline (`enable_inline_policy`); các chart có Service chờ webhook của Load Balancer Controller (`depends_on`); Free plan chỉ cho Aurora ở chế độ express mà provider AWS chưa hỗ trợ: `scripts/deployment/create-aurora-express.ps1` tạo cluster bằng CLI (master `cluster_admin` chỉ đăng nhập IAM; tạo role `telesales` chủ `app_db`, mật khẩu trong secret `telesales-production/database` cùng định dạng secret RDS), `aurora-import.tf` đưa vào state, `data.tf` để `ignore_changes = all`; bỏ các biến `aurora_*`. Sửa luôn lệnh `apply` trong eks-deploy.md 2.2 dùng file plan chưa được ghi (thiếu `-out`). Mục 2.4 có sẵn vòng build cho ECR (vòng ở README đặt `$Registry` cho GCP) với `--provenance=false --sbom=false`: không có hai cờ này, Docker Desktop đẩy index attestation mà tag `IMMUTABLE` của ECR từ chối (400), và node kéo phải image dở (`parent snapshot does not exist`). Đã deploy: 7 image tag `775e87f57740` trên ECR, job migration hoàn tất. Shop trên EKS không có sản phẩm vì overlay không có service `seed`: thêm `infra/kubernetes/seed-job.yaml` (danh mục BTC, khách CRM, ảnh; chạy lại an toàn) và bước chạy nó trong mục 2.6; đã chạy: 40 sản phẩm, 130 SKU, 70 khách, 52 đơn, 39 ảnh. Tin nhắn thoại không nhận dạng được (`No ASR: set ASR_URL`) vì overlay không có ASR: thêm `overlays/aws-production/asr.yaml` (CPU, Zipformer 30M, weight trên EFS), `ASR_URL`, NetworkPolicy chỉ cho agent và worker, image `telesales-asr` vào vòng build mục 2.4; đã kiểm từ pod agent: câu mẫu `SCN-ADV-0001 call_1 turn_1` (5 giây) nhận dạng đúng trong 0,1 giây. Webhook và cert controller của External Secrets thêm toleration cho node hệ thống (trước đó Pending).
+- **Đã kiểm:** `terraform validate` và `fmt -check` qua; `kubectl kustomize` build được cả bốn overlay; render với giá trị mẫu không còn placeholder.
+- **Số đo:** `chưa đo`; chưa `plan` hay `apply` trên tài khoản thật.
+- **Còn lại:** `karpenter_version` phải điền; số mỗi pod của KEDA phải đo; CI chưa plan stack `aws-eks`; NetworkPolicy cần VPC CNI bật network policy.
+
+### 2026-11-20 · Việc sau cuộc gọi sang worker đọc SQS; deploy bỏ Kafka
+
+Loại: tính năng (hạ tầng, runtime agent) · Trạng thái: đang đo · Chỉ số: latency (TTFT khi có cuộc gọi kết thúc), số pod scale được
+
+- **Vấn đề:** `after_call` (MemoryAgent, QaAgent) chạy bằng task asyncio trong tiến trình API, và mỗi pod agent chạy vòng đối soát 60 giây riêng, nên việc nền tranh CPU với lượt chat của khách và nhân lên theo số pod (điểm nghẽn 3 trong `docs/deployment/aws-plan.md` mục 7.1). Kafka còn trong file deploy dù không dùng.
+- **Bằng chứng:** đọc code: `_reconcile_forever` và `harness.spawn(harness.remember(...))` trong `main.py` và `runtime/calls.py`.
+- **Sửa:** `runtime/jobs.py`: khi đặt `JOBS_QUEUE_URL`, cúp máy chỉ gửi một tin SQS; không đặt thì chạy trong API như cũ (local, test, evaluation, stack EC2). `ai_agent_service/worker.py` đọc hàng đợi, chạy `harness.remember` và vòng quét. Vòng quét giữ `pg_try_advisory_lock` nên mỗi lúc chỉ một tiến trình quét. Cơ sở dữ liệu vẫn là nguồn sự thật: dòng `pending` được đặt trước khi gửi, `remember` giữ lease, nên gửi trùng, giao trùng hay mất tin đều cho cùng kết quả. Terraform `sqs.tf` (`jobs_queue_enabled`, mặc định tắt): hàng đợi, DLQ, hai policy gửi/nhận, hai cảnh báo. Kubernetes: worker, ServiceAccount và KEDA ScaledObject trong overlay production (tối thiểu 1 replica, vì vòng quét nằm ở worker). Bỏ Kafka khỏi `docker-compose.cloud.yml` và configmap Kubernetes; Kafka chỉ còn ở profile `async` của compose local.
+- **Đã kiểm:** 12 test mới trong `tests/agent/test_jobs_queue.py` qua. Toàn bộ `tests`: 289 trượt, đúng 289 test đã trượt trên mã gốc (phần lớn do `.venv` thiếu `pytest_asyncio`), không test nào trượt thêm. `terraform validate` qua; `kubectl kustomize` build được overlay production và staging.
+- **Số đo:** `chưa đo`. Cần chạy trên EKS có tải để so TTFT của lượt chat khi nhiều cuộc gọi cùng kết thúc.
+- **Còn lại:** stack EC2 vẫn chạy `after_call` trong API, vì container không lấy được credential của máy (hop limit 1, cố ý). Cần gắn Pod Identity và thay `ACCOUNT_ID` trong overlay khi có cluster. Cuộc gọi `failed` vẫn được chạy lại mỗi phút trong 2 ngày như trước; nên thêm backoff.
+
+### 2026-11-20 · Các trang cửa hàng: một hệ thống, có icon, dễ dùng hơn
+
+Loại: tính năng (giao diện web) · Trạng thái: xong · Chỉ số: lề, kiểu thẻ, số trang có icon
+
+- **Vấn đề:** Các trang trong (giỏ, thanh toán, danh mục, sản phẩm, đơn hàng, chính sách) bắt đầu ở x=120 trong khi logo và menu ở x=80; dòng dẫn dính vào nội dung; mọi khung là thẻ xám (kit đặt `--surface` là màu xám xanh); ô nhập lúc xám lúc trắng. Trang đơn hàng khi chưa đăng nhập là một cột hẹp lệch trái, hai nút khác kiểu. Trang chính sách là bốn khối chữ, tiêu đề dính mép trên. Header chỉ có chữ, số trong giỏ là "(1)".
+- **Bằng chứng:** ảnh chụp từng màn hình 1440x900 và 390x844 với dữ liệu tổng hợp, trước và sau.
+- **Sửa:** `src/app/(shop)/styles/10-inner-pages.css` (cuối cascade): lề theo `.wrap` của kit, khoảng cách dưới đầu trang, một kiểu thẻ trắng có viền mảnh, ô nhập trắng. `Icon.tsx` thêm 11 icon (user, shield, return, card, clock, pin, tag, trash, arrow-left, filter, info). Header: icon cho Tìm, Đăng nhập, Giỏ hàng và số trong giỏ là huy hiệu. Trang sản phẩm: bốn điều khoản thành lưới icon. Giỏ hàng: thanh tiến độ miễn phí giao (từ 2.000.000₫), hai dòng cam kết, icon xóa và quay lại. Đơn hàng: hai thẻ "Có tài khoản" và "Tra cứu bằng số điện thoại". Chính sách: mục lục bên trái (dính khi cuộn), mỗi mục có icon và một dòng điều khoản chính.
+- **Đã kiểm:** `tsc --noEmit` 0 lỗi; e2e: 21 test trượt, đúng 21 test đã trượt trước lượt này, không có test trượt mới; chụp lại các trang ở 1440 và 390.
+- **Số đo:** lề trong trang 120px → 80px (trùng logo); 6 trang dùng chung một kiểu thẻ thay vì thẻ xám; 4 trang có icon mới.
+- **Còn lại:** chưa chạy `npm run build` lượt này vì đang có `next dev` khác chạy trên cùng thư mục (cổng 3001). Các console nhân viên (`/calls`, `/developer`) chưa được làm lại theo hệ thống này.
+
+### 2026-11-20 · Trang chủ ngắn lại: bỏ mục photo-chapters lỗi, khung chat ở hero không còn trống
+
+Loại: tính năng (giao diện web) · Trạng thái: xong · Chỉ số: chiều cao trang, số màn hình
+
+- **Vấn đề:** Trang chủ dài 8,5 màn hình ở 1440 và 10,8 ở 390. Mục `#gia-dung` (moment `photo-chapters`) ghim ảnh tràn đè lên mục kế tiếp, và lặp lại máy lọc không khí, máy lọc nước, nồi chiên mà ô danh mục `#hang` đã có. Khung chat ở hero trống khoảng một giây đầu; trên điện thoại nó đẩy hero quá một màn hình.
+- **Bằng chứng:** ảnh chụp từng màn hình qua `e2e/redesign-snapshots.spec.ts` (dữ liệu tổng hợp) ở 1440x900 và 390x844, trước và sau.
+- **Sửa:** `src/app/(shop)/page.tsx` chỉ còn ghép năm mục; nội dung chuyển vào `src/features/home/content.ts`, các mục vào `src/features/home/sections.tsx`. Bỏ `#gia-dung` cùng luật CSS `mo-ph`. `HeroChat.tsx` mở đầu bằng lượt hỏi đáp đầu tiên, vòng lặp chạy từ lượt hai. Trên điện thoại ẩn khung chat ở hero, vì nút chat nổi đã làm việc đó. Khung xem trước chat ở `#tro-ly` (lớp `s-tro-ly`) không còn kéo thành ô xám rỗng.
+- **Đã kiểm:** `tsc --noEmit` 0 lỗi; `npm run build` qua; 15/15 test unit qua; chụp lại 32 route ở 1440 và 390.
+- **Số đo:** trang chủ 1440: 7.644px (8,5 màn hình) → 4.944px (5,5); 390: 9.112px (10,8) → 6.413px (7,6). Các trang khác không đổi chiều cao.
+- **Còn lại:** trang chủ không còn "moment" nào của taste-skill (cố ý, để trang ngắn). Nút chính trên nền emerald `#059669` chữ trắng có độ tương phản 3,77:1, dưới 4,5:1 mà `design-checklist.spec.ts` yêu cầu; không đổi vì người dùng giữ nguyên màu xanh. Cần người quyết định có dùng `--brand-strong` `#047857` (5,5:1) cho nền nút không.
+
+### 2026-11-20 · Trang quản trị không sập khi API trả thiếu trường; một trạng thái trống chung cho cửa hàng
+
+Loại: tính năng (giao diện web) · Trạng thái: xong · Chỉ số: trang render được / sập
+
+- **Vấn đề:** `/admin/kien-thuc` và `/admin/danh-gia` sập cả trang ("Cannot read properties of undefined (reading 'length')") khi phản hồi thiếu `entries` hoặc `runs`. Trang thanh toán với giỏ trống hiện tiêu đề cỡ chữ hero, nút đè lên chữ.
+- **Bằng chứng:** ảnh chụp các route `ad-know`, `ad-eval` và `/thanh-toan` với giỏ trống, dữ liệu tổng hợp.
+- **Sửa:** `faq-admin.tsx` coi phản hồi thiếu danh sách là danh sách rỗng và ẩn dòng "Ngày nghiệp vụ" khi không có ngày; `evaluation-dashboard.tsx` dùng `?? []`. Thêm `components/shop/EmptyState.tsx`, dùng ở giỏ hàng, thanh toán và trang lỗi, với CSS riêng trong `styles/04-pages.css`.
+- **Đã kiểm:** chụp lại: hai trang quản trị hiện trạng thái trống, thanh toán và giỏ trống canh giữa, footer nằm cuối màn hình; `tsc` và `build` qua.
+- **Số đo:** 2/2 trang quản trị trước sập, sau render được.
+- **Còn lại:** không.
+
+### 2026-11-20 · Gọn mã giao diện: tách shop.css, bỏ CSS chết, một thanh trên cho các console nhân viên
+
+Loại: tính năng (giao diện web, tái cấu trúc) · Trạng thái: xong · Chỉ số: số dòng CSS, số bản sao header
+
+- **Vấn đề:** `shop.css` dài 2.964 dòng, khoảng 500 dòng là luật cho header, hero cũ và dải "promises" mà không component nào dùng. `/developer` và `/agent` còn thanh trên cũ (chữ "Quivo", link tiếng Anh "Sign in, Inbox"), khác `/calls`; ba component mỗi cái tự viết thanh trên.
+- **Bằng chứng:** script so tên lớp `s-*` trong CSS với mã nguồn (đã loại lớp ghép động như `s-status-*`, `s-art-*`, `s-msg-*`); ảnh chụp `/developer`.
+- **Sửa:** `shop.css` thành danh sách `@import` của chín file trong `src/app/(shop)/styles/`, giữ nguyên thứ tự cascade (đã kiểm ghép lại đúng từng byte trước khi xóa). Gỡ 90 selector chết bằng postcss. Thêm `components/staff/StaffTopbar.tsx`, dùng ở `call-console.tsx`, `agent-console.tsx`, `workspace.tsx`.
+- **Đã kiểm:** `tsc` và `build` qua. Bộ e2e: 21 test trượt, trùng đúng 21 test trượt trên mã gốc (đã cất tạm thay đổi rồi chạy lại), nên không có test nào trượt thêm.
+- **Số đo:** CSS cửa hàng 2.964 → 2.414 dòng; thanh trên nhân viên 3 bản → 1 component.
+- **Còn lại:** 21 test e2e trượt sẵn từ trước, cần sửa riêng: test chờ `/admin` trong khi app chuyển sang `/admin/kien-thuc`, welcome gọi hai lần dưới Strict Mode khi chạy dev, logo có cả ở header lẫn footer nên selector khớp hai phần tử, độ tương phản nút chính. `snapshot`/`WEB_URL` cần dùng `localhost` thay `127.0.0.1` với Next 16 dev, nếu không trang không hydrate.
+
 ### 2026-11-16 · Sửa nhãn và lời khách D1–D7 của DISPUTES; Zalo ID cho 5 khách CRM tổng hợp
 
 Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR, HR, CCR
@@ -451,8 +606,19 @@ Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR / CCR / RQR / 
   - Không chạy lại vòng học. Script chép phiên bản trong `evaluation/runs/<vòng>/learned` vào `apps/ai-agent-service/data/kb` và `data/skills`, chạy `run_eval.py --config full --profile <m> --kb-version/--skills-version`, rồi gỡ các file vừa chép, đưa agent về v0. Bản đang bật vẫn là v0, không publish gì.
   - GapLoop: kb v5 của gaploop-5. Reflection: skills v2 của reflection-1. Combine: kb v5 + skills v1 của combined_1.
 - **Đã kiểm:** thử `SCN-GEN-0001` cho cả ba phương pháp, 0 lỗi. Dấu prompt advisor và kb khớp với R1 của vòng: Reflection `af773e79`, Combine `853a624d` / kb `5e961542`. GapLoop dùng kb `f0beda4d` với prompt gốc `8c587ab7`; R1 của gaploop-5 còn có skills v1, ở đây chỉ đo tri thức. Sau mỗi lần chạy, `data/kb` chỉ còn v0 và không còn `data/skills`.
-- **Số đo:** đang chạy 3 × 409 kịch bản, kết quả ở `evaluation/runs/full-dev/<method>`.
-- **Còn lại:** thêm ba run này vào `method_metrics.py`.
+- **Thêm:** `-Method gaploop_reflection` ghép kb v5 của gaploop-5 với skills v2 của reflection-1 (`--profile combined`), đúng hai bản đã đo riêng. `-Resume` chạy tiếp run bị dừng. Một run INCOMPLETE nhưng đã có trace thì không bị chạy lại từ đầu.
+- **Sự cố:**
+  - Ở cả 4 run, tiến trình treo ở bước đóng pool DB sau khi đã ghi manifest (`error connecting in 'pool-1'`), nên phải dừng tay. Kết quả không bị ảnh hưởng.
+  - Lúc 23:54 ngày 15/11, Postgres vào recovery mode và Docker Desktop treo. Đã khởi động lại Docker và WSL rồi `-Resume`.
+  - Còn 1–3 lượt trên 4600 chưa gắn nhãn, do extractor timeout hoặc sai định dạng. `--relabel` sửa được một phần.
+- **Số đo** (409 kịch bản `data/dev`, `reference_eval.py`, extractor v13, `gpt-5.6-luna`), theo thứ tự TSR / CCR / RQR / HR:
+  - Baseline: 55,5 / 34,5 / 18,5 / 13,8.
+  - Router: 62,1 / 49,5 / 6,7 / 13,0.
+  - GapLoop: 63,6 / 51,5 / 5,4 / 11,7.
+  - Reflection: **73,3** / **53,3** / 4,5 / 11,2.
+  - Combine (combined_1): 67,5 / 50,7 / **4,1** / **10,8**.
+  - GapLoop + Reflection (ghép): 69,2 / 52,5 / 5,0 / 11,0.
+- **Còn lại:** thêm các run này vào `method_metrics.py`. Ghép kb của GapLoop vào skills của Reflection làm TSR giảm 4,1 điểm so với Reflection một mình; nên xem kịch bản nào bị tụt.
 
 ### 2026-11-15 · Chấm rubric trên một mẫu kịch bản trải đều persona
 

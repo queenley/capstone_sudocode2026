@@ -1,0 +1,198 @@
+/* ---------- the inner pages' system ----------
+   Every storefront page but the home page (category, search, product, cart, checkout, orders, account, policy)
+   reads as one system: the same edges as the header, a page head with room under it, one white card with a
+   hairline, white fields, and an icon beside each action that has one. Last in the cascade, so it settles the
+   earlier files' grey panels and 120px edges without editing each. */
+
+/* Edges: the kit's .wrap (public/assets/system.css), so the page starts on the logo's line. */
+.s-root .s-wrap {
+  width: min(100% - 2 * var(--gut, 24px), var(--container, 1280px));
+  max-width: none;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+.s-root .s-wrap.s-narrow { width: min(100% - 2 * var(--gut, 24px), 860px); }
+.s-root .s-page { padding-top: var(--s-6, 32px); padding-bottom: var(--s-8, 64px); }
+
+/* The page head: the title, one lead line, then air before the content. */
+.s-root .s-page-title { font-size: clamp(28px, 1vw + 20px, 36px); line-height: 1.2; margin: 0 0 var(--s-2, 8px); }
+.s-root .s-page > .s-lead,
+.s-page-head .s-lead { margin: 0 0 var(--s-6, 32px); max-width: 70ch; line-height: 1.6; }
+.s-page-head { margin-bottom: var(--s-6, 32px); }
+.s-page-head .s-lead { margin-bottom: 0; }
+
+/* One card: white on the white page, a hairline, the shop's radius, a soft lift. */
+.s-root :is(.s-panel, .s-cart-line, .s-summary, .s-step, .s-policy, .s-order, .s-detail) {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--s-radius);
+  box-shadow: 0 1px 2px rgb(6 78 59 / 0.04), 0 8px 24px rgb(6 78 59 / 0.04);
+}
+.s-root .s-summary { padding: var(--s-5, 24px); }
+.s-root .s-summary h2 { margin-top: 0; }
+
+/* Fields: white, a visible edge, the brand ring on focus (the sign-in page's look, everywhere). */
+.s-root :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+}
+.s-root :is(input, select, textarea):focus-visible { border-color: var(--brand); box-shadow: var(--focus); outline: none; }
+
+/* An icon inside a text button or link sits on the text's line. */
+.s-link-btn { display: inline-flex; align-items: center; gap: 6px; }
+.s-btn > .icon, .s-link-btn > .icon { flex: none; }
+
+/* ---------- header actions (components/shop/Header.tsx) ----------
+   Tìm, Đăng nhập, Giỏ hàng: an icon and the word; the cart's count a badge on the icon. */
+.s-nav-act { display: inline-flex; align-items: center; gap: 6px; }
+.s-nav-act .icon { color: var(--brand-ink); }
+.s-nav-act__icon { position: relative; display: inline-flex; margin-right: 8px; }
+.s-nav-act__icon .nav__count {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--brand-strong);
+  color: var(--on-brand);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+@media (max-width: 1023px) {
+  .s-nav-act > span:not(.s-nav-act__icon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
+
+/* ---------- product detail: the four terms ---------- */
+.s-root .s-perks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3, 12px);
+  margin: var(--s-5, 24px) 0 0;
+}
+.s-root .s-perks li { margin: 0; }
+.s-root .s-perks li::before { content: none; }
+.s-perks a {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3, 12px);
+  min-height: 44px;
+  color: var(--ink-2);
+  font-size: var(--t-small);
+  line-height: 1.4;
+  text-decoration: none;
+}
+.s-perks a:hover { color: var(--brand-ink); }
+.s-perk-icon, .s-panel-icon, .s-policy-icon {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+}
+.s-root .s-specs th { background: var(--surface-2); }
+.s-root .s-specs td { background: var(--bg); }
+@media (max-width: 639px) {
+  .s-root .s-perks { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- cart: free delivery and the reassurances ---------- */
+.s-ship-meter {
+  display: flex;
+  gap: var(--s-3, 12px);
+  align-items: flex-start;
+  margin: var(--s-4, 16px) 0;
+  padding: var(--s-3, 12px);
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+  color: var(--brand-deep);
+}
+.s-ship-meter > .icon { flex: none; margin-top: 2px; }
+.s-ship-meter > div { flex: 1; min-width: 0; }
+.s-ship-meter p { margin: 0 0 8px; font-size: var(--t-small); }
+.s-ship-meter__bar { display: block; height: 6px; border-radius: 999px; background: var(--brand-soft-2); overflow: hidden; }
+.s-ship-meter__bar i { display: block; height: 100%; border-radius: inherit; background: var(--brand); transition: width 300ms var(--ease); }
+.s-summary-trust { list-style: none; margin: var(--s-4, 16px) 0 0; padding: 0; display: grid; gap: 8px; }
+.s-summary-trust li { display: flex; align-items: center; gap: 8px; font-size: var(--t-small); color: var(--muted); }
+.s-summary-trust .icon { color: var(--brand-ink); }
+.s-root .s-summary .s-back-link { margin: var(--s-3, 12px) 0 0; }
+
+/* ---------- two ways in (don-hang: an account, or a phone number) ---------- */
+.s-ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5, 24px); align-items: start; }
+.s-root .s-panel { padding: var(--s-6, 32px); }
+.s-panel h2 { font-size: var(--t-h3); margin: var(--s-4, 16px) 0 var(--s-2, 8px); }
+.s-panel > .s-muted { margin: 0 0 var(--s-5, 24px); line-height: 1.6; }
+.s-panel .s-row { display: flex; flex-wrap: wrap; gap: var(--s-3, 12px); }
+.s-panel-icon { width: 44px; height: 44px; }
+@media (max-width: 819px) {
+  .s-ways { grid-template-columns: minmax(0, 1fr); }
+  .s-root .s-panel { padding: var(--s-5, 24px); }
+}
+
+/* ---------- the policy page (chinh-sach) ----------
+   The contents beside the sections on a desktop; each section opens with its icon and the one fact people
+   come for, then the terms as a list with brand bullets. */
+.s-policy-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--s-7, 48px); align-items: start; }
+.s-policy-toc { position: sticky; top: calc(var(--nav, 72px) + var(--s-5, 24px)); display: grid; gap: 4px; }
+.s-policy-toc a {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3, 12px);
+  min-height: 44px;
+  padding: 0 var(--s-3, 12px);
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  text-decoration: none;
+  font-weight: 500;
+}
+.s-policy-toc a .icon { color: var(--brand-ink); }
+.s-policy-toc a:hover { background: var(--brand-soft); color: var(--brand-deep); }
+.s-policy-list { display: grid; gap: var(--s-4, 16px); }
+.s-root .s-policy { padding: var(--s-5, 24px) var(--s-6, 32px); margin: 0; scroll-margin-top: calc(var(--nav, 72px) + 16px); }
+.s-policy-head { display: flex; gap: var(--s-4, 16px); align-items: center; margin-bottom: var(--s-3, 12px); }
+.s-policy-icon { width: 44px; height: 44px; }
+.s-root .s-policy h2 { font-size: var(--t-h3); margin: 0; }
+.s-policy-key { margin: 2px 0 0; color: var(--brand-ink); font-weight: 500; font-size: var(--t-small); }
+.s-root .s-policy ul { margin: 0; padding: 0 0 0 calc(44px + var(--s-4, 16px)); list-style: none; }
+.s-root .s-policy li { position: relative; margin: 8px 0; color: var(--ink-2); }
+.s-root .s-policy li::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 0.65em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+.s-root .s-policy-help {
+  display: block;
+  margin-top: var(--s-4, 16px);
+  padding: var(--s-6, 32px);
+  border-radius: var(--s-radius);
+  background: var(--brand-soft);
+  text-align: center;
+}
+.s-policy-help > p { margin: 0 0 var(--s-4, 16px); color: var(--brand-deep); }
+@media (max-width: 1023px) {
+  .s-policy-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s-5, 24px); }
+  .s-policy-toc { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  .s-root .s-policy { padding: var(--s-5, 24px); }
+  .s-root .s-policy ul { padding-left: var(--s-4, 16px); }
+}
+
+/* ---------- product detail: the ask-the-assistant row on the white card ---------- */
+.s-root .s-ask { background: var(--brand-soft); border: 1px solid var(--brand-soft-2); }
+.s-root .s-ask:hover:not(:disabled) { background: var(--brand-soft-2); }
+.s-root .s-ask > span { display: inline-flex; align-items: center; gap: 8px; }
+
+/* a back link right under the page head sits with it, not a full section below */
+.s-root .s-page > .s-lead + .s-back-link { margin-top: calc(-1 * var(--s-4, 16px)); }

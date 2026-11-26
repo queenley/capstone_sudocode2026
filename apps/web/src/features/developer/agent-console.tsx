@@ -6,7 +6,17 @@ import KnowledgeGaps from "@/features/admin/knowledge-gaps";
 // business day. Runtime changes live in the agent process only.
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import StaffTopbar from "@/components/staff/StaffTopbar";
+import EvaluationDashboard from "@/features/admin/evaluation-dashboard";
 import { api } from "@/services/api";
+import LiveMonitor from "./live-monitor";
+
+const CONSOLE_TABS = [
+  { id: "live", label: "Trực tiếp" },
+  { id: "config", label: "Cấu hình & độ trễ" },
+  { id: "evaluation", label: "Đánh giá" },
+] as const;
+type ConsoleTab = (typeof CONSOLE_TABS)[number]["id"];
 
 type Trace = {
   trace_id: string;
@@ -94,6 +104,7 @@ export default function AgentConsole({
   const [voice, setVoice] = useState<Voice | null>(null);
   const [day, setDay] = useState("");
   const [dayInput, setDayInput] = useState("");
+  const [tab, setTab] = useState<ConsoleTab>("live");
   const context = useRef(token);
   context.current = token;
   const revision = useRef(0);
@@ -187,18 +198,7 @@ export default function AgentConsole({
 
   return (
     <main className="shell workspace agent-console">
-      <header className="topbar">
-        <Link className="logo" href="/">
-          Quivo
-        </Link>
-        <nav>
-          <Link href="/login">Sign in</Link>
-          <Link href="/agent">Inbox</Link>
-          <Link href="/calls">Calls</Link>
-          <Link href="/admin">Admin</Link>
-          <Link href="/developer">Developer</Link>
-        </nav>
-      </header>
+      <StaffTopbar current="/developer" />
       <div className="section-heading console-heading">
         <div>
           <p className="eyebrow">AI agent · observability</p>
@@ -242,6 +242,29 @@ export default function AgentConsole({
         </div>
       )}
 
+      {/* Live turns (features/developer/live-monitor.tsx), this page's settings and latency, and the evaluation
+          history the admin reads (features/admin/evaluation-dashboard.tsx). */}
+      <div className="ad-tabs console-tabs" role="tablist" aria-label="Phần của Agent Console">
+        {CONSOLE_TABS.map((t) => (
+          <button key={t.id} role="tab" id={`console-tab-${t.id}`} aria-selected={tab === t.id}
+            aria-controls={`console-panel-${t.id}`} className={tab === t.id ? "is-active" : undefined}
+            onClick={() => setTab(t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {tab === "live" && (
+        <div role="tabpanel" id="console-panel-live" aria-labelledby="console-tab-live">
+          <LiveMonitor token={token} />
+        </div>
+      )}
+      {tab === "evaluation" && (
+        <div role="tabpanel" id="console-panel-evaluation" aria-labelledby="console-tab-evaluation" className="console-eval">
+          {token ? <EvaluationDashboard token={token} onNotice={setError} /> : <p className="empty">Nhập token để xem.</p>}
+        </div>
+      )}
+      {tab === "config" && (
+      <div role="tabpanel" id="console-panel-config" aria-labelledby="console-tab-config">
       <section className="console-stats four">
         <article>
           <span>Cuộc gọi đang mở</span>
@@ -673,6 +696,8 @@ export default function AgentConsole({
         </aside>
       </div>
       <KnowledgeGaps token={token} />
+      </div>
+      )}
     </main>
   );
 }

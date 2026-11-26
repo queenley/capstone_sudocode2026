@@ -30,7 +30,7 @@ from ..components.improvement import signals
 from ..components.intake import pii
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
-from . import alerts, harness, options, trace_export, vault as vaults
+from . import alerts, harness, jobs, options, trace_export, vault as vaults
 from .db import connection, require_writable_call
 
 logger = logging.getLogger(__name__)
@@ -215,7 +215,8 @@ async def hang_up(call_id: int) -> dict[str, Any]:
         if current["ended_at"] is None:
             raise CallError(409, "The assistant is still answering. Try ending the call again in a moment.")
     if newly:
-        harness.spawn(harness.remember(call_id))
+        # The row is already 'pending': the worker (or this process, without a queue) remembers it (runtime/jobs.py).
+        await jobs.after_call(call_id)
         alerts.wake()
     return await call_row(call_id)
 

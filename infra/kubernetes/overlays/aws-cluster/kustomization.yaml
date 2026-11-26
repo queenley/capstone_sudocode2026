@@ -1,0 +1,10 @@
+# Cluster-scoped objects of the EKS deployment, kept out of overlays/aws-production so its namespace is never
+# stamped on them (kustomize does not know Karpenter's kinds are cluster-scoped). render_deployment.py
+# --environment aws-production renders both and joins them.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - karpenter.yaml
+# So these can be applied before the rest (kubectl apply -l telesales/part=cluster): the migration Job needs nodes.
+labels:
+  - pairs: {telesales/part: cluster}

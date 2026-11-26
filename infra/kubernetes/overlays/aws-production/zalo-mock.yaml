@@ -1,0 +1,64 @@
+# The Zalo mock (scripts/dev/zalo_mock.py): Zalo's two sides for the shop's OA, so the assistant can be tried on the
+# Zalo channel without an Official Account. Admins open it at https://<domain>/admin/zalo: the web server checks the
+# admin's token and proxies /zalo-mock/* here (apps/web/src/app/zalo-mock). Nothing else reaches it: only web (the
+# page) and the agent (Zalo's OA API, its replies) may connect (network-policy.yaml). State lives in memory.
+#
+# The script and the CRM's Zalo users ship in the backend-common image (scripts/, /app/btc/catalog); the mock looks
+# for the CRM at <repo>/apps/ai-agent-service/data/btc/catalog, so the command lays that out under /tmp first.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zalo-mock
+spec:
+  replicas: 1 # its users and messages are in memory: one copy, or two pages would disagree
+  selector:
+    matchLabels: {app: telesales-zalo-mock}
+  template:
+    metadata:
+      labels: {app: telesales-zalo-mock}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000}
+      nodeSelector:
+        karpenter.sh/nodepool: general
+      containers:
+        - name: zalo-mock
+          image: telesales-backend-common:dev
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              mkdir -p /tmp/repo/apps/ai-agent-service/data/btc
+              cp -r /app/scripts /tmp/repo/scripts
+              ln -sfn /app/btc/catalog /tmp/repo/apps/ai-agent-service/data/btc/catalog
+              exec python -u /tmp/repo/scripts/dev/zalo_mock.py --host 0.0.0.0 --port 8090 --no-browser \
+                --base-path /zalo-mock --webhook http://api-gateway:8000/api/channels/zalo/webhook
+          ports: [{containerPort: 8090}]
+          env:
+            - {name: PYTHONUTF8, value: "1"}
+            - {name: ZALO_MOCK_URL, value: http://zalo-mock:8090}
+            - {name: ZALO_OPENAPI_URL, value: http://zalo-mock:8090}
+            - {name: ZALO_OAUTH_URL, value: http://zalo-mock:8090}
+          envFrom:
+            - configMapRef: {name: telesales-config} # ZALO_APP_ID, ZALO_OA_ID, ZALO_OA_SECRET_KEY, ZALO_ACCESS_TOKEN
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          readinessProbe:
+            httpGet: {path: /zalo-mock/health, port: 8090}
+          resources:
+            requests: {cpu: 50m, memory: 96Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zalo-mock
+spec:
+  selector: {app: telesales-zalo-mock}
+  ports:
+    - {name: http, port: 8090, targetPort: 8090}

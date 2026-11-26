@@ -8,10 +8,20 @@ import { useEffect, useState } from "react";
 import ProductArt from "@/components/product/ProductArt";
 import { discountPercent, money, ShopProduct } from "@/lib/catalog";
 import { cart } from "@/lib/cart";
-import { catalogOnce, productMentions } from "@/lib/mentions";
+import { catalogOnce, newMentions } from "@/lib/mentions";
 
-/** *onShow* runs once the cards appear, after the catalogue arrives: the chat scrolls to keep them in view. */
-export default function ChatProducts({ text, onShow }: { text: string; onShow?: () => void }) {
+/** *onShow* runs once the cards appear, after the catalogue arrives: the chat scrolls to keep them in view.
+ *  *earlier*: the assistant's messages above this one. A product already shown under one of them gets no second
+ *  card: its card is up there, and the same card under every reply that names it again only fills the chat. */
+export default function ChatProducts({
+  text,
+  earlier = [],
+  onShow,
+}: {
+  text: string;
+  earlier?: string[];
+  onShow?: () => void;
+}) {
   const [products, setProducts] = useState<ShopProduct[]>([]);
   useEffect(() => {
     let live = true;
@@ -23,7 +33,7 @@ export default function ChatProducts({ text, onShow }: { text: string; onShow?: 
     };
   }, []);
 
-  const named = productMentions(text, products);
+  const named = newMentions(text, earlier, products);
   useEffect(() => {
     if (named.length) onShow?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps

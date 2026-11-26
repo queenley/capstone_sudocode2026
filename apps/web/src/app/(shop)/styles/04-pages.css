@@ -1,0 +1,640 @@
+/* ---------- pages ---------- */
+.s-page {
+  padding-top: 22px;
+  padding-bottom: 40px;
+}
+.s-narrow {
+  max-width: 860px;
+}
+.s-page-title {
+  font-size: 30px;
+  margin: 6px 0 16px;
+}
+.s-lead {
+  color: var(--s-muted);
+  margin-top: -6px;
+}
+.s-crumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--s-muted);
+}
+.s-crumbs a:hover {
+  color: var(--s-brand);
+}
+.s-subcats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.s-pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  font-size: 14px;
+  font-weight: 500;
+}
+.s-pill.active,
+.s-pill:hover {
+  background: var(--s-brand);
+  color: var(--on-brand);
+  border-color: var(--s-brand);
+}
+.s-alert {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  border: 1px solid var(--danger-line);
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin: 10px 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.s-load-error {
+  padding: 28px;
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.s-load-error h2 { font-size: 22px; }
+.s-load-error p { color: var(--muted); }
+.s-back-link { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 12px; }
+.s-cart-line-info, .s-summary-item > span { overflow-wrap: anywhere; }
+.s-summary-item > span:last-child { flex-shrink: 0; }
+.s-summary p { margin: 0; }
+.s-empty {
+  text-align: center;
+  color: var(--s-muted);
+  padding: 40px 10px;
+}
+.s-empty a {
+  color: var(--s-brand);
+  font-weight: 500;
+}
+.s-empty-state {
+  text-align: center;
+  padding: 70px 20px;
+}
+.s-center {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  gap: 12px;
+}
+.s-muted {
+  color: var(--s-muted);
+  font-size: 14px;
+}
+.s-good {
+  color: var(--s-good);
+  font-weight: 500;
+}
+.s-warn {
+  color: var(--s-warn);
+  font-size: 13px;
+  font-weight: 500;
+}
+.s-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.s-devnote {
+  background: var(--warn-soft);
+  border: 1px dashed var(--warn);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* ---------- listing ---------- */
+.s-listing {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+.s-filters {
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 16px;
+  position: sticky;
+  top: 140px;
+}
+.s-filters h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+.s-filters fieldset {
+  border: 0;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.s-filters legend {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.s-check {
+  display: flex !important;
+  align-items: flex-start;
+  font-size: 14px;
+  margin: 7px 0 !important;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.s-check input {
+  margin-top: 2px !important;
+}
+.s-listing-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: var(--s-muted);
+  font-size: 14px;
+}
+.s-sort {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  flex: none;
+  white-space: nowrap; /* "Sắp xếp" on one line beside its select, at every width */
+}
+.s-filter-toggle {
+  display: none !important;
+  width: auto;
+}
+.s-listing .s-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ---------- product detail ---------- */
+.s-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  margin-top: 14px;
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px solid var(--s-line);
+  padding: 24px;
+}
+.s-detail-media {
+  position: relative;
+}
+.s-detail-info h1 {
+  font-size: 30px;
+  margin: 6px 0 4px;
+  line-height: 1.25;
+}
+.s-detail-sku {
+  color: var(--s-muted);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.s-promos {
+  background: var(--surface-2);
+  border: 1px dashed var(--warn-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 14px 0;
+  font-size: 14px;
+}
+.s-promos ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+.s-options {
+  margin: 14px 0;
+}
+.s-options > span {
+  display: block;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.s-options > div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.s-option {
+  background: var(--surface);
+  color: var(--s-ink);
+  border: 1.5px solid var(--s-line);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 500;
+  min-width: 48px;
+}
+.s-option.active {
+  border-color: var(--s-brand);
+  background: var(--surface-3);
+  color: var(--s-brand);
+}
+.s-option.out {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.s-stock {
+  font-weight: 500;
+  font-size: 14px;
+  margin: 12px 0;
+}
+.s-stock.in {
+  color: var(--s-good);
+}
+.s-stock.out {
+  color: var(--s-sale);
+}
+.s-buy {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.s-buy .s-btn {
+  flex: 1;
+  min-width: 140px;
+}
+.s-qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--s-line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.s-qty button {
+  background: var(--surface);
+  color: var(--s-ink);
+  border-radius: 0;
+  padding: 9px 13px;
+  font-size: 16px;
+  min-width: 44px;
+  min-height: 44px;
+}
+.s-qty button:focus-visible {
+  outline-offset: -3px;
+}
+.s-qty button:hover:not(:disabled) {
+  background: var(--surface-3);
+  opacity: 1;
+}
+.s-qty span {
+  min-width: 34px;
+  text-align: center;
+  font-weight: 500;
+}
+.s-ask {
+  margin-top: 16px;
+  width: 100%;
+  background: var(--surface-3);
+  color: var(--s-brand-dark);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.s-ask small {
+  font-weight: 400;
+  color: var(--s-muted);
+}
+.s-ask:hover:not(:disabled) {
+  background: var(--s-accent);
+  opacity: 1;
+}
+.s-perks {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.s-perks li::before {
+  content: "✓ ";
+  color: var(--s-good);
+  font-weight: 500;
+}
+.s-specs {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--s-radius);
+  overflow: hidden;
+  border: 1px solid var(--s-line);
+  margin-top: 12px;
+}
+.s-specs th,
+.s-specs td {
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--s-line);
+  font-size: 14px;
+}
+.s-specs th {
+  width: 38%;
+  background: var(--surface-2);
+  font-weight: 500;
+}
+
+/* ---------- cart, checkout ---------- */
+.s-cart {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 22px;
+  align-items: start;
+}
+.s-cart-lines,
+.s-steps {
+  display: grid;
+  gap: 12px;
+}
+.s-cart-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 12px;
+}
+.s-cart-line-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.s-cart-line-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 110px;
+}
+.s-summary {
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 18px;
+  position: sticky;
+  top: 140px;
+  display: grid;
+  gap: 10px;
+}
+.s-summary h2,
+.s-summary h3 {
+  margin: 0;
+  font-size: 19px;
+}
+.s-summary-row,
+.s-summary-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+.s-summary-item small {
+  display: block;
+  color: var(--s-muted);
+}
+.s-summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px solid var(--s-line);
+  padding-top: 12px;
+}
+.s-summary-total b {
+  color: var(--brand-ink);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.s-step {
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 18px 20px;
+}
+.s-step h2 {
+  font-size: 19px;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.s-step-no {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--s-brand);
+  color: var(--on-brand);
+  font-size: 14px;
+}
+.s-step-locked {
+  background: var(--surface-2);
+  border-style: dashed;
+}
+.s-step > label { font-size: 14px; }
+.s-pay {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.s-form {
+  display: grid;
+  gap: 4px;
+  max-width: 460px;
+}
+.s-done {
+  text-align: center;
+  max-width: 640px;
+}
+.s-done-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin: 20px auto 0;
+  display: grid;
+  place-items: center;
+  background: var(--s-accent);
+  color: var(--s-brand-dark);
+  font-size: 34px;
+  font-weight: 500;
+}
+.s-done-list {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 14px 18px;
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+/* ---------- orders, policy ---------- */
+.s-orders {
+  display: grid;
+  gap: 14px;
+}
+.s-order {
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 14px 18px;
+}
+.s-order header,
+.s-order footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.s-order header {
+  border-bottom: 1px solid var(--s-line);
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+}
+.s-order footer {
+  border-top: 1px solid var(--s-line);
+  padding-top: 10px;
+  margin-top: 8px;
+}
+.s-order-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+  padding: 4px 0;
+}
+.s-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--s-brand);
+}
+.s-status-cancelled {
+  background: var(--surface-3);
+  color: var(--muted);
+}
+/* A COD order over 2 million: the shop calls before it ships (lib/orders.ts awaitsCall). */
+.s-status-call {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  border: 1px solid var(--warn-line);
+}
+.s-order-note {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: 13px;
+}
+/* The empty cart of a signed-in customer: the orders still on their way (gio-hang/page.tsx). */
+.s-open-orders {
+  max-width: 520px;
+  margin: 36px auto 0;
+  padding: 16px 18px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+}
+.s-open-orders h2 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+.s-open-orders ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+.s-open-orders li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--s-line);
+}
+.s-open-orders li > span:first-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.s-open-orders li small {
+  color: var(--s-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.s-open-orders .s-status {
+  flex: none;
+}
+.s-account-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 26px;
+  border-top: 1px solid var(--s-line);
+  padding-top: 14px;
+}
+.s-policy {
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  padding: 4px 22px 12px;
+  margin-bottom: 14px;
+}
+.s-policy h2 {
+  font-size: 20px;
+}
+.s-policy li {
+  margin: 7px 0;
+  line-height: 1.55;
+}
+.s-policy-help {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+
+/* ---------- empty states (components/shop/EmptyState.tsx) ----------
+   An empty cart, nothing to check out, an error: the page's heading at the page-title size (never the kit's
+   hero h1), one line, the actions, centred in a block tall enough that the footer sits at the screen's foot. */
+.s-empty-state {
+  min-height: calc(100svh - 72px - 280px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4, 16px);
+}
+.s-empty-state > h1.s-page-title { font-size: clamp(28px, 1vw + 20px, 36px); line-height: 1.2; margin: 0; }
+.s-empty-state > p { margin: 0; max-width: 46ch; color: var(--muted); }
+.s-empty-state > .s-center { margin: var(--s-2, 8px) 0 0; }

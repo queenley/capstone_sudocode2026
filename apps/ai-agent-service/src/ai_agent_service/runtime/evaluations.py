@@ -5,7 +5,8 @@ directory under ``evaluation/runs`` and a round's review was a JSON file someone
 by the Airflow worker that runs the loop, the API the admin uses and the pods that serve customers. These tables are
 what they share:
 
-- ``eval_runs`` and ``eval_metrics``: one row per scored run (``run_eval.py --ingest``), one per number of it.
+- ``eval_runs``, ``eval_metrics`` and ``eval_scenarios``: one row per scored run (``run_eval.py --ingest``), one per
+  number of it, one per scenario of each configuration (passed, why not, turns, tools).
 - ``improvement_rounds``: one weekly round, its status and what it measured.
 - ``improvement_proposals``: each change Reflection proposed in a round, and the person's decision on it.
 
@@ -49,6 +50,19 @@ CREATE TABLE IF NOT EXISTS eval_metrics (
     metric TEXT NOT NULL,
     value DOUBLE PRECISION NOT NULL,
     PRIMARY KEY (run_id, config, metric)
+);
+CREATE TABLE IF NOT EXISTS eval_scenarios (
+    run_id TEXT NOT NULL REFERENCES eval_runs (run_id) ON DELETE CASCADE,
+    config TEXT NOT NULL,
+    scenario_id TEXT NOT NULL,
+    passed BOOLEAN NOT NULL,
+    failures JSONB NOT NULL DEFAULT '[]'::jsonb,
+    calls INTEGER NOT NULL DEFAULT 0,
+    turns INTEGER NOT NULL DEFAULT 0,
+    tool_calls INTEGER NOT NULL DEFAULT 0,
+    tool_errors INTEGER NOT NULL DEFAULT 0,
+    ttft_p95_ms DOUBLE PRECISION,
+    PRIMARY KEY (run_id, config, scenario_id)
 );
 CREATE TABLE IF NOT EXISTS improvement_rounds (
     name TEXT PRIMARY KEY,
@@ -148,6 +162,23 @@ async def save_run(conn: Any, record: Mapping[str, Any]) -> None:
         for metric in record.get("metrics") or []:
             await conn.execute("INSERT INTO eval_metrics (run_id, config, metric, value) VALUES (%s, %s, %s, %s)",
                                (run["run_id"], metric["config"], metric["metric"], float(metric["value"])))
+        await conn.execute("DELETE FROM eval_scenarios WHERE run_id = %s", (run["run_id"],))
+        for row in record.get("scenarios") or []:
+            await conn.execute(
+                "INSERT INTO eval_scenarios (run_id, config, scenario_id, passed, failures, calls, turns, tool_calls, "
+                "tool_errors, ttft_p95_ms) VALUES (%s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s, %s)",
+                (run["run_id"], row["config"], row["scenario_id"], bool(row["passed"]),
+                 json.dumps(row.get("failures") or [], ensure_ascii=False), int(row.get("calls") or 0),
+                 int(row.get("turns") or 0), int(row.get("tool_calls") or 0), int(row.get("tool_errors") or 0),
+                 row.get("ttft_p95_ms")))
+
+
+async def list_scenarios(conn: Any, run_id: str) -> list[dict[str, Any]]:
+    """Each scenario of one run, both configurations, failed ones first."""
+    rows = await (await conn.execute(
+        "SELECT config, scenario_id, passed, failures, calls, turns, tool_calls, tool_errors, ttft_p95_ms "
+        "FROM eval_scenarios WHERE run_id = %s ORDER BY passed, scenario_id, config", (run_id,))).fetchall()
+    return [_jsonable(dict(row)) for row in rows]
 
 
 async def list_runs(conn: Any, *, purpose: str | None = None, limit: int = 200) -> list[dict[str, Any]]:

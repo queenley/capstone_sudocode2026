@@ -243,12 +243,17 @@ async def turn(conversation_id: UUID, data: TurnRequest, request: Request) -> di
 async def stream(conversation_id: UUID, data: TurnRequest, request: Request) -> StreamingResponse:
     # Authorise before the stream opens, so a bad token is a plain 404, not an SSE error.
     await platform.authorize(request.app, str(conversation_id), bearer(request))
-    said: asyncio.Queue[str] = asyncio.Queue()
+    said: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
 
     async def emit(kind: str, text: str) -> None:
-        # The filler line said while tools run is for a voice line; the chat shows typing instead.
+        # The filler line said while tools run is for a voice line; the chat shows its steps instead.
         if kind == "sentence":
-            said.put_nowait(text)
+            said.put_nowait(("delta", text))
+        elif kind == "step":
+            # The shop sees the label only (runtime/steps.py): no tool name, arguments or result.
+            from ...runtime import steps
+
+            said.put_nowait(("step", steps.for_customer(json.loads(text))))
 
     task = harness.spawn(_turn(request, str(conversation_id), data, emit=emit))
 
@@ -259,7 +264,11 @@ async def stream(conversation_id: UUID, data: TurnRequest, request: Request) -> 
             getter = asyncio.ensure_future(said.get())
             done, _ = await asyncio.wait({task, getter}, timeout=HEARTBEAT_SECONDS, return_when=asyncio.FIRST_COMPLETED)
             if getter in done:
-                yield _event("delta", {"text": (" " if streamed else "") + getter.result()})
+                kind, value = getter.result()
+                if kind == "step":
+                    yield _event("step", value)
+                    continue
+                yield _event("delta", {"text": (" " if streamed else "") + value})
                 streamed = True
                 continue
             getter.cancel()
@@ -267,7 +276,11 @@ async def stream(conversation_id: UUID, data: TurnRequest, request: Request) -> 
                 break
             yield ": keepalive\n\n"
         while not said.empty():
-            yield _event("delta", {"text": (" " if streamed else "") + said.get_nowait()})
+            kind, value = said.get_nowait()
+            if kind == "step":
+                yield _event("step", value)
+                continue
+            yield _event("delta", {"text": (" " if streamed else "") + value})
             streamed = True
         try:
             result = task.result()

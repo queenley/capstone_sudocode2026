@@ -1,0 +1,453 @@
+/* ---------- footer ---------- */
+.s-footer {
+  background: var(--chrome);
+  color: var(--on-chrome-muted);
+  margin-top: 46px;
+  padding-top: 40px;
+  font-size: 14px;
+}
+.s-footer h4 {
+  color: var(--on-chrome);
+  margin: 6px 0 12px;
+}
+
+/* ---------- chat widget ---------- */
+.s-chat-fab {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  background: var(--s-brand);
+  color: var(--on-brand);
+  font-weight: 500;
+  box-shadow: 0 10px 28px rgb(var(--shadow-rgb) / 0.35);
+}
+.s-chat-fab-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgb(5 150 105 / 0.3);
+}
+.s-returning {
+  position: fixed;
+  right: 22px;
+  bottom: 92px;
+  z-index: 59;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100dvh - 116px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line-strong);
+  border-top: 4px solid var(--s-brand);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+}
+.s-returning-head { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 0 24px; }
+.s-returning-close { flex-shrink: 0; color: var(--ink-2); background: var(--surface-3); }
+.s-returning-content { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0 24px 24px; }
+.s-returning-kicker { color: var(--s-brand); font-size: 10px; font-weight: 500; letter-spacing: .1em; }
+.s-returning h2 { margin: 4px 0 12px; font-size: 21px; line-height: 1.3; }
+.s-returning p { margin: 0 0 18px; font-size: 14px; line-height: 1.6; }
+.s-returning-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.s-returning-actions .s-btn { flex: 1; justify-content: space-between; }
+.s-returning small { display: block; margin-top: 12px; color: var(--muted); font-size: 11px; }
+@media (max-width: 600px) {
+  .s-returning { right: 16px; bottom: 86px; }
+  .s-returning-head { padding-left: 20px; }
+  .s-returning-content { padding: 0 20px 20px; }
+}
+.s-chat {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  width: 390px;
+  max-width: calc(100vw - 24px);
+  height: 600px;
+  max-height: calc(100vh - 40px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0;
+  left: auto;
+  top: auto;
+  padding: 0;
+  color: var(--ink);
+  max-height: calc(100dvh - 40px);
+}
+.s-chat::backdrop {
+  background: var(--overlay);
+}
+.s-chat-fab[hidden] {
+  display: none;
+}
+.s-chat-head {
+  background: var(--chrome);
+  color: var(--on-chrome);
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.s-chat-head strong {
+  display: block;
+  font-size: 16px;
+}
+.s-chat-head span {
+  font-size: 12px;
+  color: var(--on-chrome-muted);
+}
+.s-chat-head-actions {
+  display: flex;
+  gap: 8px;
+}
+.s-chat-head .s-icon-btn {
+  color: var(--on-chrome);
+}
+.s-chat-context {
+  background: var(--surface-3);
+  font-size: 13px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--s-line);
+}
+.s-chat-body {
+  flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface-2);
+}
+.s-chat-welcome p {
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+.s-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.s-chip {
+  background: var(--surface);
+  color: var(--s-brand);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.s-chip:hover:not(:disabled) {
+  background: var(--s-accent);
+  opacity: 1;
+}
+.s-msg {
+  max-width: 85%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.s-msg p {
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+}
+.s-msg-who {
+  font-size: 11px;
+  color: var(--s-muted);
+  font-weight: 500;
+  padding-left: 4px;
+}
+.s-msg-me {
+  align-self: flex-end;
+}
+.s-msg-me p {
+  background: var(--s-brand);
+  color: var(--on-brand);
+  border-color: var(--s-brand);
+  border-bottom-right-radius: 4px;
+}
+/* The products a reply names (components/shop/ChatProducts.tsx): a row of small
+   cards under the bubble, picture first, then name, price and link. */
+.s-msg-products {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 6px;
+  scroll-snap-type: x mandatory;
+  max-width: 100%;
+}
+.s-msg-product {
+  flex: 0 0 132px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.s-msg-product:hover {
+  border-color: var(--brand-line);
+  box-shadow: var(--shadow-sm);
+}
+.s-msg-product .s-art-thumb {
+  width: 100%;
+  height: 84px;
+  flex: 0 0 auto;
+}
+.s-msg-product-name {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 32px;
+}
+.s-msg-product-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-ink);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+}
+.s-msg-product-price small {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--muted);
+}
+.s-msg-product-price s {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.s-msg-product-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand-ink);
+}
+.s-msg-agent p {
+  background: var(--warn-soft);
+  border-color: var(--warn-line);
+}
+.s-msg-system p {
+  background: transparent;
+  border: 0;
+  color: var(--s-muted);
+  font-style: italic;
+}
+.s-typing {
+  color: var(--s-muted);
+  font-style: italic;
+}
+.s-looking {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.s-looking i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--s-muted);
+  opacity: 0.5;
+}
+.s-chat-error {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  font-size: 13px;
+  padding: 8px 14px;
+}
+.s-chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--s-line);
+}
+.s-chat-input textarea {
+  resize: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  max-height: 110px;
+  font-size: 14px;
+}
+.s-chat-input button {
+  border-radius: 12px;
+  padding: 0 16px;
+}
+/* Voice messages (ChatWidget, lib/voice-note.ts): hold the microphone to record, let go to send, as on Zalo. */
+.s-chat-input .s-mic {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.s-chat-input .s-mic.is-on {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  transform: scale(1.12);
+  box-shadow: 0 0 0 6px var(--danger-soft);
+}
+.s-chat-input .s-mic.is-cancel {
+  background: var(--surface-3);
+  border-color: var(--s-line);
+  color: var(--s-muted);
+  box-shadow: none;
+}
+.s-recording {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+.s-recording b {
+  font-variant-numeric: tabular-nums;
+}
+.s-recording span:last-child {
+  color: var(--s-muted);
+}
+.s-recording.is-cancel {
+  background: var(--surface-3);
+  color: var(--s-muted);
+}
+.s-rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: s-rec-blink 1s ease-in-out infinite;
+}
+@keyframes s-rec-blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-rec-dot {
+    animation: none;
+  }
+}
+.s-voice {
+  display: grid;
+  gap: 6px;
+  min-width: 220px;
+  max-width: 100%;
+  padding: 9px 12px;
+  border-radius: 14px;
+  border-bottom-right-radius: 4px;
+  background: var(--s-brand);
+  color: var(--on-brand);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.s-voice + .s-voice,
+.s-msg-me p + .s-voice,
+.s-voice + p {
+  margin-top: 4px;
+}
+.s-voice-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.s-voice-head svg {
+  flex: none;
+}
+.s-voice audio {
+  width: 100%;
+  height: 32px;
+}
+.s-voice-text {
+  overflow-wrap: anywhere;
+}
+.s-voice-text.is-failed {
+  opacity: 0.85;
+  font-style: italic;
+}
+.s-voice-hint {
+  align-self: center;
+  margin: 2px 0;
+  font-size: 12px;
+  color: var(--s-muted);
+  text-align: center;
+}
+.s-chat-closed {
+  padding: 12px;
+  border-top: 1px solid var(--s-line);
+  display: flex;
+  justify-content: center;
+}
+.s-chat-foot {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px 10px;
+  font-size: 12px;
+  color: var(--s-muted);
+  background: var(--surface-2);
+}
+.s-chat-foot a:hover {
+  color: var(--s-brand);
+}
+/* The icon and the number on one line: Tailwind's preflight makes every svg a block. */
+.s-chat-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.s-chat-foot a svg {
+  flex: none;
+}
+
