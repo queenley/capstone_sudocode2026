@@ -41,15 +41,16 @@ async def test_last_model_call_has_no_tools_and_preserves_previous_results():
         return json.dumps({"ok": True, "data": {"items": []}})
 
     model = InspectModel(responses=[AIMessage(content="", tool_calls=[{
-        "name": "catalog_search", "id": str(i), "args": {"query": str(i)}}]) for i in range(7)]
-        + [AIMessage(content="Dạ em chưa tìm được sản phẩm phù hợp ạ.")])
+        "name": "catalog_search", "id": "0", "args": {"query": "0"}}]),
+        AIMessage(content="Dạ em chưa tìm được sản phẩm phù hợp ạ.")])
     tool = StructuredTool.from_function(coroutine=lookup, name="catalog_search", description="Find product")
     agent = AdvisorAgent(llm=model, tools=[tool], retries=0)
     draft = await agent.draft([HumanMessage(content="Tìm sản phẩm")], AgentContext(call_id="fixture", lane="NEW"))
-    assert len(draft.tool_results) == 7
+    # Two model calls a turn at most: the tools in the first, the answer in the second, which may not call a tool.
+    assert len(draft.tool_results) == 1
     # The tools stay bound, so the prompt cache holds; the last call may not use them.
     assert observed[-1] == "none" and "none" not in observed[:-1]
-    assert draft.model_calls == 8
+    assert draft.model_calls == 2
 
 
 @pytest.mark.asyncio
@@ -57,10 +58,15 @@ async def test_last_model_call_has_no_tools_and_preserves_previous_results():
 async def test_model_failure_preserves_executed_order_in_hot_state(mode):
     class BrokenGraph:
         async def astream(self, *args, **kwargs):
-            yield "updates", {"model": {"messages": [AIMessage(content="", tool_calls=[{
-                "id": "order", "name": "order_create", "args": {"sku": "SKU-TEST"}}])]}}
-            yield "updates", {"tools": {"messages": [ToolMessage(name="order_create", tool_call_id="order",
-                content=json.dumps({"ok": True, "data": {"order_id": "ORDER-TEST"}}))]}}
+            # A lookup beside the order, so the turn goes on to the model after the order's line is said.
+            yield "updates", {"model": {"messages": [AIMessage(content="", tool_calls=[
+                {"id": "order", "name": "order_create", "args": {"sku": "SKU-TEST"}},
+                {"id": "look", "name": "delivery_estimate", "args": {}}])]}}
+            yield "updates", {"tools": {"messages": [
+                ToolMessage(name="order_create", tool_call_id="order",
+                            content=json.dumps({"ok": True, "data": {"order_id": "ORDER-TEST"}})),
+                ToolMessage(name="delivery_estimate", tool_call_id="look",
+                            content=json.dumps({"ok": True, "data": {"days": 2}}))]}}
             raise RuntimeError("fixture model failure after the order")
 
     agent = AdvisorAgent(llm=Model(responses=[AIMessage(content="unused")]), tools=[], retries=0)

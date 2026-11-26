@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Mapping
@@ -36,8 +36,16 @@ from ...components.memory import ontology
 #: ``handoff_brief.schema.json``) to the product's. Anything else is refused.
 CHANNELS = {"hotline": "hotline", "zalo_oa": "zalo", "chat_fanpage": "facebook", "web_chat": "web"}
 #: How the CRM names the channel of a past session, where it differs from the
-#: scenario format's: ``crm_seed*.json`` writes ``fb`` for the Facebook page.
-CRM_SESSION_CHANNELS = {"fb": "facebook"}
+#: scenario format's: ``crm_seed*.json`` writes ``fb`` for the Facebook page,
+#: and the organisers' ``seed_history`` example (answers of 11/2026) ``phone``.
+CRM_SESSION_CHANNELS = {"fb": "facebook", "phone": "hotline"}
+
+#: ``seed_history`` fact fields the organisers name differently from our slots
+#: (their example of 11/2026: ``interest_sku``, ``address``). ``address`` has
+#: no slot: the ledger keeps an address only as a call's token, so it stays in
+#: the session's summary, as a CRM session's address does.
+SEED_FIELDS = {"interest_sku": "product_advised"}
+SUMMARY_FIELDS = {"address": "Địa chỉ giao"}
 
 #: The harness's name for the field a call's turns come from, as it passes
 #: it when a call has no ``input_mode``, to the product's input mode.
@@ -246,45 +254,109 @@ def input_mode_of(value: str | None) -> str | None:
 def seed_sessions(raw: Any, *, day: str, channel: str) -> tuple[SeedSession, ...]:
     """``seed_history`` as sessions, oldest first.
 
-    The format leaves its shape open, so the likely ones are read: a list of
-    sessions, one session, or ``{"sessions": [...]}``. A session has
-    ``date`` or ``call_date`` (or ``days_before`` the call on *day*), and
-    ``facts`` or ``facts_established`` and/or a ``summary``; ``channel``,
-    ``outcome`` and ``session_id`` are optional. A CRM order (``order_id``,
-    ``sku``, ``status``) without a summary is summarised from those. Anything
-    else is refused, naming what was found, rather than half-loaded.
+    The organisers' shape (answers of 11/2026, part 2 question 2) is a list of
+    sessions with ``session_id, date, channel, summary, outcome`` and
+    ``facts``: a list of ``{field, value, as_of}``, possibly empty or absent,
+    in which case :func:`~.runner.seed` reads the facts from the summary.
+    Older shapes are still read: ``{"sessions": [...]}``, one session, facts
+    as an object of slots, ``facts_established``, ``call_date`` or
+    ``days_before``, a CRM order (``order_id``, ``sku``, ``status``).
+
+    Two values of one field: the later ``as_of`` wins, else the later session
+    (organisers' rule); the losing value is not written after the winner. A
+    field no slot holds goes into the summary rather than failing the
+    scenario. What cannot be placed at all (no date, a session after the
+    call, an unknown channel) is refused by name.
     """
     if isinstance(raw, Mapping) and isinstance(raw.get("sessions"), list):
         raw = raw["sessions"]
     items = raw if isinstance(raw, list) else [raw]
-    sessions = []
+    sessions: list[SeedSession] = []
+    dated: list[dict[str, str]] = []
     for index, item in enumerate(items, 1):
         if not isinstance(item, Mapping):
             raise ScenarioError(f"seed_history entry {index} is a {type(item).__name__}, not an object")
-        facts = item.get("facts") if "facts" in item else item.get("facts_established")
-        if facts is not None and not isinstance(facts, Mapping):
-            raise ScenarioError(f"seed_history entry {index}: facts must be an object of flat slots")
-        if any(ontology.slot(slot) is None for slot in facts or {}):
-            raise ScenarioError(f"seed_history entry {index} has an unknown memory slot")
-        for slot, value in (facts or {}).items():
-            valid, canonical = ontology.coerce(slot, value)
-            if not valid or type(canonical) is not type(value) or canonical != value:
-                raise ScenarioError(f"seed_history entry {index} has an invalid value for {slot!r}")
-        if not facts and not item.get("summary") and not item.get("order_id"):
+        raw_facts = item.get("facts") if "facts" in item else item.get("facts_established")
+        session_day = _seed_day(item, day=day, index=index)
+        facts, as_of, notes = _seed_facts(raw_facts, session_day=session_day, index=index)
+        summary = str(item.get("summary") or _order_summary(item))
+        extra = [note for note in notes if note.split(": ", 1)[-1] not in summary]
+        if extra:
+            summary = (summary.rstrip(". ") + ". " if summary else "") + "; ".join(extra) + "."
+        if not facts and not summary:
             raise ScenarioError(f"seed_history entry {index} has neither facts nor a summary: {sorted(item)}")
         sessions.append(SeedSession(
             session_id=seed_session_id(item, index),
-            day=_seed_day(item, day=day, index=index),
+            day=session_day,
             channel=(CHANNELS | CRM_SESSION_CHANNELS).get(str(item.get("channel")), str(item.get("channel") or channel)),
-            summary=str(item.get("summary") or _order_summary(item)),
+            summary=summary,
             outcome=str(item.get("outcome") or "khac"),
-            facts=dict(facts or {}),
+            facts=facts,
         ))
+        dated.append(as_of)
         if sessions[-1].day > day:
             raise ScenarioError(f"seed_history entry {index} is dated after its call")
         if sessions[-1].channel not in CHANNELS.values():
             raise ScenarioError(f"seed_history entry {index} has an unknown channel")
-    return tuple(sorted(sessions, key=lambda s: s.day))
+    order = sorted(range(len(sessions)), key=lambda i: (sessions[i].day, i))
+    return _latest_wins([sessions[i] for i in order], [dated[i] for i in order])
+
+
+def _seed_facts(raw: Any, *, session_day: str, index: int) -> tuple[dict[str, Any], dict[str, str], list[str]]:
+    """One session's facts as ``(slots, as_of per slot, summary notes)``.
+
+    A list of ``{field, value, as_of}`` keeps, per field, the value with the
+    latest ``as_of`` (the session's day when it has none). A field with no
+    slot, or a value its slot cannot hold, becomes a note for the summary.
+    """
+    if raw is None:
+        return {}, {}, []
+    if isinstance(raw, Mapping):
+        entries = [{"field": k, "value": v} for k, v in raw.items()]
+    elif isinstance(raw, list):
+        entries = raw
+    else:
+        raise ScenarioError(f"seed_history entry {index}: facts must be a list of {{field, value, as_of}} or an object")
+    facts: dict[str, Any] = {}
+    as_of: dict[str, str] = {}
+    notes: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, Mapping) or not entry.get("field") or entry.get("value") in (None, ""):
+            raise ScenarioError(f"seed_history entry {index}: a fact needs a field and a value: {entry!r}")
+        field_name, value = str(entry["field"]), entry["value"]
+        when = _as_of(entry.get("as_of"), default=session_day, index=index)
+        slot = SEED_FIELDS.get(field_name, field_name)
+        valid, canonical = ontology.coerce(slot, value) if ontology.slot(slot) else (False, value)
+        if not valid:
+            notes.append(f"{SUMMARY_FIELDS.get(field_name, field_name)}: {value}")
+            continue
+        if slot not in as_of or when >= as_of[slot]:
+            facts[slot], as_of[slot] = canonical, when
+    return facts, as_of, notes
+
+
+def _as_of(raw: Any, *, default: str, index: int) -> str:
+    if raw in (None, ""):
+        return default
+    try:
+        return date.fromisoformat(str(raw)[:10]).isoformat()
+    except ValueError as error:
+        raise ScenarioError(f"seed_history entry {index}: as_of {raw!r} is not a date") from error
+
+
+def _latest_wins(sessions: list[SeedSession], dated: list[dict[str, str]]) -> tuple[SeedSession, ...]:
+    """Drop a value written after the field's winner (latest ``as_of``, then latest session): the ledger supersedes
+    in session order, so the winner must be the last value of its field to be written."""
+    winner: dict[str, tuple[str, int]] = {}
+    for position, as_of in enumerate(dated):
+        for slot, when in as_of.items():
+            if slot not in winner or (when, position) >= winner[slot]:
+                winner[slot] = (when, position)
+    kept = []
+    for position, session in enumerate(sessions):
+        facts = {slot: value for slot, value in session.facts.items() if position <= winner[slot][1]}
+        kept.append(replace(session, facts=facts) if facts != dict(session.facts) else session)
+    return tuple(kept)
 
 
 def seed_session_id(item: Mapping[str, Any], index: int) -> str:

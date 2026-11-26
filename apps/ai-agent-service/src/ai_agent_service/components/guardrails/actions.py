@@ -52,7 +52,6 @@ ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
 AGREED = re.compile(r"\b(dong y|dung roi|dung vay|xoa di|xoa giup|xoa het|ok|oke|vang|da|u|uh|co)\b")
 DECLINED = re.compile(r"\b(khong|thoi|chua|de sau)\b")
 #: Splitting an order was proposed or asked for (QT-01: only if the customer agrees).
-SPLIT = re.compile(r"\btach\b")
 
 
 def check(
@@ -76,6 +75,7 @@ def check(
     created: Sequence[Mapping[str, Any]] = (),
     updated: Sequence[Mapping[str, Any]] = (),
     placed: Sequence[Mapping[str, Any]] = (),
+    heard_basket: Sequence[str] = (),
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
@@ -91,6 +91,9 @@ def check(
     ``order_update`` calls that succeeded in this call: the same change is not
     made twice.
     *placed* are the order lines already created this call (:func:`placed_lines`).
+    *heard_basket* is the skus of the last basket of more than one product priced on an earlier turn: the order the
+    customer heard the total of, which a quote made in the same round as the order does not replace. Kept for TSR:
+    without it the 2026-11-26 run ordered one product of a two-product basket twice (``also_ordered`` failed).
     """
     created_ids = frozenset(str(o["order_id"]) for o in created if o.get("order_id"))
     if name in CUSTOMER_READ_TOOLS:
@@ -116,7 +119,8 @@ def check(
                                               order_quotes=order_quotes or {}, trusted=trusted,
                                               created=created, customer_said=customer_said, placed=placed,
                                               said=f"{last_agent_said or ''} {customer_said or ''}",
-                                              wants_more=(intents or {}).get("one_more")),
+                                              wants_more=(intents or {}).get("one_more"),
+                                              heard_basket=heard_basket),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
@@ -152,6 +156,31 @@ def placed_lines(results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return list(lines.values())
 
 
+def cod_split(units: Sequence[tuple[str, int]], limit: int = COD_LIMIT_VND) -> tuple[list[tuple[str, int]], list[tuple[str, int]]] | None:
+    """Two COD orders for a basket above the limit (QT-01, VC-03): ``(order 1, order 2)`` units, each at most *limit*,
+    the most even split, the dearest unit in order 1; None when the basket fits one order or no two orders can hold it.
+
+    *units* are ``(sku, unit price)`` as one ``pricing.quote_order`` of the whole basket priced them, so a unit keeps
+    the price it has beside the others (the second machine's discount: QT-01 keeps it across the two orders).
+    """
+    units = sorted(units, key=lambda u: -u[1])
+    total = sum(price for _, price in units)
+    if total <= limit or not units or len(units) > 12:
+        return None
+    best: tuple[int, int] | None = None
+    for mask in range(1 << (len(units) - 1)):  # the dearest unit always in order 1
+        first = units[0][1] + sum(units[i + 1][1] for i in range(len(units) - 1) if mask >> i & 1)
+        second = total - first
+        if first <= limit and second <= limit and second > 0 and (best is None or abs(first - second) < best[0]):
+            best = (abs(first - second), mask)
+    if best is None:
+        return None
+    mask = best[1]
+    one = [units[0], *(units[i + 1] for i in range(len(units) - 1) if mask >> i & 1)]
+    two = [units[i + 1] for i in range(len(units) - 1) if not mask >> i & 1]
+    return one, two
+
+
 def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str, Any]], said: str,
                quotes: Mapping[str, int] | None = None) -> list[str]:
     """VC-03 on the whole order: the COD lines of this call in the same ``order_group`` with this one.
@@ -161,8 +190,8 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
     earlier line of the call is already in a group.
     """
     group = args.get("order_group")
-    if group is not None and not SPLIT.search(plain(said)) and not any(p.get("order_group") for p in placed):
-        return ["Chỉ tách đơn khi khách đã đồng ý; hỏi khách có muốn tách thành hai đơn không trước khi đặt order_group."]
+    # Whether the customer agreed to split is read from the conversation by the model, not from their words here
+    # (no word gates, 2026-11-26): the order still waits for its read-back and a yes before it is placed.
     if (args.get("payment") or "COD") != "COD":
         return []
     same = [p for p in placed if p.get("order_group") == group and p.get("payment") == "COD"]
@@ -176,16 +205,33 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
     with_placed = f" (gồm {len(same)} món đã đặt trong cuộc gọi)" if same else ""
     if group is None:
         return [f"Đơn COD {format_vnd(total)}{with_placed} vượt giới hạn {format_vnd(COD_LIMIT_VND)}; đề nghị chuyển "
-                "khoản, hoặc hỏi khách có muốn tách thành hai đơn, mỗi đơn COD tối đa 10.000.000đ (order_group \"1\", \"2\")."]
+                "khoản, hoặc hỏi khách có muốn tách đơn; khách đồng ý thì gọi order_split_cod với cả giỏ."]
     return [f"Đơn tách {group} COD {format_vnd(total)}{with_placed} vẫn vượt giới hạn {format_vnd(COD_LIMIT_VND)}; "
-            "xếp lại các món giữa hai đơn hoặc đề nghị chuyển khoản."]
+            "gọi order_split_cod với cả giỏ để hệ thống xếp lại, hoặc đề nghị chuyển khoản."]
+
+
+def repeated_order(args: Mapping[str, Any], *, created: Sequence[Mapping[str, Any]], placed: Sequence[Mapping[str, Any]],
+                   customer_said: str | None, wants_more: bool | None) -> Mapping[str, Any] | None:
+    """The order this call already created for the same products, when the customer did not ask for more: what an
+    ``order.create`` of *args* would book a second time (plan 003: said back, not refused to the model)."""
+    lines = purchase.lines_of(args)
+    skus = {line["sku"] for line in lines}
+    if not skus:
+        return None
+    again = [o for o in created if skus & set(o.get("skus") or [o.get("sku")])]
+    # The same sku in the other half of a split order (QT-01) is the order the customer agreed to, not a repeat.
+    other_half = args.get("order_group") is not None and all(
+        p.get("order_group") != args.get("order_group") for p in placed if p.get("sku") in skus)
+    if wants_more is None:
+        wants_more = bool(ONE_MORE.search(plain(customer_said or "")))  # Jev gave no answer
+    return again[-1] if again and not other_half and not wants_more else None
 
 
 def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes: Mapping[str, int],
                   trusted: frozenset[str] | None, created: Sequence[Mapping[str, Any]] = (),
                   customer_said: str | None = None, placed: Sequence[Mapping[str, Any]] = (),
                   said: str = "", wants_more: bool | None = None,
-                  order_quotes: Mapping[str, Any] | None = None) -> list[str]:
+                  order_quotes: Mapping[str, Any] | None = None, heard_basket: Sequence[str] = ()) -> list[str]:
     if args.get("lines"):
         return _order_of_lines(args, tier=tier, has_phone=has_phone, trusted=trusted, created=created,
                                customer_said=customer_said, placed=placed, said=said, wants_more=wants_more,
@@ -202,6 +248,11 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
                 "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
     reasons = []
+    held = list(heard_basket)
+    if len(set(held)) > 1 and args.get("sku") in held and args.get("order_group") is None:
+        # The customer last heard the whole basket priced together (2026-11-24: four items priced, then one ordered).
+        reasons.append(f"Khách vừa nghe tổng đơn {len(held)} món ({', '.join(sorted(set(held)))}): gọi order_create "
+                       "với lines đủ các món đó; chỉ bỏ món nào khi khách nói bỏ.")
     if not has_phone:
         reasons.append("Chưa có số điện thoại của khách để tạo đơn; xin số điện thoại trước.")
     if tier in ("PROBABLE", "AMBIGUOUS"):
@@ -238,9 +289,9 @@ def _parent_reason(sku: str | None) -> str | None:
     variants = commerce.variants_of(sku)
     if not variants:
         return None
-    examples = ", ".join(v["variant_sku"] for v in variants[:3])
-    return (f"{sku} có nhiều size/màu: đặt bằng variant_sku đúng size và màu khách chọn (ví dụ {examples}), báo giá "
-            "lại cho đúng mã đó; khách chưa nói size hay màu thì hỏi khách.")
+    codes = ", ".join(v["variant_sku"] for v in variants[:40])
+    return (f"{sku} có nhiều size/màu: đặt bằng đúng mã biến thể size và màu khách đã chọn, trong các mã: {codes}. "
+            "Khách chưa nói size hay màu thì hỏi khách.")
 
 
 def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trusted: frozenset[str] | None,
@@ -362,19 +413,22 @@ def _handoff(args: Mapping[str, Any], *, lane: str | None, warranted: bool | Non
     return reasons + handoff_problems(args.get("brief") or {})
 
 
+#: A transfer refused only for the customer's number: once the number is given, the harness puts it through.
+NEEDS_NUMBER = "Chưa có số điện thoại để tư vấn viên liên hệ; xin số điện thoại của khách trước khi chuyển."
+
+
 def handoff_problems(brief: Mapping[str, Any]) -> list[str]:
     """The brief against ``schemas/handoff_brief.schema.json`` itself, after the harness filled it.
 
-    One exception: a chat customer who never gave a number. The consultant
-    answers them in the same chat, so the brief goes without a phone; on the
-    hotline a person must be able to call back, so the number is asked for.
+    A brief without the customer's number is asked for on every channel (2026-11-24): the organisers grade the
+    brief's fields (``brief_must_contain``), and with the number the harness fills the customer's orders, product and
+    price into it, so the person who takes over does not ask again (rubric J05).
     """
     problems: list[str] = []
     for error in btc_schemas.errors("handoff_brief", dict(brief)):
         field = error.split(":", 1)[0]
         if field == "customer_phone" and not brief.get("customer_phone"):
-            if brief.get("channel") == "hotline":
-                problems.append("Chưa có số điện thoại để tư vấn viên gọi lại; xin số điện thoại của khách trước khi chuyển.")
+            problems.append(NEEDS_NUMBER)
             continue
         problems.append(f"Handoff Brief sai schema ở {error}")
     # Never more than a few lines back to the model: the first ones say enough.

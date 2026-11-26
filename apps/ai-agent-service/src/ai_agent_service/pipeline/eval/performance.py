@@ -73,7 +73,13 @@ def _per_turn(tokens: Mapping[str, Mapping[str, int]], turns: int) -> dict[str, 
 
 def machine() -> dict[str, Any]:
     """Rule 4 of ``huong-dan-do-latency.md``: the numbers say what they were measured on."""
-    return {"platform": platform.platform(), "processor": platform.processor() or platform.machine(), "cpus": os.cpu_count()}
+    ram = None
+    try:
+        ram = round(os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2**30, 1)
+    except (ValueError, OSError, AttributeError):
+        pass
+    return {"platform": platform.platform(), "processor": platform.processor() or platform.machine(), "cpus": os.cpu_count(),
+            "ram_gb": ram}
 
 
 def _beside(directory: Path, name: str) -> Path:

@@ -19,6 +19,8 @@ Every configuration runs, ``--runs`` times (fresh model calls each time, k = 3 b
   control     the frozen data/dev sample of --gap-round (checked byte-identical to --reflection-round's): "no harm"
   gap-loop    data/gap-loop/frozen: what GapLoop must have learned, with its three controls
   <proof>     data/reflection/<proof>/frozen for each --proof (default budget): what Reflection must have learned
+  *-learn     the learning sets themselves (data/gap-loop/learn, data/reflection/<proof>/learn): what each method was
+              taught must pass as well, under the same rule as its proof
 
 Runs are interleaved run by run (run 1 of every configuration, then run 2...), so drift over the hours a run takes
 falls on every configuration alike. Each run goes through the evaluation command as a round's runs do
@@ -45,10 +47,15 @@ for path in (ROOT / "apps" / "ai-agent-service" / "src", ROOT / "packages" / "ba
 
 CONFIGS = ("router", "gaploop", "reflection", "combined")
 GAP_PROOF = ROOT / "data" / "gap-loop" / "frozen" / "scenarios"
+GAP_LEARN = ROOT / "data" / "gap-loop" / "learn" / "scenarios"
 
 
 def reflection_proof(name: str) -> Path:
     return ROOT / "data" / "reflection" / name / "frozen" / "scenarios"
+
+
+def reflection_learn(name: str) -> Path:
+    return ROOT / "data" / "reflection" / name / "learn" / "scenarios"
 
 
 def control_of(round_name: str) -> Path:
@@ -71,6 +78,8 @@ def suite(args: argparse.Namespace) -> dict[str, Path]:
     if not args.control and other.is_dir() and digest(other) != digest(control):
         raise SystemExit(f"The two rounds measured different frozen samples ({control} and {other}): pass --control.")
     sets = {"control": control, "gap-loop": GAP_PROOF, **{p: reflection_proof(p) for p in args.proof}}
+    # The cases each method learned from must pass too, not only the proof's new wording (the user, 2026-11-24).
+    sets.update({"gap-loop-learn": GAP_LEARN, **{f"{p}-learn": reflection_learn(p) for p in args.proof}})
     missing = [f"{label}: {path}" for label, path in sets.items() if not path.is_dir()]
     if missing:
         raise SystemExit("Missing scenario folders:\n  " + "\n  ".join(missing))
@@ -84,6 +93,18 @@ def extra_args(config: str, kb: int, skills: int) -> list[str]:
         "reflection": ["--profile", "reflection", "--skills-version", str(skills)],
         "combined": ["--profile", "combined", "--kb-version", str(kb), "--skills-version", str(skills)],
     }[config]
+
+
+def skill_lines(book: dict) -> set[str]:
+    return {f"{name}: {line}" for name, skill in book.items() for line in str(skill.get("body") or "").splitlines()}
+
+
+def dropped_lines(learned: Path) -> list[str]:
+    """Lines of today's skills a learned skills file does not have: a lesson only adds."""
+    import yaml
+
+    today = yaml.safe_load((ROOT / "config" / "prompts" / "agent" / "advisor" / "skills.yaml").read_text(encoding="utf-8"))
+    return sorted(skill_lines(today) - skill_lines(yaml.safe_load(learned.read_text(encoding="utf-8"))))
 
 
 class Installed:
@@ -112,6 +133,13 @@ class Installed:
         else:
             shutil.copy2(self.kb_source, self.kb_target)
             self.added.append(self.kb_target)
+        removed = dropped_lines(self.skills_source)
+        if removed:
+            # A learned skills file is a whole copy of skills.yaml as it was when the round learned: on an older base it
+            # also takes back every line fixed since, and the run measures that, not the lesson (2026-11-24:
+            # reflect-warranty-8's v1 dropped 11 lines of today's skills). Rebuild it on today's file first.
+            raise SystemExit(f"{self.skills_source} is not today's skills plus the lesson: {len(removed)} line(s) of "
+                             f"config/prompts/agent/advisor/skills.yaml are missing, e.g. {removed[0][:120]!r}")
         if not self.skills_dir.exists():
             self.skills_dir.mkdir(parents=True)
             self.added.append(self.skills_dir)

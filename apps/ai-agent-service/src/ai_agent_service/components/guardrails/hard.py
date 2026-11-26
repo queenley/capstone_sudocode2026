@@ -11,9 +11,9 @@ sentence means:
 | tier | below VERIFIED, no order code and no price the brief holds that a tool of the turn did not give |
 | promotion | a promotion not yet started is never named (KM-02), read from the catalogue of promotions |
 | money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this call's tool results, today's quotes earlier in the call, the system's basket total, the organisers' policy passages read this turn, a quantity times a unit price, the difference of two amounts of one object, the customer's own words, or a price the brief holds |
-| days, weeks, months | a number of them must come from a tool result, a passage of the turn, the customer's words or the brief's warnings |
 
-These two compare a number with data; they do not read what a sentence means.
+Money compares a number with data; it does not read what a sentence means. Durations are not checked since
+2026-11-25: no organisers' metric reads them, and the check blocked sourced answers.
 
 What a sentence means (a price stated as the shop's, a stock, an order's
 state, a promise) is not read here: it is the PolicyAgent's. Every
@@ -47,13 +47,7 @@ HUMAN = re.compile(
 )
 ORDER_CODE = re.compile(r"\bOD\d+\b")
 #: Allows a reply past :data:`MAX_SENTENCES`: reading an order back takes more.
-ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng)", re.IGNORECASE)
-DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
-#: "7 giờ tối", "lúc 7 giờ": a time of day, not a duration.
-TIME_OF_DAY_AFTER = re.compile(r"\s*(sáng|trưa|chiều|tối)\b", re.IGNORECASE)
-TIME_OF_DAY_BEFORE = re.compile(r"\b(lúc|vào)\s+$", re.IGNORECASE)
-#: Durations the prompt's own rules state: data is erased within 72 hours of a request (QT-06).
-RULE_DURATIONS = frozenset({72})
+ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng|đọc lại đơn|, tổng )", re.IGNORECASE)
 #: A rate of the shop's documents, of a price: "bằng 8% giá sản phẩm".
 RATE = re.compile(r"(\d{1,2})\s*%")
 #: A customer typing without marks ("500 ngan", "5 trieu ruoi"), put back for the amount reader.
@@ -85,8 +79,6 @@ class GuardInput:
     quotes: Mapping[str, int] = field(default_factory=dict)
     #: Numbers in what quotes and orders returned in earlier turns: a refund told again is still sourced.
     earlier_numbers: frozenset[int] = field(default_factory=frozenset)
-    #: Numbers in every result of earlier turns, a search's warranty months included: what a duration may repeat.
-    earlier_counts: frozenset[int] = field(default_factory=frozenset)
     #: The total the system added up for the basket the customer is choosing.
     basket_total: int | None = None
     #: The units a ``pricing.quote_order`` of this call priced, units key to ``[[sku, unit price], ...]``. The sum
@@ -197,16 +189,6 @@ def amount_groups(value: Any) -> list[set[int]]:
     return groups
 
 
-def allowed_counts(view: GuardInput) -> set[int]:
-    """Numbers a duration may state: from the tools, the passages, the customer."""
-    found: set[int] = set(view.earlier_counts) | set(RULE_DURATIONS)
-    for result in view.tool_results:
-        found |= numbers_in(result.get("result"))
-    for text in (*view.customer_said, *view.policy_texts, *view.warnings):
-        found.update(int(n) for n in re.findall(r"\d+", text))
-    return found
-
-
 def check(view: GuardInput) -> Verdict:
     """Every check in the table; all reasons, not the first."""
     text = view.text.strip()
@@ -214,7 +196,6 @@ def check(view: GuardInput) -> Verdict:
         return Verdict(False, ("Câu trả lời rỗng.",))
     reasons: list[str] = []
     reasons += _money(text, view)
-    reasons += _durations(text, view)
     if INTERNAL.search(text):
         reasons.append("Nhắc tới thông tin nội bộ (giá nhập, biên lợi nhuận, nhà cung cấp, giá sàn).")
     for kind, pattern in PATTERNS:
@@ -234,6 +215,12 @@ def check(view: GuardInput) -> Verdict:
     return Verdict(not reasons, tuple(dict.fromkeys(reasons)))
 
 
+def unsourced_money(text: str, view: GuardInput) -> list[str]:
+    """The reasons :func:`check` gives for amounts with no source: not a leak, so the sentence is left out rather
+    than the answer rewritten (2026-11-26: guards rewrite only for what must not be said)."""
+    return _money(text, view)
+
+
 def _money(text: str, view: GuardInput) -> list[str]:
     """An amount with no source. Whether a sourced amount is stated rightly is a reading of meaning, the PolicyAgent's."""
     allowed = allowed_amounts(view) | set(view.brief_prices) | {COD_LIMIT_VND}
@@ -241,22 +228,6 @@ def _money(text: str, view: GuardInput) -> list[str]:
     return [f"Số tiền {format_vnd(value)} không có trong kết quả tool của cuộc gọi hay tài liệu chính sách; "
             "không tự tính, dùng đúng số đã có hoặc bỏ con số."
             for value in amounts(text) if value not in allowed]
-
-
-def _durations(text: str, view: GuardInput) -> list[str]:
-    allowed = allowed_counts(view)
-    reasons = []
-    for match in DURATION.finditer(text):
-        if match.group(3).lower() == "giờ" and (TIME_OF_DAY_AFTER.match(text[match.end():])
-                                                or TIME_OF_DAY_BEFORE.search(text[:match.start()])):
-            continue
-        stated = [int(match.group(1))] + ([int(match.group(2))] if match.group(2) else [])
-        if not all(n in allowed for n in stated):
-            reasons.append(
-                f"Thời hạn \"{match.group(0).strip()}\" không có trong kết quả tool của cuộc gọi hay tài liệu; "
-                "lấy từ delivery_estimate, catalog_search hoặc tài liệu, hoặc bỏ con số."
-            )
-    return reasons
 
 
 def _tier(text: str, view: GuardInput) -> list[str]:

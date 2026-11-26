@@ -561,6 +561,15 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                       ) : (
                         ""
                       ))}
+                    {/* Part of the reply is out and the assistant is still looking something up: a mark, not words,
+                        so it is never read as one of the reply's sentences. */}
+                    {line.text && busy && i === lines.length - 1 && (
+                      <span className="s-looking" role="status" aria-label="Đang tra cứu">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                    )}
                   </p>
                 )}
                 {/* Once the reply is complete, the products it names: picture, price, link. */}

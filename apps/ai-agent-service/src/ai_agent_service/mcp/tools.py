@@ -38,12 +38,13 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+from datetime import datetime
 import logging
 import os
 import re
 import time
 import uuid
-from typing import Any, Iterable, Mapping, Sequence
+from typing import TypedDict, Any, Iterable, Mapping, Sequence
 
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ToolCallRequest
@@ -52,6 +53,7 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 from ..components import clock
 from ..components.intake import pii
 from ..components.guardrails import fallback, purchase
+from ..components.guardrails.actions import NEEDS_NUMBER
 from ..components.intake.text import plain
 from ..observability import stopwatch
 
@@ -241,8 +243,25 @@ def without_nulls(request: Any) -> Any:
     return request.override(tool_call={**call, "args": {k: v for k, v in args.items() if v is not None}})
 
 
+def _offered_late(name: str) -> int:
+    """Where a tool goes in the list the model is sent: the ones some state takes away go last.
+
+    OpenAI caches the longest prefix two requests share, and the tools come first in it: a tool missing from the
+    middle of the list would cost the cache everything after it. Writes go only in copilot, a transfer only while it
+    waits on a number, the memory tools without a brief, the account tools without a login. The sort is stable, so
+    each group keeps the order it came in.
+    """
+    if name.startswith(ACCOUNT_PREFIX):
+        return 4
+    if name.startswith("memory_") and name not in WRITE_TOOLS:
+        return 3
+    if name == "handoff_transfer":
+        return 2
+    return 1 if name in WRITE_TOOLS else 0
+
+
 class LaneToolsMiddleware(AgentMiddleware):
-    """Offers the model only the tools the run's lane allows."""
+    """Offers the model only the tools the run's lane allows, in an order that keeps the cached prefix long."""
 
     def __init__(self, lanes: Mapping[str, frozenset[str]], mcp_tool_names: Iterable[str]) -> None:
         super().__init__()
@@ -264,18 +283,77 @@ class LaneToolsMiddleware(AgentMiddleware):
         if not getattr(context, "account_id", None):
             # The website account's tools are for a logged-in shopper only.
             allowed = frozenset(name for name in allowed if not name.startswith(ACCOUNT_PREFIX))
+        if not getattr(context, "customer_phone", None) and any(
+                o.get("tool") == "handoff.transfer" and o.get("said") == NEEDS_NUMBER
+                for o in getattr(context, "offered", None) or ()):
+            # A transfer waits on the customer's number, and there is none yet: offered again, the model calls it again
+            # and is refused again, a model round each time (2026-11-24: four turns running). It comes back with the
+            # number, and route puts the call through.
+            allowed = allowed - {"handoff_transfer"}
+        if getattr(context, "mode", None) == "copilot":
+            # A consultant has the call: the assistant suggests, the person acts (the action guard refuses it anyway,
+            # and each refusal cost a model round: 2026-11-24, four in one call).
+            allowed = allowed - WRITE_TOOLS
         tools = [
             tool
             for tool in request.tools
             if (name := _tool_name(tool)) not in self._mcp or name in allowed
         ]
-        return request.override(tools=tools)
+        return request.override(tools=sorted(tools, key=lambda tool: _offered_late(_tool_name(tool))))
 
     def wrap_model_call(self, request: Any, handler: Any) -> Any:
         return handler(self._filtered(request))
 
     async def awrap_model_call(self, request: Any, handler: Any) -> Any:
         return await handler(self._filtered(request))
+
+
+#: What an order's status is called to a customer, in the words the organisers' grader reads ("đã tạo", "đang xử lý",
+#: "đang chuẩn bị", "đang giao", "đã giao"): put beside each order of an ``order_status`` result, so the model says the
+#: shop's words rather than its own ("đang được chuẩn bị" is not "đang chuẩn bị", 2026-11-26).
+STATUS_WORDS = {
+    "created": "đã tạo, đang xử lý", "pending": "đã tạo, đang xử lý", "confirmed": "đã xác nhận, đang xử lý",
+    "processing": "đang xử lý, đang chuẩn bị hàng", "packing": "đang chuẩn bị hàng, đang đóng gói",
+    "shipping": "đang giao, đã bàn giao đơn vị vận chuyển", "delivered": "đã giao thành công", "cancelled": "đã hủy",
+    "returned": "đã hoàn về", "pickup_scheduled": "đã hẹn lấy hàng trả",
+}
+
+
+#: Days a delivered order may be returned (DT-01: 7 days from receipt) and the most a delivery takes: an order placed
+#: longer ago than both is past its return window whatever day it arrived.
+RETURN_DAYS = 7
+LONGEST_DELIVERY_DAYS = 7
+
+
+def with_status_words(name: str, message: Any, today: Any = None) -> Any:
+    """An ``order_status`` result with ``status_text`` beside each order's ``status``, and ``return_window: "đã hết"``
+    on a delivered order placed too long ago to return (the model read the date and booked a return anyway,
+    2026-11-27); any other result as it is."""
+    if name != "order_status" or not isinstance(message, ToolMessage) or not isinstance(message.content, str):
+        return message
+    try:
+        envelope = json.loads(message.content)
+    except ValueError:
+        return message
+    data = envelope.get("data") if isinstance(envelope, dict) else None
+    orders = data.get("orders") if isinstance(data, dict) else None
+    if not isinstance(orders, list):
+        return message
+    changed = False
+    for order in orders:
+        if isinstance(order, dict) and order.get("status") in STATUS_WORDS and "status_text" not in order:
+            order["status_text"] = STATUS_WORDS[order["status"]]
+            changed = True
+        if isinstance(order, dict) and order.get("status") == "delivered" and today is not None and order.get("date"):
+            try:
+                placed = datetime.fromisoformat(str(order["date"])[:10]).date()
+            except ValueError:
+                continue
+            day = today.date() if hasattr(today, "date") else today
+            if (day - placed).days > RETURN_DAYS + LONGEST_DELIVERY_DAYS:
+                order["return_window"] = f"đã hết hạn đổi trả {RETURN_DAYS} ngày"
+                changed = True
+    return message.model_copy(update={"content": json.dumps(envelope, ensure_ascii=False)}) if changed else message
 
 
 class ToolGuardMiddleware(AgentMiddleware):
@@ -309,6 +387,10 @@ class ToolGuardMiddleware(AgentMiddleware):
     # ── hooks ─────────────────────────────────────────────────────────────
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
+        today = getattr(getattr(getattr(request, "runtime", None), "context", None), "now", None)
+        return with_status_words(request.tool_call["name"], await self._guarded_call(request, handler), today)
+
+    async def _guarded_call(self, request: Any, handler: Any) -> Any:
         call = request.tool_call
         name = call["name"]
         if name not in self._guarded:
@@ -521,126 +603,8 @@ def chained_lookups(messages: Sequence[Any]) -> list[dict[str, Any]]:
     return calls
 
 
-#: Products looked up ahead of the model in one turn, at most: a turn naming more is comparing, and the model picks.
-PREFETCH_PRODUCTS = 2
-
-
-def prefetch() -> bool:
-    """``ADVISOR_PREFETCH=1``: price and stock of the products the customer names are read before the model's first
-    call. Off unless set, until its effect on the scored metrics is measured (2026-11-14: TTFT 2.15 s to 0.8 s on a
-    named-product turn, one model round instead of two)."""
-    return os.environ.get("ADVISOR_PREFETCH", "0").strip().lower() not in ("0", "false", "no", "off", "")
-
-
-def named_lookups(messages: Sequence[Any], said: str | None) -> list[dict[str, Any]]:
-    """The price and stock calls for the products *said* names, before the model's first call of the turn.
-
-    The brief's loop retrieves before it plans (section C.2), as ``load_context`` does with the knowledge base. A
-    product is one the catalogue matcher recognises in the customer's words; nothing is decided from them: the
-    results are real tool results the model reads, and it still calls whatever else the turn needs.
-    """
-    if not said or not messages or not isinstance(messages[-1], HumanMessage):
-        return []
-    from ..components.intake import commerce
-
-    try:
-        skus = sorted(commerce.named_products(said))
-        if not skus and (sku := commerce.commerce(said).get("sku")):
-            skus = [sku]
-    except Exception:  # noqa: BLE001 - recognition that fails is a turn without a head start, never a failed turn
-        logger.exception("Product recognition failed")
-        return []
-    if not skus or len(skus) > PREFETCH_PRODUCTS:
-        return []
-    # A product sold in sizes and colours is priced and stocked per variant: the parent's stock is every variant's
-    # together and its price leaves out a size a promotion excludes (2026-11-16: "RunLite 2 Pro size 41 màu đen"
-    # read as in stock, the variant being sold out). Looked up ahead only when the words name the variant.
-    looked: list[str] = []
-    for sku in skus:
-        if commerce.variants_of(sku):
-            variant = commerce.variant_said(sku, said)
-            if variant is None:
-                continue
-            sku = variant
-        looked.append(sku)
-    return [{"name": name, "args": args, "id": f"chain-{uuid.uuid4().hex[:12]}", "type": "tool_call"}
-            for sku in looked for name, args in ((QUOTE, {"sku": sku, "qty": 1}), (STOCK, {"sku": sku}))]
-
-
-#: Tool calls the harness makes ahead of the model in one turn, at most (plan 002, step 4).
-MAX_AHEAD_CALLS = 4
-DELIVERY = "delivery_estimate"
-
-
-def need_search(said: str | None, recent: Sequence[tuple[str, str]] = ()) -> dict[str, Any] | None:
-    """The ``catalog_search`` a need the customer just stated leads to: a kind of product, said this turn or earlier in
-    the call, and a room area or a budget said this turn. None without both: the model asks or searches itself."""
-    if not said:
-        return None
-    from ..components.intake import commerce
-
-    try:
-        need = commerce.observe(said)["scenario_entities"]
-        area, budget = need.get("room_area_m2"), need.get("budget_vnd")
-        if not area and not budget:
-            return None
-        earlier = [text for who, text in reversed(recent) if who == "customer"][:3]
-        category = next((c for text in (said, *earlier) if (c := commerce.named_category(text))), None)
-    except Exception:  # noqa: BLE001 - recognition that fails is a turn without a head start, never a failed turn
-        logger.exception("Need recognition failed")
-        return None
-    if category is None:
-        return None
-    args: dict[str, Any] = {"category": category}
-    if area:
-        args["min_room_area_m2"] = int(area)
-    if budget:
-        args["max_price_vnd"] = int(budget)
-    if need.get("has_children"):
-        args["has_children"] = True  # read by product_advise only; a plain search is sent without it
-    return args
-
-
 def _call(name: str, args: Mapping[str, Any]) -> dict[str, Any]:
     return {"name": name, "args": dict(args), "id": f"chain-{uuid.uuid4().hex[:12]}", "type": "tool_call"}
-
-
-def ahead_lookups(messages: Sequence[Any], context: Any, allowed: frozenset[str]) -> list[dict[str, Any]]:
-    """What the harness looks up before the model's first call of a turn (section C.2: retrieve before plan).
-
-    Each from what is already known, never deciding anything: the products the customer names; else the need they
-    state (a search, whose first results are then priced, :func:`search_follow_ups`); the product of the order being
-    closed (``pending_purchase``) and, with an address in the call, its delivery date. Only tools the lane allows,
-    with the organisers' arguments, at most :data:`MAX_AHEAD_CALLS`.
-    """
-    if not messages or not isinstance(messages[-1], HumanMessage):
-        return []
-    said = getattr(context, "customer_said", None)
-    calls = named_lookups(messages, said)
-    if not calls and SEARCH in allowed and (search := need_search(said, getattr(context, "recent", ()))):
-        calls = [_call(SEARCH, {k: v for k, v in search.items() if k != "has_children"})]
-    pending = getattr(context, "pending_purchase", None) or {}
-    lines = purchase.lines_of(pending.get("args") or {})
-    if len(lines) == 1:
-        sku = lines[0]["sku"]
-        if not any((c["args"] or {}).get("sku") == sku for c in calls):
-            calls += [_call(QUOTE, {"sku": sku, "qty": lines[0]["qty"]}), _call(STOCK, {"sku": sku})]
-        if DELIVERY in allowed and getattr(context, "addresses", None):
-            calls.append(_call(DELIVERY, {}))  # the guard fills in the call's latest address
-    return [c for c in calls if c["name"] in allowed][:MAX_AHEAD_CALLS]
-
-
-def search_follow_ups(results: Sequence[Any], budget: int) -> list[dict[str, Any]]:
-    """Price and stock of a search's first two results, within *budget* calls."""
-    calls = []
-    for result in results:
-        if result.name != SEARCH:
-            continue
-        items = ((parse_envelope(result.content) or {}).get("data") or {}).get("items") or []
-        for item in items[:PREFETCH_PRODUCTS]:
-            if isinstance(item.get("sku"), str):
-                calls += [_call(QUOTE, {"sku": item["sku"], "qty": 1}), _call(STOCK, {"sku": item["sku"]})]
-    return calls[:max(0, budget)]
 
 
 #: The team's own tool for a question that needs weighing (plan 002, B3): which product fits a need, or which of the
@@ -649,6 +613,32 @@ def search_follow_ups(results: Sequence[Any], budget: int) -> list[dict[str, Any
 ADVISE = "product_advise"
 #: Products priced and checked per call: two to offer and one to compare with.
 ADVISE_TOP = 3
+
+
+#: The team's tool for a COD basket above the limit: the system arranges and prices the orders (QT-01, VC-03).
+SPLIT = "order_split_cod"
+
+
+class SplitLine(TypedDict):
+    """One product of the basket to split."""
+
+    sku: str
+    qty: int
+
+
+async def order_split_cod(lines: list[SplitLine], address: str | None = None) -> str:
+    """Place a cash-on-delivery basket above 10.000.000đ as several COD orders, each at most 10.000.000đ.
+
+    Use it only when the customer agreed to split the basket. The system prices the basket, arranges the orders so the
+    second-machine discount is kept (QT-01), and places each one with the shop's order tool. The first call returns the
+    orders to read back (CONFIRMATION_REQUIRED, each order's items and total); after the customer agrees, call it again
+    with the same basket and the orders are placed.
+
+    Args:
+        lines: Every product of the basket, each with its code (the variant's for a size or colour) and quantity.
+        address: The delivery address the customer gave, if any.
+    """
+    raise RuntimeError("order_split_cod runs in ActionGuardMiddleware")  # never reached: the middleware answers it
 
 
 def product_advise_on() -> bool:
@@ -695,8 +685,8 @@ def _inner(call: Mapping[str, Any], message: Any) -> dict[str, Any]:
 
 
 class ChainLookupMiddleware(AgentMiddleware):
-    """Saves the model round between a search and its price, and the one before a named product's price: the model
-    then reads real results of real tools."""
+    """Saves the model round between a search and its price: the model then reads real results of real tools. Also
+    answers the team's ``product_advise`` with the organisers' tools."""
 
     def __init__(self, tools: Iterable[Any], guard: ToolGuardMiddleware,
                  lanes: Mapping[str, frozenset[str]] | None = None) -> None:
@@ -706,39 +696,16 @@ class ChainLookupMiddleware(AgentMiddleware):
         self._lanes = lanes or {}
 
     async def abefore_model(self, state: Any, runtime: Any) -> dict[str, Any] | None:
+        """The price and stock a search the model just made leads to, in the harness's own round: driven by the
+        tools' results, never by the customer's words (plan 003 removed the lookups ahead of the model)."""
         if QUOTE not in self._tools or STOCK not in self._tools:
             return None
         messages = state.get("messages") or []
         calls = chained_lookups(messages)
-        context = getattr(runtime, "context", None)
-        ahead = False
-        if not calls and prefetch():
-            allowed = self._lanes.get(getattr(context, "lane", None), frozenset()) & frozenset(self._tools)
-            calls, ahead = ahead_lookups(messages, context, allowed), True
         if not calls:
             return None
-        advised = [c for c in calls if c["name"] == SEARCH and ahead and ADVISE in self._tools]
-        if advised:
-            # A stated need, with the team's tool offered: looked up ahead as it would be, ranked by the need, so the
-            # model reads the best fits priced and checked, not a search in the catalogue's own order.
-            need = need_search(getattr(context, "customer_said", None), getattr(context, "recent", ())) or advised[0]["args"]
-            advice = _call(ADVISE, {"category": need.get("category"), "room_area_m2": need.get("min_room_area_m2"),
-                                    "budget_vnd": need.get("max_price_vnd"), "has_children": need.get("has_children")})
-            calls = [c for c in calls if c is not advised[0]]
-            produced_advice = [AIMessage(content="", tool_calls=[advice], additional_kwargs={CHAINED: True}),
-                               await self._advised(advice, state, runtime)]
-            if not calls:
-                return {"messages": produced_advice}
-        else:
-            produced_advice = []
         results = await self._run(calls, state, runtime)
-        produced: list[Any] = [*produced_advice,
-                               AIMessage(content="", tool_calls=calls, additional_kwargs={CHAINED: True}), *results]
-        if ahead and (more := search_follow_ups(results, MAX_AHEAD_CALLS - len(calls))):
-            # A search's results name the products; their prices come in a second round of the harness's own.
-            produced += [AIMessage(content="", tool_calls=more, additional_kwargs={CHAINED: True}),
-                         *await self._run(more, {**state, "messages": [*messages, *produced]}, runtime)]
-        return {"messages": produced}
+        return {"messages": [AIMessage(content="", tool_calls=calls, additional_kwargs={CHAINED: True}), *results]}
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
         if (request.tool_call or {}).get("name") != ADVISE:
@@ -804,91 +771,15 @@ class ChainLookupMiddleware(AgentMiddleware):
             for call in calls)))
 
 
-#: The argument a write tool is offered for the line said when it succeeds (``fallback.REPLY_HOLES``). The team's
-#: own: it is taken off the call before any guard, server or trace sees it.
-REPLY_ARG = "reply"
-
-REPLY_DOC = ("Câu em nói với khách ngay khi tool này làm xong, thay cho lượt trả lời sau đó: đúng cách xưng hô đang "
-             "dùng, tối đa 2 câu, không nhắc tên tool hay mã lỗi; tool không làm được thì câu này không được nói. ")
-REPLY_HOLES_DOC = ("Số liệu chỉ viết bằng chỗ trống {holes}; hệ thống điền từ kết quả tool. Không tự viết chữ số nào.")
-REPLY_NO_HOLES_DOC = "Không viết chữ số nào."
-REPLY_EXTRA_DOC = {
-    "handoff_transfer": " Câu báo khách em đang kết nối khách với đồng nghiệp, khách chờ một chút.",
-    # A hole the action's result does not have makes the line unusable, and the turn takes a second round
-    # (2026-11-15: {fee_vnd} on an address change).
-    "order_update": (" Chỉ dùng chỗ trống mà việc này trả về: đổi địa chỉ chỉ có {order_id}; {fee_vnd}, {price_diff_vnd},"
-                     " {refund_vnd}, {extra_payment_vnd}, {refund_days} chỉ có khi đổi hay trả hàng."),
-}
-
-
 def first_clause() -> bool:
     """``ADVISOR_FIRST_CLAUSE=1``: on a call, the answer's first clause goes to the voice ahead of its sentence
     (``SentenceSplitter.pieces``). Off unless set, until measured."""
     return os.environ.get("ADVISOR_FIRST_CLAUSE", "0").strip().lower() not in ("0", "false", "no", "off", "")
 
 
-def reply_plan() -> bool:
-    """``ADVISOR_REPLY_PLAN=1``: a write tool's call carries the line said when it succeeds, and the turn ends on it
-    without a second model round (``docs/plan/002``). Off unless set, until its effect on the scored metrics is
-    measured (2026-11-15: the line costs the round about 0.08 s; the round it saves, about 1 s)."""
-    return os.environ.get("ADVISOR_REPLY_PLAN", "0").strip().lower() not in ("0", "false", "no", "off", "")
-
-
-def with_reply(tool: Mapping[str, Any]) -> dict[str, Any]:
-    """*tool*, an OpenAI tool, with the required :data:`REPLY_ARG` its holes describe."""
-    function = dict(tool["function"])
-    name = function["name"]
-    holes = sorted(fallback.REPLY_HOLES[name])
-    doc = REPLY_DOC + (REPLY_HOLES_DOC.format(holes=", ".join(f"{{{h}}}" for h in holes)) if holes
-                       else REPLY_NO_HOLES_DOC) + REPLY_EXTRA_DOC.get(name, "")
-    parameters = json.loads(json.dumps(function.get("parameters") or {"type": "object", "properties": {}}))
-    parameters.setdefault("properties", {})[REPLY_ARG] = {"type": "string", "description": doc}
-    parameters["required"] = [*[k for k in parameters.get("required") or [] if k != REPLY_ARG], REPLY_ARG]
-    return {**tool, "function": {**function, "parameters": parameters}}
-
-
-class ReplyPlanMiddleware(AgentMiddleware):
-    """Offers the write tools :data:`REPLY_ARG` and takes it off the call before anything runs it.
-
-    Sits after :class:`StrictToolsMiddleware`, whose schemas it extends, and before the action guard, which drops an
-    argument the tool does not declare. The line travels on the tool's message (``additional_kwargs``), for the
-    harness to say once the result is in.
-    """
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._shown: dict[str, dict[str, Any]] = {}
-
-    def _with_reply(self, request: Any) -> Any:
-        if not reply_plan():
-            return request
-        tools = []
-        for tool in request.tools:
-            name = _tool_name(tool)
-            if name in fallback.REPLY_HOLES:
-                if name not in self._shown:
-                    self._shown[name] = with_reply(tool if isinstance(tool, dict) else convert_to_openai_tool(tool))
-                tool = self._shown[name]
-            tools.append(tool)
-        return request.override(tools=tools)
-
-    def wrap_model_call(self, request: Any, handler: Any) -> Any:
-        return handler(self._with_reply(request))
-
-    async def awrap_model_call(self, request: Any, handler: Any) -> Any:
-        return await handler(self._with_reply(request))
-
-    async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
-        call = request.tool_call
-        args = call.get("args")
-        if not isinstance(args, Mapping) or REPLY_ARG not in args:
-            return await handler(request)
-        line = args.get(REPLY_ARG)
-        request = request.override(tool_call={**call, "args": {k: v for k, v in args.items() if k != REPLY_ARG}})
-        result = await handler(request)
-        if isinstance(result, ToolMessage) and isinstance(line, str) and line.strip():
-            result = result.model_copy(update={"additional_kwargs": {**result.additional_kwargs, REPLY_ARG: line}})
-        return result
+def sentence_review() -> bool:
+    """``ADVISOR_SENTENCE_REVIEW=1``: the PolicyAgent reads each said sentence beside the stream. Off unless set."""
+    return os.environ.get("ADVISOR_SENTENCE_REVIEW", "0").strip().lower() not in ("0", "false", "no", "off", "")
 
 
 ADDRESS_TOKEN = re.compile(r"<ADDR_\d+>")

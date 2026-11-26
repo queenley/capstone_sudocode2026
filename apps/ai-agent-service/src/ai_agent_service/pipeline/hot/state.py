@@ -144,10 +144,17 @@ class HotState(TurnInput, total=False):
     deletion_recorded: bool
     #: ``schedule.callback`` ran in this call: a later turn may speak of the call back as booked.
     callback_booked: bool
+    #: Every moment a call back was booked for in this call: the same one is not booked twice.
+    callbacks_booked: list[str]
     deletion_awaiting_for: str | None
     #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the
     #: same change asked again in a later turn is refused, not made (and charged) a second time.
     updated_orders: list[dict[str, Any]]
+    #: The write calls the guard refused in the last turn with what to put to the customer instead (an hour in working
+    #: time, a variant in stock): the customer's next words answer that offer.
+    offered: list[dict[str, Any]]
+    #: The products the customer last heard named by the harness's lines: what "máy này" means next turn.
+    heard_products: list[str]
     #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),
     #: and whether the agent asked already (``components.intake.honorific``).
     honorific_said: str | None

@@ -38,13 +38,62 @@ def test_duplicate_and_missing_requested_ids_are_reported(tmp_path):
     {"date": "2026-10-16", "facts": {"budget_vnd": 123000}},
     {"days_before": -1, "facts": {"budget_vnd": 123000}},
     {"days_before": 1, "channel": "unknown", "facts": {"budget_vnd": 123000}},
-    {"days_before": 1, "facts": {"unknown-slot": "value"}},
-    {"days_before": 1, "facts": {"budget_vnd": "123000"}},
-    {"days_before": 1, "facts": {"budget_vnd": {"value": 123000}}},
+    {"days_before": 1, "facts": [{"field": "budget_vnd"}]},
+    {"days_before": 1, "facts": [{"field": "budget_vnd", "value": 123000, "as_of": "not a date"}]},
+    {"days_before": 1, "facts": "budget 123000"},
 ])
 def test_future_or_unknown_channel_seed_cannot_change_the_measurement(seed):
     with pytest.raises(scenarios.ScenarioError):
         scenarios.plan(scenario(seed_history=[seed]))
+
+
+def test_the_organisers_seed_history_example_is_seeded():
+    """BTC's answers of 11/2026 (part 2, question 2): facts are a list of {field, value, as_of}, channel ``phone``."""
+    plan, = scenarios.plan(scenario(seed_history=[{
+        "session_id": "S-C031-0917", "date": "2026-09-17", "channel": "phone",
+        "summary": "Khách hỏi máy lọc AP-X, hẹn gọi lại sau khi lĩnh lương.", "outcome": "hen_goi_lai",
+        "facts": [{"field": "interest_sku", "value": "SKU-AP-X", "as_of": "2026-09-17"},
+                  {"field": "address", "value": "12 Nguyễn Trãi, Thanh Xuân, Hà Nội", "as_of": "2026-09-17"}]}]))
+    seed, = plan.seed
+    assert (seed.session_id, seed.day, seed.channel, seed.outcome) == ("S-C031-0917", "2026-09-17", "hotline", "hen_goi_lai")
+    assert seed.facts == {"product_advised": "SKU-AP-X"}
+    assert "12 Nguyễn Trãi, Thanh Xuân, Hà Nội" in seed.summary
+
+
+def test_a_field_no_slot_holds_goes_to_the_summary_instead_of_failing_the_scenario():
+    plan, = scenarios.plan(scenario(seed_history=[{"days_before": 1, "summary": "Synthetic session",
+                                                   "facts": [{"field": "unknown-slot", "value": "value"},
+                                                             {"field": "budget_vnd", "value": {"value": 1}}]}]))
+    assert plan.seed[0].facts == {} and "unknown-slot: value" in plan.seed[0].summary
+
+
+def test_the_latest_as_of_wins_even_from_an_earlier_session():
+    """Two values of one field: the later as_of wins (BTC), so an older value recorded later is not written after it."""
+    plan, = scenarios.plan(scenario(seed_history=[
+        {"date": "2026-09-01", "summary": "First", "facts": [{"field": "room_area_m2", "value": 20, "as_of": "2026-09-01"},
+                                                              {"field": "room_area_m2", "value": 15, "as_of": "2026-08-01"}]},
+        {"date": "2026-10-01", "summary": "Second", "facts": [{"field": "room_area_m2", "value": 25, "as_of": "2026-08-15"},
+                                                               {"field": "budget_vnd", "value": 5000000}]}]))
+    first, second = plan.seed
+    assert first.facts == {"room_area_m2": 20}
+    assert second.facts == {"budget_vnd": 5000000}
+
+
+def test_a_session_without_facts_keeps_its_summary_for_extraction():
+    plan, = scenarios.plan(scenario(seed_history=[{"date": "2026-10-01", "summary": "Hỏi nồi chiên Xiaomi 4.5L", "facts": []}]))
+    assert plan.seed[0].facts == {} and plan.seed[0].summary == "Hỏi nồi chiên Xiaomi 4.5L"
+
+
+def test_facts_are_read_from_the_summary_when_the_seed_gives_none():
+    import asyncio
+
+    from ai_agent_service.agents.memory import MemoryAgent
+    from ai_agent_service.pipeline.eval import runner
+
+    found = asyncio.run(runner.facts_from_summary(
+        MemoryAgent(use_model=False), "Khách hỏi máy lọc AP-X, phòng 20 mét vuông.", on="2026-09-17"))
+    assert found["room_area_m2"] == 20
+    assert "product_advised" not in found  # no word matching of ours: the product stays in the summary the brief shows
 
 
 def test_organisers_public_inputs_still_plan_without_changes():
@@ -73,3 +122,20 @@ def test_a_crm_session_channel_is_seeded_under_the_products_name():
         {"days_before": 1, "channel": "fb", "summary": "Synthetic session"},
         {"days_before": 1, "channel": "web", "summary": "Synthetic session"}]))
     assert [s.channel for s in plan.seed] == ["facebook", "web"]
+
+
+def test_a_skills_version_asked_for_is_the_one_the_advisor_reads(tmp_path, monkeypatch):
+    """--skills-version is read after the skills module was imported: it must be read again (ablation, 2026-11-24)."""
+    from ai_agent_service.components.context import skills as skill_book
+
+    folder = tmp_path / "skills"
+    folder.mkdir()
+    learned = {"place-order": {"description": "d", "done_on": [], "body": "- learned line"}}
+    (folder / "v7.yaml").write_text(__import__("yaml").safe_dump(learned, allow_unicode=True), encoding="utf-8")
+    monkeypatch.setattr(skill_book, "versions_dir", lambda: folder)
+    monkeypatch.setenv("EVAL_SKILLS_VERSION", "7")
+    try:
+        assert skill_book.reload() == 7 and skill_book.SKILLS == learned
+    finally:
+        monkeypatch.delenv("EVAL_SKILLS_VERSION")
+        skill_book.reload()

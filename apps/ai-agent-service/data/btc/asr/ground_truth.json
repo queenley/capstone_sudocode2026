@@ -1,7 +1,9 @@
 {
-  "description": "MẪU 4/12 hội thoại ground truth (D01–D04) kèm audio để team thử pipeline ASR và định dạng hypotheses.json. 8 hội thoại còn lại BTC giữ để chấm mù; audio của cả 12 sẽ phát vào ngày chấm.",
+  "description": "MẪU 4/12 hội thoại ground truth (D01–D04) kèm audio/ do BTC phát, để team thử pipeline ASR và định dạng hypotheses.json. 8 hội thoại còn lại BTC giữ để chấm mù; audio đầy đủ phát vào ngày chấm. Team KHÔNG tự sinh audio từ file này — WER chỉ so được giữa các team khi cùng chạy trên audio của BTC.",
   "hypotheses_format": "asr/hypotheses.json = {\"D01\": {\"text\": \"<transcript toàn hội thoại>\", \"entities\": {\"price_vnd\": 4890000, ...}, \"turns\": [{\"speaker\": \"A|C\", \"start\": 0.0, \"end\": 3.2, \"text\": \"...\"}]}}. turns là tùy chọn (M2 diarization).",
   "normalization_rule": "Trước khi tính WER/CER: lowercase, NFC, bỏ dấu câu, gộp khoảng trắng. Ground truth viết số bằng chữ như lời nói; nếu ASR trả về chữ số thì nhóm phải chuẩn hóa về cùng một dạng (nêu rõ chọn dạng nào) trước khi tính WER. Entity so exact-match sau ITN.",
+  "entities_rule": "entities cấp hội thoại = HỢP của mọi thực thể được nhắc. Nếu một trường được nhắc nhiều lần với giá trị KHÁC nhau (ví dụ agent báo giá 2 model trong cùng cuộc) thì giá trị là MỘT LIST theo thứ tự được nhắc, tên trường đó liệt kê trong entities_multi. Entity Accuracy: khớp bất kỳ giá trị nào trong list là đúng; nếu hypotheses có turns[] thì BTC chấm thêm bản chặt theo từng lượt (turns[].entities). KHÔNG suy ra 'khách đã chốt sản phẩm nào' từ entities.",
+  "scenario_ref_rule": "scenario_ref chỉ cho biết hội thoại mượn tình huống của kịch bản nào để nghe cho tự nhiên. Số liệu trong hội thoại ASR là ground truth ĐỘC LẬP dùng cho WER/CER/Entity, KHÔNG đối chiếu với test_set/*.json (ngân sách, giá, SĐT có thể khác). D01 và D02 là cùng một khách (nữ, miền Bắc) gọi hai lần — dùng để kiểm tra ASR/diarization có giữ nhất quán giọng qua hai file.",
   "reference_date": "2026-10-15",
   "dialogues": [
     {
@@ -94,33 +96,43 @@
         "room_area_m2": 25,
         "has_children": true,
         "budget_vnd": 5000000,
-        "sku": "SKU-AP-X",
-        "price_vnd": 4890000,
+        "sku": [
+          "SKU-AP-Y",
+          "SKU-AP-X"
+        ],
+        "price_vnd": [
+          5200000,
+          4890000
+        ],
         "promo_expiry": "2026-10-22",
         "blocker": "can hoi chong"
       },
+      "entities_multi": [
+        "price_vnd",
+        "sku"
+      ],
       "n_turns": 10
     },
     {
       "id": "D02",
-      "customer_region": "nam",
-      "customer_gender": "m",
+      "customer_region": "bac",
+      "customer_gender": "f",
       "agent_gender": "f",
       "agent_region": "nam",
       "scenario_ref": "SC-01 call_2",
       "noisy": true,
-      "note": "Khách gọi lại sau hai ngày — chốt đơn, xác nhận tiếp nối",
+      "note": "Khách gọi lại sau hai ngày — CÙNG khách với D01, chốt đơn, xác nhận tiếp nối",
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo, hôm trước anh có gọi hỏi máy lọc không khí bên em đó",
+          "text": "alo, hôm trước chị có gọi hỏi máy lọc không khí bên em đó",
           "entities": {}
         },
         {
           "idx": 2,
           "speaker": "A",
-          "text": "dạ em chào anh, hôm mười lăm bên em có tư vấn anh mẫu e pia y cho phòng hai mươi lăm mét, giá năm triệu hai trăm nghìn, anh đã trao đổi với nhà mình chưa ạ",
+          "text": "dạ em chào chị, hôm mười lăm bên em có tư vấn chị mẫu e pia y cho phòng ngủ hai mươi lăm mét, giá năm triệu hai trăm nghìn, chị đã trao đổi với anh nhà chưa ạ",
           "entities": {
             "sku": "SKU-AP-Y",
             "price_vnd": 5200000,
@@ -130,7 +142,7 @@
         {
           "idx": 3,
           "speaker": "C",
-          "text": "rồi, bà xã anh ok rồi, giá vẫn vậy đúng không em",
+          "text": "rồi, ông xã chị đồng ý rồi, giá vẫn vậy đúng không em",
           "entities": {}
         },
         {
@@ -145,7 +157,7 @@
         {
           "idx": 5,
           "speaker": "C",
-          "text": "ừ lên đơn cho anh đi, giao về địa chỉ cũ, thanh toán khi nhận hàng",
+          "text": "ừ lên đơn cho chị đi, giao về địa chỉ cũ, thanh toán khi nhận hàng",
           "entities": {
             "payment": "COD"
           }
@@ -153,7 +165,7 @@
         {
           "idx": 6,
           "speaker": "A",
-          "text": "dạ em xác nhận lại, một máy e pia y, năm triệu hai trăm nghìn, giao về số bốn mươi lăm đường lê văn sỹ quận ba, thanh toán cê ô đê, đúng không ạ",
+          "text": "dạ em xác nhận lại, một máy e pia y, năm triệu hai trăm nghìn, giao về số mười hai ngõ ba mươi tám phố hoàng cầu quận đống đa, thanh toán cê ô đê, đúng không ạ",
           "entities": {
             "price_vnd": 5200000,
             "payment": "COD"
@@ -168,13 +180,13 @@
         {
           "idx": 8,
           "speaker": "A",
-          "text": "dạ mã đơn của anh là ô đê ba trăm mười hai nghìn bốn trăm năm mươi sáu, em cảm ơn anh ạ",
+          "text": "dạ mã đơn của chị là ô đê ba trăm mười hai nghìn bốn trăm năm mươi sáu, em cảm ơn chị ạ",
           "entities": {
             "order_id": "OD312456"
           }
         }
       ],
-      "full_text": "alo, hôm trước anh có gọi hỏi máy lọc không khí bên em đó dạ em chào anh, hôm mười lăm bên em có tư vấn anh mẫu e pia y cho phòng hai mươi lăm mét, giá năm triệu hai trăm nghìn, anh đã trao đổi với nhà mình chưa ạ rồi, bà xã anh ok rồi, giá vẫn vậy đúng không em dạ vẫn năm triệu hai trăm nghìn, còn tặng màng lọc, giao nội thành một đến hai ngày làm việc ạ ừ lên đơn cho anh đi, giao về địa chỉ cũ, thanh toán khi nhận hàng dạ em xác nhận lại, một máy e pia y, năm triệu hai trăm nghìn, giao về số bốn mươi lăm đường lê văn sỹ quận ba, thanh toán cê ô đê, đúng không ạ đúng rồi em dạ mã đơn của anh là ô đê ba trăm mười hai nghìn bốn trăm năm mươi sáu, em cảm ơn anh ạ",
+      "full_text": "alo, hôm trước chị có gọi hỏi máy lọc không khí bên em đó dạ em chào chị, hôm mười lăm bên em có tư vấn chị mẫu e pia y cho phòng ngủ hai mươi lăm mét, giá năm triệu hai trăm nghìn, chị đã trao đổi với anh nhà chưa ạ rồi, ông xã chị đồng ý rồi, giá vẫn vậy đúng không em dạ vẫn năm triệu hai trăm nghìn, còn tặng màng lọc, giao nội thành một đến hai ngày làm việc ạ ừ lên đơn cho chị đi, giao về địa chỉ cũ, thanh toán khi nhận hàng dạ em xác nhận lại, một máy e pia y, năm triệu hai trăm nghìn, giao về số mười hai ngõ ba mươi tám phố hoàng cầu quận đống đa, thanh toán cê ô đê, đúng không ạ đúng rồi em dạ mã đơn của chị là ô đê ba trăm mười hai nghìn bốn trăm năm mươi sáu, em cảm ơn chị ạ",
       "entities": {
         "sku": "SKU-AP-Y",
         "price_vnd": 5200000,
@@ -183,6 +195,7 @@
         "payment": "COD",
         "order_id": "OD312456"
       },
+      "entities_multi": [],
       "n_turns": 8
     },
     {
@@ -278,6 +291,7 @@
         "blocker": "so sanh gia",
         "phone": "0917223456"
       },
+      "entities_multi": [],
       "n_turns": 9
     },
     {
@@ -356,6 +370,7 @@
         "exchange_fee_vnd": 0,
         "in_stock": true
       },
+      "entities_multi": [],
       "n_turns": 7
     }
   ]

@@ -52,6 +52,15 @@ LEARNERS = {"gap-loop": ("gaploop", "combined")}
 REFLECTION_SETS = ("budget", "warranty", "conduct")
 for _set in REFLECTION_SETS:
     LEARNERS[_set] = ("reflection", "combined")
+#: The learning sets pass under the same rule as their proofs (ablation.py runs them as "<set>-learn").
+LEARNERS.update({f"{name}-learn": learners for name, learners in list(LEARNERS.items())})
+
+
+def set_controls(label: str, path: Path) -> set[str]:
+    """A proof set's controls (verdict.controls); in a learning set, the cases whose labels forbid a claim."""
+    if not label.endswith("-learn"):
+        return controls(label)
+    return {f.stem for f in path.glob("*.json") if "forbidden_claims" in f.read_text(encoding="utf-8")}
 MIN_RUNS = 3
 RESAMPLES = 2000
 
@@ -203,7 +212,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if label == "control":
             checks += control_checks(metrics, by_config)
         else:
-            checks += proof_checks(label, by_config, controls(label))
+            checks += proof_checks(label, by_config, set_controls(label, ROOT / plan["sets"][label]["path"]))
     for label, learn in plan.get("learn_sets", {}).items():
         if label in plan["sets"]:
             result = apart(ROOT / learn, ROOT / plan["sets"][label]["path"])

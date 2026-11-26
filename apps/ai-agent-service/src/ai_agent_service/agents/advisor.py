@@ -41,12 +41,14 @@ import re
 import logging
 import os
 import time
+import uuid
 from datetime import timedelta
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, AsyncIterator, Awaitable, Callable, Literal, Mapping, Sequence
 
 from langchain.agents import create_agent
+from langchain.agents.middleware.types import ToolCallRequest
 from langchain.agents.middleware import (
     AgentMiddleware,
     ModelCallLimitMiddleware,
@@ -64,8 +66,9 @@ from ..components import clock
 from ..components.context import focus
 from ..components.context.budget import Section, assemble
 from ..components.guardrails import actions, purchase
+from ..components.guardrails.hard import MAX_SENTENCES
 from ..components.memory.brief import BriefLine
-from ..components.intake import pii
+from ..components.intake import commerce, pii
 from ..components.intake.itn import format_vnd
 from ..components.intake.text import plain
 from ..config.config_manager import get_lanes, load_prompt, load_prompt_yaml
@@ -74,8 +77,8 @@ from ..observability import stopwatch
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
 from ..components.context import skills as skill_book
-from ..mcp.tools import (ChainLookupMiddleware, LaneToolsMiddleware, ReplyPlanMiddleware, StrictToolsMiddleware,
-                         ToolGuardMiddleware, ADVISE, CHAINED, QUOTE, REPLY_ARG, SEARCH, STOCK, envelope_of,
+from ..mcp.tools import (ChainLookupMiddleware, LaneToolsMiddleware, StrictToolsMiddleware,
+                         ToolGuardMiddleware, ADVISE, CHAINED, QUOTE, SEARCH, SPLIT, STOCK, envelope_of, order_split_cod,
                          parse_envelope, order_arguments, product_advise, product_advise_on, without_nulls)
 from .base import BaseAgent
 from .policy import EARLY_INTENTS, NO_HANDOFF, band
@@ -160,12 +163,18 @@ class AgentContext:
     seen_products: tuple[Mapping[str, Any], ...] = ()
     #: The latest result per tool and subject from earlier turns: what need not be asked again.
     earlier_results: tuple[Mapping[str, Any], ...] = ()
+    #: Moments a call back is already booked for in this call, earlier turns included.
+    callbacks_booked: tuple[str, ...] = ()
     #: ``(sku, unit price, qty)`` of the basket being chosen, when all of it is quoted.
     basket_lines: tuple[tuple[str, int, int], ...] = ()
     #: The orders earlier turns of this call created: ``{order_id, sku}``.
     created_orders: tuple[Mapping[str, Any], ...] = ()
     #: The changes ``order_update`` made in earlier turns of this call: ``{order_id, action, new_variant_sku}``.
     updated_orders: tuple[Mapping[str, Any], ...] = ()
+    #: Last turn's write calls the guard refused, and what it said to put to the customer (``nodes._offered``).
+    offered: tuple[Mapping[str, Any], ...] = ()
+    #: The products the customer heard named last, by the harness's lines (``fallback.told_products``).
+    heard_products: tuple[str, ...] = ()
     #: How an unknown customer calls themselves, and whether the agent asked.
     self_called: str | None = None
     honorific_asked: bool = False
@@ -185,8 +194,8 @@ class AgentContext:
     consent: dict[str, Any] = field(default_factory=dict, repr=False, compare=False)
     #: The run only warms the provider's prompt cache and the connection (:meth:`AdvisorAgent.warm`): no tool may run.
     warming: bool = False
-    #: Lines the harness said in this answer from a tool's result: the model's next round goes on after them.
-    harness_said: list[str] = field(default_factory=list, repr=False, compare=False)
+    #: A rewrite of an answer that used one model call: its one call answers, no tool (two calls a turn at most).
+    answer_only: bool = False
     #: The skills loaded for the task on: ``load_skill`` adds to it, the next model call reads it.
     skills: list[str] = field(default_factory=list, repr=False, compare=False)
     #: ``PolicyAgent.probability``: what the customer means for one action, None without an answer.
@@ -270,16 +279,22 @@ ADVISE_NOTE = _NOTES["advise"]
 PREAMBLE_NOTE = _NOTES["preamble"]
 
 
-def preamble() -> bool:
-    """``ADVISOR_PREAMBLE=1``: the advisor writes one short line before a lookup, in the same round (OpenAI calls these
-    tool preambles). The organisers' TTFA ends at the first audio played (``eval/huong-dan-do-latency.md``)."""
-    return os.environ.get("ADVISOR_PREAMBLE", "0").strip().lower() not in ("0", "false", "no", "off", "")
-
-
 #: Passages shown to the model per turn (section 4.2: five retrieved, three allowed in).
 KNOWLEDGE_SHOWN = 3
 #: Passages read on earlier turns of the call that stay shown, the latest first.
 EARLIER_SHOWN = 3
+
+
+def preamble_asked(context: AgentContext) -> bool:
+    """Whether this turn asks for the line before a tool call (``preamble``, OpenAI's tool preambles): the lanes where
+    the advisor does business, not copilot."""
+    return context.lane in ("NEW", "CONTINUITY") and context.mode != "copilot"
+
+
+#: The preamble note again at the end of the turn's context: OpenAI's GPT-4.1 guide places instructions both before
+#: and after a long context; the note alone, near the start, was skipped on follow-up lookups (2026-11-26).
+PREAMBLE_REMINDER = ("Nếu tin nhắn đầu của lượt này cần gọi tool: viết câu mở theo <cau_mo_truoc_tool> trước, "
+                     "rồi mới gọi tool, trong cùng tin nhắn.")
 
 
 def lane_instruction(context: AgentContext) -> str:
@@ -295,7 +310,9 @@ def lane_instruction(context: AgentContext) -> str:
         extra.append(SPOKEN_NOTE)
     else:
         extra.append(CHAT_NOTE)
-    if preamble() and context.lane in ("NEW", "CONTINUITY") and context.mode != "copilot":
+    # With the advisor's own words on each call (``say``, plan 003) a line written before the call is not asked for:
+    # its facts came before the lookup that backs them, and the guard stopped them (2026-11-16).
+    if preamble_asked(context):
         extra.append(PREAMBLE_NOTE)
     if product_advise_on() and context.lane in ("NEW", "CONTINUITY"):
         extra.append(ADVISE_NOTE)
@@ -335,17 +352,16 @@ def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str,
         ).strip()),
         Section("products", _products_block(context.seen_products)),
         Section("earlier", _earlier_block(context.earlier_results)),
-        Section("basket", _basket_block(context.basket_lines)),
+        Section("basket", _basket_block(context.basket_lines, context.order_quotes)),
         Section("orders", _orders_block(context.created_orders, context.updated_orders)),
+        Section("offered", _offered_block(context.offered)),
+        Section("heard", _heard_block(context.heard_products)),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
         Section("knowledge", "\n".join(x for x in (_knowledge_block("Tài liệu liên quan", policy),
                                                     context.knowledge_note) if x)),
         Section("playbook", _knowledge_block("Kinh nghiệm xử lý đã được duyệt", playbook)),
         Section("tool_results", _tool_block(context.tool_results)),
-        Section("said", (f"Khách vừa nghe hệ thống báo: «{' '.join(context.harness_said)}». Kết quả đó khách đã biết: "
-                         "không nhắc lại việc đã làm, mã đơn hay giờ hẹn trong câu đó. Chỉ nói thêm điều khách chưa "
-                         "nghe và cần biết; không còn gì thì không viết gì thêm.") if context.harness_said else ""),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
         Section("blocked", _blocked_block(context)),
         Section("no_handoff", NO_HANDOFF_NOTE if (context.early_answers.get("handoff") is not None
@@ -362,6 +378,8 @@ def _state_block(context: AgentContext) -> str:
     parts = []
     if context.call_state:
         parts.append("Trạng thái cuộc:\n" + "\n".join(f"- {line}" for line in context.call_state))
+    if preamble_asked(context):
+        parts.append(PREAMBLE_REMINDER)
     if context.customer_said and context.lane in ("CONTINUITY", "NEW"):
         parts.append(f'Yêu cầu hiện tại của khách: "{context.customer_said}". Làm đúng yêu cầu này trước, không trả lời '
                      "sang việc khác; thông tin ở trên chỉ dùng khi phục vụ yêu cầu này.")
@@ -472,12 +490,49 @@ def _earlier_block(results: Sequence[Mapping[str, Any]]) -> str:
             "thể, số lượng, địa chỉ, giỏ hàng hoặc khi sắp đặt đơn):\n" + "\n".join(lines))
 
 
-def _basket_block(lines: Sequence[tuple[str, int, int]]) -> str:
-    """The basket's total, added up here: a model that adds gets it wrong often enough to matter."""
+def _heard_block(skus: Sequence[str]) -> str:
+    """Which products "máy này" can mean: the ones the customer heard, not every one a lookup returned."""
+    if not skus:
+        return ""
+    from ..components.intake.commerce import product_name
+
+    named = "; ".join(f"{product_name(s) or s} ({s})" for s in skus)
+    return (f"Mẫu khách vừa nghe: {named}. Khách nói \"máy này\", \"cái đó\" là mẫu này. Khách đã nghe hơn một mẫu mà "
+            "lời khách không rõ mẫu nào thì hỏi lại một câu và dừng, không gọi tool. Mẫu khác có trong kết quả tool mà "
+            "khách chưa nghe thì không nói tới khi khách chưa hỏi.")
+
+
+def _offered_block(offered: Sequence[Mapping[str, Any]]) -> str:
+    """Last turn's refused write calls: the offer the customer is now answering, with its exact values."""
+    if not offered:
+        return ""
+    # A transfer's brief is the harness's to fill: its arguments would only lengthen the prompt.
+    lines = [f"- {o.get('tool')} {json.dumps({k: v for k, v in (o.get('args') or {}).items() if k != 'brief'}, ensure_ascii=False)}"
+             f": {o.get('said')}" for o in offered]
+    return ("Lượt trước hệ thống chưa làm các việc sau và em đã đề xuất lại với khách theo lý do này. Khách đồng ý thì "
+            "gọi lại đúng tool với giá trị đã đề xuất (ngày giờ, mã, số tiền), không tính lại từ đầu. Lý do là còn chờ "
+            "khách cho một thông tin (số điện thoại, size, địa chỉ) thì chỉ gọi lại khi lời mới nhất của khách có thông "
+            "tin đó; chưa có thì xin lại một câu, không gọi tool:\n" + "\n".join(lines))
+
+
+def _basket_block(lines: Sequence[tuple[str, int, int]], order_quotes: Mapping[str, Any] | None = None) -> str:
+    """The basket's total, added up here: a model that adds gets it wrong often enough to matter. With a quote of the
+    whole basket, its unit prices (a second machine is cheaper beside the first) and, above the COD limit, the two
+    orders a split would be (QT-01): the model only places them, it does not arrange or price them."""
     if not lines:
         return ""
+    units = (order_quotes or {}).get(purchase.units_key([{"sku": sku, "qty": qty} for sku, _, qty in lines]))
+    if units:
+        priced = [(str(sku), int(price)) for sku, price in units]
+        items = ", ".join(f"{sku} {format_vnd(price)}" for sku, price in priced)
+        text = (f"Tổng giỏ (hệ thống đã cộng, theo báo giá cả giỏ): {format_vnd(sum(p for _, p in priced))}, gồm {items}. "
+                "Khách hỏi tổng thì viết {tổng}.")
+        if sum(p for _, p in priced) > actions.COD_LIMIT_VND:
+            text += (f" Giỏ vượt {format_vnd(actions.COD_LIMIT_VND)} nên một đơn COD không nhận; khách đồng ý tách thì gọi "
+                     "order_split_cod với cả giỏ, hệ thống tự xếp các đơn và giữ ưu đãi mua kèm (QT-01).")
+        return text
     items = ", ".join(f"{sku} {format_vnd(price)} x {qty}" for sku, price, qty in lines)
-    return f"Tổng giỏ (hệ thống đã cộng): {format_vnd(sum(p * q for _, p, q in lines))}, gồm {items}. Khách hỏi tổng thì đọc đúng số này."
+    return f"Tổng giỏ (hệ thống đã cộng): {format_vnd(sum(p * q for _, p, q in lines))}, gồm {items}. Khách hỏi tổng thì viết {{tổng}}."
 
 
 def _tool_block(results: Sequence[Mapping[str, Any]]) -> str:
@@ -533,9 +588,9 @@ class ContextPromptMiddleware(AgentMiddleware):
             request = request.override(tools=[t for t in request.tools if getattr(t, "name", None) != LOAD_SKILL])
         last = self._is_last(request)
         if last and not context.warming:
-            turn += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "
-                     "thiếu dữ liệu thì nói chưa kiểm tra được và xin đúng thông tin còn thiếu. "
-                     "Không khẳng định thao tác thành công nếu chưa có kết quả tool thành công.")
+            turn += ("\nĐây là lần viết cuối của lượt: không gọi thêm tool. Trả lời từ kết quả đã có, tối đa hai câu trừ khi đọc lại đơn, "
+                     "không nhắc lại câu mở. Còn thiếu một điều thì hỏi hoặc xác nhận đúng điều đó, việc tiếp theo "
+                     "để lượt sau. Không nói đã làm khi chưa có kết quả tool thành công.")
         if self.split:
             request = request.override(system_message=SystemMessage(content=static),
                                        messages=with_turn_context(request.messages, turn))
@@ -548,7 +603,7 @@ class ContextPromptMiddleware(AgentMiddleware):
     def _is_last(self, request: ModelRequest) -> bool:
         context = getattr(getattr(request, "runtime", None), "context", None)
         return (request.state.get("run_model_call_count", 0) >= self.model_limit - 1
-                or bool(getattr(context, "warming", False)))
+                or bool(getattr(context, "warming", False)) or bool(getattr(context, "answer_only", False)))
 
     @staticmethod
     def _answer_only(response: Any) -> Any:
@@ -593,11 +648,135 @@ def _asked_together(request: Any) -> list[str]:
 
 
 class ActionGuardMiddleware(AgentMiddleware):
-    """The guardrail before act (section 4.4): a write tool runs only if its arguments pass."""
+    """The guardrail before act (section 4.4): a write tool runs only if its arguments pass.
+
+    What the write needs and a tool can tell, the guard looks up itself rather than refusing the call back to the model
+    (plan 003, a second model round each time): today's quote of the order (``pricing_get_quote``, or
+    ``pricing_quote_order`` for more than one unit), the stock of the variant an exchange asks for
+    (``inventory_check``). Those calls run through the same tool guard as any other and are carried on the write's
+    result (``inner``), so the trace records them. An order this call already created is said back
+    (``ALREADY_CREATED``), not booked twice.
+    """
+
+    def __init__(self, tools: Sequence[Any] = (), guard: Any = None) -> None:
+        super().__init__()
+        self._tools = {getattr(t, "name", None): t for t in tools}
+        self._guard = guard
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
         with stopwatch.span("tools"):
+            if (request.tool_call or {}).get("name") == SPLIT:
+                return await self._split(request)
             return await self._guarded(request, handler)
+
+    async def _split(self, request: Any) -> ToolMessage:
+        """:data:`SPLIT`, the team's tool: the basket priced as one, arranged into COD orders each within the limit
+        (``actions.cod_split``), and each order put through ``order_create`` exactly as if the model had called it: its
+        read-back, the customer's yes, the signed consent. What ran is recorded as the organisers' calls (``inner``)."""
+        call = request.tool_call
+        args = {k: v for k, v in (call.get("args") or {}).items() if v not in (None, "", [])}
+        lines = [{"sku": str(l["sku"]), "qty": int(l.get("qty") or 1)} for l in args.get("lines") or []
+                 if isinstance(l, Mapping) and l.get("sku")]
+        inner: list[dict[str, Any]] = []
+
+        def answer(envelope: Mapping[str, Any]) -> ToolMessage:
+            return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=SPLIT,
+                               additional_kwargs={"inner": inner})
+
+        quoted = await self._look_up("pricing_quote_order", {
+            "lines": lines, **({"address": args["address"]} if args.get("address") else {})}, request) if lines else None
+        if quoted:
+            inner.append(quoted)
+        units = [(str(u.get("sku")), int(u["final_price_vnd"])) for u in
+                 ((parse_envelope((quoted or {}).get("content")) or {}).get("data") or {}).get("units") or []
+                 if isinstance(u.get("final_price_vnd"), int)]
+        split = actions.cod_split(units)
+        if not split:
+            fits = units and sum(p for _, p in units) <= actions.COD_LIMIT_VND
+            return answer({"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": (
+                "Giỏ không vượt 10.000.000đ: đặt bằng order_create, không cần tách." if fits else
+                "Không xếp được thành các đơn COD dưới 10.000.000đ; đề nghị khách chuyển khoản.")}})
+        orders = []
+        for group, (mine, other) in enumerate(((split[0], split[1]), (split[1], split[0])), start=1):
+            order = ({"sku": mine[0][0], "qty": 1, "price_vnd": mine[0][1]} if len(mine) == 1 else
+                     {"lines": [{"sku": s, "qty": 1, "price_vnd": p} for s, p in mine]})
+            order.update({"payment": "COD", "order_group": str(group), "basket_skus": [s for s, _ in other],
+                          **({"address": args["address"]} if args.get("address") else {})})
+            sub = {"name": "order_create", "args": order, "id": f"{call['id']}-{group}", "type": "tool_call"}
+
+            async def run(inner_request: Any) -> Any:
+                return await inner_request.tool.ainvoke(inner_request.tool_call)
+
+            async def through_guard(inner_request: Any) -> Any:
+                return await self._guard.awrap_tool_call(inner_request, run)
+
+            placed = await self._guarded(ToolCallRequest(tool_call=sub, tool=self._tools.get("order_create"),
+                                                         state=request.state, runtime=request.runtime), through_guard)
+            extra = getattr(placed, "additional_kwargs", {}) or {}
+            inner += list(extra.get("inner") or [])
+            inner.append({"name": "order_create", "args": extra.get("args") or order,
+                          "content": getattr(placed, "content", ""), "blocked_by": extra.get("blocked_by")})
+            orders.append({"order_group": str(group), "items": [s for s, _ in mine],
+                           "total_vnd": sum(p for _, p in mine), "result": parse_envelope(getattr(placed, "content", ""))})
+        done = all((o["result"] or {}).get("ok") for o in orders)
+        if done:
+            return answer({"ok": True, "data": {"orders": [{**{k: o[k] for k in ("order_group", "items", "total_vnd")},
+                                                            **((o["result"] or {}).get("data") or {})} for o in orders],
+                                                "note": "Tổng từng đơn đọc đúng số total_vnd của đơn đó; {tổng} là tổng "
+                                                        "cả giỏ."}})
+        return answer({"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False,
+                       "message": "Đọc lại các đơn dưới đây cho khách (món, giá, tổng từng đơn đúng số total_vnd; "
+                                  "{tổng} là tổng cả giỏ) rồi hỏi khách đồng ý; khách đồng ý thì gọi lại "
+                                  "order_split_cod với cùng giỏ.",
+                       "details": {"orders": [{k: o[k] for k in ("order_group", "items", "total_vnd")} for o in orders]}}})
+
+    async def _look_up(self, name: str, args: Mapping[str, Any], request: Any) -> dict[str, Any] | None:
+        """One organisers' lookup made for a write, through the tool guard; ``{name, args, content}`` or None."""
+        if name not in self._tools or self._guard is None:
+            return None
+        call = {"name": name, "args": dict(args), "id": f"inner-{uuid.uuid4().hex[:12]}", "type": "tool_call"}
+
+        async def run(inner: Any) -> Any:
+            return await inner.tool.ainvoke(inner.tool_call)
+
+        answer = await self._guard.awrap_tool_call(
+            ToolCallRequest(tool_call=call, tool=self._tools[name], state=request.state, runtime=request.runtime), run)
+        return {"name": name, "args": (getattr(answer, "additional_kwargs", {}) or {}).get("args") or call["args"],
+                "content": getattr(answer, "content", "")}
+
+    async def _fill_in(self, name: str, args: dict[str, Any], request: Any, quotes: dict[str, int],
+                       order_quotes: dict[str, Any], codes: set[str], inner: list[dict[str, Any]]) -> dict[str, Any]:
+        """Looks up what *args* needs and no result of this call has yet; *quotes*, *order_quotes* and *codes* grow."""
+        if name == "order_create":
+            lines = purchase.lines_of(args)
+            if args.get("lines") and purchase.units_key(lines) not in order_quotes:
+                found = await self._look_up("pricing_quote_order", {
+                    "lines": [{"sku": line["sku"], "qty": line["qty"]} for line in lines],
+                    **({"address": args["address"]} if args.get("address") else {})}, request)
+                if found:
+                    inner.append(found)
+                    envelope = parse_envelope(found["content"]) or {}
+                    if envelope.get("ok") and (priced := purchase.quoted_units(envelope.get("data") or {})):
+                        order_quotes[priced[0]] = priced[1]
+                        codes.update(sku for sku, _ in priced[1])
+            elif args.get("sku") and args["sku"] not in quotes and not args.get("basket_skus"):
+                found = await self._look_up("pricing_get_quote", {
+                    "sku": args["sku"], "qty": 1, **({"address": args["address"]} if args.get("address") else {})},
+                    request)
+                if found:
+                    inner.append(found)
+                    data = (parse_envelope(found["content"]) or {}).get("data") or {}
+                    if data.get("sku") and data.get("final_price_vnd") is not None:
+                        quotes[str(data["sku"])] = int(data["final_price_vnd"])
+                        codes.add(str(data["sku"]))
+        elif name == "order_update" and args.get("new_variant_sku") and args["new_variant_sku"] not in codes:
+            found = await self._look_up("inventory_check", {"sku": args["new_variant_sku"]}, request)
+            if found:
+                inner.append(found)
+                data = (parse_envelope(found["content"]) or {}).get("data") or {}
+                if data.get("sku"):
+                    codes.add(str(data["sku"]))
+        return args
 
     async def _guarded(self, request: Any, handler: Any) -> Any:
         request = without_nulls(request)
@@ -608,9 +787,9 @@ class ActionGuardMiddleware(AgentMiddleware):
             logger.info("Dropped undeclared arguments of %s: %s", name, sorted(set(call["args"]) - set(kept)))
             call = {**call, "args": kept}
             request = request.override(tool_call=call)
+        context = getattr(getattr(request, "runtime", None), "context", None)
         if name not in actions.WRITE_TOOLS | actions.CUSTOMER_READ_TOOLS:
             return await handler(request)
-        context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
             return ToolMessage(content=json.dumps({"ok": False, "error": {"code": "PRECONDITION",
                 "retryable": False, "message": "Missing trusted runtime context."}}),
@@ -635,6 +814,12 @@ class ActionGuardMiddleware(AgentMiddleware):
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
         order_quotes = {**context.order_quotes, **_order_quotes_in(state)}
+        codes, orders = _seen_in(state, context.tool_results)
+        codes = set(codes) | set(context.trusted_skus)
+        inner: list[dict[str, Any]] = []
+        if name in ("order_create", "order_update"):
+            args = await self._fill_in(name, args, request, quotes, order_quotes, codes, inner)
+            call = {**call, "args": args}
         if name == "order_create" and args.get("basket_skus") and args.get("sku"):
             # Half of a split order (QT-01): its unit price is the quote made with the other half's machines, where the
             # second-item promotion applies, not the one-machine quote (2026-11-16: the second order was refused). The
@@ -645,23 +830,51 @@ class ActionGuardMiddleware(AgentMiddleware):
                 units = (order_quotes or {}).get(purchase.units_key(
                     [{"sku": args["sku"]}, *({"sku": sku} for sku in args["basket_skus"])]))
                 together = next((int(price) for sku, price in units or () if sku == args["sku"]), None)
+            if together is None:
+                # No quote of this half with the other half's machines yet: the guard asks for it, the model's own
+                # figure is a one-machine price the mock refuses (2026-11-24, PRICE_MISMATCH on the second order).
+                found = await self._look_up("pricing_get_quote", {
+                    "sku": args["sku"], "qty": 1, "basket_skus": list(args["basket_skus"]),
+                    **({"address": args["address"]} if args.get("address") else {})}, request)
+                if found:
+                    inner.append(found)
+                    data = (parse_envelope(found["content"]) or {}).get("data") or {}
+                    if data.get("final_price_vnd") is not None:
+                        together = int(data["final_price_vnd"])
             if together is not None:
                 quotes = {**quotes, args["sku"]: together}
         if name == "order_create":
             args = _filled_order(args, context, quotes, order_quotes)
-        codes, orders = _seen_in(state, context.tool_results)
+            if args.get("sku") and args.get("price_vnd") is None and not args.get("lines"):
+                # A variant the customer's words picked, not quoted yet: the guard looks its price up itself.
+                found = await self._look_up("pricing_get_quote", {"sku": args["sku"], "qty": int(args.get("qty") or 1)},
+                                            request)
+                if found:
+                    inner.append(found)
+                    data = (parse_envelope(found["content"]) or {}).get("data") or {}
+                    if data.get("final_price_vnd") is not None:
+                        quotes = {**quotes, args["sku"]: int(data["final_price_vnd"])}
+                        args["price_vnd"] = int(data["final_price_vnd"])
         created = (*context.created_orders, *_created_in(state))
         intents = await _intents(name, args, context, created, state)
+        if name == "order_create" and (earlier := actions.repeated_order(
+                args, created=created, placed=placed_this_call(context, state), customer_said=context.customer_said,
+                wants_more=(intents or {}).get("one_more"))):
+            envelope = {"ok": False, "error": {"code": "ALREADY_CREATED", "retryable": False, "details": dict(earlier),
+                        "message": f"Đơn {earlier.get('order_id')} đã tạo trong cuộc này; không tạo lại."}}
+            return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
+                               additional_kwargs={"args": args, "blocked_by": "guardrail", "inner": inner})
         verdict = actions.check(
             name, args, tier=context.tier, mode=context.mode, has_phone=bool(context.customer_phone),
             quotes=quotes, order_quotes=order_quotes,
-            orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
+            orders=context.known_orders | orders, trusted=frozenset(codes) | set(quotes),
             lane=context.lane, intents=intents, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
             deletion_asked=context.deletion_asked,
             shared_phone=context.shared_phone, created=created,
             updated=(*context.updated_orders, *_updated_in(state, context.tool_results)),
             placed=placed_this_call(context, state),
+            heard_basket=_heard_basket(context.order_quotes),
         )
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
@@ -669,8 +882,8 @@ class ActionGuardMiddleware(AgentMiddleware):
             record = purchase.draft(business_args, context, delivery, names=_names_in(state), quotes=quotes,
                                     order_quotes=order_quotes)
             pending = context.pending_purchase
-            heard = bool(pending and pending.get("payload_hash") == record["payload_hash"]
-                         and pending.get("owner") == record["owner"])
+            heard = bool(pending and pending.get("owner") == record["owner"] and record["payload_hash"] in
+                         {d.get("payload_hash") for d in (pending, *(pending.get("siblings") or []))})
             agreed = None
             # PB-09 asks the order read back once before order.create, not a second yes after it: a customer who asked
             # for the order hears it read back in the same reply that places it (the user's decision, 2026-11-10).
@@ -691,20 +904,56 @@ class ActionGuardMiddleware(AgentMiddleware):
                 envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False, "message": message,
                     "details": {} if heard else {"purchase_draft": record}}}
                 return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
-                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
+                                   additional_kwargs={"args": args, "blocked_by": "guardrail", "inner": inner})
             context.consent["draft"] = purchase.authorize(record, context.turn_id)
-            if not heard:
-                context.consent["read_back"] = record["read_back"]
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
             return ToolMessage(
                 content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
-                additional_kwargs={"args": args, "blocked_by": "guardrail"},
+                additional_kwargs={"args": args, "blocked_by": "guardrail", "inner": inner},
             )
         if name == "schedule_callback" and args.get("callback_at"):
             # The shop's clock is Vietnam's, to the minute; the tool's own answer carries no offset.
             args["callback_at"] = re.sub(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::\d{2})?(?:\.\d+)?(?:\+07:00|Z)?$", r"\1", str(args["callback_at"]))
-        return await handler(request.override(tool_call={**call, "args": args}))
+            refused = callback_refusal(str(args["callback_at"]), context,
+                                       [*context.tool_results, *tool_results_of(state.get("messages") or [])])
+            if refused is not None:
+                return ToolMessage(content=json.dumps(refused, ensure_ascii=False), tool_call_id=call["id"], name=name,
+                                   additional_kwargs={"args": args, "blocked_by": "guardrail", "inner": inner})
+        result = await handler(request.override(tool_call={**call, "args": args}))
+        if inner and isinstance(result, ToolMessage):
+            result = result.model_copy(update={"additional_kwargs": {**result.additional_kwargs, "inner": inner}})
+        return result
+
+
+#: Days ahead a call back may be booked: a customer's "cuối tháng" read as a year later is not a date they gave.
+CALLBACK_HORIZON_DAYS = 60
+
+
+def callback_refusal(callback_at: str, context: AgentContext, results: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
+    """Why this ``schedule.callback`` must not run, as the tool's own refusal, or None.
+
+    The same moment already booked in this call is said back, not booked again (2026-11-26: one call back booked
+    three times as the customer kept talking); a moment more than :data:`CALLBACK_HORIZON_DAYS` ahead, or in the
+    past, is asked again."""
+    if callback_at in context.callbacks_booked:
+        return {"ok": False, "error": {"code": "ALREADY_BOOKED", "retryable": False, "details": {"callback_at": callback_at},
+                "message": "Lịch gọi lại này đã đặt trong cuộc; báo lại đúng giờ đã đặt, không đặt thêm."}}
+    booked = [r for r in results if r.get("name") == "schedule.callback" and (r.get("result") or {}).get("ok")]
+    for result in booked:
+        data = (result.get("result") or {}).get("data") or {}
+        if callback_at in (data.get("callback_at"), (result.get("args") or {}).get("callback_at"), data.get("moved_from")):
+            return {"ok": False, "error": {"code": "ALREADY_BOOKED", "retryable": False, "details": dict(data),
+                    "message": "Lịch gọi lại này đã đặt trong cuộc; báo lại đúng giờ đã đặt, không đặt thêm."}}
+    try:
+        moment = datetime.fromisoformat(callback_at)
+    except ValueError:
+        return None
+    now = context.now.replace(tzinfo=None) if context.now else None
+    if now is not None and not (now - timedelta(minutes=5) <= moment <= now + timedelta(days=CALLBACK_HORIZON_DAYS)):
+        return {"ok": False, "error": {"code": "PRECONDITION", "retryable": False,
+                "message": "Giờ hẹn không phải giờ khách vừa nói (đã qua hoặc quá xa); hỏi lại khách ngày giờ cụ thể."}}
+    return None
 
 
 def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mapping[str, int],
@@ -713,6 +962,17 @@ def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mappin
     from the ``pricing.quote_order`` of the same units), and what it left out of an order the customer already heard
     read back comes from that read-back."""
     order = dict(args)
+    if isinstance(order.get("lines"), list):
+        order["lines"] = [dict(line) if isinstance(line, dict) else line for line in order["lines"]]
+    # A product sold in sizes and colours named by its own code: the variant the customer's words pick, when they pick
+    # exactly one (2026-11-27: "size 42 màu đen" said, the parent code sent three turns running).
+    said = [text for who, text in context.recent if who == "customer"][::-1]
+    for line in (order.get("lines") if isinstance(order.get("lines"), list) else [order]):
+        if isinstance(line, dict) and line.get("sku") and commerce.variants_of(str(line["sku"])):
+            picked = next((v for text in said if (v := commerce.variant_said(str(line["sku"]), text))), None)
+            if picked:
+                line["sku"] = picked
+                line.pop("price_vnd", None)  # today's price of the variant, filled below, not the product's
     if isinstance(order.get("lines"), list) and len(order["lines"]) == 1 and int(order["lines"][0].get("qty") or 1) == 1:
         order.update({"sku": order["lines"][0].get("sku")})  # one unit is an order of one product
         order.pop("lines")
@@ -726,9 +986,26 @@ def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mappin
         if units:
             order["lines"] = purchase.priced_lines(units)
         order.pop("sku", None), order.pop("price_vnd", None), order.pop("qty", None)
+    elif order.get("sku") and order.get("basket_skus") and (units := (order_quotes or {}).get(
+            purchase.units_key([{"sku": order["sku"], "qty": int(order.get("qty") or 1)},
+                                *({"sku": s} for s in order["basket_skus"])]))):
+        # One order of a split (QT-01): its unit's price in the quote of the whole basket, the second machine's
+        # discount kept, not the product's price alone (2026-11-27: 6.490.000đ asked for a 3.245.000đ unit).
+        own = [int(price) for sku, price in units if sku == order["sku"]]
+        if own:
+            order["price_vnd"] = min(own)
     elif order.get("sku") in quotes:
         order["price_vnd"] = quotes[order["sku"]]
     return order
+
+
+def _heard_basket(order_quotes: Mapping[str, Any]) -> list[str]:
+    """The skus of the last basket of more than one product priced on an earlier turn of the call."""
+    for key in reversed(list(order_quotes or {})):
+        skus = str(key).split("|")
+        if len(set(skus)) > 1:
+            return skus
+    return []
 
 
 def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -739,9 +1016,11 @@ def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[di
     return list(lines.values())
 
 
-#: Reasons a person is needed whatever the PolicyAgent's doubt: a wrong "no" would leave the customer without one.
-PLAIN_HANDOFF_REASONS = frozenset({"cau_hoi_y_te", "khach_yeu_cau_gap_nguoi", "khieu_nai_nghiem_trong", "loi_he_thong",
-                                   "khach_mat_kien_nhan"})
+#: Reasons a person is needed whatever the PolicyAgent's doubt: a wrong "no" would leave the customer without one. The
+#: model picks the reason itself, so only those it cannot pick from a misreading stay: a health question, a broken
+#: system. "Serious complaint" and "impatient" were the model's words for a warranty question and for a request for
+#: another person's details (2026-11-26, rules 6 and 7 say no transfer): on doubt those wait for a clear yes.
+PLAIN_HANDOFF_REASONS = frozenset({"cau_hoi_y_te", "loi_he_thong"})
 
 
 async def _verdict(context: AgentContext, intent: str, state: Mapping[str, Any], *, early: bool = True) -> str:
@@ -753,8 +1032,11 @@ async def _verdict(context: AgentContext, intent: str, state: Mapping[str, Any],
     """
     if early and context.early_intents is not None and intent in EARLY_INTENTS:
         probability = (await context.early_intents()).get(intent)
-        if band(intent, probability) == "yes" or (intent == "handoff" and probability is not None
-                                                   and probability <= NO_HANDOFF):
+        # A transfer is never taken from the early answer's yes: the early question sees neither the reason nor the
+        # documents, and a transfer leaves the rest of the call to a person (2026-11-24: "cho chị số điện thoại của
+        # anh F" read 0.94 early; asked with the reason given, it is a refusal).
+        if (band(intent, probability) == "yes" and intent != "handoff") or (
+                intent == "handoff" and probability is not None and probability <= NO_HANDOFF):
             logger.info("Intent %s taken from the turn's early check: %.2f", intent, probability)
             context.intent_probabilities[f"{intent}:early"] = round(probability, 3)
             return "yes" if band(intent, probability) == "yes" else "no"
@@ -802,15 +1084,17 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, cr
             return {"handoff": verdict == "yes"}
         # Unsure, or no answer: a reason that needs a person goes through; "the documents do not say" goes through
         # only when the search found nothing, else the passages are read first.
-        return {"handoff": brief.get("escalation_reason") in PLAIN_HANDOFF_REASONS or not documents}
+        return {"handoff": brief.get("escalation_reason") in (*PLAIN_HANDOFF_REASONS, "khach_yeu_cau_gap_nguoi")
+                or not documents}
     if name == "memory_request_deletion" and context.tier == "VERIFIED":
         return {"delete": _agreed(await _verdict(context, "delete", {"recent_messages": said}))}
     if name == "order_update":
         if args.get("action") == "update_address" and any(
                 o.get("order_id") == args.get("order_id") and o.get("no_address") for o in created):
             return {}  # the address this order still lacks: the customer already agreed to the order
-        change = {k: args.get(k) for k in ("order_id", "action", "new_variant_sku", "new_address") if args.get(k)}
-        return {"change": _agreed(await _verdict(context, "change", {"recent_messages": said, "change": change}))}
+        # The model decides when the customer has chosen the change (2026-11-25): asking the PolicyAgent refused
+        # customers who had named the new size and asked what the exchange cost.
+        return {}
     asked_skus = {line["sku"] for line in purchase.lines_of(args)}
     if name == "order_create" and any(asked_skus & set(o.get("skus") or [o.get("sku")]) for o in created):
         return {"one_more": _agreed(await _verdict(context, "one_more", {"recent_messages": said,
@@ -947,7 +1231,8 @@ class AdvisorAgent(BaseAgent):
 
     #: Four items need catalogue, quote, stock and order each, plus delivery.
     TOOL_CALLS_PER_RUN = 20
-    MODEL_CALLS_PER_RUN = 8
+    #: Two model calls a turn at most: the opening line with the tools, then the answer from their results.
+    MODEL_CALLS_PER_RUN = 2
 
     def __init__(
         self,
@@ -965,6 +1250,9 @@ class AdvisorAgent(BaseAgent):
         from config, for offline tests."""
         super().__init__("advisor", provider=provider, model=model, generation=generation, llm=llm)
         self._tools = [*(tools or ()), *([load_skill] if tools else [])]
+        if "order_create" in {getattr(t, "name", None) for t in self._tools}:
+            # The team's tool for a COD basket above the limit: ActionGuardMiddleware answers it with order_create.
+            self._tools.append(tool(order_split_cod, parse_docstring=True))
         if product_advise_on() and {SEARCH, QUOTE, STOCK} <= {getattr(t, "name", None) for t in self._tools}:
             # Plan 002, B3: the team's own tool; ChainLookupMiddleware answers it with the organisers' tools.
             self._tools.append(tool(product_advise, parse_docstring=True))
@@ -984,8 +1272,7 @@ class AdvisorAgent(BaseAgent):
                 LaneToolsMiddleware(get_lanes(), names),
                 *([StrictToolsMiddleware()] if openai else []),
                 # After the strict schemas it extends, before the guard that would drop the argument as undeclared.
-                ReplyPlanMiddleware(),
-                ActionGuardMiddleware(),
+                ActionGuardMiddleware(self._tools, guard),
                 guard,
             ],
             context_schema=AgentContext,
@@ -1110,12 +1397,21 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
             if call["name"] == LOAD_SKILL:
                 continue  # how the model reads a procedure, not a business tool: no trace, no evidence
             answer = answers.get(call["id"])
-            if call["name"] == ADVISE and answer is not None and answer.additional_kwargs.get("inner") is not None:
-                # The team's tool is the organisers' calls it made: those are what ran, and what the trace records.
+            if call["name"] in (ADVISE, SPLIT) and answer is not None and answer.additional_kwargs.get("inner") is not None:
+                # The team's tool is the organisers' calls it made: those are what ran, and what the trace records; an
+                # order the consent check held back is recorded as held back, as if the model had called it.
+                results += [{"name": dotted(inner["name"]), "args": dict(inner.get("args") or {}),
+                             "result": parse_envelope(inner.get("content")), "blocked_by": inner.get("blocked_by")}
+                            for inner in answer.additional_kwargs["inner"]]
+                # What the team's tool concluded: not a call that ran, so it has no ``result`` and the trace leaves it out.
+                results.append({"name": call["name"], "args": dict(call.get("args") or {}), "result": None,
+                                "advice": parse_envelope(answer.content), "blocked_by": None})
+                continue
+            if answer is not None and answer.additional_kwargs.get("inner"):
+                # Lookups the action guard made for this write (plan 003): they ran, so the trace records them first.
                 results += [{"name": dotted(inner["name"]), "args": dict(inner.get("args") or {}),
                              "result": parse_envelope(inner.get("content")), "blocked_by": None}
                             for inner in answer.additional_kwargs["inner"]]
-                continue
             envelope = parse_envelope(answer.content) if answer is not None else None
             blocked_by = answer.additional_kwargs.get("blocked_by") if answer is not None else None
             if answer is None:
@@ -1130,12 +1426,9 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
             args = (answer.additional_kwargs.get("args") if answer is not None else None) or call["args"]
             result = {
                 "name": dotted(call["name"]),
-                # The line written ahead for the customer is not an argument of the tool: not in the trace.
-                "args": {k: v for k, v in args.items() if k != REPLY_ARG},
+                "args": dict(args),
                 "result": envelope,
                 "blocked_by": blocked_by,
             }
-            if answer is not None and answer.additional_kwargs.get(REPLY_ARG):
-                result[REPLY_ARG] = answer.additional_kwargs[REPLY_ARG]
             results.append(result)
     return results

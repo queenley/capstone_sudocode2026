@@ -115,7 +115,7 @@
       "customer_goal": "Hỏi chi tiết về khả năng lọc khí radon của xe đẩy",
       "customer_turns": [
         "Alo, em, cho anh hỏi thêm một chút.",
-        "Xe đẩy này có lọc được khí radon không?",
+        "Xe đẩy này có đạt chuẩn an toàn châu Âu EN 1888 không em?",
         "Nếu không có thông tin thì em cũng cứ nói cho anh biết nhé.",
         "Khi nào có thông tin thì em gọi cho anh nhé."
       ],
@@ -135,7 +135,18 @@
         "owned_sku"
       ],
       "success_if": {
-        "tool_called": null,
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
         "agent_must_say": [
           "không có thông tin",
           "chưa có thông tin",
@@ -149,14 +160,14 @@
         ]
       },
       "ground_truth_facts": {
-        "unknown_topic": "máy có lọc được khí radon không",
+        "unknown_topic": "xe đẩy có đạt chuẩn EN 1888 không",
         "call_date": "2026-10-19"
       },
       "relevant_policy_ids": [
         "PB-05",
         "PB-01"
       ],
-      "expected_outcome": "thong_tin"
+      "expected_outcome": "chuyen_may"
     }
   }
 }

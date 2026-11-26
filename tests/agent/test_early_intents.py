@@ -102,6 +102,7 @@ class Says:
         self.views.append(view)
 
         async def events():
+            await asyncio.sleep(0)  # a model takes a moment: the early question starts meanwhile
             yield AdvisorEvent("text", text=self.text)
             yield AdvisorEvent("done", draft=Draft(text=self.text, tool_results=[], model="fixture", model_calls=1,
                                                    seconds=0.0))
@@ -122,7 +123,7 @@ async def test_asked_once_in_a_lane_with_write_tools_and_never_left_running(monk
     monkeypatch.setenv("ADVISOR_EARLY_INTENTS", "1")
     policy = Policy()
     advisor = await turn("NEW", policy)
-    assert policy.asked == [("purchase", "handoff", "delete", "one_more")]
+    assert policy.asked == [("purchase", "handoff", "delete", "one_more", "other_model")]
     assert advisor.views[0].early_intents is not None
     assert policy.cancelled  # no write tool asked for it: cancelled as the turn ended
 

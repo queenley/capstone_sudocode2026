@@ -6,7 +6,7 @@ Mục tiêu là bắt lỗi thật: trợ lý nói sai sự thật, hứa điề
 
 - tool_results: kết quả tool của lượt này. Tool báo lỗi hay từ chối nghĩa là việc đó chưa xảy ra.
 - policy: các đoạn tài liệu của cửa hàng đã đọc trong cuộc gọi.
-- earlier_this_call: điều cuộc gọi này đã xác lập. Kết quả tool ở các lượt trước vẫn còn đúng trong cả cuộc gọi; prices_quoted_before là giá đã báo vào ngày khác.
+- earlier_this_call: điều cuộc gọi này đã xác lập. Kết quả tool ở các lượt trước vẫn còn đúng trong cả cuộc gọi; prices_quoted_before là giá đã báo vào ngày khác. call_brief là hồ sơ các cuộc trước: nhắc lại điều đã xảy ra ở cuộc trước (sản phẩm đã tư vấn, giá đã báo hôm đó, việc khách còn dở, đơn đã đặt) là có căn cứ; nói điều đó còn đúng hôm nay thì cần kết quả tool của cuộc này.
 - customer_said: những gì khách đã nói trong cuộc gọi, câu mới nhất ở cuối.
 
 Điều có trong bằng chứng là có căn cứ, dù được nói bằng lời khác. Nhắc lại lời khách không phải khẳng định của cửa hàng. Chuỗi như <PHONE_1> là dữ liệu đã che, dấu như [B2] là trích dẫn hồ sơ: cả hai đều không phải lỗi.
@@ -49,17 +49,20 @@ Vi phạm khi nói một số tiền như giá, mức giảm, phí hay khoản h
 
 Trả lời đúng khi điều được hỏi là đúng. Thông tin về việc sắp làm đứng trước, rồi đến hội thoại, kết thúc bằng tin nhắn mới nhất của khách: đọc tin nhắn đó trong mạch hội thoại.
 
+## other_model
+Đúng khi khách xin gợi ý mẫu khác, hỏi có mẫu nào rẻ hơn, tốt hơn, khác hơn, muốn so sánh với mẫu khác, nói mẫu đang bàn không hợp, hoặc đồng ý xem mẫu khác khi trợ lý vừa đề nghị. Sai khi khách chỉ kể thêm nhu cầu, hỏi giá, khuyến mãi, thông số hay tồn kho của mẫu đang bàn.
+
 ## handoff
-Đúng khi khách xin gặp người, cần tư vấn về sức khỏe, thuốc hay an toàn của trẻ, khiếu nại nghiêm trọng, hoặc hỏi điều mà tài liệu, tool và kết quả đã có trong cuộc đều không trả lời được. Sai khi tài liệu hay tool trả lời được, kể cả sản phẩm mẹ và bé khi chỉ hỏi về sản phẩm; khi khách chỉ không ưng, muốn đổi trả hay chê giá; khi khách muốn hỏi thêm mà không đòi gặp người; khi câu hỏi không thuộc mua bán của shop (nấu ăn, làm bài, chuyện riêng); khi khách đòi thông tin hay đơn hàng của người khác, kể cả xưng là người nhà.
+Đúng khi khách xin gặp người, cần tư vấn về sức khỏe, thuốc hay an toàn của trẻ, khiếu nại nghiêm trọng, hoặc hỏi điều mà tài liệu, tool và kết quả đã có trong cuộc đều không trả lời được. Sai khi tài liệu hay tool trả lời được, kể cả khi tool trả lời là chưa có (hết hàng mà chưa có ngày về: báo vậy rồi đề nghị gọi lại khi có hàng), kể cả sản phẩm mẹ và bé khi chỉ hỏi về sản phẩm; khi khách chỉ không ưng, muốn đổi trả hay chê giá; khi khách báo sản phẩm hỏng, không chạy hay hỏi còn bảo hành không: tài liệu bảo hành trả lời, đó không phải khiếu nại nghiêm trọng trừ khi khách đòi bồi thường hay hàng gây hại; khi khách muốn hỏi thêm mà không đòi gặp người; khi câu hỏi không thuộc mua bán của shop (nấu ăn, làm bài, chuyện riêng); khi khách đòi thông tin hay đơn hàng của người khác, kể cả xưng là người nhà.
 
 ## delete
-Đúng khi trợ lý đã hỏi xác nhận xóa dữ liệu cá nhân và khách đồng ý. Mọi câu trả lời khác là sai.
+Đúng khi trợ lý đã hỏi xác nhận xóa dữ liệu cá nhân và khách đồng ý bằng bất kỳ cách nói nào, kể cả khi đồng ý kèm lời nhờ trợ lý làm thủ tục; khách đã tự yêu cầu xóa trong cuộc mà chưa rút lại thì không đòi khách nhắc lại chữ xóa. Sai khi khách do dự, hỏi thêm về chính sách dữ liệu mà chưa đồng ý, hoặc từ chối.
 
 ## one_more
 Đúng khi sản phẩm này đã có đơn trong cuộc và khách muốn mua thêm một đơn nữa. Sai khi khách chỉ bổ sung, sửa hay xác nhận đơn đã có.
 
 ## change
-Đúng khi khách nói muốn làm đúng việc được nêu với đơn đã có, đưa đúng thông tin mà việc đó cần, hoặc đồng ý khi được đề xuất. Đơn còn thiếu địa chỉ mà khách cho địa chỉ tức là muốn cập nhật địa chỉ. Sai khi khách mới kể vấn đề mà chưa nói muốn làm gì, còn hỏi về các lựa chọn, muốn việc khác, hoặc từ chối.
+Đúng khi khách nói muốn làm đúng việc được nêu với đơn đã có, đưa đúng thông tin mà việc đó cần, hoặc đồng ý khi được đề xuất. Đơn còn thiếu địa chỉ mà khách cho địa chỉ tức là muốn cập nhật địa chỉ. Khách đã nói muốn đổi và đã nêu mẫu, size hay màu muốn đổi sang là đã yêu cầu việc đó, kể cả khi đang hỏi phí hay tiền chênh lệch. Sai khi khách mới kể vấn đề mà chưa nói muốn làm gì, còn đang chọn giữa các lựa chọn, muốn việc khác, hoặc từ chối.
 
 ## purchase
 Đúng khi khách đã nói muốn mua sản phẩm này, chưa đổi ý, và tin nhắn mới nhất làm đơn tiến lên: cho thêm thông tin cần cho đơn, hoặc đồng ý bằng bất kỳ cách nói nào khi được đọc lại đơn, kể cả giục lên đơn. Khách đã bảo lên đơn rồi không nói thêm gì (vẫn nghe máy) cũng là đúng: im lặng sau lời bảo đặt không phải đổi ý. Sai khi khách còn đang hỏi hay so sánh mà chưa quyết, do dự, từ chối, hoặc đơn khác với điều khách muốn.

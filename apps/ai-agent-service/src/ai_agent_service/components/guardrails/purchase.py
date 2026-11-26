@@ -194,7 +194,7 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
             "target_id": target(order), "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
-            "status": "pending", "question": question, "read_back": read_back,
+            "status": "pending", "question": question, "read_back": read_back, "total_vnd": total,
             "args": {k: (address if k == "address" else v) for k, v in order.items() if k in FILLED and v}}
 
 
@@ -217,10 +217,25 @@ def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, tur
            said: str, last_reply: str | None) -> dict[str, Any] | None:
     """The fallback when the PolicyAgent gave no answer: a short yes to a read-back the customer just heard, nothing else."""
     opened = still_open(pending, call_id=call_id, channel=channel, turn_id=turn_id)
-    if (opened is None or not last_reply or not last_reply.endswith(opened.get("question") or "\0")
-            or not agrees(said)):
+    if opened is None or not last_reply or not heard_in(opened, last_reply) or not agrees(said):
         return None
     return authorize(opened, turn_id)
+
+
+def heard_in(record: Mapping[str, Any], text: str) -> bool:
+    """Whether *text*, what the agent said, read this order back: its total is in it (the model words the read-back
+    itself, 2026-11-26, so the question is not matched word for word)."""
+    totals = [d.get("total_vnd") for d in (record, *(record.get("siblings") or []))]
+    if len(totals) > 1 and all(isinstance(t, int) for t in totals):
+        # A split read back together: each order's total said, or the basket's.
+        return all(heard_in({"total_vnd": t}, text) for t in totals) or heard_in({"total_vnd": sum(totals)}, text)
+    total = record.get("total_vnd")
+    if not isinstance(total, int):
+        return False
+    flat = re.sub(r"(?<=\d)[.,\s](?=\d{3}(?!\d))", "", text or "")
+    at = flat.rfind(str(total))
+    # A yes answers the last question asked: after the total, one question at most, the one asking to order.
+    return at >= 0 and flat[at:].count("?") <= 1
 
 
 def authorize(draft_record: Mapping[str, Any], turn_id: str | None) -> dict[str, Any]:

@@ -115,6 +115,10 @@ class TokenTrackingCallback(BaseCallbackHandler):
     out for free.
     """
 
+    #: Bookkeeping under a lock, no I/O: run on the event loop rather than handed to a thread for every event of an
+    #: async call, streamed tokens included (LangChain's default for a sync handler; see ``spend_guard.StopSwitch``).
+    run_inline = True
+
     def __init__(
         self, rate_limiter: AdvancedTokenRateLimiter, agent_name: str = ""
     ) -> None:

@@ -155,6 +155,7 @@ INTENTS = {
     "change": _ask("Theo luật change, khách đã yêu cầu hoặc đồng ý việc này chưa?"),
     "purchase": _ask("Theo luật purchase, khách đã đồng ý đặt đơn này chưa?"),
     "identity": _ask("Theo luật identity, khách có nói mình là người được nêu tên không?"),
+    "other_model": _ask("Theo luật other_model, khách có xin gợi ý hay so sánh mẫu khác không?"),
 }
 
 #: Provisional, set on Jev (2026-11-01), the model before this one, with no labelled set yet: 0.5 where a wrong "no"
@@ -163,11 +164,12 @@ INTENTS = {
 #: 0.06 or less (asked as a list of messages; asked as two fields it gave 0.38): hence 0.6.
 #: Set again on the FIX scenarios and the team's labels. On the Decisions API a clear yes to a deletion read 0.63 and 0.87,
 #: and a postponement 0.00 (2026-11-07), hence 0.6 for delete.
-INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.6, "one_more": 0.5, "change": 0.5, "identity": 0.6, "purchase": 0.7}
+INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.6, "one_more": 0.5, "change": 0.5, "identity": 0.6, "purchase": 0.7,
+                     "other_model": 0.5}
 
 #: The intents the conversation alone answers, asked together at the start of a turn whose lane has write tools
 #: (plan 002, step 3). ``change`` needs the change itself, from the tool's arguments; ``identity`` is not a tool's.
-EARLY_INTENTS = ("purchase", "handoff", "delete", "one_more")
+EARLY_INTENTS = ("purchase", "handoff", "delete", "one_more", "other_model")
 
 def early_intents_on() -> bool:
     """``ADVISOR_EARLY_INTENTS=1``: :data:`EARLY_INTENTS` are asked at the start of a turn whose lane has write tools,
@@ -181,7 +183,7 @@ def early_intents_on() -> bool:
 #: caller decides which). Set high on purpose (the user, 2026-11-15: "ngưỡng phải thật chắc"), to be calibrated on
 #: labelled turns: on the bench a plain yes read 0.97-1.00, a price question 0.00-0.18 for a transfer, once 0.74.
 INTENT_BANDS = {"purchase": (0.9, 0.3), "delete": (0.9, 0.3), "handoff": (0.8, 0.2), "change": (0.8, 0.3),
-                "one_more": (0.8, 0.2)}
+                "one_more": (0.8, 0.2), "other_model": (0.7, 0.3)}
 
 #: The early check alone may refuse a transfer only when it is this sure none is wanted (plan 002, C4).
 NO_HANDOFF = 0.02

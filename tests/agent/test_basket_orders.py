@@ -59,11 +59,10 @@ def test_two_six_million_items_on_cod_are_refused():
     assert _check({"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD"}).passed
 
 
-def test_a_split_into_two_orders_needs_the_customers_agreement():
+def test_a_split_order_is_checked_on_its_own_group_and_not_on_the_customers_words():
+    # The customer's agreement is the model's to read (no word gates); each half is held to the COD limit.
     line = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD", "order_group": "1"}
-    assert not _check(line, customer="ok em").passed
-    asked = "Dạ đơn trên 10 triệu không COD được, anh có muốn em tách thành hai đơn không ạ?"
-    assert _check(line, agent=asked, customer="ừ được em").passed
+    assert _check(line, customer="ok em").passed and _check(line, customer="ừ được em").passed
     # The second order of the split: the call already has a group, each order is checked on its own.
     second = {"sku": "SKU-B", "price_vnd": SIX_M, "payment": "COD", "order_group": "2"}
     assert _check(second, placed=[_line("SKU-A", group="1")]).passed

@@ -74,7 +74,7 @@ RUNS = runs_dir()
 EXTRACTOR_CACHE = RUNS / "cache" / "extractor.json"
 
 #: Extractor calls in flight at once; the provider's rate limiter paces them.
-EXTRACTOR_CONCURRENCY = 4
+EXTRACTOR_CONCURRENCY = 8
 #: Seconds one turn's labelling may take, its retry included (two attempts of 60 s, and the limiter's wait).
 #: Past it the labelling stops with an error instead of waiting: eval2 (2026-11-07) waited over twenty minutes
 #: on four calls whose connections the provider had closed. What was labelled stays in the cache for the rerun.
@@ -308,6 +308,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         # In the environment, so the MCP servers this command starts read the same version.
         os.environ["KNOWLEDGE_VERSION"] = str(args.kb_version)
+        from ...config.config_manager import get_knowledge_config
+
+        get_knowledge_config.cache_clear()  # read before the option was seen: the manifest must name this version
     # Each profile changes exactly what its column says, so Router, GapLoop, Reflection and Combined read as an ablation.
     for profile, option, value in (("gaploop", "--kb-version", args.kb_version), ("combined", "--kb-version", args.kb_version),
                                    ("reflection", "--skills-version", args.skills_version),
@@ -334,6 +337,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"No skills version {args.skills_version} in {skills_dir}")
             return 2
         os.environ["EVAL_SKILLS_VERSION"] = str(args.skills_version)
+        # The skills module read the version in force when it was imported, before this option was seen: read again,
+        # or a --skills-version run (the ablation, full_dev) measures skills v0 (found 2026-11-24).
+        from ...components.context import skills as skill_book
+
+        served = skill_book.reload()
+        if served != args.skills_version:
+            print(f"Skills v{served} served where v{args.skills_version} was asked")
+            return 2
     from ...mcp.server_base import use_selector_loop_on_windows
 
     use_selector_loop_on_windows()

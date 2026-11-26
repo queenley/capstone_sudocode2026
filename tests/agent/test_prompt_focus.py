@@ -39,7 +39,10 @@ def shown(said, **fields):
 
 
 def test_the_rules_are_numbered_once_in_order_and_say_no_procedure_a_skill_says():
-    assert list(map(int, rule_numbers(HARD_RULES))) == list(range(1, 18))
+    steps = HARD_RULES.split("<mot_luot>")[1].split("</mot_luot>")[0]
+    rules = HARD_RULES.split("<luat>")[1].split("</luat>")[0]
+    assert list(map(int, rule_numbers(steps))) == list(range(1, 6))
+    assert list(map(int, rule_numbers(rules))) == list(range(1, 11))
     for skill in skill_book.SKILLS.values():  # a procedure is written in one place
         for line in skill["body"].splitlines():
             assert line.removeprefix("- ") not in HARD_RULES

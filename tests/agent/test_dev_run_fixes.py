@@ -7,7 +7,6 @@ import pytest
 from ai_agent_service.components.guardrails import actions, purchase
 from ai_agent_service.components.identity.resolver import Match, pick_by_name
 from ai_agent_service.components.intake import commerce, itn
-from ai_agent_service.mcp.tools import named_lookups
 from ai_agent_service.pipeline.hot.nodes import _handoff_product
 from langchain_core.messages import HumanMessage
 
@@ -55,19 +54,11 @@ def test_tối_đa_is_not_evening():
     assert "T08:00" in itn.normalise("phòng tối đa 30 mét, 8 giờ sáng giao", datetime(2026, 10, 17, 10, tzinfo=VN))
 
 
-def test_prefetch_looks_up_the_variant_the_customer_names_and_never_the_parent():
-    said = "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen."
-    calls = named_lookups([HumanMessage(content=said)], said)
-    assert {c["args"]["sku"] for c in calls} == {"SKU-SN-RUN2-41-DEN"}
-    vague = "anh muốn đặt giày RunLite 2 Pro"
-    assert named_lookups([HumanMessage(content=vague)], vague) == []
-
-
 def test_a_product_sold_in_variants_is_not_ordered_by_its_parent_code():
     verdict = actions.check("order_create", {"sku": "SKU-SN-RUN2", "price_vnd": 1690000, "payment": "COD", "address": "Quận 7"},
                             tier="VERIFIED", mode="speak", has_phone=True, quotes={"SKU-SN-RUN2": 1690000},
                             trusted=frozenset({"SKU-SN-RUN2"}))
-    assert not verdict.passed and "variant_sku" in verdict.reasons[0]
+    assert not verdict.passed and "SKU-SN-RUN2-42-DEN" in verdict.reasons[0]  # every variant code, the right one in it
 
 
 def test_an_order_the_customer_asked_for_is_placed_without_a_payment_or_an_address():
@@ -151,3 +142,75 @@ def test_a_promotion_not_started_is_not_named_by_its_first_day(said, blocked):
 def test_a_callback_time_is_said_the_spoken_way():
     from ai_agent_service.components import clock
     assert clock.spoken_moment(clock.parse_local("2026-10-16T19:00")) == "19 giờ tối thứ Sáu 16/10/2026"
+
+
+def test_a_refused_offer_is_kept_one_turn_with_its_exact_values():
+    # 2026-11-24: "20:30 thứ Bảy 24/10" offered on a Thursday and accepted, then booked for Thursday.
+    from ai_agent_service.agents.advisor import _offered_block
+    from ai_agent_service.pipeline.hot.nodes import _offered
+
+    refused = {"name": "schedule.callback", "args": {"callback_at": "2026-10-24T21:00"},
+               "result": {"ok": False, "error": {"code": "PRECONDITION",
+                                                 "message": "đề xuất với khách 20:30 thứ Bảy 24/10/2026 (2026-10-24T20:30)"}}}
+    looked_up = {"name": "pricing.get_quote", "args": {"sku": "SKU-X"}, "result": {"ok": False, "error": {"code": "PRECONDITION"}}}
+    offered = _offered([refused, looked_up])
+    assert [o["tool"] for o in offered] == ["schedule.callback"]
+    assert "2026-10-24T20:30" in _offered_block(offered)
+    assert _offered([]) == [] and _offered_block(()) == ""
+
+
+def test_a_transfer_that_waited_only_on_the_number_goes_through_once_a_number_is_known():
+    # 2026-11-24: the transfer was refused for the number, the number came, then identity was asked.
+    from ai_agent_service.components.orchestration.rules import RouteInput, decide
+
+    waiting = decide(RouteInput(tier="PROBABLE", has_brief=False, asr_low_conf=False, tool_failures=0,
+                                transfer_waiting=True))
+    assert waiting.lane == "HANDOFF"
+    assert decide(RouteInput(tier="PROBABLE", has_brief=False, asr_low_conf=False, tool_failures=0)).lane == "CONFIRM_IDENTITY"
+
+
+def test_a_refused_transfer_is_shown_without_its_brief():
+    from ai_agent_service.agents.advisor import _offered_block
+
+    block = _offered_block([{"tool": "handoff.transfer", "args": {"brief": {"conversation_summary": "dài"}},
+                             "said": "Chưa có số điện thoại"}])
+    assert "conversation_summary" not in block and "không gọi tool" in block
+
+
+def test_figure_labels_are_filled_from_the_tools_and_an_unknown_one_is_not_said():
+    from ai_agent_service.components.guardrails import fallback
+
+    text, missing = fallback.fill_figures("AirPure Y giá {giá:SKU-AP-Y}, cả giỏ {tổng} ạ.", {"SKU-AP-Y": 5200000}, 10935000)
+    assert text == "AirPure Y giá 5.200.000đ, cả giỏ 10.935.000đ ạ." and missing == []
+    _, missing = fallback.fill_figures("Pro giá {giá:SKU-AP-PRO} ạ.", {"SKU-AP-Y": 5200000}, None)
+    assert missing and "SKU-AP-PRO" in missing[0]
+
+
+def test_a_one_item_order_out_of_the_basket_heard_earlier_is_refused():
+    from ai_agent_service.agents.advisor import _heard_basket
+
+    heard = _heard_basket({"SKU-AP-PRO|SKU-AF-XM|SKU-FAN-SEN": [], "SKU-AP-PRO": []})
+    assert sorted(heard) == ["SKU-AF-XM", "SKU-AP-PRO", "SKU-FAN-SEN"]  # a one-item quote later does not replace it
+    reasons = actions._order_create({"sku": "SKU-AP-PRO", "price_vnd": 7990000}, tier="VERIFIED", has_phone=True,
+                                    quotes={"SKU-AP-PRO": 7990000}, trusted=None, heard_basket=heard)
+    assert any("3 món" in r for r in reasons)
+
+
+def test_a_transfer_waiting_on_the_number_is_not_offered_until_the_number_comes():
+    from types import SimpleNamespace
+
+    from ai_agent_service.mcp.tools import LaneToolsMiddleware
+
+    middleware = LaneToolsMiddleware({"NEW": frozenset({"handoff_transfer", "order_status"})},
+                                     ["handoff_transfer", "order_status"])
+    tools = [SimpleNamespace(name="handoff_transfer"), SimpleNamespace(name="order_status")]
+    waiting = ({"tool": "handoff.transfer", "said": actions.NEEDS_NUMBER},)
+
+    def offered(**context):
+        request = SimpleNamespace(tools=tools, runtime=SimpleNamespace(context=SimpleNamespace(
+            lane="NEW", account_id=None, mode="speak", **context)),
+            override=lambda tools: SimpleNamespace(tools=tools))
+        return [t.name for t in middleware._filtered(request).tools]
+
+    assert offered(customer_phone=None, offered=waiting) == ["order_status"]
+    assert offered(customer_phone="0900000000", offered=waiting) == ["order_status", "handoff_transfer"]

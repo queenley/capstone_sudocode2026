@@ -25,23 +25,18 @@ SAFE_LINE = "Dạ phần này em chưa có thông tin chắc chắn để báo {
 AMBIGUOUS_QUESTION = "Dạ cho em xin tên của mình để em xem đúng thông tin ạ?"
 
 LINES = {
+    # Failure paths only: the model is what failed or is not trusted, so the harness speaks. A tool's outcome is never
+    # said by the harness: the model's next round reads it and answers (2026-11-26).
     "tool_down": "Dạ hệ thống tra cứu bên em đang chậm, {who} nhắn lại giúp em sau ít phút nhé ạ.",
     "asr_unclear": "Dạ em nghe chưa rõ, {who} nói lại giúp em được không ạ?",
     "model_error": "Dạ em xin lỗi, em chưa trả lời được ngay, {who} nhắc lại giúp em câu vừa rồi được không ạ?",
-    "bridging": "Dạ em kết nối anh/chị với đồng nghiệp phụ trách ngay ạ, anh/chị chờ em một chút.",
-    # Section 4.8: said once as a tool round starts, so the line is not silent;
-    # never the answer, never in the transcript, never counted as the first token.
+    "bridging": "Dạ em kết nối {who} với đồng nghiệp phụ trách ngay ạ, {who} chờ em một chút.",
+    # Section 4.8: said once as a tool round starts on a call with nothing heard yet; never the answer, never in the
+    # transcript, never counted as the first token.
     "filler": "Dạ {who} chờ em một xíu ạ.",
-    # A turn whose order was placed and whose read-back was still blocked: the customer must not
-    # hear "chưa có thông tin" about an order that exists.
+    # A turn whose order was placed and whose answer was then blocked: the customer must not hear "chưa có thông
+    # tin" about an order that exists.
     "order_placed": "Dạ em đã tạo đơn cho {who} rồi ạ, {who} cần đổi gì trong đơn thì báo em nhé.",
-    # A call back on a day the shop is closed: the tool moved it (LN-02) and the answer did not say so.
-    "callback_moved": "Dạ hôm {who} hẹn bên em nghỉ nên lịch gọi lại được dời sang {moment} ạ.",
-    # What a tool with an effect did, said from its own result the moment it returns: the customer hears the
-    # outcome without waiting for the model's next round, which then goes on from it (section 4.8).
-    "order_created": "Dạ em đã lên đơn {order_id} cho {who} rồi ạ.",
-    "order_updated": "Dạ em đã cập nhật đơn {order_id} cho {who} rồi ạ.",
-    "callback_booked": "Dạ em đã đặt lịch gọi lại cho {who} vào {moment} ạ.",
 }
 
 #: Plan 002, A2: what the voice says while a lookup runs and the answer needs the model's next round, by the tool the
@@ -89,116 +84,37 @@ def line(name: str, who: str = "anh/chị") -> str:
     return LINES[name].format(who=who)
 
 
-def result_line(result: Mapping[str, Any], who: str = "anh/chị") -> str | None:
-    """The line for what a tool with an effect did, from its result alone; None when it did nothing or failed."""
-    envelope = result.get("result") or {}
-    data = envelope.get("data") or {}
-    if not envelope.get("ok"):
-        return None
-    name = str(result.get("name", "")).replace("_", ".")
-    if name == "handoff.transfer":
-        return LINES["bridging"]
-    if name == "order.create" and data.get("order_id"):
-        return LINES["order_created"].format(who=who, order_id=data["order_id"])
-    if name == "order.update" and data.get("order_id"):
-        return LINES["order_updated"].format(who=who, order_id=data["order_id"])
-    if name == "schedule.callback":
-        moment = clock.parse_local(data.get("callback_at"))
-        if moment is not None:
-            line = "callback_moved" if data.get("moved_from") else "callback_booked"
-            return LINES[line].format(who=who, moment=clock.spoken_moment(moment))
-    return None
+
+#: A figure the advisor writes as a label for code to fill (rules.md, rule 1): {giá:SKU-AP-Y}, {tổng}.
+FIGURE = re.compile(r"\{\s*(giá|gia|tổng|tong)\s*(?::\s*([A-Za-z0-9_-]+))?\s*\}", re.IGNORECASE)
 
 
-#: Write tools whose success line the model writes in the round that calls them (the ``reply`` argument), by wire
-#: name, with the holes the harness may fill from the tool's result. The harness says the line the moment the tool
-#: succeeds and the turn needs no second model round. Only the success line: a line for each failure too made the
-#: round 0.6 to 0.8 s longer (bench of 2026-11-15); a failure goes back to the model.
-REPLY_HOLES: dict[str, frozenset[str]] = {
-    "order_create": frozenset({"order_id", "total_vnd", "estimated_delivery"}),
-    "order_update": frozenset({"order_id", "fee_vnd", "price_diff_vnd", "refund_vnd", "extra_payment_vnd",
-                               "refund_days"}),
-    "schedule_callback": frozenset({"callback_at"}),
-    "handoff_transfer": frozenset(),
-    "memory_request_deletion": frozenset(),
-}
+def fill_figures(text: str, prices: Mapping[str, int], total: int | None) -> tuple[str, list[str]]:
+    """*text* with each figure label replaced by today's figure from the tools, and the labels nothing answers.
 
-MONEY_HOLES = frozenset({"total_vnd", "fee_vnd", "price_diff_vnd", "refund_vnd", "extra_payment_vnd"})
+    The model never writes a price: it names which one, code says it (2026-11-24: a price of the product next to the
+    one the customer asked about, read as theirs). A label without a quote is not said; the next round looks it up.
+    """
+    missing: list[str] = []
 
-#: Tools whose fixed line (:func:`result_line`) says all the customer needs: said, it ends the turn as well.
-WHOLE_LINES = frozenset({"schedule.callback", "handoff.transfer"})
+    def one(match: re.Match[str]) -> str:
+        kind, sku = match.group(1).lower(), match.group(2)
+        if kind in ("giá", "gia"):
+            if sku and sku in prices:
+                return format_vnd(int(prices[sku]))
+            missing.append(f"giá hôm nay của {sku or '(chưa ghi mã)'}")
+        elif total is not None:
+            return format_vnd(int(total))
+        else:
+            missing.append("tổng giỏ")
+        return match.group(0)
 
-#: A hole, with the currency word a model writes after a price ("{total_vnd}đ"): the amount carries its own.
-HOLE = re.compile(r"\{(\w+)\}(\s*(?:đồng|vnđ|vnd|đ)(?!\w))?", re.IGNORECASE)
-MAX_REPLY_CHARS = 300
-
-#: What a line written ahead may not say by hand, only through a hole: an amount, a date, a time of day. Any other
-#: figure (a house number, "72 giờ" from QT-06) is the hard guard's to trace, as in every sentence (2026-11-15: a
-#: ban on every digit sent 2 of 6 write turns to a second model round).
-HAND_FIGURE = re.compile(
-    r"\d{1,3}(?:[.,]\d{3})+|\d+\s*(?:đồng|vnđ|vnd|đ|k|nghìn|ngàn|triệu|tr)(?!\w)"  # an amount
-    r"|\d{1,2}\s*/\s*\d{1,2}|\bngày\s+\d"                                     # a date
-    r"|\d{1,2}\s*:\s*\d{2}|\b(?:lúc|vào)\s+\d|\d{1,2}\s*(?:h|giờ)\s*(?:\d{1,2}\s*)?(?:sáng|trưa|chiều|tối)",  # a time
-    re.IGNORECASE)
+    return FIGURE.sub(one, text), missing
 
 
 def wire_name(name: str) -> str:
     """``order.create`` -> ``order_create``."""
     return str(name).replace(".", "_")
-
-
-def outcome_of(result: Mapping[str, Any]) -> str | None:
-    """What a tool call came to: ``ok``; ``moved`` for a call back the tool moved (LN-02); else the error code."""
-    envelope = result.get("result") or {}
-    if envelope.get("ok"):
-        moved = str(result.get("name")) == "schedule.callback" and (envelope.get("data") or {}).get("moved_from")
-        return "moved" if moved else "ok"
-    code = (envelope.get("error") or {}).get("code")
-    return str(code) if code else None
-
-
-def _hole(name: str, value: Any) -> str:
-    if name in MONEY_HOLES:
-        return format_vnd(abs(int(value)))
-    if name == "estimated_delivery":
-        return clock.day_label(str(value))
-    if name == "callback_at":
-        moment = clock.parse_local(value)
-        if moment is None:
-            raise ValueError(value)
-        return clock.spoken_moment(moment)
-    return str(value)
-
-
-def render(name: str, template: Any, data: Mapping[str, Any]) -> str | None:
-    """*template*, the line the model wrote for tool *name*'s success, with its holes filled from *data*.
-
-    None when the line cannot be trusted: a hole the tool does not have or did not fill, an amount, a date or a time
-    written by hand (:data:`HAND_FIGURE`: only a hole brings those in), more than two sentences or
-    :data:`MAX_REPLY_CHARS`.
-    """
-    allowed = REPLY_HOLES.get(wire_name(name))
-    if allowed is None or not isinstance(template, str) or not template.strip():
-        return None
-    if HAND_FIGURE.search(HOLE.sub(" ", template)):
-        return None
-
-    def fill(match: re.Match[str]) -> str:
-        hole, unit = match.group(1), match.group(2) or ""
-        value = data.get(hole)
-        if hole not in allowed or value in (None, ""):
-            raise KeyError(hole)
-        return _hole(hole, value) + ("" if hole in MONEY_HOLES else unit)
-
-    try:
-        line = " ".join(HOLE.sub(fill, template).split())
-    except (KeyError, ValueError, TypeError):
-        return None
-    if "{" in line or "}" in line or len(line) > MAX_REPLY_CHARS:
-        return None
-    if len(re.findall(r"[.!?…](?=\s)", line)) > 1:
-        return None
-    return line
 
 
 def is_bridging(text: str) -> bool:

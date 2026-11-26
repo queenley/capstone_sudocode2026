@@ -43,6 +43,10 @@ BLOCKING = ("failed_turns", "unlabelled_turns", "after_call_failed", "schema_err
             "scenarios_rejected", "scenarios_stopped", "empty_trace")
 
 #: Packages whose version changes what a run does.
+#: Environment switches recorded with every run (``.env.example`` documents each).
+SWITCHES = ("AGENT_PROFILE", "HANDOFF_AUTO_ACCEPT", "ADVISOR_SKILLS", "ADVISOR_REPLY_PLAN", "ADVISOR_EARLY_INTENTS",
+            "ADVISOR_SHORT_BRIEF", "ADVISOR_PREAMBLE", "ADVISOR_PRODUCT_ADVISE", "ADVISOR_FIRST_CLAUSE",
+            "ADVISOR_SERVICE_TIER", "ADVISOR_CONTEXT", "ADVISOR_TRANSPORT")
 PACKAGES = ("langchain", "langgraph", "langchain-google-genai", "fastmcp", "jsonschema")
 
 
@@ -102,6 +106,8 @@ def manifest(
             "extractor": dict(extractor) if extractor else None,
         },
         "advisor_context": "full" if focus.full() else "focused",
+        # The switches that make the agent another agent: a run is reproduced only with the same ones (plan 003).
+        "switches": {name: os.environ.get(name) for name in SWITCHES},
         "prompts_sha256": {
             "advisor": _sha([advisor_prompts.HARD_RULES, dict(advisor_prompts.skill_book.SKILLS), advisor_prompts.LANE_NOTES, advisor_prompts.CONFIRM_NOTES,
                              advisor_prompts.OPENING, advisor_prompts.COPILOT_NOTE, advisor_prompts.SPOKEN_NOTE]),

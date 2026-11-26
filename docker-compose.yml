@@ -187,10 +187,8 @@ services:
       # 1 loads skills on demand instead of keeping them all in the advisor's prompt.
       ADVISOR_SKILLS: ${ADVISOR_SKILLS:-0}
       ADVISOR_PREFETCH: ${ADVISOR_PREFETCH:-0}
-      ADVISOR_REPLY_PLAN: ${ADVISOR_REPLY_PLAN:-0}
       ADVISOR_EARLY_INTENTS: ${ADVISOR_EARLY_INTENTS:-0}
       ADVISOR_SHORT_BRIEF: ${ADVISOR_SHORT_BRIEF:-0}
-      ADVISOR_PREAMBLE: ${ADVISOR_PREAMBLE:-0}
       ADVISOR_PRODUCT_ADVISE: ${ADVISOR_PRODUCT_ADVISE:-0}
       VOICE_HOLD_MS: ${VOICE_HOLD_MS:-0}
       # 1 keeps what each voice call's microphone sent, at 16 kHz, in runs/voice/ inside the container: for diagnosing
@@ -198,6 +196,8 @@ services:
       VOICE_RECORD: ${VOICE_RECORD:-0}
       ADVISOR_FIRST_CLAUSE: ${ADVISOR_FIRST_CLAUSE:-0}
       ADVISOR_SERVICE_TIER: ${ADVISOR_SERVICE_TIER:-}
+      ADVISOR_REASONING_EFFORT: ${ADVISOR_REASONING_EFFORT:-}
+      ADVISOR_TRANSPORT: ${ADVISOR_TRANSPORT:-}
       # A profile of apps/ai-agent-service/config/models.yaml ("local": every agent on Gemini's free
       # key). Empty: the file as written.
       AGENT_PROFILE: ${AGENT_PROFILE:-}

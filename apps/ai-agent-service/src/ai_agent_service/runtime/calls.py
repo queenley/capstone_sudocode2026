@@ -288,9 +288,9 @@ async def request_handoff(call_id: int, *, reason: str) -> dict[str, Any]:
         await conn.execute(
             "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, 'agent', %s, %s) "
             "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",
-            (call_id, turn_id, LINES["bridging"], json.dumps({"bridging": True})),
+            (call_id, turn_id, LINES["bridging"].format(who="anh/chị"), json.dumps({"bridging": True})),
         )
-    await harness.add_spoken(call_id, AIMessage(content=LINES["bridging"], id=f"agent-{turn_id}"))
+    await harness.add_spoken(call_id, AIMessage(content=LINES["bridging"].format(who="anh/chị"), id=f"agent-{turn_id}"))
     logger.info("Handoff requested on call %s: %s", call_id, reason)
     alerts.wake()
     return row

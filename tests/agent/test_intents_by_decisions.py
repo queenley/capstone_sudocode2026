@@ -72,8 +72,7 @@ async def test_jev_is_asked_only_when_the_action_depends_on_the_customer():
     assert await _intents("memory_request_deletion", {}, context, ()) == {"delete": True}
     assert await _intents("order_create", {"sku": "SKU-A"}, context, ()) == {}  # nothing ordered yet
     assert await _intents("order_create", {"sku": "SKU-A"}, context, ({"sku": "SKU-A"},)) == {"one_more": True}
-    assert await _intents("order_update", {"order_id": "OD1", "action": "exchange_size"}, context, ()) == {"change": True}
-    assert judge.asked[-1][1]["change"] == {"order_id": "OD1", "action": "exchange_size"}
+    assert await _intents("order_update", {"order_id": "OD1", "action": "exchange_size"}, context, ()) == {}
     assert await _intents("schedule_callback", {}, context, ()) == {}
     asked = len(judge.asked)
     in_handoff_lane = AgentContext(call_id="x", tier="VERIFIED", lane="HANDOFF", judge=judge)

@@ -35,6 +35,7 @@ from ..config.config_manager import require_api_key
 from . import tracing
 from .callback_handler import TokenTrackingCallback
 from .spend_guard import StopSwitch
+from .websocket import SocketClient
 from .rate_limiter import AdvancedTokenRateLimiter
 
 # Provider ids understood by init_chat_model, mapped to the package that
@@ -109,6 +110,12 @@ def limiter_stats() -> dict[str, dict[str, Any]]:
 #: Agents whose runs pass the Langfuse handler themselves (BaseAgent.run_config); tracing them here too would count
 #: each call twice.
 RUN_TRACED = frozenset({"advisor"})
+
+
+def over_sockets() -> bool:
+    """``ADVISOR_TRANSPORT=websocket``: the advisor's calls go to the Responses API over kept WebSockets
+    (``llm/websocket.py``). Empty: Chat Completions over HTTP."""
+    return os.environ.get("ADVISOR_TRANSPORT", "").strip().lower() == "websocket"
 
 
 def cache_options(provider: str, agent_name: str) -> dict[str, Any]:
@@ -210,6 +217,19 @@ class LLMFactory:
             tier = os.environ.get("ADVISOR_SERVICE_TIER", "").strip()
             if tier and agent_name == "advisor":
                 kwargs["service_tier"] = tier
+            # ADVISOR_REASONING_EFFORT: the advisor's reasoning effort for a bench or a run, without editing models.yaml
+            # (2026-11-26: tool preambles, which OpenAI's guides place after the chain of thought).
+            effort = os.environ.get("ADVISOR_REASONING_EFFORT", "").strip().lower()
+            if effort and agent_name == "advisor":
+                kwargs["reasoning_effort"] = effort
+            if agent_name == "advisor" and over_sockets():
+                # The Responses API, which is what a socket speaks; nothing kept on OpenAI's side (store false), as
+                # every request carries its whole input.
+                kwargs["use_responses_api"] = True
+                kwargs["store"] = False
+                if kwargs.get("reasoning_effort") not in (None, "none"):
+                    # With nothing stored, the reasoning of a tool round reaches the next round only encrypted.
+                    kwargs["include"] = ["reasoning.encrypted_content"]
         else:
             for name in ("service_tier", "store", "include", "output_version"):
                 kwargs.pop(name, None)
@@ -221,10 +241,13 @@ class LLMFactory:
             kwargs.setdefault("temperature", 0.0)
 
         try:
-            return init_chat_model(model, model_provider=provider, **kwargs)
+            chat = init_chat_model(model, model_provider=provider, **kwargs)
         except ImportError as error:
             package = SUPPORTED_PROVIDERS[provider]
             raise ImportError(
                 f"Provider {provider!r} needs {package}. "
                 f"Run: pip install -r requirements.txt"
             ) from error
+        if provider == "openai" and agent_name == "advisor" and over_sockets():
+            chat.root_async_client = SocketClient(chat.root_async_client)
+        return chat

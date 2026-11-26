@@ -1,5 +1,6 @@
 """infra/improve/run.py: the weekly round without Airflow (EventBridge + Fargate on AWS), and the deploy files around it."""
 import importlib.util
+import shlex
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -40,7 +41,7 @@ def test_the_week_is_viet_nams_monday_even_when_utc_is_still_sunday():
 def test_learn_runs_the_dags_two_first_steps_for_this_week():
     run, shell = _runner(), Shell()
     assert run.learn(datetime(2026, 11, 16, 2, 0, tzinfo=VIETNAM), shell) == 0
-    assert [line.split(" ")[3] for line in shell.lines] == ["gaps", "weekly-learn"]
+    assert [shlex.split(line)[3] for line in shell.lines] == ["gaps", "weekly-learn"]
     assert "--week 2026-W47" in shell.lines[1] and "{{" not in shell.lines[1]
 
 

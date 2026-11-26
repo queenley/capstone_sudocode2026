@@ -71,6 +71,8 @@ class RouteInput:
     #: been asked and not answered, the call goes on as a stranger's
     #: (section 4.2: the question is asked once).
     awaiting_identity: bool = True
+    #: A transfer refused last turn only because the customer's number was missing, and a number is known now.
+    transfer_waiting: bool = False
 
 
 @dataclass(frozen=True)
@@ -101,6 +103,8 @@ def _table(view: RouteInput) -> tuple[Lane, int, str]:
         return "HANDOFF", 1, "tools failing"
     if view.model_failures >= MODEL_FAILURES:
         return "HANDOFF", 1, "the model failing"
+    if view.transfer_waiting:
+        return "HANDOFF", 1, "a transfer that waited on the customer's number"
     if view.asr_low_conf:
         return "CLARIFY", 2, "the recognition was unclear"
     if view.tier in ("PROBABLE", "AMBIGUOUS") and view.awaiting_identity:

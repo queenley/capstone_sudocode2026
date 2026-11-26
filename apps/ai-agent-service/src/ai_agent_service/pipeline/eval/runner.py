@@ -291,8 +291,12 @@ async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: s
     for session in sessions:
         source = {"call_id": f"seed:{session.session_id}", "call": "seed", "turn": 0, "channel": session.channel,
                   "said_by": "system", "extractor_version": "seed"}
+        facts = dict(session.facts)
+        if not facts and session.summary:
+            facts = await facts_from_summary(rig.memory, session.summary, on=session.day)
+            source["extractor_version"] = f"seed-summary:{rig.memory.version}"
         decisions = []
-        for slot, value in session.facts.items():
+        for slot, value in facts.items():
             spec = ontology.slot(slot)
             if spec is None:
                 raise scenarios.ScenarioError(f"seed {session.session_id}: unknown memory slot {slot!r}")
@@ -313,6 +317,22 @@ async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: s
             "outcome": session.outcome, "commitments": [], "source_turn_span": [],
         })
     return customer_id
+
+
+#: Slots a summary never settles: the session's own outcome is given beside it, and mood or promises are the call's.
+SUMMARY_SKIPS = frozenset({"outcome", "sentiment", "commitments", "objection_handling"})
+
+
+async def facts_from_summary(memory: MemoryAgent, summary: str, *, on: str) -> dict[str, Any]:
+    """The slots a past session's summary states, when ``seed_history`` gives no ``facts`` (organisers' answers of
+    11/2026: "the system must extract them from the summary").
+
+    The summary is read by the MemoryAgent as one line of the customer's, the extraction ``after_call`` runs. No
+    word matching of our own: a product the summary names stays in the episode's summary, which the Call Brief shows.
+    """
+    found = await memory.extract([{"turn": 1, "speaker": "customer", "text": summary}], [], on=on)
+    return {c.slot: c.value for c in found
+            if c.slot and c.slot not in SUMMARY_SKIPS and ontology.slot(c.slot) and c.confidence >= 0.5}
 
 
 async def _seed_owner(rig: Rig, phone: str | None, name: str | None) -> str:
@@ -649,6 +669,10 @@ def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenar
         # without them a transfer or an order the run should not have made cannot be explained (2026-11-16).
         "intent_probabilities": draft.get("intent_probabilities"),
         "regenerations": state.get("regen_count") or 0,
+        # Plan 003: what the harness said from the results, whether the turn ended there, and what the model asked
+        # its next round to answer (follow_up).
+        "reply_plan": {k: draft.get(k) for k in ("planned_lines", "ended_on_tools", "fallback_round", "follow_ups")
+                       if draft.get(k)},
         "blocked_drafts": [d.get("reasons") for d in state.get("blocked_drafts") or []],
         # What the agent was about to say, beside why it was stopped: diagnostics only, never the BTC trace.
         "blocked_draft_texts": [d.get("text") for d in state.get("blocked_drafts") or []],
