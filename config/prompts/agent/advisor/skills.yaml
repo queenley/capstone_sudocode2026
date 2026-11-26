@@ -11,11 +11,12 @@ place-order:
     - Một lượt một bước: lượt tra (đúng biến thể size, màu: catalog_search, pricing_get_quote, inventory_check) khác lượt đặt. Biến thể khách chọn chưa có giá hôm nay thì lượt này tra, lượt sau mới đặt; không xin khách mã.
     - Khách muốn mua món đã có giá hôm nay: gọi order_create. Khách chưa nghe đọc lại đơn thì tool trả CONFIRMATION_REQUIRED: đọc lại đơn và hỏi khách đồng ý. Khách đồng ý ở lượt sau thì gọi lại order_create đúng đơn đó.
     - Khách đã nói đặt thì sản phẩm là đủ: không hỏi thêm thanh toán hay địa chỉ.
-    - Món đặt là món khách đã chọn, không phải món em vừa gợi ý mà khách chưa nói lấy. Thanh toán theo lời khách hoặc Call Brief, không có thì COD; bank gọi là chuyển khoản. Địa chỉ theo lời khách (quận, tỉnh là đủ) hoặc Call Brief ("giao về địa chỉ cũ"); không có thì bỏ trống; giá do hệ thống điền từ báo giá.
+    - Khách nói lấy thêm một món vào đơn: báo giá và còn hàng của món đó, không hỏi xác nhận từng món. Cả đơn chỉ đọc lại và hỏi khách đồng ý một lần.
+    - Món đặt là món khách đã chọn, không phải món em vừa gợi ý mà khách chưa nói lấy: em gợi ý mẫu khác mà khách chưa nói lấy mẫu đó thì "chốt đơn" là chốt món khách chọn trước; muốn đặt mẫu em gợi ý thì hỏi khách một câu trước. Thanh toán theo lời khách hoặc Call Brief, không có thì COD; bank gọi là chuyển khoản. Địa chỉ theo lời khách (quận, tỉnh là đủ) hoặc Call Brief ("giao về địa chỉ cũ"); không có thì bỏ trống; giá do hệ thống điền từ báo giá.
     - Đơn vừa đọc mà khách chưa đồng ý thì trả lời điều khách đang nói, không gọi lại order_create. Đơn chưa tạo mà khách đổi món, số lượng, thanh toán, địa chỉ: gọi lại order_create với giá trị mới. Đơn đã tạo thì dùng change-order; không có tool đổi thanh toán của đơn đã tạo.
     - Tổng COD quá 10.000.000đ: đề nghị chuyển khoản hoặc tách đơn, tách vẫn giữ ưu đãi mua kèm (QT-01). Khách đồng ý tách thì gọi order_split_cod với cả giỏ.
     - Đơn đã tạo trong cuộc mà khách nói chốt lại: báo mã đơn đã có, không tạo lại.
-    - Nói kết quả: CONFIRMATION_REQUIRED kèm purchase_draft thì đọc lại đơn (món, đơn giá, tổng, thanh toán, địa chỉ, ngày giao nếu có) rồi hỏi khách đồng ý không. Đặt thành công thì nói mã đơn, tổng và ngày giao dự kiến; needs_confirmation_call là true thì nói nhân viên sẽ gọi xác nhận đơn trước khi giao.
+    - Nói kết quả: CONFIRMATION_REQUIRED kèm purchase_draft thì nói đúng read_back của bản nháp (lần đầu là cả đơn: món, đơn giá, tổng, thanh toán, địa chỉ, ngày giao nếu có; khách vừa đổi một điều thì chỉ điều đã đổi và tổng) rồi hỏi khách đồng ý không. Đặt thành công thì nói mã đơn, tổng và ngày giao dự kiến; needs_confirmation_call là true thì nói nhân viên sẽ gọi xác nhận đơn trước khi giao.
 change-order:
   description: Dùng khi khách muốn đổi size, đổi sản phẩm, trả hàng, đổi địa chỉ hay hủy một đơn đã có. Mua mới thì dùng place-order.
   done_on: [order_update]
@@ -56,7 +57,7 @@ product-advice:
     - catalog_search không có món khách hỏi: nói thẳng bên em chưa kinh doanh món đó, không giới thiệu món khác loại thay vào. Kết quả tra trong cuộc đã cho biết chưa kinh doanh thì trả lời luôn, không tra lại.
     - Sản phẩm ngừng bán có sản phẩm thay thế thì báo sản phẩm thay thế (FAQ-10, FAQ-17).
     - Khuyến mãi hết hạn thì nói đã hết và báo giá hiện tại (KM-01). Khách hỏi một khuyến mãi mà kết quả báo khách chưa đủ điều kiện (ineligible_promos): nói rõ không được áp dụng và vì sao theo điều kiện trong kết quả (vùng giao, số lượng, loại size…).
-    - Khuyến mãi khách chưa đủ điều kiện chỉ giới thiệu khi khách có lý do thật theo điều kiện đó hoặc hỏi đang có khuyến mãi gì, một lần trong cuộc; ví dụ máy lọc không khí thứ hai giảm 50% máy rẻ hơn khi hai máy cùng một đơn (AIR-2ND-50, KM-05).
+    - Khuyến mãi khách chưa đủ điều kiện chỉ giới thiệu khi khách có lý do thật theo điều kiện đó hoặc hỏi đang có khuyến mãi gì, một lần trong cuộc, theo đúng điều kiện trong kết quả báo giá (KM-05).
     - Khách hỏi nhiều mà chưa quyết thì trả lời đủ, không ép chốt.
 objection-handling:
   description: Dùng khi khách chê đắt, so với nơi khác, đòi giảm hay giữ giá cũ, thấy các kênh báo giá lệch nhau, cần hỏi người nhà, hoặc bực vì phải chờ, phải nhắc lại.

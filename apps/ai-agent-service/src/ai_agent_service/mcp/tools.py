@@ -38,7 +38,6 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-from datetime import datetime
 import logging
 import os
 import re
@@ -53,6 +52,7 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 from ..components import clock
 from ..components.intake import pii
 from ..components.guardrails import fallback, purchase
+from ..components.guardrails import actions
 from ..components.guardrails.actions import NEEDS_NUMBER
 from ..components.intake.text import plain
 from ..observability import stopwatch
@@ -308,21 +308,39 @@ class LaneToolsMiddleware(AgentMiddleware):
         return await handler(self._filtered(request))
 
 
-#: What an order's status is called to a customer, in the words the organisers' grader reads ("đã tạo", "đang xử lý",
-#: "đang chuẩn bị", "đang giao", "đã giao"): put beside each order of an ``order_status`` result, so the model says the
-#: shop's words rather than its own ("đang được chuẩn bị" is not "đang chuẩn bị", 2026-11-26).
+#: What an order's status is called to a customer: one plain phrase per status of the mock's enum, put beside each
+#: order of an ``order_status`` result so the model says the status rather than a paraphrase that changes it.
 STATUS_WORDS = {
-    "created": "đã tạo, đang xử lý", "pending": "đã tạo, đang xử lý", "confirmed": "đã xác nhận, đang xử lý",
-    "processing": "đang xử lý, đang chuẩn bị hàng", "packing": "đang chuẩn bị hàng, đang đóng gói",
-    "shipping": "đang giao, đã bàn giao đơn vị vận chuyển", "delivered": "đã giao thành công", "cancelled": "đã hủy",
+    "created": "đã tạo đơn", "pending": "đã tạo đơn", "confirmed": "đã xác nhận",
+    "processing": "đang xử lý", "packing": "đang đóng gói",
+    "shipping": "đang giao", "delivered": "đã giao", "cancelled": "đã hủy",
     "returned": "đã hoàn về", "pickup_scheduled": "đã hẹn lấy hàng trả",
 }
 
 
-#: Days a delivered order may be returned (DT-01: 7 days from receipt) and the most a delivery takes: an order placed
-#: longer ago than both is past its return window whatever day it arrived.
-RETURN_DAYS = 7
-LONGEST_DELIVERY_DAYS = 7
+
+
+#: What an error of the organisers' tools means and what to do next: a bare code reads as a dead end, and the model
+#: went on with a code it had made up instead of searching for the right one.
+ERROR_HINTS = {
+    "UNKNOWN_SKU": "Mã này không có trong danh mục: gọi catalog_search với tên sản phẩm khách nói để lấy mã đúng, "
+                   "không đoán mã và không hỏi khách mã.",
+}
+
+
+def with_hints(message: Any) -> Any:
+    """A result whose ``error`` is a code of :data:`ERROR_HINTS` with a ``hint`` beside it; any other as it is."""
+    if not isinstance(message, ToolMessage) or not isinstance(message.content, str):
+        return message
+    try:
+        envelope = json.loads(message.content)
+    except ValueError:
+        return message
+    data = envelope.get("data") if isinstance(envelope, dict) else None
+    if not isinstance(data, dict) or data.get("error") not in ERROR_HINTS or "hint" in data:
+        return message
+    data["hint"] = ERROR_HINTS[data["error"]]
+    return message.model_copy(update={"content": json.dumps(envelope, ensure_ascii=False)})
 
 
 def with_status_words(name: str, message: Any, today: Any = None) -> Any:
@@ -344,15 +362,14 @@ def with_status_words(name: str, message: Any, today: Any = None) -> Any:
         if isinstance(order, dict) and order.get("status") in STATUS_WORDS and "status_text" not in order:
             order["status_text"] = STATUS_WORDS[order["status"]]
             changed = True
-        if isinstance(order, dict) and order.get("status") == "delivered" and today is not None and order.get("date"):
-            try:
-                placed = datetime.fromisoformat(str(order["date"])[:10]).date()
-            except ValueError:
-                continue
-            day = today.date() if hasattr(today, "date") else today
-            if (day - placed).days > RETURN_DAYS + LONGEST_DELIVERY_DAYS:
-                order["return_window"] = f"đã hết hạn đổi trả {RETURN_DAYS} ngày"
-                changed = True
+        window = actions.return_window(order, today) if isinstance(order, dict) else None
+        if window == "closed":
+            order["return_window"] = f"đã hết hạn đổi trả {actions.RETURN_DAYS} ngày"
+            changed = True
+        elif window == "defect":
+            order["return_window"] = (f"đã quá {actions.RETURN_DAYS} ngày đổi trả; chỉ còn đổi mới nếu lỗi nhà sản xuất, "
+                                      f"trong {actions.DEFECT_DAYS} ngày")
+            changed = True
     return message.model_copy(update={"content": json.dumps(envelope, ensure_ascii=False)}) if changed else message
 
 
@@ -388,7 +405,7 @@ class ToolGuardMiddleware(AgentMiddleware):
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
         today = getattr(getattr(getattr(request, "runtime", None), "context", None), "now", None)
-        return with_status_words(request.tool_call["name"], await self._guarded_call(request, handler), today)
+        return with_hints(with_status_words(request.tool_call["name"], await self._guarded_call(request, handler), today))
 
     async def _guarded_call(self, request: Any, handler: Any) -> Any:
         call = request.tool_call

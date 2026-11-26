@@ -400,6 +400,14 @@ def product_name(sku: str) -> str | None:
     return None
 
 
+def category_of(sku: str) -> str | None:
+    """The catalogue category of a product or variant code ("gia-dung/quat"); None for a code it does not hold."""
+    for product in _catalogue()['products']:
+        if product['sku'] == sku or any(v['variant_sku'] == sku for v in product.get('variants') or []):
+            return product.get('category')
+    return None
+
+
 def variant_said(sku: str, text: str) -> str | None:
     """The one variant of product *sku* whose size and colour *text* states ("RunLite 2 Pro size 41 màu đen");
     None when the product has no variants or the words do not pick exactly one."""

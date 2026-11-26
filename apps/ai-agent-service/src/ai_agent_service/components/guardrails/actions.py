@@ -76,6 +76,7 @@ def check(
     updated: Sequence[Mapping[str, Any]] = (),
     placed: Sequence[Mapping[str, Any]] = (),
     heard_basket: Sequence[str] = (),
+    order_records: Sequence[Mapping[str, Any]] = (),
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
@@ -91,6 +92,8 @@ def check(
     ``order_update`` calls that succeeded in this call: the same change is not
     made twice.
     *placed* are the order lines already created this call (:func:`placed_lines`).
+    *order_records* are the orders ``order_status`` showed this call, with their status and date: a return or an
+    exchange of one past its return window is refused before it reaches the tool (DT-01).
     *heard_basket* is the skus of the last basket of more than one product priced on an earlier turn: the order the
     customer heard the total of, which a quote made in the same round as the order does not replace. Kept for TSR:
     without it the 2026-11-26 run ordered one product of a two-product basket twice (``also_ordered`` failed).
@@ -124,7 +127,8 @@ def check(
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
-                                                    updated=updated, agreed=(intents or {}).get("change"))),
+                                                    updated=updated, agreed=(intents or {}).get("change"),
+                                                    records=order_records, now=now)),
         "schedule_callback": lambda: _schedule_callback(args, now=now, has_phone=has_phone),
         "handoff_transfer": lambda: _handoff(args, lane=lane, warranted=(intents or {}).get("handoff")),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said,
@@ -250,7 +254,7 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     reasons = []
     held = list(heard_basket)
     if len(set(held)) > 1 and args.get("sku") in held and args.get("order_group") is None:
-        # The customer last heard the whole basket priced together (2026-11-24: four items priced, then one ordered).
+        # The customer last heard the whole basket priced together: an order of one of its items is asked about once.
         reasons.append(f"Khách vừa nghe tổng đơn {len(held)} món ({', '.join(sorted(set(held)))}): gọi order_create "
                        "với lines đủ các món đó; chỉ bỏ món nào khi khách nói bỏ.")
     if not has_phone:
@@ -338,10 +342,14 @@ def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trus
 
 
 def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,
-                  updated: Sequence[Mapping[str, Any]] = (), agreed: bool | None = None) -> list[str]:
+                  updated: Sequence[Mapping[str, Any]] = (), agreed: bool | None = None,
+                  records: Sequence[Mapping[str, Any]] = (), now: datetime | None = None) -> list[str]:
     order_id, action = args.get("order_id"), args.get("action")
     if not order_id:
         return ["Thiếu order_id."]
+    if action in WINDOW_ACTIONS and any(o.get("order_id") == order_id and past_return_window(o, now) for o in records):
+        return [f"Đơn {order_id} đã hết hạn đổi trả {RETURN_DAYS} ngày kể từ khi nhận hàng (DT-01): không trả hay đổi "
+                "được, kể cả khi khách năn nỉ. Nói rõ với khách, không gọi order_update."]
     if any(done.get("order_id") == order_id and done.get("action") == action
            and done.get("new_variant_sku") == args.get("new_variant_sku")
            and done.get("new_address") == args.get("new_address") for done in updated):
@@ -501,3 +509,45 @@ def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any], *, customer
     if not filled.get("next_action"):
         filled["next_action"] = NEXT_ACTION.get(str(filled["escalation_reason"]), NEXT_ACTION_DEFAULT)
     return filled
+
+
+#: Days a delivered order may be returned or exchanged (DT-01: 7 days from receipt), the longer window of household
+#: and mother-and-baby goods with a manufacturing defect (DT-01, DT-05: 30 days), and the most a delivery takes
+#: (VC-01): the order date plus that delivery is the earliest the customer can have received it, so a window counted
+#: from there never closes before the real one.
+RETURN_DAYS = 7
+DEFECT_DAYS = 30
+DEFECT_CATEGORIES = ("gia-dung", "me-be")
+LONGEST_DELIVERY_DAYS = 7
+#: The actions the return window closes (DT-01: an exchange is a return of the item first).
+WINDOW_ACTIONS = frozenset({"return", "exchange_size", "exchange_product"})
+
+
+def _days_since_receipt(order: Mapping[str, Any], day: Any) -> int | None:
+    """Days since the latest day a delivered order can have arrived; None when it is not recorded as delivered (the
+    customer may have it before the record says so) or the dates are unreadable."""
+    if order.get("status") != "delivered" or not order.get("date") or day is None:
+        return None
+    try:
+        placed = datetime.fromisoformat(str(order["date"])[:10]).date()
+        today = datetime.fromisoformat(str(day)[:10]).date() if isinstance(day, str) else getattr(day, "date", lambda: day)()
+    except ValueError:
+        return None
+    return (today - placed).days - LONGEST_DELIVERY_DAYS
+
+
+def return_window(order: Mapping[str, Any], day: Any) -> str | None:
+    """What DT-01 leaves of a delivered order's return window on *day*: None while 7 days are not over, "defect"
+    when only a manufacturing defect of household or mother-and-baby goods can still be exchanged, "closed" after."""
+    days = _days_since_receipt(order, day)
+    if days is None or days <= RETURN_DAYS:
+        return None
+    category = commerce.category_of(str(order.get("sku") or ""))
+    if category and category.startswith(DEFECT_CATEGORIES) and days <= DEFECT_DAYS:
+        return "defect"
+    return "closed"
+
+
+def past_return_window(order: Mapping[str, Any], day: Any) -> bool:
+    """Whether no return or exchange of the order is possible on *day*, a manufacturing defect included."""
+    return return_window(order, day) == "closed"

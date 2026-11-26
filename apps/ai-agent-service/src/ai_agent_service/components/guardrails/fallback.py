@@ -85,7 +85,7 @@ def line(name: str, who: str = "anh/chị") -> str:
 
 
 
-#: A figure the advisor writes as a label for code to fill (rules.md, rule 1): {giá:SKU-AP-Y}, {tổng}.
+#: A figure the advisor writes as a label for code to fill (rules.md, rule 1): {giá:SKU-DEMO-1}, {tổng}.
 FIGURE = re.compile(r"\{\s*(giá|gia|tổng|tong)\s*(?::\s*([A-Za-z0-9_-]+))?\s*\}", re.IGNORECASE)
 
 

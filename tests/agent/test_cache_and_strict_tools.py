@@ -539,3 +539,14 @@ def test_the_tools_a_state_takes_away_are_sent_last():
                                                 "memory_request_deletion", "handoff_transfer", "memory_get_episodes",
                                                 "account_cart"]
 
+
+
+def test_an_order_read_back_again_after_a_change_says_only_what_changed():
+    context = order_context()
+    first = purchase.draft({"sku": "N", "qty": 1, "price_vnd": 100000, "payment": "COD"}, context, names={"N": "Quạt N"})
+    assert "Quạt N" in first["read_back"]
+    from dataclasses import replace
+    context = replace(context, pending_purchase=first)
+    again = purchase.draft({"sku": "N", "qty": 1, "price_vnd": 100000, "payment": "bank"}, context, names={"N": "Quạt N"})
+    assert "chuyển khoản" in again["read_back"] and "Quạt N" not in again["read_back"]
+    assert "100.000đ" in again["read_back"]  # the total is always said

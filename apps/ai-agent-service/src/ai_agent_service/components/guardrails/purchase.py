@@ -189,12 +189,28 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
         whole = f", tổng cả giỏ {format_vnd(sum(int(price) for _, price in units))}" if units else ""
         question = f"Đơn này đi cùng {', '.join(others)}{whole}. " + question
         read_back = f"Đơn này đi cùng {', '.join(others)}{whole}. " + read_back
+    # The customer already heard this order read back in the call and changed something: only what changed is read
+    # again, with the total. A second confirmation of what they confirmed is a repeated question (RQR).
+    before = getattr(context, "pending_purchase", None) or {}
+    if before.get("owner") == _owner(context) and before.get("lines") and not others and not order.get("order_group"):
+        old = before.get("args") or {}
+        changes = []
+        if sorted((l["sku"], l["qty"], l["price_vnd"]) for l in before["lines"]) != sorted(
+                (l["sku"], l["qty"], l["price_vnd"]) for l in lines):
+            changes.append(items)
+        if old.get("payment") != order.get("payment"):
+            changes.append(f"thanh toán {payment}")
+        if (old.get("address") or None) != (address if order["address"] else None):
+            changes.append(f"địa chỉ giao hàng: {address}")
+        if changes:
+            question = f"{addressed(context)} đồng ý đặt đơn với {', '.join(changes)}, tổng {format_vnd(total)} không ạ?"
+            read_back = f"Dạ em cập nhật đơn: {', '.join(changes)}, tổng {format_vnd(total)}."
     if order.get("order_group"):
         question = f"Đây là đơn {order['order_group']} của phần tách đơn. " + question
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
             "target_id": target(order), "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
-            "status": "pending", "question": question, "read_back": read_back, "total_vnd": total,
+            "status": "pending", "question": question, "read_back": read_back, "total_vnd": total, "lines": lines,
             "args": {k: (address if k == "address" else v) for k, v in order.items() if k in FILLED and v}}
 
 

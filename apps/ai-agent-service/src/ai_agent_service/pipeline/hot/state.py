@@ -121,6 +121,9 @@ class HotState(TurnInput, total=False):
     order_quotes: dict[str, list[list[Any]]]
     #: Order lines created this call, retained across turn resets (``actions.placed_lines``).
     placed_lines: list[dict[str, Any]]
+    #: The orders ``order_status`` showed this call, ``{order_id, sku, status, date}``, retained across turn resets:
+    #: what the return window of a later turn's order_update is read from.
+    order_records: list[dict[str, Any]]
     #: Public catalogue codes seen in this call, retained across turn resets.
     trusted_skus: list[str]
     #: The products tools showed this call, latest last: ``{sku, name, price_vnd}``.
@@ -153,8 +156,6 @@ class HotState(TurnInput, total=False):
     #: The write calls the guard refused in the last turn with what to put to the customer instead (an hour in working
     #: time, a variant in stock): the customer's next words answer that offer.
     offered: list[dict[str, Any]]
-    #: The products the customer last heard named by the harness's lines: what "máy này" means next turn.
-    heard_products: list[str]
     #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),
     #: and whether the agent asked already (``components.intake.honorific``).
     honorific_said: str | None

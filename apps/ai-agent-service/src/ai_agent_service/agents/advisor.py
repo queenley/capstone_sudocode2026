@@ -131,6 +131,8 @@ class AgentContext:
     #: Orders of more than one unit priced this call: units key to ``[[sku, unit price], ...]`` (``pricing.quote_order``).
     order_quotes: Mapping[str, Any] = field(default_factory=dict)
     known_orders: frozenset[str] = frozenset()
+    #: The orders ``order_status`` showed in earlier turns of the call, with status and date (the guard's return window).
+    order_records: tuple[Mapping[str, Any], ...] = ()
     #: Order lines created earlier in this call (``actions.placed_lines``): the COD limit is on the whole order.
     placed_lines: tuple[Mapping[str, Any], ...] = ()
     #: The customer's phone, raw. Filled into tools by the harness; never shown to the model.
@@ -173,8 +175,6 @@ class AgentContext:
     updated_orders: tuple[Mapping[str, Any], ...] = ()
     #: Last turn's write calls the guard refused, and what it said to put to the customer (``nodes._offered``).
     offered: tuple[Mapping[str, Any], ...] = ()
-    #: The products the customer heard named last, by the harness's lines (``fallback.told_products``).
-    heard_products: tuple[str, ...] = ()
     #: How an unknown customer calls themselves, and whether the agent asked.
     self_called: str | None = None
     honorific_asked: bool = False
@@ -355,7 +355,6 @@ def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str,
         Section("basket", _basket_block(context.basket_lines, context.order_quotes)),
         Section("orders", _orders_block(context.created_orders, context.updated_orders)),
         Section("offered", _offered_block(context.offered)),
-        Section("heard", _heard_block(context.heard_products)),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
         Section("knowledge", "\n".join(x for x in (_knowledge_block("Tài liệu liên quan", policy),
@@ -488,18 +487,6 @@ def _earlier_block(results: Sequence[Mapping[str, Any]]) -> str:
     lines = [f"- {r.get('tool')}: {r.get('result')}" for r in results]
     return ("Đã tra trong cuộc này (kết quả tool của các lượt trước; trả lời từ đây, chỉ gọi lại khi đổi sản phẩm, biến "
             "thể, số lượng, địa chỉ, giỏ hàng hoặc khi sắp đặt đơn):\n" + "\n".join(lines))
-
-
-def _heard_block(skus: Sequence[str]) -> str:
-    """Which products "máy này" can mean: the ones the customer heard, not every one a lookup returned."""
-    if not skus:
-        return ""
-    from ..components.intake.commerce import product_name
-
-    named = "; ".join(f"{product_name(s) or s} ({s})" for s in skus)
-    return (f"Mẫu khách vừa nghe: {named}. Khách nói \"máy này\", \"cái đó\" là mẫu này. Khách đã nghe hơn một mẫu mà "
-            "lời khách không rõ mẫu nào thì hỏi lại một câu và dừng, không gọi tool. Mẫu khác có trong kết quả tool mà "
-            "khách chưa nghe thì không nói tới khi khách chưa hỏi.")
 
 
 def _offered_block(offered: Sequence[Mapping[str, Any]]) -> str:
@@ -874,7 +861,8 @@ class ActionGuardMiddleware(AgentMiddleware):
             shared_phone=context.shared_phone, created=created,
             updated=(*context.updated_orders, *_updated_in(state, context.tool_results)),
             placed=placed_this_call(context, state),
-            heard_basket=_heard_basket(context.order_quotes),
+            heard_basket=[] if _asked_again(state, name, args) else _heard_basket(context.order_quotes),
+            order_records=[*context.order_records, *_order_records_in(state, context.tool_results)],
         )
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
@@ -964,12 +952,16 @@ def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mappin
     order = dict(args)
     if isinstance(order.get("lines"), list):
         order["lines"] = [dict(line) if isinstance(line, dict) else line for line in order["lines"]]
-    # A product sold in sizes and colours named by its own code: the variant the customer's words pick, when they pick
-    # exactly one (2026-11-27: "size 42 màu đen" said, the parent code sent three turns running).
-    said = [text for who, text in context.recent if who == "customer"][::-1]
+    # A product sold in sizes and colours named by its own code: the variant the customer's latest words about size or
+    # colour pick, when they pick exactly one (the model had sent the parent code turns running). Only the latest
+    # such words: a size changed later without the colour is a change of mind, not the earlier pair, and the parent
+    # code is left for the guard to ask about.
+    latest = next((text for who, text in reversed(context.recent) if who == "customer"
+                   and (lambda seen: seen.get("size") is not None or seen.get("color"))(
+                       commerce.observe(text)["scenario_entities"])), None)
     for line in (order.get("lines") if isinstance(order.get("lines"), list) else [order]):
-        if isinstance(line, dict) and line.get("sku") and commerce.variants_of(str(line["sku"])):
-            picked = next((v for text in said if (v := commerce.variant_said(str(line["sku"]), text))), None)
+        if latest and isinstance(line, dict) and line.get("sku") and commerce.variants_of(str(line["sku"])):
+            picked = commerce.variant_said(str(line["sku"]), latest)
             if picked:
                 line["sku"] = picked
                 line.pop("price_vnd", None)  # today's price of the variant, filled below, not the product's
@@ -990,13 +982,22 @@ def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mappin
             purchase.units_key([{"sku": order["sku"], "qty": int(order.get("qty") or 1)},
                                 *({"sku": s} for s in order["basket_skus"])]))):
         # One order of a split (QT-01): its unit's price in the quote of the whole basket, the second machine's
-        # discount kept, not the product's price alone (2026-11-27: 6.490.000đ asked for a 3.245.000đ unit).
+        # discount kept, not the product's price alone (the order was otherwise sent at the full price).
         own = [int(price) for sku, price in units if sku == order["sku"]]
         if own:
             order["price_vnd"] = min(own)
     elif order.get("sku") in quotes:
         order["price_vnd"] = quotes[order["sku"]]
     return order
+
+
+def _asked_again(state: Mapping[str, Any], name: str, args: Mapping[str, Any]) -> bool:
+    """Whether this run already sent the same call for the same product and the guard refused it: the model, told
+    once that the customer heard a whole basket, has weighed the customer's words and kept its order."""
+    return any(isinstance(m, ToolMessage) and m.name == name and (m.additional_kwargs or {}).get("blocked_by") == "guardrail"
+               and ((m.additional_kwargs or {}).get("args") or {}).get("sku") == args.get("sku") and not args.get("lines")
+               and (envelope_of(m) or {}).get("error", {}).get("code") == "PRECONDITION"
+               for m in state.get("messages") or [])
 
 
 def _heard_basket(order_quotes: Mapping[str, Any]) -> list[str]:
@@ -1033,8 +1034,8 @@ async def _verdict(context: AgentContext, intent: str, state: Mapping[str, Any],
     if early and context.early_intents is not None and intent in EARLY_INTENTS:
         probability = (await context.early_intents()).get(intent)
         # A transfer is never taken from the early answer's yes: the early question sees neither the reason nor the
-        # documents, and a transfer leaves the rest of the call to a person (2026-11-24: "cho chị số điện thoại của
-        # anh F" read 0.94 early; asked with the reason given, it is a refusal).
+        # documents, and a transfer leaves the rest of the call to a person (a request for another person's
+        # number read as a transfer early; asked with the reason given, it is a refusal).
         if (band(intent, probability) == "yes" and intent != "handoff") or (
                 intent == "handoff" and probability is not None and probability <= NO_HANDOFF):
             logger.info("Intent %s taken from the turn's early check: %.2f", intent, probability)
@@ -1100,6 +1101,15 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, cr
         return {"one_more": _agreed(await _verdict(context, "one_more", {"recent_messages": said,
                                                                          "already_ordered": args.get("sku")}))}
     return {}
+
+
+def _order_records_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The orders ``order_status`` showed in this call and this turn, as it showed them (status, date)."""
+    envelopes = [envelope_of(m) for m in state.get("messages") or [] if isinstance(m, ToolMessage)]
+    envelopes += [r.get("result") for r in earlier]
+    return [order for envelope in envelopes if isinstance(envelope, dict) and envelope.get("ok")
+            for order in ((envelope.get("data") or {}).get("orders") or [] if isinstance(envelope.get("data"), dict) else [])
+            if isinstance(order, dict) and order.get("order_id")]
 
 
 def _seen_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> tuple[frozenset[str], frozenset[str]]:

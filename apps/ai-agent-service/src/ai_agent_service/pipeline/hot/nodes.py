@@ -303,7 +303,7 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
 #: A caller who did not confirm: a new customer on this key, and nothing of the other's.
 STRANGER: dict[str, Any] = {
     "tier": "UNKNOWN", "customer_id": None, "customer_name": None, "honorific": None, "awaiting": None,
-    "brief": None, "brief_lines": [], "freshness": [], "known_orders": [],
+    "brief": None, "brief_lines": [], "freshness": [], "known_orders": [], "order_records": [],
     "phone_token": None, "phone_last4": None, "quotes": {}, "order_quotes": {}, "provisional": None,
 }
 
@@ -458,7 +458,7 @@ async def _brief(state: dict[str, Any], context: HotContext, started: float) -> 
             crm = next((c for c in crm.get("candidates") or [] if c["customer_id"] == customer_id), {})
     found = await recall.retrieve(customer_id, state["on"], harness, crm=crm, memory_on=memory_on)
     if found.get("forgotten"):
-        return {"tier": "UNKNOWN", "customer_id": None, "customer_name": None, "known_orders": [],
+        return {"tier": "UNKNOWN", "customer_id": None, "customer_name": None, "known_orders": [], "order_records": [],
                 "brief": {}, "brief_lines": [], "freshness": [], "crm": {}, "call_brief_latency_ms": None}
     phone = context.vault.get(state.get("phone_token") or "")
     products, orders, warnings = [], [], []
@@ -717,6 +717,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         quotes=dict(state.get("quotes") or {}),
         order_quotes=dict(state.get("order_quotes") or {}),
         known_orders=frozenset(state.get("known_orders") or []),
+        order_records=tuple(state.get("order_records") or ()),
         placed_lines=tuple(state.get("placed_lines") or []),
         customer_phone=phone,
         vault=context.vault,
@@ -748,7 +749,6 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         created_orders=tuple(state.get("created_orders") or ()),
         updated_orders=tuple(state.get("updated_orders") or ()),
         offered=tuple(state.get("offered") or ()),
-        heard_products=tuple(state.get("heard_products") or ()),
         self_called=None if tier == "VERIFIED" else state.get("honorific_said"),
         honorific_asked=bool(state.get("honorific_asked")),
         flags=dict(state.get("flags") or {}),
@@ -837,6 +837,14 @@ def _basket_after(basket: Mapping[str, Mapping[str, Any]], results: Sequence[Map
         asked = result.get("args") or {}
         if result.get("name") == "order.create":
             current = {}
+        elif result.get("name") == "pricing.quote_order" and isinstance(asked.get("lines"), list):
+            # A quote of several units together is the basket the customer is hearing priced.
+            lines = [line for line in asked["lines"] if isinstance(line, dict) and line.get("sku")]
+            if len({line["sku"] for line in lines}) > 1:
+                current = {}
+                for line in lines:
+                    qty = current.get(line["sku"], {}).get("qty", 0) + int(line.get("qty") or 1)
+                    current[line["sku"]] = {"qty": qty}
         elif result.get("name") == "pricing.get_quote" and (envelope.get("data") or {}).get("sku"):
             sku = envelope["data"]["sku"]
             others = [s for s in asked.get("basket_skus") or [] if s != sku]
@@ -902,6 +910,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     quotes = dict(state.get("quotes") or {})
     order_quotes = dict(state.get("order_quotes") or {})
     orders = list(state.get("known_orders") or [])
+    records = {str(r.get("order_id")): dict(r) for r in state.get("order_records") or []}
     created = list(state.get("created_orders") or [])
     deletion_recorded = bool(state.get("deletion_recorded"))
     callback_booked = bool(state.get("callback_booked"))
@@ -936,6 +945,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             for order in data.get("orders") or ([data] if data.get("order_id") else []):
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])
+                if result["name"] == "order.status" and order.get("order_id"):
+                    records[str(order["order_id"])] = {k: order.get(k) for k in ("order_id", "sku", "status", "date")}
         elif result.get("blocked_by") == "guardrail" and (envelope.get("error") or {}).get("code") == "CONFIRMATION_REQUIRED":
             draft = (envelope["error"].get("details") or {}).get("purchase_draft")
             if draft and pending_purchase and pending_purchase.get("issued_turn_id") == draft.get("issued_turn_id") \
@@ -953,7 +964,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             "order_quotes": order_quotes,
             "call_log": [*(state.get("call_log") or []), *log][-CALL_LOG_SIZE:],
             "basket": _basket_after(state.get("basket") or {}, new_results),
-            "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
+            "known_orders": orders, "order_records": list(records.values()), "created_orders": created, "updated_orders": updated, "tool_failures": failures,
             "deletion_recorded": deletion_recorded, "callback_booked": callback_booked,
             "callbacks_booked": sorted(set(booked)),
             "pending_purchase": pending_purchase,
@@ -965,8 +976,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
 
 def _offered(results: Sequence[Mapping[str, Any]], before: Sequence[Mapping[str, Any]] = ()) -> list[dict[str, Any]]:
     """This turn's write calls refused for something the customer must decide, with the guard's words: what the agent
-    then put to the customer. Kept one turn, so a yes next turn carries the exact offer (2026-11-24: "20:30 thứ Bảy
-    24/10" offered on a Thursday, accepted, booked for Thursday: the refusal that held the date was gone). A transfer
+    then put to the customer. Kept one turn, so a yes next turn carries the exact offer (an offered day and time,
+    accepted, was otherwise booked for the day of the call: the refusal that held the date was gone). A transfer
     that waits only on the customer's number is kept until a transfer goes through: the number may come turns later
     (2026-11-26: asked at turn 1, given at turn 5, the transfer was forgotten)."""
     offered = [{"tool": r.get("name"), "args": dict(r.get("args") or {}),
@@ -1005,6 +1016,8 @@ class _Attempt:
     open_clause: int | None = None
     #: How many sentences were said when the first tool results came: what follows is the answer to them.
     at_tools: int | None = None
+    #: The first clause said ahead was left out: its rest goes with it, or the answer opens mid-sentence.
+    skip_rest: bool = False
 
 
 def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
@@ -1313,6 +1326,12 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
     *kind* ``clause`` is the first clause of the answer, said ahead (plan 002): the hard check reads it, the
     PolicyAgent reads its whole sentence once the ``rest`` arrives, which the hard check reads whole as well.
     """
+    if kind != "rest":
+        attempt.skip_rest = False
+    elif attempt.skip_rest:
+        attempt.skip_rest = False
+        attempt.last_spoken = False
+        return True  # the rest of a first clause that was left out: half a sentence is not said either
     # Vietnamese is written in Latin letters: a run of another script is a decoding slip ("娱乐注册", "циатә"), not speech.
     sentence = OTHER_SCRIPT.sub("", sentence)
     sentence, missing = fallback.fill_figures(sentence, *_figures(state, results))
@@ -1321,8 +1340,7 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         # sentence is left out, no rewrite (it would be a model call with no tool to look the figure up).
         if missing:
             logger.info("Call %s: a sentence with a figure no tool gave was left out: %s", state.get("call_id"), missing)
-        attempt.last_spoken = False
-        return True
+        return _left_out(attempt, kind)
     if kind == "rest" and attempt.open_clause is not None:
         return await _offer_rest(state, context, sentence, results, attempt, timing)
     spoken = unmarked(sentence)
@@ -1334,8 +1352,7 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         attempt.last_spoken = False
         return True  # already said in this answer: a regeneration going on from it repeats its last line
     if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
-        attempt.last_spoken = False
-        return True  # past the length the rules allow: not said, the stream goes on to its end
+        return _left_out(attempt, kind)  # past the length the rules allow: not said, the stream goes on to its end
     with stopwatch.span("guard"):
         view_ = guard_input(state, context, spoken, results)
         reasons = list(check(view_).reasons)
@@ -1343,8 +1360,7 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         # An amount no tool gave is not a leak: the sentence is left out and the answer goes on, with no rewrite
         # (a rewrite is a model call and seconds of silence). Figures are the harness's to fill, from labels.
         logger.info("Call %s: a sentence with an unsourced amount was left out: %s", state.get("call_id"), reasons)
-        attempt.last_spoken = False
-        return True
+        return _left_out(attempt, kind)
     if reasons:
         attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, sentence])
         return False
@@ -1366,6 +1382,18 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
     await _say(context, spoken, timing, token_at=attempt.token_at)
     attempt.said.append(sentence)
     attempt.last_spoken = True
+    return True
+
+
+def _left_out(attempt: _Attempt, kind: str) -> bool:
+    """A sentence left out, the answer going on. A first clause takes its rest with it; a rest left out after its
+    clause was said closes that clause, so the reply never ends on a comma."""
+    attempt.last_spoken = False
+    if kind == "clause":
+        attempt.skip_rest = True
+    elif kind == "rest" and attempt.open_clause is not None:
+        index, attempt.open_clause = attempt.open_clause, None
+        attempt.said[index] = attempt.said[index].rstrip(" ,;:–-") + "."
     return True
 
 
@@ -1569,9 +1597,12 @@ def _figures(state: HotState, results: Sequence[Mapping[str, Any]]) -> tuple[dic
     if total is None:
         total = _basket_total(state, results)
     if total is None and state.get("order_quotes"):
-        # No basket this turn: the last whole basket quoted in the call (2026-11-27: "tổng đơn" asked a turn after).
-        last = list((state.get("order_quotes") or {}).values())[-1]
-        total = sum(int(price) for _, price in last) or None
+        # No basket quoted this turn: the quote of an earlier turn, only if it priced the very units in the basket now
+        # (asked for the total a turn later); a basket changed since has no total yet.
+        current = _basket_after(state.get("basket") or {}, results)
+        key = purchase.units_key([{"sku": sku, "qty": line.get("qty") or 1} for sku, line in current.items()])
+        same = (state.get("order_quotes") or {}).get(key) if current else None
+        total = sum(int(price) for _, price in same) or None if same else None
     return prices, total
 
 

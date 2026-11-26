@@ -121,16 +121,16 @@ def test_an_order_status_result_carries_the_shops_words():
                                                           {"order_id": "OD3", "status": "weird"}]}})
     message = with_status_words("order_status", ToolMessage(content=content, tool_call_id="1", name="order_status"))
     orders = json.loads(message.content)["data"]["orders"]
-    assert "đang chuẩn bị" in orders[0]["status_text"] and "đang xử lý" in orders[0]["status_text"]
-    assert "đã tạo" in orders[1]["status_text"] and "status_text" not in orders[2]
+    assert orders[0]["status_text"] == "đang xử lý" and orders[1]["status_text"] == "đã tạo đơn"
+    assert "status_text" not in orders[2]
     other = ToolMessage(content=content, tool_call_id="2", name="pricing_get_quote")
     assert with_status_words("pricing_get_quote", other) is other
 
 
-def test_every_status_word_holds_a_phrase_the_grader_reads():
-    graded = ("đã tạo", "đang xử lý", "đang chuẩn bị", "đang giao", "đã bàn giao", "đã giao", "giao thành công",
-              "đã hủy", "đã hoàn", "đã hẹn", "đã xác nhận")
-    assert all(any(phrase in words for phrase in graded) for words in STATUS_WORDS.values())
+def test_every_status_word_is_one_phrase_of_its_own_status():
+    """One plain phrase per status: no synonyms stacked, and a status never sounds like a later one."""
+    assert all("," not in words for words in STATUS_WORDS.values())
+    assert "xử lý" not in STATUS_WORDS["created"] and "giao" not in STATUS_WORDS["processing"]
 
 
 # ── call backs ────────────────────────────────────────────────────────────
@@ -343,10 +343,13 @@ def test_an_order_by_a_products_own_code_takes_the_variant_the_customer_named():
     assert kept["sku"] == "SKU-SN-RUN2"  # no size and colour said: nothing guessed, the guard asks
 
 
-def test_the_total_label_falls_back_to_the_last_basket_quoted_in_the_call():
-    state = {"order_quotes": {"SKU-AP-MINI|SKU-AP-PRO|SKU-AP-PRO": [["SKU-AP-PRO", 7_690_000], ["SKU-AP-PRO", 7_690_000],
-                                                                     ["SKU-AP-MINI", 1_095_000]]}}
-    assert nodes._figures(state, [])[1] == 16_475_000
+def test_the_total_label_falls_back_to_an_earlier_quote_of_the_same_basket_only():
+    quoted = {"SKU-AP-MINI|SKU-AP-PRO|SKU-AP-PRO": [["SKU-AP-PRO", 7_690_000], ["SKU-AP-PRO", 7_690_000],
+                                                   ["SKU-AP-MINI", 1_095_000]]}
+    same = {"order_quotes": quoted, "basket": {"SKU-AP-PRO": {"qty": 2}, "SKU-AP-MINI": {"qty": 1}}}
+    assert nodes._figures(same, [])[1] == 16_475_000
+    changed = {"order_quotes": quoted, "basket": {"SKU-AP-PRO": {"qty": 1}, "SKU-AP-MINI": {"qty": 1}}}
+    assert nodes._figures(changed, [])[1] is None  # the basket changed since: no total yet
 
 
 def test_a_read_back_of_a_split_says_each_items_price_in_its_order():
@@ -457,3 +460,68 @@ async def test_the_split_tool_reads_the_orders_back_then_places_them_on_one_yes(
     assert sorted(p["total_vnd"] for p in placed) == [3_245_000, 7_690_000]
     groups = [i["args"].get("order_group") for i in second.additional_kwargs["inner"] if i["name"] == "order_create"]
     assert groups == ["1", "2"]
+
+
+# ── review fixes, 2026-11-27 ─────────────────────────────────────────────
+
+
+def test_a_first_clause_left_out_takes_its_rest_and_a_rest_left_out_closes_its_clause():
+    attempt = nodes._Attempt()
+    assert nodes._left_out(attempt, "clause") and attempt.skip_rest
+    attempt = nodes._Attempt(said=["Dạ đơn của chị là mã này,"], open_clause=0)
+    nodes._left_out(attempt, "rest")
+    assert attempt.said == ["Dạ đơn của chị là mã này."] and attempt.open_clause is None
+
+
+def _delivered(sku, placed):
+    return {"order_id": "OD1", "sku": sku, "status": "delivered", "date": placed}
+
+
+def test_the_return_window_follows_dt01_by_category():
+    shoe, fan = "SKU-SN-RUN2", "SKU-FAN-SEN"
+    assert actions.return_window(_delivered(shoe, "2026-10-10"), "2026-10-20") is None  # within 7 days of receipt
+    assert actions.return_window(_delivered(shoe, "2026-09-01"), "2026-10-20") == "closed"
+    # Household goods: a manufacturing defect is still exchanged within 30 days (DT-01, DT-05).
+    assert actions.return_window(_delivered(fan, "2026-09-25"), "2026-10-20") == "defect"
+    assert actions.return_window(_delivered(fan, "2026-08-01"), "2026-10-20") == "closed"
+    # Not recorded as delivered: the customer may have it already, nothing is closed.
+    assert actions.return_window({**_delivered(shoe, "2026-01-01"), "status": "processing"}, "2026-10-20") is None
+
+
+def test_a_return_past_the_window_is_refused_before_the_tool():
+    reasons = actions._order_update({"order_id": "OD1", "action": "return"}, orders=frozenset({"OD1"}), trusted=None,
+                                    records=[_delivered("SKU-SN-RUN2", "2026-04-04")], now=datetime(2026, 10, 30))
+    assert reasons and "hết hạn" in reasons[0]
+    assert not actions._order_update({"order_id": "OD1", "action": "update_address", "new_address": "Hà Nội"},
+                                     orders=frozenset({"OD1"}), trusted=None,
+                                     records=[_delivered("SKU-SN-RUN2", "2026-04-04")], now=datetime(2026, 10, 30))
+
+
+def test_an_unknown_code_comes_back_with_what_to_do():
+    content = json.dumps({"ok": True, "data": {"error": "UNKNOWN_SKU"}})
+    data = json.loads(tools_module.with_hints(ToolMessage(content=content, tool_call_id="1", name="x")).content)["data"]
+    assert "catalog_search" in data["hint"]
+
+
+def test_the_variant_is_taken_from_the_latest_words_about_size_or_colour_only():
+    context = AgentContext(call_id="c", recent=(("customer", "Lấy size 42 màu đen nhé"), ("customer", "Thôi lấy size 43")))
+    order = advisor_module._filled_order({"sku": "SKU-SN-RUN2", "qty": 1, "payment": "COD"}, context, {})
+    assert order["sku"] == "SKU-SN-RUN2"  # the size changed without a colour: no earlier pair is reused
+
+
+def test_a_basket_priced_together_is_the_basket_a_later_total_is_read_for():
+    quote = {"name": "pricing.quote_order", "args": {"lines": [{"sku": "SKU-AP-PRO", "qty": 2}, {"sku": "SKU-AP-MINI", "qty": 1}]},
+             "result": {"ok": True, "data": {"units": [], "total_vnd": 16_475_000}}}
+    basket = nodes._basket_after({}, [quote])
+    assert basket == {"SKU-AP-PRO": {"qty": 2}, "SKU-AP-MINI": {"qty": 1}}
+    # A single quote of one of its items later does not change it.
+    single = {"name": "pricing.get_quote", "args": {"sku": "SKU-AP-MINI", "qty": 1},
+              "result": {"ok": True, "data": {"sku": "SKU-AP-MINI", "final_price_vnd": 2_190_000}}}
+    assert nodes._basket_after(basket, [single]) == basket
+
+
+def test_an_order_status_of_an_earlier_turn_is_kept_for_the_return_window():
+    status = {"name": "order.status", "args": {}, "result": {"ok": True, "data": {"orders": [
+        {"order_id": "OD1", "sku": "SKU-SN-RUN2", "status": "delivered", "date": "2026-04-04", "price_vnd": 1}]}}}
+    kept = nodes._absorb({"turn_no": 1}, [status])["order_records"]
+    assert kept == [{"order_id": "OD1", "sku": "SKU-SN-RUN2", "status": "delivered", "date": "2026-04-04"}]
