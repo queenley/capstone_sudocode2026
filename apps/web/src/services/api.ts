@@ -138,6 +138,8 @@ export type TurnResult = {
   confidence: number;
   trace_id: string;
   products: CommerceCatalogItem[];
+  /** Manufacturer pages a reviewer approved with the knowledge that answered this turn (docs/plan/002, section 12). */
+  references?: { url: string; domain: string; title: string }[];
   stages?: string[];
   stage_timings_ms?: Record<string, number>;
   tool_calls?: string[];

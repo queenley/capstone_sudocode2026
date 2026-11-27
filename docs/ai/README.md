@@ -16,7 +16,7 @@ Mã nguồn chính: [`apps/ai-agent-service`](../../apps/ai-agent-service/). REA
 | 3 | [Thuật toán](03-thuat-toan.md) | Truy hồi tri thức, chọn lane, guardrail, chuẩn hóa số nói, che PII, cổng ghi bộ nhớ hoạt động thế nào? | dev, người làm AI |
 | 4 | [Dữ liệu](04-du-lieu.md) | Dữ liệu BTC gồm gì? Bộ kịch bản test được sinh ra sao? Bộ nhớ lưu những gì? | data, dev |
 | 5 | [Đánh giá](05-danh-gia.md) | Đo bằng chỉ số nào, chạy thế nào, kết quả hiện tại ra sao, còn thiếu gì? | cả nhóm |
-| 6 | [Vòng cải tiến](06-vong-cai-tien.md) | Reflection và Knowledge Gap Loop học gì, ai duyệt, chứng minh bằng bộ dữ liệu nào, kết quả và phần chưa xong? | người làm AI, cả nhóm |
+| 6 | [Vòng cải tiến](06-vong-cai-tien.md) | Reflection và Knowledge Gap Loop học gì, ai duyệt, chứng minh bằng bộ dữ liệu nào, kết quả và phần chưa xong? Nghiên cứu thị trường trên web viết thẻ so sánh và gợi ý trả lời thế nào? | người làm AI, cả nhóm |
 
 ---
 
@@ -106,6 +106,8 @@ Ba ý chính để nhớ:
 | Tri thức (BM25 + embedding + RRF + ngưỡng từ chối) | chạy được; Recall@5 93,2% trên 60 câu BTC |
 | Voice (VAD, Smart Turn, ASR, TTS, barge-in) | chạy được; WER 6,2% trên 674 lượt nói tổng hợp |
 | Vòng tự cải tiến (`components/improvement/*`, `pipeline/improve`), QA chấm rubric | có CLI `python -m ai_agent_service.pipeline.improve`, chạy offline, không trên đường chạy của khách; chưa có số đo trên `data/dev` (cập nhật 12/11/2026, xem [Vòng cải tiến](06-vong-cai-tien.md)) |
+| Nghiên cứu thị trường trên web (MCP `market`, vai `researcher`): thẻ so sánh, gợi ý cho Gap Loop, link trang chính hãng | có code và test offline, thử thật trên vài SKU và gap tổng hợp (27/11/2026); chưa có số đo, chưa chạy trong cluster. Xem [Vòng cải tiến](06-vong-cai-tien.md#nghiên-cứu-thị-trường-trên-web) |
+| Chat web: link tới đơn của khách đã đăng nhập, link trang chính hãng dưới câu trả lời | có code, `tsc` qua; chưa thử trên trình duyệt |
 | Chất lượng end-to-end | TSR M2 còn 25–40% trên các cohort nhỏ, xa ngưỡng 70% của BTC. Mọi nhãn còn là diagnostic, chưa có người duyệt |
 
 Chi tiết số liệu và giới hạn: [Đánh giá](05-danh-gia.md#6-kết-quả-đến-hiện-tại).

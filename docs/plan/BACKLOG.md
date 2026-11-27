@@ -35,3 +35,4 @@ Các mục dưới đây lấy từ lỗi và giới hạn **đã ghi nhận** t
 | 8 | QaAgent chấm rubric J01–J12 sau mỗi cuộc | `agents/qa.py` chưa gọi model | tool nội bộ | chất lượng | trung bình | ý tưởng | |
 | 9 | Trang đọc tín hiệu 👍/👎 của nhân viên | tín hiệu đã ghi, chưa có nơi xem | UI | | thấp | ý tưởng | |
 | 10 | Thêm entity `sku`, `order_id`, số điện thoại cho ASR | entity accuracy chưa đo các loại này | ITN / lexicon | ASR | thấp | ý tưởng | |
+| 11 | So sánh với sản phẩm trên thị trường (battlecard từ web, ngoại tuyến) | khách `khach_so_gia` so giá nơi khác; advisor chỉ có câu chung của `objection-handling` | tool (MCP `researcher`) + tri thức | TSR, HR, vi phạm `competitor` | trung bình | đang làm | [002](002-so-sanh-doi-thu-tu-web.md) |

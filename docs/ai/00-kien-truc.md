@@ -59,7 +59,7 @@ flowchart LR
         direction TB
         API["API: stream SSE · voice WS<br/>Zalo webhook · lease cuộc gọi"]
         HOT["Đồ thị nóng LangGraph<br/>perceive → advisor → guard → respond"]
-        MCP["MCP servers (stdio)<br/>catalog · crm · order · memory · knowledge · account"]
+        MCP["MCP servers (stdio)<br/>catalog · crm · order · memory · knowledge · account<br/>(+ market: web, chỉ vòng nghiên cứu)"]
         COLD["after_call<br/>ghi bộ nhớ khi gác máy"]
         TTS["TTS VieNeu"]
     end
@@ -209,14 +209,14 @@ flowchart TD
         OFF["eval/ · improve/<br/>(chạy offline bằng CLI)"]
     end
 
-    AG["agents/<br/>Advisor · Policy · Memory · Qa<br/>Reflection · Approval · Simulator"]
+    AG["agents/<br/>Advisor · Policy · Memory · Qa<br/>Reflection · Approval · Simulator · Market"]
 
-    COMP["components/<br/>intake · identity · orchestration · context<br/>guardrails · memory · knowledge · handoff<br/>voice · improvement · evaluation · clock"]
+    COMP["components/<br/>intake · identity · orchestration · context<br/>guardrails · memory · knowledge · handoff<br/>voice · improvement · evaluation · clock · market"]
 
     subgraph MCPL["mcp/"]
         MCLI["client.py<br/>một client mỗi vai"]
         MTOOL["tools.py<br/>middleware: lane, strict, guard, chain"]
-        MSRV["servers/<br/>memory · catalog · crm · order<br/>knowledge · account (+ btc, delivery)"]
+        MSRV["servers/<br/>memory · catalog · crm · order<br/>knowledge · account · market (+ btc, delivery)"]
     end
 
     BASE["llm/ · config/ · observability/<br/>factory, rate limiter, token ledger, Langfuse"]
@@ -332,18 +332,21 @@ Ghi chú từng bước:
 
 ## 0.8 MCP: vai, server và ai thấy tool nào
 
-Bốn vai (`ROLES` trong [server_base.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/server_base.py)), mỗi vai một client. Server kiểm vai ở **mọi** lời gọi; vai đi kèm biến môi trường `MCP_ROLE` khi server là tiến trình con stdio, hoặc header `x-role` khi gọi qua HTTP.
+Năm vai (`ROLES` trong [server_base.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/server_base.py)), mỗi vai một client. Server kiểm vai ở **mọi** lời gọi; vai đi kèm biến môi trường `MCP_ROLE` khi server là tiến trình con stdio, hoặc header `x-role` khi gọi qua HTTP.
 
-| Server | `advisor` (model) | `harness` (code của đồ thị) | `memory_writer` (`after_call`) | `admin` (console, xóa dữ liệu) | Cổng HTTP mặc định |
-|---|---|---|---|---|---|
-| `memory` | ✓ | ✓ | ✓ | ✓ | 8801 |
-| `catalog` | ✓ | ✓ | | | 8802 |
-| `crm` | ✓ | ✓ | | | 8803 |
-| `order` | ✓ | ✓ | | | 8804 |
-| `knowledge` | | ✓ | | ✓ | 8805 |
-| `account` | ✓ | | | | 8806 |
+| Server | `advisor` (model) | `harness` (code của đồ thị) | `memory_writer` (`after_call`) | `admin` (console, xóa dữ liệu) | `researcher` (nghiên cứu thị trường, offline) | Cổng HTTP mặc định |
+|---|---|---|---|---|---|---|
+| `memory` | ✓ | ✓ | ✓ | ✓ | | 8801 |
+| `catalog` | ✓ | ✓ | | | | 8802 |
+| `crm` | ✓ | ✓ | | | | 8803 |
+| `order` | ✓ | ✓ | | | | 8804 |
+| `knowledge` | | ✓ | | ✓ | | 8805 |
+| `account` | ✓ | | | | | 8806 |
+| `market` | | | | | ✓ | 8807 |
 
 Nguồn: `SERVER_ROLES` và `HTTP_URLS` trong [client.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/client.py). Một vai chỉ khởi động server có tool nó được dùng: vai `memory_writer` không phải mở sáu tiến trình và thêm một model embedding.
+
+`market` ([servers/market.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers/market.py)) là server duy nhất ra internet: `market_web_search` (Brave hoặc Tavily) và `market_web_extract` (chỉ domain cho phép, đang tắt). Chỉ vai `researcher` gọi được. Không lượt nào của khách chạy dưới vai đó, và không lane nào có tool `market_*`. Lý do không cho advisor tìm web khi khách đang chờ (luật BTC cấm so giá đối thủ, hard guard tin mọi số trong kết quả tool, độ trễ, prompt injection) nằm ở [đề xuất 002](../plan/002-so-sanh-doi-thu-tu-web.md).
 
 Tên tool: BTC đặt tên có dấu chấm (`inventory.check`). Provider kiểu OpenAI không nhận dấu chấm, nên trên dây là `inventory_check`. `client.py` đổi lại dấu chấm khi ghi trace, để bộ chấm của BTC so khớp được.
 
@@ -389,6 +392,8 @@ flowchart LR
         IM["pipeline.improve round"] --> EV
         IM --> RF["Reflection: skills v&lt;N&gt;"]
         IM --> GL["Knowledge Gap Loop: kb v&lt;N&gt;"]
+        MR["improve market-research / market-gaps<br/>(MCP market, vai researcher)"] --> MC["thẻ so sánh, gợi ý trả lời<br/>chờ người duyệt"]
+        MC --> GL
     end
 
     MW --> DB[("agent.facts, agent.episodes")]
@@ -400,6 +405,7 @@ flowchart LR
 
 - **`after_call`** ([after_call.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/cold/after_call.py)) là nơi chặn đầu độc bộ nhớ: chỉ ghi cho khách cuộc gọi đã xác nhận; `AMBIGUOUS` lúc gác máy thì không ghi cho ai. Bốn bước `extract` → `gate` → `commit` → `summarize`. Một finalizer sở hữu mỗi cuộc, và yêu cầu xóa dữ liệu chờ các lần ghi của nó xong.
 - **Đánh giá** dùng cùng đồ thị nóng và `after_call`, nhưng với database riêng `*_eval`, đồng hồ ảo và store ghi trace. Cách chạy: [evaluation/README.md](../../evaluation/README.md).
+- **Nghiên cứu thị trường** ([pipeline/improve/market.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/improve/market.py)) tìm web, rồi viết thẻ so sánh (battlecard) và gợi ý trả lời cho câu hỏi còn thiếu. Mọi thứ chờ người duyệt rồi mới thành một version kb. Chi tiết: [Vòng cải tiến](06-vong-cai-tien.md#nghiên-cứu-thị-trường-trên-web).
 - **Vòng cải tiến** không chạy trong service: nó tạo version mới của skills hoặc knowledge, cần duyệt, rồi được đo bằng `run_eval.py --profile gaploop|reflection|combined`. Chi tiết: [Vòng cải tiến](06-vong-cai-tien.md).
 
 ## 0.11 Khi thêm code: đặt ở đâu

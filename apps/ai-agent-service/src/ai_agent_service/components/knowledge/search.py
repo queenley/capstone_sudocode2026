@@ -35,6 +35,7 @@ from datetime import date
 from pathlib import Path
 from typing import Literal, Mapping, Sequence
 
+from .. import market
 from ..intake.text import plain
 from .corpus import THROUGH_TOOLS, Chunk, by_id, covers
 from .lexical import Lexical, fuse
@@ -204,7 +205,9 @@ class KnowledgeBase:
         fused = fuse(rankings, k=self.settings.fusion_k) if self._vectors is not None or len(rankings) > 1 else lexical
         day = order_date or on
         ranked = [doc_id for doc_id, _ in fused]
-        top = [doc_id for doc_id in ranked if self._by_id[doc_id].in_force(day) and self._fits(self._by_id[doc_id], about)][:k]
+        compares = market.compares(query)
+        top = [doc_id for doc_id in ranked if self._by_id[doc_id].in_force(day) and self._fits(self._by_id[doc_id], about)
+               and (compares or not self._by_id[doc_id].provenance.get("battlecard"))][:k]
         reached = ranked[:ranked.index(top[-1])] if top else ranked
         withheld = tuple(doc_id for doc_id in reached if not self._by_id[doc_id].in_force(day))
         scores = dict(fused)

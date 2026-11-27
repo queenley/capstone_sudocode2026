@@ -6,6 +6,7 @@ Trang này mô tả hai cơ chế tự cải tiến của trợ lý đúng như 
 |---|---|---|---|
 | **Reflection** | Cách ứng xử trong một tình huống mà skill chưa dạy, hoặc đã dạy mà agent không theo | Một dòng của một skill trong [`skills.yaml`](../../config/prompts/agent/advisor/skills.yaml), thành một phiên bản skill mới | ApprovalAgent (vòng chấm tự động) hoặc người |
 | **Knowledge Gap Loop** | Câu hỏi tài liệu không trả lời được, đã được tư vấn viên trả lời | Một mục mới của kho tri thức (`kb_search` đọc) | Người, sau cổng kiểm tra |
+| **Nghiên cứu thị trường** (tìm web) | Điều khách hay so với nơi khác; câu trả lời của hãng cho câu hỏi còn thiếu | Thẻ so sánh (playbook theo SKU) và gợi ý cho Gap Loop; cả hai thành mục kho tri thức sau khi duyệt | Người, sau cổng kiểm tra |
 
 Mã nguồn: [`pipeline/improve/cli.py`](../../apps/ai-agent-service/src/ai_agent_service/pipeline/improve/cli.py) (lệnh `improve`), [`components/improvement/`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/), các agent [`qa.py`](../../apps/ai-agent-service/src/ai_agent_service/agents/qa.py), [`reflection.py`](../../apps/ai-agent-service/src/ai_agent_service/agents/reflection.py), [`approval.py`](../../apps/ai-agent-service/src/ai_agent_service/agents/approval.py), [`policy.py`](../../apps/ai-agent-service/src/ai_agent_service/agents/policy.py).
 
@@ -132,6 +133,37 @@ sequenceDiagram
 - Rủi ro: bộ ẩn của BTC có case ngoài tài liệu chỉ đạt khi agent nói "chưa có thông tin". Một mục cho đúng chủ đề đó sẽ làm case đó trượt; người duyệt chịu rủi ro này.
 
 ---
+
+### Nghiên cứu thị trường trên web
+
+Hai việc dùng chung MCP server `market` (vai `researcher`, không lượt nào của khách chạy dưới vai này) và `MarketResearchAgent`. Agent này không có tool nào: code tìm, agent chỉ viết một câu trả lời có cấu trúc từ kết quả được đưa. Đề xuất, thử thật và lý do chọn kiến trúc: [002](../plan/002-so-sanh-doi-thu-tu-web.md).
+
+```mermaid
+flowchart LR
+    CAT["catalog BTC"] --> Q1["truy vấn theo sản phẩm"]
+    GAP["gap đang mở<br/>(đã restate)"] --> Q2["truy vấn = câu hỏi,<br/>bỏ token PII"]
+    Q1 & Q2 --> WS["market_web_search<br/>(vai researcher)"]
+    WS --> EV["evidence.jsonl<br/>(nội bộ)"]
+    WS --> AG["MarketResearchAgent<br/>(không tool)"]
+    AG --> BC["thẻ so sánh<br/>cards.json"]
+    AG --> GS["gợi ý trả lời<br/>gap-suggestions.json"]
+    BC --> R1["người duyệt<br/>/admin/kien-thuc"]
+    GS --> R2["tư vấn viên sửa, duyệt<br/>qua Gap Loop"]
+    R1 & R2 --> KB["data/kb/v&lt;N+1&gt;.jsonl"]
+```
+
+| Việc | Lệnh | Kết quả | Cổng code |
+|---|---|---|---|
+| **Thẻ so sánh** (battlecard) | `improve market-research --sku SKU-AP-X` hoặc `--category …` | Mục playbook `BC-<SKU>-…`, `situation: price_comparison`, `applies_to: [SKU]`. Chỉ nói quyền lợi của shop, mỗi ý trích mã tài liệu trong ngoặc vuông | Không số tiền, mã khuyến mãi, tồn kho; không tên nơi bán, không thương hiệu shop không bán, không lời chê; mỗi ý có mã được phép; tối đa 3 ý |
+| **Gợi ý trả lời cho gap** | `improve gaps` (restate), rồi `improve market-gaps --limit 5` | Nháp kèm link, ghi chú và `grounds`, cạnh câu hỏi trong "Câu hỏi còn thiếu kiến thức" | Cổng Gap Loop; link phải nằm trong kết quả tìm kiếm; phải có link hoặc mã tài liệu; không gửi ra ngoài câu chưa restate (có thể chứa tên) hay chủ đề PB-06 |
+
+Ba luật ở phía truy hồi và hiển thị:
+
+- **Thẻ so sánh chỉ được truy hồi khi câu của khách so với nơi khác** (`market.compares` trong [search.py](../../apps/ai-agent-service/src/ai_agent_service/components/knowledge/search.py)). Không có luật này, thẻ của một sản phẩm chiếm hạng 1 ở mọi câu hỏi về sản phẩm đó (thử thật 2026-11-27).
+- **`grounds: documents`** nghĩa là tài liệu đã trả lời câu hỏi: đó là lỗi tra cứu, không phải thiếu kiến thức. Giao diện báo chuyển cho đội kỹ thuật thay vì thêm mục mới.
+- **Link trang chính hãng** đến tay khách chỉ khi người duyệt chọn, domain nằm trong `references.allowed_domains` của [market.yaml](../../apps/ai-agent-service/config/market.yaml), và mục đó đứng hạng 1 khi trả lời (`references_of` trong `conversations.py`). Advisor không đọc và không viết link.
+
+Cần `BRAVE_SEARCH_API_KEY` (hoặc `TAVILY_API_KEY`) và key của model `agents.market`. Mỗi truy vấn tốn một lượt tìm kiếm; mỗi sản phẩm hoặc gap tốn một lần gọi model. Chưa có số đo trên kịch bản hay gap thật.
 
 ## 5. Bộ dữ liệu chứng minh
 

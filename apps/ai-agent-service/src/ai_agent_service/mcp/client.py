@@ -57,17 +57,20 @@ SERVERS: dict[str, str] = {
     "order": "ai_agent_service.mcp.servers.order",
     "knowledge": "ai_agent_service.mcp.servers.knowledge",
     "account": "ai_agent_service.mcp.servers.account",
+    "market": "ai_agent_service.mcp.servers.market",
 }
 
 # Only start servers containing business tools this role may use. In particular,
 # a memory writer must not load six Python processes and another embedding model.
 SERVER_ROLES: dict[str, frozenset[str]] = {
-    "memory": ROLES,
+    "memory": frozenset({"advisor", "harness", "memory_writer", "admin"}),
     "catalog": frozenset({"advisor", "harness"}),
     "crm": frozenset({"advisor", "harness"}),
     "order": frozenset({"advisor", "harness"}),
     "knowledge": frozenset({"harness", "admin"}),
     "account": frozenset({"advisor"}),
+    # The web, for the offline market research only (docs/plan/002): never a customer's turn.
+    "market": frozenset({"researcher"}),
 }
 
 #: Server name -> (environment variable naming its URL, default port) over HTTP.
@@ -78,6 +81,7 @@ HTTP_URLS: dict[str, tuple[str, int]] = {
     "order": ("MCP_ORDER_URL", 8804),
     "knowledge": ("MCP_KNOWLEDGE_URL", 8805),
     "account": ("MCP_ACCOUNT_URL", 8806),
+    "market": ("MCP_MARKET_URL", 8807),
 }
 
 

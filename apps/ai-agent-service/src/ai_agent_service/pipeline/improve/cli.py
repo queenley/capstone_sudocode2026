@@ -113,6 +113,22 @@ def parser() -> argparse.ArgumentParser:
                          help="A learning set's scenarios directory; repeat")
     w_learn.add_argument("--frozen-ids", type=Path, action="append", default=[], required=True,
                          help="A JSON list of frozen ids, so the loop never learns from what it is measured on")
+    # The market research (pipeline/improve/market.py, docs/plan/002): battlecards a person approves.
+    m_research = commands.add_parser("market-research", help="Search the web for products like ours; draft battlecards")
+    m_research.add_argument("--category", help="A category prefix, e.g. gia-dung/may-loc-khong-khi")
+    m_research.add_argument("--sku", action="append", default=[], help="One product; repeat")
+    m_research.add_argument("--round", help="A name for the run (default: market-<UTC date>)")
+    m_research.add_argument("--limit", type=int, help="At most this many products")
+    m_gaps = commands.add_parser("market-gaps", help="Draft answers from the web for open knowledge gaps")
+    m_gaps.add_argument("--limit", type=int, help="At most this many gaps (default: gaps.max_gaps_per_run)")
+    m_gaps.add_argument("--round", help="A name for the run (default: market-gaps-<UTC date>)")
+    m_cards = commands.add_parser("market-cards", help="List battlecards")
+    m_cards.add_argument("--status", choices=("pending", "flagged", "approved", "rejected"))
+    m_decide = commands.add_parser("market-decide", help="A person approves (publishes) or rejects a battlecard")
+    m_decide.add_argument("--card", required=True)
+    m_decide.add_argument("--decision", choices=("approved", "rejected"), required=True)
+    m_decide.add_argument("--reviewer", required=True)
+    m_decide.add_argument("--note", default="")
     return parser
 
 
@@ -143,6 +159,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return asyncio.run(run_round(args))
         if args.command.startswith("weekly-"):
             return _weekly(args)
+        if args.command.startswith("market-"):
+            return _market(args)
     except (OSError, KeyError, ValueError) as error:
         print(error)
         return 2
@@ -162,6 +180,41 @@ def _weekly(args: argparse.Namespace) -> int:
     if args.command == "weekly-status":
         return asyncio.run(weekly.status(week))
     return asyncio.run(weekly.measure(week, frozen_sets=frozen))
+
+
+def _market(args: argparse.Namespace) -> int:
+    from ...components.improvement import market as battlecards
+    from ...mcp.server_base import use_selector_loop_on_windows
+
+    if args.command == "market-research":
+        from . import market
+
+        if not args.category and not args.sku:
+            raise ValueError("Name a --category or at least one --sku")
+        use_selector_loop_on_windows()
+        name = args.round or f"market-{datetime.now(timezone.utc):%Y%m%d}"
+        report = asyncio.run(market.research(category=args.category, skus=args.sku, round_name=name, limit=args.limit))
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "market-gaps":
+        from . import market
+
+        use_selector_loop_on_windows()
+        name = args.round or f"market-gaps-{datetime.now(timezone.utc):%Y%m%d}"
+        report = asyncio.run(market.research_gaps(round_name=name, limit=args.limit))
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "market-cards":
+        for row in battlecards.cards(args.status):
+            print(f"{row['id']}  {row['status']:<8}  {row['sku']:<14}  {row.get('round') or ''}"
+                  + (f"  gate: {' | '.join(row['gate'])}" if row.get("gate") else ""))
+            for point in row["card"]["points"]:
+                print(f"    - {point.get('text')} ({', '.join(point.get('cites') or [])})")
+        return 0
+    record = battlecards.decide(args.card, args.decision, reviewer=args.reviewer, note=args.note)
+    print(f"{record['id']} {record['status']}" + (f": {record['chunk_id']} in knowledge version "
+                                                  f"{record['knowledge_version']}" if record.get("chunk_id") else ""))
+    return 0
 
 
 # ── a run on disk ─────────────────────────────────────────────────────────

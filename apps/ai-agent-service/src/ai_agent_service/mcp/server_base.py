@@ -49,7 +49,9 @@ logger = logging.getLogger(__name__)
 
 ROLE_HEADER = "x-role"
 ROLE_ENV = "MCP_ROLE"
-ROLES = frozenset({"advisor", "harness", "memory_writer", "admin"})
+#: ``researcher`` is the offline market research of ``docs/plan/002-so-sanh-doi-thu-tu-web.md``: the only role that
+#: may search the web, and it may do nothing else. No role a customer's turn runs under ever holds it.
+ROLES = frozenset({"advisor", "harness", "memory_writer", "admin", "researcher"})
 
 
 class ToolFailure(Exception):

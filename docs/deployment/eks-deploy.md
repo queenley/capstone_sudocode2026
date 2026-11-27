@@ -10,13 +10,70 @@ Mọi lệnh viết cho PowerShell, chạy từ thư mục gốc repo. Tham số
 
 ## 1. Tổng quan
 
+Câu hỏi sơ đồ trả lời: **khi đã deploy, request của khách và nhân viên đi qua đâu, và mỗi pod dùng dịch vụ AWS nào?** Tên khớp manifest render từ overlay `aws-production`.
+
+```mermaid
+flowchart LR
+    U["Khách, nhân viên, admin<br/>(trình duyệt, gọi thoại)"] -->|"HTTPS / WSS"| ALB["ALB + ACM<br/>(Ingress)"]
+    GH["GitHub Actions<br/>Deploy EKS"] -->|"build, push 9 image"| ECR[("ECR")]
+    GH -->|"migrate, kubectl apply, seed"| EKS
+
+    subgraph EKS["EKS, namespace telesales-production (node do Karpenter cấp)"]
+        WEB["web<br/>(Next.js, HPA)"]
+        GW["api-gateway<br/>(HPA)"]
+        SVC["identity · commerce · sales<br/>(HPA)"]
+        EVT["*-events workers<br/>(outbox)"]
+        AG["ai-agent-service<br/>(KEDA: lượt, cuộc gọi thoại)"]
+        WRK["ai-agent-worker<br/>(KEDA: độ dài SQS)"]
+        MCP["mcp-servers<br/>(6 server HTTP, HPA)"]
+        ASR["asr-service"]
+        ZM["zalo-mock"]
+        CJ["CronJob improve-learn,<br/>improve-tick"]
+    end
+
+    ALB -->|"/"| WEB
+    ALB -->|"/api"| GW
+    WEB --> GW
+    WEB -->|"/zalo-mock (admin)"| ZM
+    GW --> SVC
+    GW --> AG
+    ZM -->|"webhook"| GW
+    AG --> MCP
+    AG --> ASR
+    AG -->|"cuộc gọi kết thúc"| SQS[("SQS + DLQ")]
+    SQS --> WRK
+    WRK --> MCP
+
+    subgraph DATA["Dịch vụ dữ liệu AWS"]
+        DB[("Aurora PostgreSQL<br/>app_db, app_db_eval")]
+        VK[("ElastiCache Valkey<br/>rate limit, limiter, kb:changed")]
+        EFS[("EFS<br/>skills · kb · improvement · runs")]
+        SM[("Secrets Manager<br/>(External Secrets)")]
+    end
+
+    SVC & EVT & MCP --> DB
+    AG & WRK & CJ --> DB
+    GW & AG & WRK --> VK
+    AG & WRK & CJ --> EFS
+    SM -.->|"telesales-secrets"| EKS
+    ECR -.->|"pull image"| EKS
+
+    AG & WRK & CJ -->|"HTTPS qua NAT"| LLM["API model (OpenAI)"]
+    AG -.->|"trace"| LF["Langfuse"]
+```
+
+- **Vào:** ALB chỉ có hai đường: `/api` vào `api-gateway`, còn lại vào `web` ([ingress.yaml](../../infra/kubernetes/overlays/aws-production/ingress.yaml)). Cuộc gọi thoại là WebSocket qua cùng `/api`.
+- **Agent:** `ai-agent-service` trả lời từng lượt; tool đi qua `mcp-servers` bằng HTTP, nên chỉ agent và worker gọi được MCP ([network-policy.yaml](../../infra/kubernetes/overlays/aws-production/network-policy.yaml)). Việc sau cuộc gọi (`after_call`) đi qua SQS sang `ai-agent-worker`.
+- **Co giãn:** KEDA theo số lượt đang chạy và số cuộc gọi thoại cho agent, theo độ dài hàng đợi cho worker; HPA theo CPU cho các service còn lại ([scaling.yaml](../../infra/kubernetes/overlays/aws-production/scaling.yaml)). Karpenter thêm, bớt node.
+- **Dữ liệu dùng chung:** EFS giữ skills, kho tri thức và trạng thái cải tiến, để mọi pod agent, worker và CronJob cải tiến thấy cùng một version (mục 2.11).
+
 Thứ tự một lần deploy:
 
 ```mermaid
 flowchart TD
     A["1. Terraform: VPC + EKS"] --> B["2. Terraform: phần còn lại (Aurora, Valkey, EFS, SQS, ECR, add-on)"]
     B --> C["3. Điền secret app trong Secrets Manager"]
-    C --> D["4. Build và push 7 image lên ECR"]
+    C --> D["4. Build và push 9 image lên ECR"]
     D --> E["5. Render manifest từ output overlay"]
     E --> F["6. NodePool Karpenter, namespace, secret migration, Job migrate"]
     F --> G["7. kubectl apply deployment.yaml"]
@@ -177,6 +234,8 @@ Remove-Item C:/secure/telesales-app.json
 ```
 
 Ý nghĩa từng khóa và khóa tùy chọn: bảng ở [README.md, mục 3](README.md#3-cluster-secret-và-database). `LANGFUSE_PROJECT_ID` để trang dev mở được trace của từng lượt.
+
+`BRAVE_SEARCH_API_KEY` (tùy chọn): chỉ cần khi chạy nghiên cứu thị trường (`improve market-research`, `market-gaps`) trong cluster. Thẻ và gợi ý ghi vào EFS (`data/improvement/market`), nơi trang `/admin/kien-thuc` đọc. Không có key thì các lệnh đó dừng với `NOT_CONFIGURED`; lượt của khách không dùng key này. `put-secret-value` **thay cả secret**: đọc giá trị đang có (`aws secretsmanager get-secret-value`), thêm khóa vào JSON đó, rồi mới đưa lên, nếu không sẽ mất các khóa khác.
 
 **`ENVIRONMENT=staging`: bắt buộc, vì chưa có nhà cung cấp SMS.** Configmap đặt `ENVIRONMENT=production`; ở chế độ đó mã OTP chỉ gửi qua SMS (`OTP_DELIVERY_URL`), nên khách không đăng ký hay xác minh được. Với `staging`, mã OTP hiện trên màn hình. Secret được nạp sau configmap nên giá trị trong secret thắng. Khi có SMS thật: bỏ dòng này, thêm `OTP_DELIVERY_URL` và `OTP_DELIVERY_TOKEN` ([README.md, OTP webhook](README.md#otp-webhook)).
 

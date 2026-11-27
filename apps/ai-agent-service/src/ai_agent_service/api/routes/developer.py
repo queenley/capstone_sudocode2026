@@ -36,7 +36,10 @@ ADMIN = {"admin"}
 
 class GapResolution(BaseModel):
     answer: str = Field(min_length=3, max_length=4000)
-    cites: list[str] = Field(min_length=1, max_length=20)
+    #: The shop's sections the answer rests on. May be empty only when it rests on a manufacturer's page instead.
+    cites: list[str] = Field(default_factory=list, max_length=20)
+    #: Manufacturer pages given to the customer beside the answer (docs/plan/002, section 12).
+    references: list[str] = Field(default_factory=list, max_length=5)
     approved: Literal[True]
 
 
@@ -60,9 +63,14 @@ async def knowledge_gaps(request: Request):
 async def resolve_gap(gap_id: str, body: GapResolution, request: Request):
     _guard(request)
     from ...components.improvement import gaps
+    if not body.cites and not body.references:
+        raise HTTPException(422, "Cần mã tài liệu, hoặc link trang chính hãng mà câu trả lời dựa vào")
     try:
+        # With no section of the shop's, the answer is the consultant's, from the manufacturer's page they chose.
         version = await asyncio.to_thread(gaps.resolve, gap_id, answer=body.answer, cites=body.cites,
-                                                       reviewer=str(request.state.actor_id))
+                                          reviewer=str(request.state.actor_id),
+                                          source="documents" if body.cites else "consultant",
+                                          references=body.references)
     except KeyError as error:
         raise HTTPException(404, "Knowledge gap not found") from error
     except ValueError as error:

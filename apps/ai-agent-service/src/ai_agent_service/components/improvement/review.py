@@ -35,7 +35,7 @@ from .signals import home
 
 #: Authors that may never approve: the agents of the loop.
 AGENTS = frozenset({"qa", "qaagent", "policy", "policyagent", "memory", "simulator", "advisor", "reflection",
-                    "reflectionagent"})
+                    "reflectionagent", "market", "marketresearchagent"})
 DECISIONS = ("approved", "rejected")
 #: The ApprovalAgent's name in a review file (agents/approval.py): it decides, it never writes a change.
 APPROVAL_AGENT = "approval-agent"

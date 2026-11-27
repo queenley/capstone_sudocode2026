@@ -87,14 +87,14 @@ Những gì cần đọc hiểu lời khách không nằm trong luật mà nằm
 | `runtime/db.py`, `runtime/vault.py` | schema `agent`, pool, checkpointer; vault PII mã hóa |
 | `runtime/platform.py` | **chỗ duy nhất** chạm bảng platform |
 | `pipeline/hot`, `pipeline/cold` | đồ thị 7 bước; after_call |
-| `pipeline/improve` | vòng cải tiến offline: lấy lỗi từ bộ chấm, chẩn đoán, Reflection sửa skill, Gap Loop thêm tri thức, duyệt, publish, đo lại ([docs/ai/06](../../docs/ai/06-vong-cai-tien.md)) |
-| `agents/` | Advisor, Policy (Jev), Memory, QA, Simulator (khách của bước khám phá, không phải simulator đánh giá) |
-| `components/` | intake, identity, guardrails, memory/brief, handoff, voice, clock |
-| `mcp/client.py`, `mcp/servers/` | client phân quyền theo role (tự chèn `on`, `customer_phone`, bỏ trường `_internal`) và 5 server |
+| `pipeline/improve` | vòng cải tiến offline: lấy lỗi từ bộ chấm, chẩn đoán, Reflection sửa skill, Gap Loop thêm tri thức, duyệt, publish, đo lại; nghiên cứu thị trường trên web (`market.py`: thẻ so sánh, gợi ý cho gap) ([docs/ai/06](../../docs/ai/06-vong-cai-tien.md)) |
+| `agents/` | Advisor, Policy (Jev), Memory, QA, Simulator (khách của bước khám phá, không phải simulator đánh giá), Market (viết thẻ so sánh và gợi ý trả lời từ kết quả web, không có tool) |
+| `components/` | intake, identity, guardrails, memory/brief, handoff, voice, clock, market (cấu hình và làm sạch văn bản web, domain chính hãng) |
+| `mcp/client.py`, `mcp/servers/` | client phân quyền theo role (tự chèn `on`, `customer_phone`, bỏ trường `_internal`) và các server (`market` chỉ cho vai `researcher`) |
 
 Thư mục ngoài `src/`:
 
-- `config/`: `models.yaml` (agent → provider/model, rate limit), `lanes.yaml`, `situations.yaml`, `knowledge.yaml` (phiên bản tri thức, tham số truy hồi, ngưỡng θ, model embedding).
+- `config/`: `models.yaml` (agent → provider/model, rate limit), `lanes.yaml`, `situations.yaml`, `knowledge.yaml` (phiên bản tri thức, tham số truy hồi, ngưỡng θ, model embedding), `market.yaml` (nhà cung cấp tìm kiếm, truy vấn, cổng thẻ so sánh, domain chính hãng được gửi link cho khách).
 - `data/btc/`: gói của BTC gồm catalog, CRM, chính sách, `mock_tools.py`, `reference_eval.py`, test set.
 - `data/kb/v<N>.jsonl`: các mục FAQ/playbook đã duyệt của từng phiên bản tri thức; `v0` chưa có mục nào.
 
@@ -107,6 +107,7 @@ Thư mục ngoài `src/`:
 | order | `order_status`, `order_update` |
 | memory | `identity_find`, `identity_link_provisional`, `memory_get_profile`, `memory_get_episodes`, `memory_get_open_items`, `memory_commit_*`, `memory_confirm_identity`, `memory_request_deletion`, `memory_delete_customer` |
 | knowledge | `kb_search` (harness, admin), `kb_upsert` (chỉ admin) |
+| market | `market_web_search`, `market_web_extract` (chỉ vai `researcher`; không lane nào có; extract tắt khi `extract.allowed_domains` rỗng) |
 
 `order_create` nhận thêm hai tham số tùy chọn của nhóm (BTC cho phép thêm): `basket_skus` (các món khác trong cùng đơn, chuyển thẳng cho mock để máy thứ hai được AIR-2ND-50) và `order_group` ("1"/"2" khi khách đồng ý tách một đơn COD trên 10 triệu; không gửi xuống mock, guard đọc nó). `delivery_estimate` là hàm thuần trong `mcp/servers/delivery.py`, để bộ sinh dữ liệu dùng chung đúng quy tắc giao hàng.
 
@@ -153,6 +154,7 @@ Test `tests/agent/test_btc_contract.py` giữ các điểm trên. Mọi tên slo
 | `AGENT_PROFILE` | `local`: các agent liệt kê trong `profiles.local` của `models.yaml` dùng `gemini-3.5-flash-lite` (key miễn phí); extractor của phần đánh giá giữ nguyên model |
 | `IMPROVEMENT_DIR` | tín hiệu, round, thẻ bài học, file duyệt, sổ cải tiến (mặc định `data/improvement`, không đưa lên git) |
 | `EXPLORE_DATABASE_URL` | database của bước khám phá, tên phải kết thúc bằng `_explore` (mặc định: tên app + `_explore`) |
+| `BRAVE_SEARCH_API_KEY`, `TAVILY_API_KEY` | API tìm kiếm của server `market` (chọn bằng `search.provider` trong `config/market.yaml`); chỉ vòng nghiên cứu thị trường dùng. Thiếu key thì lệnh `market-*` dừng với `NOT_CONFIGURED` |
 | `PROMPTS_DIR` | prompt của agent, mặc định `config/prompts/agent` ở root repo (image: `/app/agent/prompts`) |
 
 Đổi model hoặc provider của advisor: sửa `config/models.yaml`, hoặc chọn tạm trong Agent Console (`/developer`); lựa chọn tạm mất khi restart.
@@ -197,7 +199,17 @@ export PYTHONPATH=apps/ai-agent-service/src:packages/backend-common
 apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve round --name warranty-proof --learn data/reflection/warranty/learn/scenarios --frozen data/reflection/warranty/frozen/scenarios --frozen-ids data/reflection/warranty/frozen.json --r0-runs 2 --r1-runs 2 --scripted
 ```
 
-Các bước (`harvest`, `score`, `reflect`, `gaps`, `publish`, `compare`, `rollback`, `revoke`), ApprovalAgent, bộ dữ liệu chứng minh, kết quả và phần chưa xong: [docs/ai/06-vong-cai-tien.md](../../docs/ai/06-vong-cai-tien.md).
+Nghiên cứu thị trường trên web (tốn phí tìm kiếm và model, thử một SKU trước):
+
+```bash
+apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve market-research --sku SKU-AP-X
+apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve market-gaps --limit 5
+apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve market-cards --status pending
+```
+
+Lệnh CLI chỉ nạp `apps/ai-agent-service/.env`. Key đặt ở `.env` gốc repo thì export vào shell trước.
+
+Các bước (`harvest`, `score`, `reflect`, `gaps`, `publish`, `compare`, `rollback`, `revoke`, `market-*`), ApprovalAgent, bộ dữ liệu chứng minh, kết quả và phần chưa xong: [docs/ai/06-vong-cai-tien.md](../../docs/ai/06-vong-cai-tien.md).
 
 ## Giới hạn (kế thừa từ agent tham chiếu)
 

@@ -9,6 +9,7 @@ import EvaluationDashboard from "./evaluation-dashboard";
 import FaqAdmin from "./faq-admin";
 import ImprovementAdmin from "./improvement-admin";
 import KnowledgeGaps from "./knowledge-gaps";
+import MarketCards from "./market-cards";
 import PoliciesAdmin from "./policies-admin";
 import SkillsAdmin from "./skills-admin";
 
@@ -20,6 +21,7 @@ export function KnowledgeSection() {
     <div className="sl-columns ad-knowledge">
       <KnowledgeGaps token={token} onFaqCreated={() => setFaqAdded((count) => count + 1)} />
       <FaqAdmin token={token} refresh={faqAdded} />
+      <MarketCards token={token} />
     </div>
   );
 }

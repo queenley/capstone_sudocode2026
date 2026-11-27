@@ -194,6 +194,18 @@ agents:
       use_responses_api: true
       max_tokens: 4096
 
+  # docs/plan/002: writes one battlecard per product from cleaned web search results (agents/market.py). Offline,
+  # one call per product a round, never on the hot path; a person approves every card. The knowledge agent's model,
+  # unmeasured on this task: no card has been written or reviewed yet (2026-11-27).
+  market:
+    provider: openai
+    model: gpt-5.6-luna
+    generation:
+      temperature: null
+      reasoning_effort: low
+      use_responses_api: false
+      max_tokens: 4096
+
   # The exploration's customer (agents/simulator.py): its persona voice and
   # its observer of the agent's questions and prices. Offline, on the
   # learning set only, and never the evaluation's simulator.

@@ -225,15 +225,23 @@ SOURCES = ("documents", "consultant")
 
 
 def resolve(key: str, *, answer: str, cites: list[str], reviewer: str, source: str = "documents",
-            directory: Path | None = None, config_path: Path | None = None, questions: Sequence[str] = ()) -> int:
+            directory: Path | None = None, config_path: Path | None = None, questions: Sequence[str] = (),
+            references: Sequence[str] = ()) -> int:
     """Publish a reviewed answer to gap *key* as a knowledge entry.
 
     ``source="documents"``: every cited section must be public and in force. ``source="consultant"``: new knowledge
     from the person who answered; citations are optional and, when given, still checked. Either way the gate holds:
     no amount, promotion code or stock status, and no topic that must go to a person.
+
+    *references* are manufacturer pages the reviewer chose to give the customer beside the answer (docs/plan/002,
+    section 12): only https pages on a domain of ``config/market.yaml`` ``references``. The advisor never reads them;
+    the web chat shows them under a reply this entry answered.
     """
     if source not in SOURCES:
         raise ValueError(f"Unknown source {source!r}; one of {', '.join(SOURCES)}")
+    from .. import market as market_text
+
+    links = market_text.references(references)
     if not re.fullmatch(r"[a-f0-9]{16}", key) or not answer.strip() or (source == "documents" and not cites):
         raise ValueError("A gap, an answer and supporting sources are required")
     if not reviewer.strip() or reviewer.casefold() in review.AGENTS:
@@ -256,6 +264,8 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str, source: s
         entry = {"chunk_id": "FAQ-GAP-" + key.upper(), "source": "faq", "title": title,
                  "text": answer.strip(), "approved_by": reviewer,
                  "provenance": {"gap_id": key, "cites": cites, "source": source}}
+        if links:
+            entry["references"] = links
         # Other ways a customer asks it (knowledge/expand.entry_questions): indexed, never read out, no personal data.
         asked = [q.strip() for q in questions if q.strip() and pii.tokenise(q, pii.Vault()) == q]
         if asked:

@@ -486,3 +486,62 @@
   flex: none;
 }
 
+/* The customer's own orders a reply names (components/shop/ChatOrders.tsx): a link to each on /don-hang. */
+.s-msg-orders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 2px 6px;
+}
+.s-msg-order {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.s-msg-order:hover,
+.s-msg-order:focus-visible {
+  border-color: var(--brand-line);
+  box-shadow: var(--shadow-sm);
+}
+.s-msg-order-link {
+  color: var(--brand-ink);
+}
+/* The manufacturer's page under a reply (components/shop/ChatReferences.tsx): opens the brand's site. */
+.s-msg-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 2px 6px;
+}
+.s-msg-ref {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-ink);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.s-msg-ref small {
+  color: var(--muted, var(--ink));
+  font-weight: 400;
+}
+.s-msg-ref:hover,
+.s-msg-ref:focus-visible {
+  border-color: var(--brand-line);
+  box-shadow: var(--shadow-sm);
+}

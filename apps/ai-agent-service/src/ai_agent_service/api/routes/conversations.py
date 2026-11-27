@@ -204,6 +204,7 @@ def _result(row: dict[str, Any], turn_id: str, outcome: harness.Outcome | None, 
         "confidence": 1.0 if state.get("lane") else 0.0,
         "trace_id": f"{row['id']}:{turn_id}",
         "products": _products(results, state.get("quotes") or {}),
+        "references": references_of(state, reply),
         "stages": list(NODES),
         "stage_timings_ms": dict(((outcome.latency or {}) if outcome else {}).get("stages_ms") or {}),
         "tool_calls": [dotted(str(r.get("name") or "")) if "." not in str(r.get("name")) else r.get("name")
@@ -225,6 +226,22 @@ def _result(row: dict[str, Any], turn_id: str, outcome: harness.Outcome | None, 
             "model": draft.get("model"),
         },
     }
+
+
+def references_of(state: dict[str, Any], reply: str) -> list[dict[str, str]]:
+    """The manufacturer pages to show under *reply* (docs/plan/002, section 12): the links a reviewer approved with
+    the knowledge entry that came first for this turn, when the documents covered the question and the assistant
+    answered it. The model never writes a link; a link is shown only where the entry it belongs to answered."""
+    knowledge = state.get("knowledge") or {}
+    draft = state.get("draft") or {}
+    if (not reply.strip() or knowledge.get("abstain") or draft.get("fallback") or state.get("lane") == "HANDOFF"
+            or (state.get("handoff") or {}).get("status") == "pending"):
+        return []
+    first = next((hit for hit in knowledge.get("hits") or () if not hit.get("pinned")), None)
+    if not first or first.get("restricted"):
+        return []
+    return [{"url": str(link["url"]), "domain": str(link.get("domain") or ""), "title": str(first.get("title") or "")}
+            for link in first.get("references") or () if isinstance(link, dict) and link.get("url")]
 
 
 def _products(results: list[dict[str, Any]], quotes: dict[str, int]) -> list[dict[str, Any]]:

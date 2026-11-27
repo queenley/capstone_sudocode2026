@@ -61,3 +61,43 @@ export const statusLabel = (order: CustomerOrder) =>
 export const isOpen = (order: CustomerOrder) => ["confirmed", "shipping", "return_requested"].includes(order.status);
 
 export const CALL_NOTE = "Đơn COD trên 2 triệu: cửa hàng sẽ gọi cho bạn để xác nhận trước khi giao.";
+
+// ── an order the assistant names in the chat (components/shop/ChatOrders.tsx) ──
+
+type Coded = { id: string; order_code?: string | null };
+
+/** Every way the assistant says an order's code: its own (OD600001), the website's (WEB-1A2B3C4D), and the
+ *  account tool's (#1A2B3C4D, mcp/servers/account.py order_ref). */
+export const orderCodes = (order: Coded): string[] => {
+  const short = order.id.slice(0, 8).toUpperCase();
+  return [order.order_code?.toUpperCase(), `WEB-${short}`, `#${short}`].filter(
+    (code): code is string => !!code,
+  );
+};
+
+/** The anchor of an order on /don-hang: the chat links to /don-hang#<anchor>. */
+export const orderAnchor = (order: Coded) => `don-${orderCode(order)}`;
+
+/** Something in *text* reads as an order code, whether or not it is one of this customer's. */
+export const ORDER_CODE =
+  /(?<![A-Z0-9])(?:OD\d{4,}|WEB-[0-9A-F]{8}|#[0-9A-F]{8})(?![A-Z0-9])/i;
+
+const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** The orders of *orders* whose code *text* names, in the order the text names them, once each. Only these
+ *  get a link: a code the assistant got wrong, or one of someone else's, matches none of the customer's own. */
+export function ordersNamed<T extends Coded>(text: string, orders: T[]): T[] {
+  const said = text.toUpperCase();
+  return orders
+    .map((order) => {
+      const at = orderCodes(order)
+        .map((code) =>
+          said.search(new RegExp(`(?<![A-Z0-9])${escape(code)}(?![A-Z0-9])`)),
+        )
+        .filter((index) => index >= 0);
+      return { order, at: at.length ? Math.min(...at) : -1 };
+    })
+    .filter((row) => row.at >= 0)
+    .sort((a, b) => a.at - b.at)
+    .map((row) => row.order);
+}

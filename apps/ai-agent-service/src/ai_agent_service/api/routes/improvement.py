@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field
 from src.api.routes.shared import staff
 
 from ...components.context import skills as skill_book
-from ...components.improvement import review, skill_versions
+from ...components.improvement import market as battlecards, review, skill_versions
 from ...runtime import airflow_pipeline, evaluations, k8s_pipeline
 from ...runtime.db import connection
 
@@ -127,6 +127,52 @@ async def rollback(body: Rollback, request: Request) -> dict[str, Any]:
         raise HTTPException(422, str(error)) from error
     await asyncio.to_thread(skill_book.reload)
     return {"skills_version": body.to, "previous": previous, "reload_required": False}
+
+
+# ── battlecards from the market research (docs/plan/002) ──────────────────
+
+
+@router.get("/improvement/market/cards")
+async def market_cards(request: Request,
+                       status: Literal["pending", "flagged", "approved", "rejected"] | None = Query(default=None)
+                       ) -> dict[str, Any]:
+    """The cards the research drafted, with the gate's reasons and what it saw of other sellers (staff only)."""
+    staff(request, READ)
+    return {"cards": await asyncio.to_thread(battlecards.cards, status)}
+
+
+@router.get("/improvement/market/evidence")
+async def market_evidence(request: Request, sku: str | None = Query(default=None, max_length=64)) -> dict[str, Any]:
+    """The search results kept as evidence: internal, never shown to the advisor or a customer."""
+    staff(request, READ)
+    return {"evidence": await asyncio.to_thread(battlecards.evidence, sku)}
+
+
+@router.get("/improvement/market/gap-suggestions")
+async def market_gap_suggestions(request: Request) -> dict[str, Any]:
+    """Draft answers from the web for the open knowledge gaps: for the consultant to read, never published as such."""
+    staff(request, READ)
+    from ...components.improvement import market_gaps
+
+    return {"suggestions": await asyncio.to_thread(market_gaps.suggestions)}
+
+
+@router.post("/improvement/market/cards/{card_id}/review")
+async def market_decide(card_id: str, body: Decision, request: Request) -> dict[str, Any]:
+    """Approve (publish as the next knowledge version) or reject one pending card, under the signed-in person."""
+    staff(request, ADMIN)
+    if body.decision == "rejected" and len(body.note.strip()) < 3:
+        raise HTTPException(422, "Từ chối cần ghi lý do")
+    reviewer = _reviewer(request)
+    try:
+        record = await asyncio.to_thread(battlecards.decide, card_id, body.decision, reviewer=reviewer,
+                                         note=body.note.strip())
+    except KeyError as error:
+        raise HTTPException(404, "Battlecard not found") from error
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    # The knowledge server reads its version at startup, as for a Knowledge Gap entry.
+    return {"card": record, "reload_required": record["status"] == "approved"}
 
 
 @router.get("/evaluations")

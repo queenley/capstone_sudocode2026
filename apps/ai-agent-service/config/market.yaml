@@ -1,0 +1,101 @@
+# The offline market research of docs/plan/002-so-sanh-doi-thu-tu-web.md. No secrets: the provider's key is read
+# from the environment variable named below, never written here.
+#
+# What this research is for: learning what customers compare our products with, so a battlecard can say what the
+# shop itself offers on exactly those points. It never gives the advisor a competitor's price or a reason to talk
+# about another shop (PB-02, PB-04, FAQ-15); the advisor has no tool of this server (role `researcher` only).
+
+search:
+  # brave | tavily. Neither has been measured on the shop's Vietnamese queries yet: the plan's step 1 is a probe of
+  # about 20 queries on both, for latency, the share of Vietnamese shop pages, and the cost per query.
+  provider: brave
+  api_key_env:
+    brave: BRAVE_SEARCH_API_KEY
+    tavily: TAVILY_API_KEY
+  # Brave's `country` takes a fixed list without VN (422 "Input should be 'AR', 'AU', …", probed 2026-11-27):
+  # ALL, with the Vietnamese language below, is what returns Vietnamese shop pages. null sends no country.
+  country: ALL
+  language: vi
+  results_per_query: 5
+  # Seconds before one search is abandoned.
+  timeout: 10.0
+
+# Pages web_extract may read. Empty turns web_extract off: the research then reads search snippets only, which is
+# what the first rounds do. Add a domain only after reading that site's terms of use on automated access.
+extract:
+  allowed_domains: []
+  max_chars: 6000
+  timeout: 10.0
+
+research:
+  # Per product: the queries, {name} {brand} {kind} filled from the catalogue. {kind} is the category's words below.
+  queries:
+    - "{name} giá"
+    - "{kind} {brand} tương tự {name}"
+  # Hard cap for one run, whatever the number of products: the run stops searching past it.
+  max_queries_per_run: 60
+  kinds:
+    gia-dung/may-loc-khong-khi: máy lọc không khí
+    gia-dung/may-loc-nuoc: máy lọc nước
+    gia-dung/quat: quạt điện
+    gia-dung/noi-chien: nồi chiên không dầu
+    thoi-trang/giay: giày
+    thoi-trang/ao-khoac: áo khoác
+    me-be: đồ mẹ và bé
+
+# Suggested answers for the Knowledge Gap Loop (pipeline/improve/market.py, research_gaps): an open question the
+# documents did not answer is searched, and a draft answer with its links waits beside it for the consultant. Never
+# published by itself: the consultant reads, edits and resolves it through the Gap Loop's own review.
+gaps:
+  max_gaps_per_run: 20
+  results_per_query: 5
+  # The longest draft offered; an answer read on a call is short.
+  max_answer_chars: 600
+
+# A link a customer may be given beside an answer (docs/plan/002, section 12): the manufacturer's own page, chosen
+# by the consultant who approves the answer. Only these domains, https, and their subdomains; a link to any other
+# site (a shop, a forum, a review) is refused when the answer is approved. Add a brand's domain only after checking
+# it is the brand's own site. Brands of the catalogue that are not real (AirPure, RunLite…) have none.
+references:
+  max_per_answer: 2
+  allowed_domains:
+    - philips.com.vn
+    - samsung.com
+    - panasonic.com
+    - mi.com
+
+battlecard:
+  # At most this many points on one card: the hard guard allows three sentences a reply (MAX_SENTENCES).
+  max_points: 3
+  # The organisers' sections a card may cite, by prefix; restricted, retired and out-of-industry sections never are.
+  cite_prefixes: [BH, DT, VC, PB, FAQ, SP, KM-07]
+  # Shops and marketplaces a card must never name (the gate refuses it). Brands outside our catalogue, as they appear
+  # in a run's search results, are refused too.
+  retailers:
+    - shopee
+    - lazada
+    - tiki
+    - tiktok shop
+    - sendo
+    - điện máy xanh
+    - dienmayxanh
+    - thế giới di động
+    - thegioididong
+    - nguyễn kim
+    - mediamart
+    - fpt shop
+    - cellphones
+    - hoàng hà
+    - amazon
+  # Words that run another seller or product down (PB-04): never on a card.
+  disparaging:
+    - hàng giả
+    - hàng nhái
+    - kém chất lượng
+    - lừa đảo
+    - dỏm
+    - không uy tín
+    - kém hơn
+    - tệ hơn
+    - rẻ hơn
+    - đắt hơn

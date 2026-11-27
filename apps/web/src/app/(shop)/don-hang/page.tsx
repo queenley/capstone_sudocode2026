@@ -14,6 +14,7 @@ import {
   CALL_NOTE,
   CustomerOrder as Order,
   ORDER_SOURCE,
+  orderAnchor,
   orderCode,
   PAYMENT_LABEL,
   statusLabel,
@@ -30,6 +31,19 @@ export default function OrdersPage() {
     deletion_token: string;
   } | null>(null);
   const [notice, setNotice] = useState("");
+  // The order a link from the chat points to (/don-hang#don-OD600001, components/shop/ChatOrders.tsx): the list
+  // arrives after the page, so the browser cannot scroll to it by itself.
+  const [focused, setFocused] = useState("");
+  useEffect(() => {
+    const read = () => setFocused(decodeURIComponent(window.location.hash.slice(1)));
+    read();
+    window.addEventListener("hashchange", read);
+    return () => window.removeEventListener("hashchange", read);
+  }, []);
+  useEffect(() => {
+    if (!focused || !orders?.length) return;
+    document.getElementById(focused)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focused, orders]);
 
   useEffect(() => {
     try {
@@ -185,7 +199,11 @@ export default function OrdersPage() {
       ) : (
         <div className="s-orders">
           {orders.map((order) => (
-            <article key={order.id} className="s-order">
+            <article
+              key={order.id}
+              id={orderAnchor(order)}
+              className={`s-order${focused === orderAnchor(order) ? " s-order-focus" : ""}`}
+            >
               <header>
                 <div>
                   <b>Đơn {orderCode(order)}</b>

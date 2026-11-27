@@ -21,6 +21,88 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-27 · Link trang chính hãng dưới câu trả lời
+
+Loại: tính năng (tri thức, giao diện web) · Trạng thái: đang đo · Chỉ số: không có (trải nghiệm)
+
+- **Vấn đề:** câu trả lời Gap Loop dựa vào trang nhà sản xuất, nhưng khách không có cách tự đọc nguồn.
+- **Bằng chứng:** yêu cầu của người dùng (2026-11-27).
+- **Sửa:** mục 12 của [002](002-so-sanh-doi-thu-tu-web.md). Domain chính hãng trong `market.yaml` `references`. `gaps.resolve(references=…)` kiểm domain và lưu vào mục tri thức. Route `resolve` nhận `references`, cho bỏ trống `cites` khi có link (ghi `source: consultant`). `hit_view` mang `references`. `references_of` trong `conversations.py` thêm `references` vào `TurnResult`. Chat web hiện nút `ChatReferences`. Admin chọn link bằng ô tích, chỉ với link chính hãng (`official_sources`). Advisor không đọc và không viết link.
+- **Đã kiểm:** `test_market_research.py` 32 test qua (domain, phát hành, hit_view, điều kiện hiển thị, `official_sources`). Bộ test đầy đủ: 1900 qua; 10 lỗi và 14 error còn lại là thiếu `soxr`/`soundfile` và khóa file Windows, không liên quan. `tsc --noEmit` không lỗi. Chưa thử trên trình duyệt.
+- **Số đo:** chưa đo.
+- **Còn lại:** link mất khi tải lại trang. Chưa có trên Zalo. Danh sách domain cần người kiểm thêm theo từng thương hiệu thật trong catalog.
+
+### 2026-11-27 · Link tới đơn hàng ngay trong chat
+
+Loại: tính năng (giao diện web) · Trạng thái: đang đo · Chỉ số: không có (trải nghiệm; trợ lý và evaluation không đổi)
+
+- **Vấn đề:** khách đã đăng nhập hỏi tình trạng đơn thì chỉ nhận chữ. Muốn xem chi tiết, họ phải tự vào `/don-hang` và tìm đúng đơn.
+- **Bằng chứng:** yêu cầu của người dùng.
+- **Sửa:**
+  - [ChatOrders.tsx](../../apps/web/src/components/shop/ChatOrders.tsx): dưới mỗi câu trả lời, nút "Đơn … · Xem đơn hàng →" cho từng đơn mà câu trả lời nhắc mã. Chỉ khi có token khách (đăng nhập hoặc đã xác minh số điện thoại). Danh sách đơn lấy từ `/api/customer/orders` bằng token của chính khách, và chỉ mã có trong danh sách đó mới có link. Model không bao giờ viết link: mã sai, hoặc mã của người khác, không ra link. Câu trả lời nêu mã chưa có trong danh sách (đơn vừa tạo) thì đọc lại danh sách một lần.
+  - [orders.ts](../../apps/web/src/lib/orders.ts): `orderCodes` (ba cách trợ lý đọc mã: `OD600001`, `WEB-1A2B3C4D`, `#1A2B3C4D`), `ordersNamed`, `orderAnchor`.
+  - [don-hang/page.tsx](../../apps/web/src/app/(shop)/don-hang/page.tsx): mỗi đơn có `id` để neo tới. Trang cuộn tới đơn được trỏ và làm nổi viền khi danh sách tải xong hoặc khi hash đổi. Đang ở sẵn `/don-hang` thì link đặt `location.hash` trực tiếp, vì `Link` của Next không phát `hashchange`.
+  - CSS `.s-msg-orders`, `.s-msg-order`, `.s-order-focus`.
+- **Đã kiểm:** `tsc --noEmit` không lỗi. `ordersNamed` chạy bằng Node trên 6 trường hợp: mã OD, mã `#`, mã `WEB-` chữ thường, mã không phải của khách, mã dài hơn, không có mã. Cả 6 đúng. Chưa thử trên trình duyệt.
+- **Số đo:** chưa đo.
+- **Còn lại:** chưa có trang chi tiết từng đơn: link là `/don-hang#don-<mã>`. Câu trả lời không nêu mã ("đơn máy lọc của chị đang giao") thì không có link. Kênh Zalo và thoại không có. Repo web chưa có bộ test JS: kiểm bằng script tạm.
+
+### 2026-11-27 · Gợi ý câu trả lời từ web cho Knowledge Gap Loop
+
+Loại: tool (MCP `researcher`) + tri thức (Gap Loop) · Trạng thái: đang đo · Chỉ số: số lượt "chưa có thông tin" (PB-05), tỷ lệ gợi ý được nhân viên dùng
+
+- **Vấn đề:** câu hỏi tài liệu không trả lời được thì khách nghe "em chưa có thông tin". Nhân viên phải tự tìm câu trả lời từ đầu cho từng gap.
+- **Bằng chứng:** yêu cầu của người dùng (mở rộng tool tìm kiếm cho thông tin sản phẩm khác, ưu tiên trải nghiệm khách); thiết kế ở mục 11 của [002](002-so-sanh-doi-thu-tu-web.md).
+- **Sửa:**
+  - [market_gaps.py](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/market_gaps.py): truy vấn chỉ từ câu `restated`, bỏ token PII, bỏ qua chủ đề PB-06; cổng (link phải có trong kết quả tìm kiếm, phải có nguồn); `grounds` báo khi tài liệu đã trả lời.
+  - `MarketResearchAgent.answer_gap` và prompt [gap_answer.md](../../config/prompts/agent/market/gap_answer.md).
+  - `research_gaps` trong [pipeline/improve/market.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/improve/market.py), lệnh `market-gaps`.
+  - API `GET /api/developer/improvement/market/gap-suggestions`; khung gợi ý và nút "Dùng gợi ý" trong [knowledge-gaps.tsx](../../apps/web/src/features/admin/knowledge-gaps.tsx). `gaps.py` không đổi: duyệt vẫn qua cổng và người của Gap Loop.
+- **Đã kiểm:** `tests/agent/test_market_research.py` 28 test qua; cùng các test Gap Loop, FAQ và vòng cải tiến: 122 qua. `tsc --noEmit` không lỗi. Thử thật 5 gap tổng hợp: 3 câu đã có trong tài liệu, được trả lời đúng mã; 2 câu không có trong tài liệu ra `no_answer` vì web chỉ có mẫu gần giống. Chưa mở trang trên trình duyệt.
+- **Số đo:** chưa đo (kho thật có 0 gap).
+- **Còn lại:** chạy trên gap thật khi có. Đo tỷ lệ "Dùng gợi ý" và số gap `grounds: documents` (lỗi tra cứu). Gắn sau bước `improve gaps` của vòng tuần.
+
+### 2026-11-27 · Battlecard từ nghiên cứu thị trường trên web (ngoại tuyến)
+
+Loại: tool (MCP, role `researcher`) + tri thức (playbook) · Trạng thái: đang đo · Chỉ số: TSR trên persona `khach_so_gia`, số vi phạm `competitor`, HR, Recall@5
+
+- **Vấn đề:** khách so sản phẩm với nơi khác ("bên kia rẻ hơn") chỉ nhận câu chung của skill `objection-handling`, không gắn với điều khách đang so. Người dùng muốn agent tìm sản phẩm tương tự trên internet và nói vì sao nên mua ở shop.
+- **Bằng chứng:** yêu cầu của người dùng; nghiên cứu và lý do chọn kiến trúc trong [002](002-so-sanh-doi-thu-tu-web.md) (PB-02, PB-04, FAQ-15 cấm so giá; hard guard tin mọi số trong kết quả tool; TTFT p95 3779 ms).
+- **Sửa:**
+  - [market.py (server)](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers/market.py): `market_web_search` (Brave hoặc Tavily, chọn trong [market.yaml](../../apps/ai-agent-service/config/market.yaml)) và `market_web_extract` (chỉ domain cho phép; danh sách đang rỗng nên tắt). Role mới `researcher` trong [server_base.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/server_base.py) là role duy nhất gọi được. `SERVER_ROLES["memory"]` ghi rõ bốn role cũ để role mới không mở thêm server bộ nhớ.
+  - [components/market](../../apps/ai-agent-service/src/ai_agent_service/components/market/__init__.py): làm sạch văn bản web (bỏ HTML, câu dạng prompt injection, dãy số dài) và luật domain.
+  - [agents/market.py](../../apps/ai-agent-service/src/ai_agent_service/agents/market.py): `MarketResearchAgent`, không có tool. Một câu trả lời có cấu trúc cho mỗi sản phẩm; model `agents.market` trong `models.yaml`; prompt [battlecard.md](../../config/prompts/agent/market/battlecard.md).
+  - [pipeline/improve/market.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/improve/market.py) và lệnh `market-research`, `market-cards`, `market-decide` trong `cli.py`: code tạo truy vấn từ catalog, lưu bằng chứng, rồi đưa kết quả cho agent dưới dạng dữ liệu.
+  - [components/improvement/market.py](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/market.py): cổng kiểm (dùng lại cổng Gap Loop, cộng với chặn tên nơi bán, thương hiệu shop không bán, lời chê, ý không trích nguồn, mã ngoài danh sách được phép, quá 3 ý). Lưu ở `IMPROVEMENT_DIR/market/`. Người duyệt thì thẻ thành mục playbook `situation: price_comparison`, `applies_to: [SKU]` qua `versions.publish`; thẻ cũ cùng SKU bị `revoke`.
+  - API `/api/developer/improvement/market/*` ([improvement.py](../../apps/ai-agent-service/src/ai_agent_service/api/routes/improvement.py)) và khung duyệt [market-cards.tsx](../../apps/web/src/features/admin/market-cards.tsx) trên `/admin/kien-thuc`.
+- **Thử thật (2026-11-27, một SKU, `IMPROVEMENT_DIR` và KB tạm, `knowledge.yaml` không đổi):** Brave + `gpt-5.6-luna` trên SKU-AP-X: 2 truy vấn, 8 kết quả, 1 thẻ qua cổng. Mọi số trong thẻ có trong tài liệu (25 m², HEPA H13, PM2.5 từ catalog; 24 dB từ SP-AIR-01; 24 tháng từ BH-01). Thử tìm ra ba lỗi, đã sửa:
+  - Brave không nhận `country=VN` (422, danh sách quốc gia không có VN): [market.yaml](../../apps/ai-agent-service/config/market.yaml) để `country: ALL`, chỉ giữ `search_lang=vi`. Lỗi 4xx giờ kèm mô tả của nhà cung cấp.
+  - Model viết `questions` thành câu hỏi sản phẩm thường ("Sản phẩm được bảo hành trong bao lâu?"). Giờ chỉ giữ câu có dấu hiệu so sánh, cộng ba câu so sánh cố định (`comparison_questions`).
+  - Thẻ vẫn đứng hạng 1 cho "Bảo hành máy lọc không khí bao lâu?" và "phòng bao nhiêu m2?" về AirPure X, trên BH-01 và SP-AIR-01. Nguyên nhân: mục có `applies_to` khớp sản phẩm được ưu tiên ở mọi lượt về sản phẩm đó. [search.py](../../apps/ai-agent-service/src/ai_agent_service/components/knowledge/search.py) giờ chỉ trả về mục có `battlecard` khi câu của khách so sánh với nơi khác (`market.compares`). Sau sửa, ở chế độ hybrid: ba câu so sánh, thẻ hạng 1; bốn câu thường, kết quả giống hệt khi không có thẻ.
+- **Mã trích dẫn trong thẻ (2026-11-27):** thẻ ghi mã nguồn trong ngoặc vuông `[BH-01]`, không ngoặc tròn. `unmarked` ([nodes.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/hot/nodes.py)) chỉ bỏ mã ngoặc vuông trước khi khách nghe; `(BH-01)` lọt qua nguyên vẹn. Trong 113.039 lượt của 36 run dưới `evaluation/runs`, trợ lý chưa lần nào để lọt mã, nhưng thẻ là đoạn văn có mã ở cuối mỗi ý, dễ bị bắt chước.
+- **Đã kiểm:** `tests/agent/test_market_research.py` 21 test qua; cùng các test tri thức, MCP và vòng cải tiến: 89 qua. `evaluation/rag_offline.py` trên KB đang chạy (v0, không thẻ): Recall@5 89,8, bằng với `search.py` gốc (con số 93,2 trong `knowledge.yaml` là lần đo 17/10). `tsc --noEmit` của web không lỗi. Chưa mở trang admin trên trình duyệt.
+- **Số đo:** chưa đo.
+- **Còn lại:** đo khoảng 20 truy vấn tiếng Việt để chọn Brave hay Tavily (cần key, tốn vài USD). Chạy thử một danh mục, duyệt vài thẻ, đo Recall@5 (`evaluation/rag_offline.py`), rồi R0/R1 trên một kịch bản `khach_so_gia` trước cả cohort. Chưa gắn vào vòng tuần (`weekly.py`) hay K8s job. Thẻ duyệt xong cần nạp lại dịch vụ tri thức. Chưa có xác nhận pháp lý cho bất kỳ câu so sánh trực tiếp nào.
+
+### 2026-11-27 · Nới guard trước khi gọi tool và báo khách khi guard chặn
+
+Loại: guard trước hành động (`components/guardrails/actions.py`), prompt · Trạng thái: đang đo · Chỉ số: TSR, số `order_create` bị chặn mỗi cuộc
+
+- **Vấn đề:** guard trước tool quá chặt. `order_create` hay bị từ chối dù khách đã muốn đặt. Khi bị chặn, agent không nói rõ với khách việc gì chưa làm được và còn thiếu gì.
+- **Bằng chứng:** người dùng báo khi thử tay ("create.order không cho gọi"); chưa đọc trace một run cụ thể.
+- **Sửa:**
+  - [advisor.py](../../apps/ai-agent-service/src/ai_agent_service/agents/advisor.py): câu vừa nói bị review gắn cờ (`review_flags`) không còn chặn mọi write tool. Tool vẫn chạy, kết quả có thêm `correct_first` để câu trả lời đính chính.
+  - Mọi lần chặn đi qua `guard_block`: envelope có `"status": "blocked"` và `notify_customer`. `notify_customer` là false khi chặn là `CONFIRMATION_REQUIRED` (hệ thống tự đọc lại đơn), khi ở chế độ copilot, hoặc khi chặn chuyển máy sớm.
+  - [harness.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/harness.py): meta của lượt có `guard_tool_blocks` (tên tool, mã, lý do, `notify_customer`).
+  - [rules.md](../../config/prompts/agent/advisor/rules.md) luật 7: gặp `status: blocked` và `notify_customer: true` thì nói khách một câu ngắn việc chưa làm được và còn thiếu gì, rồi hỏi đúng điều thiếu. Gặp `correct_first` thì đính chính.
+  - [policy.py](../../apps/ai-agent-service/src/ai_agent_service/agents/policy.py): ngưỡng intent `purchase` hạ từ 0.7 xuống 0.5.
+  - [actions.py](../../apps/ai-agent-service/src/ai_agent_service/components/guardrails/actions.py): bỏ luật đòi chữ "tách" mới cho `order_group`; sự đồng ý tách đơn nằm ở câu đọc lại ("Đây là đơn 1 của phần tách đơn"). Bỏ so `price_vnd` với báo giá vì `_filled_order` đã ghi giá báo vào trước khi kiểm. Vẫn giữ luật phải có báo giá, mã tin cậy, giới hạn COD, tier, đơn trùng.
+  - [purchase.py](../../apps/ai-agent-service/src/ai_agent_service/components/guardrails/purchase.py): xóa `missing()` không còn ai gọi.
+  - Đã thử rồi quay lui: cho câu đọc lại nằm ở giữa câu trả lời trước. Test EC03 `intervening-question` chỉ ra một "vâng" sau câu hỏi khác ("Muốn xem ảnh không?") sẽ đặt đơn, nên giữ điều kiện câu đọc lại phải ở cuối.
+- **Đã kiểm:** `tests/agent` 1751 qua. Sửa 2 test theo hành vi mới (`test_reviews_beside_stream.py`, `test_basket_orders.py`); 4 file guard/intent sau khi sửa: 98 qua. Các test ASR/voice còn lỗi vì venv thiếu `soxr`, không chạm code đã đổi.
+- **Số đo:** chưa đo.
+- **Còn lại:** chạy một kịch bản đặt hàng (rồi cả cohort) để xem TSR và số lần chặn. Nới `review_flags` nghĩa là một đơn có thể được tạo ngay sau một câu sai; câu trả lời phải đính chính. Nhận HMAC (R1) và TTL/dùng một lần vẫn giữ nguyên.
+
 ### 2026-11-27 · Chọn thời điểm gửi cho tin nhắn chat và cuộc gọi
 
 Loại: tính năng (kiểm thử, giao diện) · Trạng thái: đang đo · Chỉ số: không có (công cụ để kiểm thử bằng tay)
@@ -35,7 +117,7 @@ Loại: tính năng (kiểm thử, giao diện) · Trạng thái: đang đo · C
   - Gọi: thêm `sent_at` trong frame đầu của websocket ([voice.py](../../apps/ai-agent-service/src/ai_agent_service/api/routes/voice.py)), áp cho cả cuộc gọi.
   - Web: thêm ô "Thời điểm gửi" dưới tiêu đề [ChatWidget.tsx](../../apps/web/src/components/shop/ChatWidget.tsx). Giá trị lưu trong localStorage ([lib/sent-at.ts](../../apps/web/src/lib/sent-at.ts)) và được `streamTurn` cùng `VoiceCall` gửi đi. Ô bị khoá khi đang gọi.
   - Evaluation không đổi, vì runner không đi qua các route này.
-- **Đã kiểm:** `tests/agent/test_sent_at.py` 13 test qua. Các test voice, handoff và callback qua (70 test). 2 test lỗi do giới hạn biến môi trường của Windows với test id 256 KB, không liên quan đến thay đổi này. `tsc --noEmit` của web không có lỗi. Chưa thử trên trình duyệt.
+- **Đã kiểm:** `tests/agent/test_sent_at.py` 13 test qua. Các test voice, handoff và callback qua (70 test). 2 test lỗi do giới hạn biến môi trường của Windows với test id 256 KB, không liên quan đến thay đổi này. `tsc --noEmit` của web không có lỗi. Thử trên docker compose với `SKU-SN-RUN2-41-DEN`: mặc định 15/10 còn hàng; `sent_at` 17/10 19:30 hết hàng, có lại 24/10; 25/10 còn 12 đôi; giá trị sai trả về 422. Trên trình duyệt (Playwright), ô chọn gửi `sent_at` và agent trả lời theo ngày đó.
 - **Số đo:** chưa đo.
 - **Còn lại:**
   - `calls.business_day` vẫn ghi ngày làm việc chung. Console hiện ngày đó, không phải ngày đã chọn.

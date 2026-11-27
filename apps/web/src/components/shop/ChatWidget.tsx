@@ -9,6 +9,8 @@ import { useSentAt } from "@/lib/sent-at";
 import { VoiceCall } from "@/services/voice";
 import VoiceCallPanel from "@/features/voice/voice-call";
 import ChatProducts from "@/components/shop/ChatProducts";
+import ChatOrders from "@/components/shop/ChatOrders";
+import ChatReferences, { type Reference } from "@/components/shop/ChatReferences";
 import {
   loadConversation,
   newSession,
@@ -93,6 +95,9 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   /** The tool steps of the turn being answered, as they happen; then kept, folded, under the reply they led to. */
   const [liveSteps, setLiveSteps] = useState<TurnStep[]>([]);
   const [doneSteps, setDoneSteps] = useState<Map<string, { steps: TurnStep[]; ms: number }>>(() => new Map());
+  // The manufacturer's pages sent with a reply, by its words, as the steps are: the lines are read again from the
+  // server after each turn, and a line has no room for them.
+  const [doneRefs, setDoneRefs] = useState<Map<string, Reference[]>>(() => new Map());
   const [error, setError] = useState("");
   const [call, setCall] = useState<VoiceCall | null>(null);
   // Testing aid: when messages and calls say they were sent (lib/sent-at.ts).
@@ -306,6 +311,10 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       if (reply && turnSteps.length) {
         const kept = { steps: turnSteps, ms: Math.round(performance.now() - startedAt) };
         setDoneSteps((old) => new Map(old).set(reply, kept));
+      }
+      if (reply && result?.references?.length) {
+        const refs = result.references;
+        setDoneRefs((old) => new Map(old).set(reply, refs));
       }
       setLiveSteps([]);
       pending.current = null;
@@ -641,6 +650,23 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                       }
                     />
                   )}
+                {/* Signed in: the customer's own orders the reply names, linked to the order on /don-hang. */}
+                {line.speaker !== "customer" &&
+                  line.speaker !== "system" &&
+                  !(busy && i === lines.length - 1) && (
+                    <ChatOrders
+                      text={line.text}
+                      onShow={
+                        i === lines.length - 1
+                          ? () => bottom.current?.scrollIntoView({ block: "nearest" })
+                          : undefined
+                      }
+                    />
+                  )}
+                {/* The manufacturer's page a reviewer approved with the answer this reply rests on. */}
+                {line.speaker === "assistant" && doneRefs.has(line.text) && (
+                  <ChatReferences references={doneRefs.get(line.text)!} />
+                )}
               </div>
             ))}
             {/* Who answers now: a person has the conversation and has read it, so nothing needs repeating. */}

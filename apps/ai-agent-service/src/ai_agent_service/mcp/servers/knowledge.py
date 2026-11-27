@@ -228,6 +228,9 @@ def hit_view(hit: Hit, *, reveal: bool) -> dict[str, Any]:
         "cosine": hit.cosine,
         "coverage": hit.coverage,
         "absence": hit.absence,
+        # Manufacturer pages a reviewer chose for a customer (docs/plan/002, section 12). Not in what the advisor
+        # reads (agents/advisor.py, _knowledge_block): the web chat shows them under the reply.
+        "references": list(chunk.provenance.get("references") or []),
     }
 
 
