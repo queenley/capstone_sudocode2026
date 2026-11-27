@@ -153,9 +153,11 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
         # the account tools read their website account. Other channels have no such account.
         account = conversation.customer_id if conversation.channel == "web" else None
         signed_in = {"account_id": str(account), "account_name": await platform.account_name(app, account)} if account else {}
+        # Only a turn whose sender chose a moment carries one; the rest run on the business day.
+        clock_choice = {"sent_at": sent_at} if sent_at else {}
         outcome = await harness.spawn(calls.take_turn(row, content=message, turn_id=turn_id, arrived=arrived,
                                                       actor=actor, memory=data.memory_enabled, emit=emit,
-                                                      sent_at=sent_at, **signed_in))
+                                                      **clock_choice, **signed_in))
     except CallError as error:
         raise HTTPException(error.status, str(error)) from error
     if outcome.kind == "error":
