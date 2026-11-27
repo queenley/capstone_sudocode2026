@@ -38,6 +38,10 @@ Bảng tra từng **từ đứng riêng** ("k" → không, "dc/đc" → được
 | "bốn triệu tám không biết" | 4.800.000 + "không biết" | "không" sau số là hỏi/phủ định (ASR không trả dấu chấm hỏi) |
 | "ô đê ba trăm mười hai nghìn..." | OD312456 | "ô đê" + số là mã đơn |
 | "tối mai 8 giờ", "chiều thứ bảy 3 giờ rưỡi" | `2026-10-26T20:00:00+07:00` | ghép buổi + ngày + giờ, dạng `schedule.callback` nhận |
+| "5 triệu bảy trăm", "7 triệu bảy trăm nghìn" | 5.700.000, 7.700.000 | chữ số đứng trước đơn vị là phần đầu của số tiền (trước 16/11 ra `5 1.700.000đ`) |
+| "Tối thứ Bảy này tầm 10 giờ" | thứ Bảy tới, 22:00 | cho phép "tầm/khoảng/lúc/vào" giữa ngày và giờ, "này" sau thứ |
+| "Tối thứ Tư này, ngày 11/11, tầm 10 giờ", "tối thứ Hai (19/10) tầm 7 giờ" | 2026-11-11 22:00, 2026-10-19 19:00 | giờ thiếu buổi hay ngày thì lấy trong cùng câu: ngày ghi rõ trước, rồi thứ, rồi buổi đứng trước thứ ("tối đa" không phải buổi tối); ngày ghi rõ đã qua trong năm thì hiểu là năm sau |
+| "toi thu hai 19 10 tam 7 gio" (gõ không dấu) | 2026-10-19 19:00 | câu không dấu dùng mẫu riêng: "gio", "toi/sang/chieu", thứ viết "thu 2", ngày "19 10" ngay sau thứ |
 
 Giá trị chuẩn được **đặt cạnh** chữ gốc để model đọc cả hai. Cùng module có chiều ngược lại, `amounts()`, đọc mọi số tiền trong câu trả lời (5.200.000đ, 5,2 triệu, 5 triệu 2, 4tr890, 249k, và cả viết bằng chữ) để hard guard kiểm. **Một module cho hai chiều** để lời khách và câu trợ lý được đếm theo cùng một cách.
 
@@ -209,7 +213,7 @@ Regex đọc trên văn bản **bỏ dấu, chữ thường**, nên "khong", "ko
 | **Tiền** | mọi số tiền (chữ số hoặc chữ) phải thuộc tập cho phép (xem dưới). Giá trong brief chỉ được nói như lịch sử ("hôm trước bên em báo") và chỉ khi `VERIFIED` |
 | **Ngày, tháng** | "giao trong 2 ngày", "đổi trả 7 ngày", "bảo hành 24 tháng": con số phải có trong kết quả tool, đoạn tài liệu, lời khách, hoặc luật của prompt (72 giờ xóa dữ liệu) |
 | **Tồn kho** | "còn hàng / hết hàng / chỉ còn N" cần tool của lượt nói giống vậy, hoặc cảnh báo brief |
-| **Khuyến mãi** | mã KM được nhắc phải được áp trong báo giá lượt này, hoặc nói như lịch sử / đã hết. KM chưa bắt đầu thì không bao giờ nhắc (KM-02) |
+| **Khuyến mãi** | mã KM được nhắc phải được áp trong báo giá lượt này, hoặc nói như lịch sử / đã hết. KM chưa bắt đầu thì không bao giờ nhắc (KM-02), bằng mã hay, trong câu nói về khuyến mãi, bằng ngày bắt đầu của nó ("chương trình 11/11"); ngày giao "11/11" không bị chặn |
 | **Nội bộ** | không "giá nhập, giá vốn, biên lợi nhuận, nhà cung cấp, giá sàn" |
 | **PII** | không PII thô; không dãy 10–14 chữ số; không token không thuộc cuộc này |
 | **Tier** | dưới `VERIFIED`: không mã đơn `OD...`, không giá đã báo |

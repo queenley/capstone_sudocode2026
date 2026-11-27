@@ -39,10 +39,11 @@ import asyncio
 import hashlib
 import json
 import logging
+import os
 import re
 import time
 import uuid
-from typing import Any, Iterable, Mapping, Sequence
+from typing import TypedDict, Any, Iterable, Mapping, Sequence
 
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ToolCallRequest
@@ -50,8 +51,11 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from ..components import clock
 from ..components.intake import pii
-from ..components.guardrails import purchase
+from ..components.guardrails import fallback, purchase
+from ..components.guardrails import actions
+from ..components.guardrails.actions import NEEDS_NUMBER
 from ..components.intake.text import plain
+from ..observability import stopwatch
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +95,11 @@ def _tool_name(tool: Any) -> str | None:
 SYSTEM_ARGS = frozenset({"on", "customer_phone", "customer_id", "account_id", "call_id", "turn_id",
                          "purchase_authorization", IDEMPOTENCY_ARG})
 
+#: Arguments of one tool the harness fills or that nothing reads, kept from the model (plan 002, 2026-11-15): each
+#: costs output tokens on the call the customer waits for. ``price_vnd`` is today's quote (``_filled_order``),
+#: ``promo_code`` the organisers' mock works out itself, a call back's ``note`` is not read by anything that decides.
+HARNESS_ARGS = {"order_create": frozenset({"price_vnd", "promo_code"}), "schedule_callback": frozenset({"note"})}
+
 #: ``handoff_transfer`` takes the brief as an open object, since the harness adds to it; the model writes these.
 MODEL_ARGS = {
     "handoff_transfer": {
@@ -112,6 +121,34 @@ MODEL_ARGS = {
         },
     },
 }
+
+
+def short_brief() -> bool:
+    """``ADVISOR_SHORT_BRIEF=1``: the model writes only a Handoff Brief's reason, its detail and a short summary; the
+    harness fills in the rest from the state (``actions.fill_handoff``). Off unless set, until its effect on the
+    scored metrics is measured (2026-11-15: the round writing the whole brief took about 2.7 s)."""
+    return os.environ.get("ADVISOR_SHORT_BRIEF", "0").strip().lower() not in ("0", "false", "no", "off", "")
+
+
+#: The short brief: what only the conversation knows and the harness cannot fill in.
+SHORT_BRIEF = {
+    "type": "object",
+    "description": "What the person taking the call needs. The system fills in the customer, the product, the "
+                   "customer's open question and the next step.",
+    "properties": {
+        "escalation_reason": MODEL_ARGS["handoff_transfer"]["brief"]["properties"]["escalation_reason"],
+        "escalation_reason_detail": {"type": "string", "description": "One sentence."},
+        "conversation_summary": {"type": "string", "description": "One or two sentences."},
+    },
+    "required": ["escalation_reason", "escalation_reason_detail", "conversation_summary"],
+}
+
+
+def model_args(name: str) -> dict[str, Any]:
+    """The arguments the model writes for tool *name* in place of the declared ones (:data:`MODEL_ARGS`)."""
+    if name == "handoff_transfer" and short_brief():
+        return {"brief": SHORT_BRIEF}
+    return MODEL_ARGS.get(name) or {}
 
 
 def _strict_value(schema: Mapping[str, Any]) -> dict[str, Any]:
@@ -148,8 +185,9 @@ def strict_tool(tool: Any) -> dict[str, Any]:
     function = formatted["function"]
     name = function["name"]
     parameters = dict(function.get("parameters") or {"type": "object", "properties": {}})
-    shown = {key: spec for key, spec in (parameters.get("properties") or {}).items() if key not in SYSTEM_ARGS}
-    shown.update(MODEL_ARGS.get(name) or {})
+    hidden = SYSTEM_ARGS | HARNESS_ARGS.get(name, frozenset())
+    shown = {key: spec for key, spec in (parameters.get("properties") or {}).items() if key not in hidden}
+    shown.update(model_args(name))
     required = [key for key in parameters.get("required") or [] if key in shown]
     function = {**function, "parameters": _strict_object({**parameters, "properties": shown, "required": required}),
                 "strict": True}
@@ -205,8 +243,25 @@ def without_nulls(request: Any) -> Any:
     return request.override(tool_call={**call, "args": {k: v for k, v in args.items() if v is not None}})
 
 
+def _offered_late(name: str) -> int:
+    """Where a tool goes in the list the model is sent: the ones some state takes away go last.
+
+    OpenAI caches the longest prefix two requests share, and the tools come first in it: a tool missing from the
+    middle of the list would cost the cache everything after it. Writes go only in copilot, a transfer only while it
+    waits on a number, the memory tools without a brief, the account tools without a login. The sort is stable, so
+    each group keeps the order it came in.
+    """
+    if name.startswith(ACCOUNT_PREFIX):
+        return 4
+    if name.startswith("memory_") and name not in WRITE_TOOLS:
+        return 3
+    if name == "handoff_transfer":
+        return 2
+    return 1 if name in WRITE_TOOLS else 0
+
+
 class LaneToolsMiddleware(AgentMiddleware):
-    """Offers the model only the tools the run's lane allows."""
+    """Offers the model only the tools the run's lane allows, in an order that keeps the cached prefix long."""
 
     def __init__(self, lanes: Mapping[str, frozenset[str]], mcp_tool_names: Iterable[str]) -> None:
         super().__init__()
@@ -228,12 +283,23 @@ class LaneToolsMiddleware(AgentMiddleware):
         if not getattr(context, "account_id", None):
             # The website account's tools are for a logged-in shopper only.
             allowed = frozenset(name for name in allowed if not name.startswith(ACCOUNT_PREFIX))
+        if not getattr(context, "customer_phone", None) and any(
+                o.get("tool") == "handoff.transfer" and o.get("said") == NEEDS_NUMBER
+                for o in getattr(context, "offered", None) or ()):
+            # A transfer waits on the customer's number, and there is none yet: offered again, the model calls it again
+            # and is refused again, a model round each time (2026-11-24: four turns running). It comes back with the
+            # number, and route puts the call through.
+            allowed = allowed - {"handoff_transfer"}
+        if getattr(context, "mode", None) == "copilot":
+            # A consultant has the call: the assistant suggests, the person acts (the action guard refuses it anyway,
+            # and each refusal cost a model round: 2026-11-24, four in one call).
+            allowed = allowed - WRITE_TOOLS
         tools = [
             tool
             for tool in request.tools
             if (name := _tool_name(tool)) not in self._mcp or name in allowed
         ]
-        return request.override(tools=tools)
+        return request.override(tools=sorted(tools, key=lambda tool: _offered_late(_tool_name(tool))))
 
     def wrap_model_call(self, request: Any, handler: Any) -> Any:
         return handler(self._filtered(request))
@@ -242,12 +308,80 @@ class LaneToolsMiddleware(AgentMiddleware):
         return await handler(self._filtered(request))
 
 
+#: What an order's status is called to a customer: one plain phrase per status of the mock's enum, put beside each
+#: order of an ``order_status`` result so the model says the status rather than a paraphrase that changes it.
+STATUS_WORDS = {
+    "created": "đã tạo đơn", "pending": "đã tạo đơn", "confirmed": "đã xác nhận",
+    "processing": "đang xử lý", "packing": "đang đóng gói",
+    "shipping": "đang giao", "delivered": "đã giao", "cancelled": "đã hủy",
+    "returned": "đã hoàn về", "pickup_scheduled": "đã hẹn lấy hàng trả",
+}
+
+
+
+
+#: What an error of the organisers' tools means and what to do next: a bare code reads as a dead end, and the model
+#: went on with a code it had made up instead of searching for the right one.
+ERROR_HINTS = {
+    "UNKNOWN_SKU": "Mã này không có trong danh mục: gọi catalog_search với tên sản phẩm khách nói để lấy mã đúng, "
+                   "không đoán mã và không hỏi khách mã.",
+}
+
+
+def with_hints(message: Any) -> Any:
+    """A result whose ``error`` is a code of :data:`ERROR_HINTS` with a ``hint`` beside it; any other as it is."""
+    if not isinstance(message, ToolMessage) or not isinstance(message.content, str):
+        return message
+    try:
+        envelope = json.loads(message.content)
+    except ValueError:
+        return message
+    data = envelope.get("data") if isinstance(envelope, dict) else None
+    if not isinstance(data, dict) or data.get("error") not in ERROR_HINTS or "hint" in data:
+        return message
+    data["hint"] = ERROR_HINTS[data["error"]]
+    return message.model_copy(update={"content": json.dumps(envelope, ensure_ascii=False)})
+
+
+def with_status_words(name: str, message: Any, today: Any = None) -> Any:
+    """An ``order_status`` result with ``status_text`` beside each order's ``status``, and ``return_window: "đã hết"``
+    on a delivered order placed too long ago to return (the model read the date and booked a return anyway,
+    2026-11-27); any other result as it is."""
+    if name != "order_status" or not isinstance(message, ToolMessage) or not isinstance(message.content, str):
+        return message
+    try:
+        envelope = json.loads(message.content)
+    except ValueError:
+        return message
+    data = envelope.get("data") if isinstance(envelope, dict) else None
+    orders = data.get("orders") if isinstance(data, dict) else None
+    if not isinstance(orders, list):
+        return message
+    changed = False
+    for order in orders:
+        if isinstance(order, dict) and order.get("status") in STATUS_WORDS and "status_text" not in order:
+            order["status_text"] = STATUS_WORDS[order["status"]]
+            changed = True
+        window = actions.return_window(order, today) if isinstance(order, dict) else None
+        if window == "closed":
+            order["return_window"] = f"đã hết hạn đổi trả {actions.RETURN_DAYS} ngày"
+            changed = True
+        elif window == "defect":
+            order["return_window"] = (f"đã quá {actions.RETURN_DAYS} ngày đổi trả; chỉ còn đổi mới nếu lỗi nhà sản xuất, "
+                                      f"trong {actions.DEFECT_DAYS} ngày")
+            changed = True
+    return message.model_copy(update={"content": json.dumps(envelope, ensure_ascii=False)}) if changed else message
+
+
 class ToolGuardMiddleware(AgentMiddleware):
     """Timeout, one retry, a circuit breaker, and the virtual clock."""
 
     #: Section 6.1: seconds per call, by tool; everything else gets DEFAULT_TIMEOUT.
     TIMEOUTS = {"kb_search": 3.0, "kb_upsert": 3.0}
     DEFAULT_TIMEOUT = 2.0
+    #: A write that times out may still land on the server (2026-11-19, call 27: an order placed 70 ms after its 2 s
+    #: limit, the customer told it failed and transferred). A write is given long enough to answer.
+    WRITE_TIMEOUT = 10.0
 
     def __init__(
         self,
@@ -274,13 +408,14 @@ class ToolGuardMiddleware(AgentMiddleware):
 
         call = request.tool_call
         name = call["name"]
+        today = getattr(getattr(getattr(request, "runtime", None), "context", None), "now", None)
         if name not in self._guarded:
-            return await handler(request)
+            return with_hints(with_status_words(name, await handler(request), today))
         async with steps.tool(name) as step:
             result = await self._guarded_call(request, handler, call, name)
             envelope = envelope_of(result)
             step["ok"] = envelope is None or bool(envelope.get("ok", True))
-            return result
+            return with_hints(with_status_words(name, result, today))
 
     async def _guarded_call(self, request: Any, handler: Any, call: Any, name: str) -> Any:
         if self._is_open(name):
@@ -289,7 +424,8 @@ class ToolGuardMiddleware(AgentMiddleware):
             )
         request = self._with_context(request)
 
-        limit = self._timeout or self.TIMEOUTS.get(name, self.DEFAULT_TIMEOUT)
+        limit = self._timeout or self.TIMEOUTS.get(
+            name, self.WRITE_TIMEOUT if name in WRITE_TOOLS else self.DEFAULT_TIMEOUT)
         attempt = 0
         while True:
             attempt += 1
@@ -490,29 +626,183 @@ def chained_lookups(messages: Sequence[Any]) -> list[dict[str, Any]]:
     return calls
 
 
-class ChainLookupMiddleware(AgentMiddleware):
-    """Saves the model round between a search and its price: the model then reads real results of real tools."""
+def _call(name: str, args: Mapping[str, Any]) -> dict[str, Any]:
+    return {"name": name, "args": dict(args), "id": f"chain-{uuid.uuid4().hex[:12]}", "type": "tool_call"}
 
-    def __init__(self, tools: Iterable[Any], guard: ToolGuardMiddleware) -> None:
+
+#: The team's own tool for a question that needs weighing (plan 002, B3): which product fits a need, or which of the
+#: named ones to take. The organisers allow a team's own tools (``DIEU-CHINH-DE.md`` section 3); the calls it makes
+#: are theirs and are what the trace records.
+ADVISE = "product_advise"
+#: Products priced and checked per call: two to offer and one to compare with.
+ADVISE_TOP = 3
+
+
+#: The team's tool for a COD basket above the limit: the system arranges and prices the orders (QT-01, VC-03).
+SPLIT = "order_split_cod"
+
+
+class SplitLine(TypedDict):
+    """One product of the basket to split."""
+
+    sku: str
+    qty: int
+
+
+async def order_split_cod(lines: list[SplitLine], address: str | None = None) -> str:
+    """Place a cash-on-delivery basket above 10.000.000đ as several COD orders, each at most 10.000.000đ.
+
+    Use it only when the customer agreed to split the basket. The system prices the basket, arranges the orders so the
+    second-machine discount is kept (QT-01), and places each one with the shop's order tool. The first call returns the
+    orders to read back (CONFIRMATION_REQUIRED, each order's items and total); after the customer agrees, call it again
+    with the same basket and the orders are placed.
+
+    Args:
+        lines: Every product of the basket, each with its code (the variant's for a size or colour) and quantity.
+        address: The delivery address the customer gave, if any.
+    """
+    raise RuntimeError("order_split_cod runs in ActionGuardMiddleware")  # never reached: the middleware answers it
+
+
+def product_advise_on() -> bool:
+    """``ADVISOR_PRODUCT_ADVISE=1``: the advisor is offered :data:`ADVISE`. Off unless set, until measured."""
+    return os.environ.get("ADVISOR_PRODUCT_ADVISE", "0").strip().lower() not in ("0", "false", "no", "off", "")
+
+
+async def product_advise(category: str | None = None, query: str | None = None, room_area_m2: int | None = None,
+                         budget_vnd: int | None = None, has_children: bool | None = None,
+                         skus: list[str] | None = None) -> str:
+    """Products for what the customer needs, or a comparison of products already named, in one call.
+
+    Searches the catalogue for the need, puts the best fits first and gives the first three with today's price
+    (as pricing_get_quote), their stock (as inventory_check) and how each fits: the room area, the budget, a child
+    lock. Use it when the customer describes a need or asks which to choose, instead of catalog_search followed by
+    pricing_get_quote and inventory_check. Its prices and stock are tool results like theirs.
+
+    Args:
+        category: The category slug when the need names a kind of product, e.g. gia-dung/may-loc-khong-khi.
+        query: Words to search with: a brand, a model, a feature the customer named.
+        room_area_m2: The room's area the customer gave, in m².
+        budget_vnd: The customer's budget for one unit, in VND.
+        has_children: Whether the customer has small children (a child lock counts).
+        skus: Product codes to compare, from earlier tool results; leave out to search.
+    """
+    raise RuntimeError("product_advise runs in ChainLookupMiddleware")  # never reached: the middleware answers it
+
+
+def _fit(item: Mapping[str, Any], area: int | None, budget: int | None, children: bool | None) -> tuple[Any, ...]:
+    """How well a search result fits the need, best first: the room, the budget, a child lock, then the price."""
+    attributes = item.get("attributes") or {}
+    price = int(item.get("list_price_vnd") or 0)
+    room = attributes.get("room_area_m2")
+    return (bool(area) and isinstance(room, (int, float)) and room < area,
+            bool(budget) and price > int(budget or 0),
+            bool(children) and not attributes.get("child_safe_lock"),
+            abs(price - int(budget)) if budget else price)
+
+
+def _inner(call: Mapping[str, Any], message: Any) -> dict[str, Any]:
+    """One call made inside :data:`ADVISE`, as the trace records it."""
+    return {"name": call["name"], "args": (getattr(message, "additional_kwargs", {}) or {}).get("args") or call["args"],
+            "content": getattr(message, "content", "")}
+
+
+class ChainLookupMiddleware(AgentMiddleware):
+    """Saves the model round between a search and its price: the model then reads real results of real tools. Also
+    answers the team's ``product_advise`` with the organisers' tools."""
+
+    def __init__(self, tools: Iterable[Any], guard: ToolGuardMiddleware,
+                 lanes: Mapping[str, frozenset[str]] | None = None) -> None:
         super().__init__()
         self._tools = {tool.name: tool for tool in tools}
         self._guard = guard
+        self._lanes = lanes or {}
 
     async def abefore_model(self, state: Any, runtime: Any) -> dict[str, Any] | None:
+        """The price and stock a search the model just made leads to, in the harness's own round: driven by the
+        tools' results, never by the customer's words (plan 003 removed the lookups ahead of the model)."""
         if QUOTE not in self._tools or STOCK not in self._tools:
             return None
-        calls = chained_lookups(state.get("messages") or [])
+        messages = state.get("messages") or []
+        calls = chained_lookups(messages)
         if not calls:
             return None
+        results = await self._run(calls, state, runtime)
+        return {"messages": [AIMessage(content="", tool_calls=calls, additional_kwargs={CHAINED: True}), *results]}
 
+    async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
+        if (request.tool_call or {}).get("name") != ADVISE:
+            return await handler(request)
+        with stopwatch.span("tools"):
+            return await self._advise(request)
+
+    async def _advise(self, request: Any) -> Any:
+        """:data:`ADVISE`: the organisers' tools, through the same guard as every call, in two rounds of the harness."""
+        return await self._advised(request.tool_call, request.state, request.runtime)
+
+    async def _advised(self, call: Mapping[str, Any], state: Any, runtime: Any) -> ToolMessage:
+        args = {k: v for k, v in (call.get("args") or {}).items() if v not in (None, "", [])}
+        area = int(args["room_area_m2"]) if args.get("room_area_m2") else None
+        budget = int(args["budget_vnd"]) if args.get("budget_vnd") else None
+        inner: list[dict[str, Any]] = []
+        items: dict[str, Mapping[str, Any]] = {}
+        skus = [s for s in args.get("skus") or [] if isinstance(s, str)][:ADVISE_TOP]
+        if not skus:
+            search = {k: args[k] for k in ("query", "category") if args.get(k)}
+            if area:
+                search["min_room_area_m2"] = area
+            searched = _call(SEARCH, search)
+            [found] = await self._run([searched], state, runtime)
+            inner.append(_inner(searched, found))
+            listed = [i for i in ((parse_envelope(found.content) or {}).get("data") or {}).get("items") or []
+                      if isinstance(i.get("sku"), str)]
+            listed.sort(key=lambda i: _fit(i, area, budget, args.get("has_children")))
+            items = {i["sku"]: i for i in listed[:ADVISE_TOP]}
+            skus = list(items)
+        calls = [c for sku in skus for c in (_call(QUOTE, {"sku": sku, "qty": 1}), _call(STOCK, {"sku": sku}))]
+        answers = await self._run(calls, state, runtime) if calls else []
+        inner += [_inner(c, a) for c, a in zip(calls, answers)]
+        data = {c["args"]["sku"] + ":" + c["name"]: (parse_envelope(a.content) or {}) for c, a in zip(calls, answers)}
+        candidates = []
+        for sku in skus:
+            quote = (data.get(f"{sku}:{QUOTE}") or {}).get("data") or {}
+            stock = (data.get(f"{sku}:{STOCK}") or {}).get("data") or {}
+            item = items.get(sku) or {}
+            attributes = item.get("attributes") or {}
+            price = quote.get("final_price_vnd")
+            room = attributes.get("room_area_m2")
+            candidates.append({
+                "sku": sku, "name": item.get("name") or quote.get("name"), "final_price_vnd": price,
+                "applied_promos": quote.get("applied_promos"), "in_stock": stock.get("in_stock"), "stock_qty": stock.get("qty"),
+                **{k: attributes[k] for k in ("room_area_m2", "features", "warranty_months", "child_safe_lock") if k in attributes},
+                "fits_room": None if not area or not isinstance(room, (int, float)) else room >= area,
+                "over_budget_vnd": (price - budget) if budget and isinstance(price, int) and price > budget else 0,
+            })
+        note = ("Không có sản phẩm nào khớp nhu cầu trong danh mục: nói rõ shop chưa có, không đưa sản phẩm loại khác."
+                if not candidates else "Giá cuối và tồn kho hôm nay; ứng viên khớp nhu cầu nhất đứng đầu.")
+        envelope = {"ok": True, "data": {"candidates": candidates, "note": note}}
+        return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=ADVISE,
+                           additional_kwargs={"inner": inner})
+
+    async def _run(self, calls: Sequence[dict[str, Any]], state: Any, runtime: Any) -> list[Any]:
         async def run(request: Any) -> Any:
             return await request.tool.ainvoke(request.tool_call)
 
-        results = await asyncio.gather(*(
+        return list(await asyncio.gather(*(
             self._guard.awrap_tool_call(ToolCallRequest(tool_call=call, tool=self._tools[call["name"]], state=state,
                                                         runtime=runtime), run)
-            for call in calls))
-        return {"messages": [AIMessage(content="", tool_calls=calls, additional_kwargs={CHAINED: True}), *results]}
+            for call in calls)))
+
+
+def first_clause() -> bool:
+    """``ADVISOR_FIRST_CLAUSE=1``: on a call, the answer's first clause goes to the voice ahead of its sentence
+    (``SentenceSplitter.pieces``). Off unless set, until measured."""
+    return os.environ.get("ADVISOR_FIRST_CLAUSE", "0").strip().lower() not in ("0", "false", "no", "off", "")
+
+
+def sentence_review() -> bool:
+    """``ADVISOR_SENTENCE_REVIEW=1``: the PolicyAgent reads each said sentence beside the stream. Off unless set."""
+    return os.environ.get("ADVISOR_SENTENCE_REVIEW", "0").strip().lower() not in ("0", "false", "no", "off", "")
 
 
 ADDRESS_TOKEN = re.compile(r"<ADDR_\d+>")

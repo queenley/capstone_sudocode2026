@@ -14,6 +14,14 @@
 >
 > Kiểm offline: 404/404 kịch bản nạp được; oracle CCR 100 · RQR 0 · TSR 100 · HR 0; hội thoại mẫu TSR 98,8. Oracle dựng từ nhãn nên không chứng minh nhãn đúng: xem `reports/label_check.json` (stage `check_labels`).
 
+## Bộ đại diện (24/11/2026)
+
+[`representative.txt`](representative.txt): 43 kịch bản, mỗi hành vi chấm được xuất hiện ít nhất một lần. Hành vi đọc từ nhãn, không từ tag `variant:`: tool phải gọi (kèm `action` của `order.update` và cách thanh toán), điều phải nói (`must_say_any`, số và giờ coi như nhau), claim cấm, loại `trace_must_not_match`, `max_agent_questions`, giỏ (`also_ordered`, `total_match_vnd`), brief chuyển máy, kênh, đổi kênh, ASR hoặc teencode, nhớ từ cuộc trước, `hard_case`. 107 hành vi; chọn tham lam ít kịch bản nhất phủ hết, bỏ 10 kịch bản có nhãn trái BTC (`docs/evaluation/dev-audit-20261119.md` mục 4). Chạy từ gốc repo:
+
+```
+apps/ai-agent-service/.venv/bin/python run_eval.py --scenarios data/dev/scenarios $(sed 's/^/--only /' data/dev/representative.txt)
+```
+
 Bộ dữ liệu do [`evaluation/data-generation`](../../evaluation/data-generation/README.md) sinh, theo định dạng kịch bản của BTC. README này chỉ cách dùng nó để chấm agent. Con số chính thức luôn là `reference_eval.py` của BTC, chạy qua `run_eval.py` ở gốc repo (quy tắc trong [`evaluation/README.md`](../../evaluation/README.md)).
 
 ## Nhãn đã sửa (bản r4, 08–09/11/2026)

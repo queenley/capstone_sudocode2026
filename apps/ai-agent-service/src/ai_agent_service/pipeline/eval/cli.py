@@ -74,7 +74,7 @@ RUNS = runs_dir()
 EXTRACTOR_CACHE = RUNS / "cache" / "extractor.json"
 
 #: Extractor calls in flight at once; the provider's rate limiter paces them.
-EXTRACTOR_CONCURRENCY = 4
+EXTRACTOR_CONCURRENCY = 8
 #: Seconds one turn's labelling may take, its retry included (two attempts of 60 s, and the limiter's wait).
 #: Past it the labelling stops with an error instead of waiting: eval2 (2026-11-07) waited over twenty minutes
 #: on four calls whose connections the provider had closed. What was labelled stays in the cache for the rerun.
@@ -147,6 +147,11 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--sample-size", type=int, default=20, help="With --judge-sample: (call, criterion) pairs to draw (default 20).")
     parser.add_argument("--judge-agreement", type=Path, metavar="SHEET_DIR",
                         help="Compare the people's verdicts in a --judge-sample sheet with the judge's: agreement and Cohen's kappa.")
+    parser.add_argument("--simulate", action="store_true",
+                        help="Play --scenarios against the organisers' customer simulator (simulator/customer_simulator_spec.md), "
+                             "full configuration only, once per --seeds; TSR per seed, mean, stdev and range. Spends model calls.")
+    parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2], metavar="N",
+                        help="With --simulate: the seeds (default 0 1 2, the specification's three).")
     parser.add_argument("--relabel", type=Path, metavar="RUN_DIR",
                         help="Label a finished run's turns again with today's extractor and grade them; the agent does not run.")
     parser.add_argument("--asr", type=Path, help="ASR ground_truth.json or its directory; scores with main's unchanged scorer.")
@@ -218,6 +223,64 @@ def _tables(args: argparse.Namespace) -> int:
     return 0
 
 
+def _simulate(args: argparse.Namespace) -> int:
+    """``--simulate``: the cohort against the simulated customer, seed by seed (:mod:`.simulate`)."""
+    if args.relabel or args.config or args.judge or args.no_extract or args.resume:
+        print("--simulate plays the full configuration against the simulator; --config, --judge, --relabel, "
+              "--no-extract and --resume do not apply")
+        return 2
+    if not args.scenarios.is_dir():
+        print(f"{args.scenarios} is not a directory")
+        return 2
+    from . import scenarios
+
+    ready, rejected = scenarios.load(args.scenarios, set(args.only) or None)
+    if rejected or not ready:
+        for item in rejected:
+            print(f"Rejected {item.path.name}: {item.reason}")
+        print("No scenario to play" if not ready else "Invalid cohort; no model calls.")
+        return 2
+    run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
+    out = (args.out or RUNS / f"{run_id}-simulate").resolve()
+    if out.exists() and any(out.iterdir()):
+        print(f"{out} is not empty: the CLI never overwrites evidence")
+        return 2
+    try:
+        _say_cap(validate_ledger())
+    except RuntimeError as error:
+        print(error)
+        return 2
+    from . import runner
+
+    try:
+        database = runner.use_evaluation_database()
+    except RuntimeError as error:
+        print(error)
+        return 2
+    out.mkdir(parents=True, exist_ok=True)
+    os.environ["MCP_TRANSPORT"] = "stdio"
+    os.environ["MCP_LOG_FILE"] = str(out / "mcp-servers.log")
+    print(f"Simulate {run_id}: database {database}, seeds {args.seeds}, {len(ready)} scenarios, output {out}")
+
+    async def play() -> int:
+        from ...mcp import client as mcp_client
+        from . import simulate
+
+        async with runner.evaluation_lock():
+            try:
+                rig = await runner.build(provider=args.provider, model=args.model)
+                return await simulate.run(rig, ready, args.seeds, out, run_id=run_id)
+            finally:
+                await mcp_client.close_all()
+
+    try:
+        return asyncio.run(play())
+    except Exception:
+        (out / "evaluation-error.log").write_text(traceback.format_exc(), encoding="utf-8")
+        print(f"Simulation failed: {out / 'evaluation-error.log'}")
+        return 1
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
     if args.ingest:
@@ -245,6 +308,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         # In the environment, so the MCP servers this command starts read the same version.
         os.environ["KNOWLEDGE_VERSION"] = str(args.kb_version)
+        from ...config.config_manager import get_knowledge_config
+
+        get_knowledge_config.cache_clear()  # read before the option was seen: the manifest must name this version
     # Each profile changes exactly what its column says, so Router, GapLoop, Reflection and Combined read as an ablation.
     for profile, option, value in (("gaploop", "--kb-version", args.kb_version), ("combined", "--kb-version", args.kb_version),
                                    ("reflection", "--skills-version", args.skills_version),
@@ -271,6 +337,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"No skills version {args.skills_version} in {skills_dir}")
             return 2
         os.environ["EVAL_SKILLS_VERSION"] = str(args.skills_version)
+        # The skills module read the version in force when it was imported, before this option was seen: read again,
+        # or a --skills-version run (the ablation, full_dev) measures skills v0 (found 2026-11-24).
+        from ...components.context import skills as skill_book
+
+        served = skill_book.reload()
+        if served != args.skills_version:
+            print(f"Skills v{served} served where v{args.skills_version} was asked")
+            return 2
     from ...mcp.server_base import use_selector_loop_on_windows
 
     use_selector_loop_on_windows()
@@ -349,6 +423,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(error)
             return 2
         return asyncio.run(judge_agreement.judge_run(args.judge_run.resolve(), out, _judge(), only=args.only))
+    if args.simulate:
+        return _simulate(args)
     if args.relabel:
         if args.no_extract or args.judge or args.provider or args.model or args.only:
             print("--relabel runs only the extractor; agent/selection options are not supported (--config is)")

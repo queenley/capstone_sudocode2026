@@ -61,7 +61,11 @@ def cached_tokens(response: LLMResult) -> int:
     for generations in response.generations:
         for generation in generations:
             meta = getattr(getattr(generation, "message", None), "usage_metadata", None) or {}
-            cached = (meta.get("input_token_details") or {}).get("cache_read")
+            details = meta.get("input_token_details") or {}
+            # A call in another processing tier reports its cache under the tier's name ("priority_cache_read"):
+            # read as 0 it made the cache look cold on every priority call (2026-11-15).
+            cached = details.get("cache_read") or next(
+                (v for k, v in details.items() if k.endswith("_cache_read") and v), None)
             if cached:
                 return int(cached)
     return 0
@@ -110,6 +114,10 @@ class TokenTrackingCallback(BaseCallbackHandler):
     its model through ``LLMFactory.create_llm``, so per-agent token totals fall
     out for free.
     """
+
+    #: Bookkeeping under a lock, no I/O: run on the event loop rather than handed to a thread for every event of an
+    #: async call, streamed tokens included (LangChain's default for a sync handler; see ``spend_guard.StopSwitch``).
+    run_inline = True
 
     def __init__(
         self, rate_limiter: AdvancedTokenRateLimiter, agent_name: str = ""

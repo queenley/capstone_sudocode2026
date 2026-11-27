@@ -16,6 +16,7 @@ from typing import Any, Mapping
 from uuid import uuid4
 
 from ...config.database import derived_key
+from ..intake import commerce
 from ..intake.itn import format_vnd
 from ..intake.text import plain
 
@@ -126,24 +127,6 @@ def _owner(context: Any) -> str:
     return hashlib.sha256(_json([context.customer_id, context.customer_phone]).encode()).hexdigest()
 
 
-def missing(args: Mapping[str, Any], order: Mapping[str, Any], delivery: str | None) -> list[str]:
-    """What the order still lacks before it may be read back (PB-09), in the words the model is told.
-
-    Product and today's price are the action guard's (a trusted code, the current quote); the quantity reads back as
-    1 unless said. The payment must be one the model passed, from the customer or the brief: :func:`payload` would
-    write COD for a missing one, and a read-back the customer answers by naming the payment is a read-back wasted
-    (eval2: 116 of 153 read-backs were answered with a missing field, not a yes).
-    """
-    gaps = []
-    if not args.get("payment"):
-        gaps.append("phương thức thanh toán khách chọn (COD hay chuyển khoản)")
-    if not order.get("address"):
-        gaps.append("địa chỉ giao hàng (lời khách hoặc Call Brief)")
-    if not delivery:
-        gaps.append("ngày giao dự kiến (gọi delivery_estimate với địa chỉ giao)")
-    return gaps
-
-
 def estimated_delivery(results: Any) -> str | None:
     """The day the latest successful ``delivery.estimate`` of the call gave, ``YYYY-MM-DD``."""
     for result in reversed(list(results or ())):
@@ -170,17 +153,26 @@ def addressed(context: Any) -> str:
 
 
 def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
-          names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
+          names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None,
+          order_quotes: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """The order to read back, as it is said aloud: names and amounts, never a product code; with *delivery*,
     the day :func:`estimated_delivery` found."""
     order = payload(args)
     known = {**{p.get("sku"): p.get("name") for p in context.seen_products if p.get("name")}, **(names or {})}
-    address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
+    # No address in the call or the Call Brief: the order is placed without one (address is optional in the
+    # organisers' order.create); the read-back says the record has none rather than that the customer gave none.
+    address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa có trong hồ sơ"
     promo = f", mã khuyến mãi: {order['promo_code']}" if order["promo_code"] else ""
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
     arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""
     lines = lines_of(order)
     total = sum(line["price_vnd"] * line["qty"] for line in lines)
+    for line in lines:
+        # A variant is never among the searched products by its own code: its name, size and colour come from the
+        # catalogue, so the read-back names what is being bought (PB-09) instead of "1 sản phẩm đã chọn".
+        name = commerce.product_name(line["sku"])
+        if name and (not known.get(line["sku"]) or " size " in name):
+            known[line["sku"]] = name
     items = "; ".join(f"{line['qty']} sản phẩm {known.get(line['sku']) or 'đã chọn'}, đơn giá {format_vnd(line['price_vnd'])}"
                       for line in lines)
     question = (f"{addressed(context)} xác nhận đặt {items}, tổng {format_vnd(total)}, thanh toán {payment}{promo}, "
@@ -190,16 +182,35 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
     basket = [sku for sku in order.get("basket_skus") or [] if sku not in {line["sku"] for line in lines}]
     others = [known[sku] for sku in basket if known.get(sku)]
     if others:
-        prices = [(quotes or {}).get(sku) for sku in basket]
-        whole = "" if None in prices else f", tổng cả giỏ {format_vnd(total + sum(prices))}"
+        # The basket's total is the pricing.quote_order of all its machines: each machine's own quote misses the
+        # second-item promotion the two orders share (QT-01; "tổng cả giỏ 14.180.000đ" was read for a basket of
+        # 10.935.000đ, 2026-11-16). Without that quote, no total.
+        units = (order_quotes or {}).get(units_key([*lines, *({"sku": sku} for sku in basket)]))
+        whole = f", tổng cả giỏ {format_vnd(sum(int(price) for _, price in units))}" if units else ""
         question = f"Đơn này đi cùng {', '.join(others)}{whole}. " + question
         read_back = f"Đơn này đi cùng {', '.join(others)}{whole}. " + read_back
+    # The customer already heard this order read back in the call and changed something: only what changed is read
+    # again, with the total. A second confirmation of what they confirmed is a repeated question (RQR).
+    before = getattr(context, "pending_purchase", None) or {}
+    if before.get("owner") == _owner(context) and before.get("lines") and not others and not order.get("order_group"):
+        old = before.get("args") or {}
+        changes = []
+        if sorted((l["sku"], l["qty"], l["price_vnd"]) for l in before["lines"]) != sorted(
+                (l["sku"], l["qty"], l["price_vnd"]) for l in lines):
+            changes.append(items)
+        if old.get("payment") != order.get("payment"):
+            changes.append(f"thanh toán {payment}")
+        if (old.get("address") or None) != (address if order["address"] else None):
+            changes.append(f"địa chỉ giao hàng: {address}")
+        if changes:
+            question = f"{addressed(context)} đồng ý đặt đơn với {', '.join(changes)}, tổng {format_vnd(total)} không ạ?"
+            read_back = f"Dạ em cập nhật đơn: {', '.join(changes)}, tổng {format_vnd(total)}."
     if order.get("order_group"):
         question = f"Đây là đơn {order['order_group']} của phần tách đơn. " + question
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
             "target_id": target(order), "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
-            "status": "pending", "question": question, "read_back": read_back,
+            "status": "pending", "question": question, "read_back": read_back, "total_vnd": total, "lines": lines,
             "args": {k: (address if k == "address" else v) for k, v in order.items() if k in FILLED and v}}
 
 
@@ -222,10 +233,25 @@ def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, tur
            said: str, last_reply: str | None) -> dict[str, Any] | None:
     """The fallback when the PolicyAgent gave no answer: a short yes to a read-back the customer just heard, nothing else."""
     opened = still_open(pending, call_id=call_id, channel=channel, turn_id=turn_id)
-    if (opened is None or not last_reply or not last_reply.endswith(opened.get("question") or "\0")
-            or not agrees(said)):
+    if opened is None or not last_reply or not heard_in(opened, last_reply) or not agrees(said):
         return None
     return authorize(opened, turn_id)
+
+
+def heard_in(record: Mapping[str, Any], text: str) -> bool:
+    """Whether *text*, what the agent said, read this order back: its total is in it (the model words the read-back
+    itself, 2026-11-26, so the question is not matched word for word)."""
+    totals = [d.get("total_vnd") for d in (record, *(record.get("siblings") or []))]
+    if len(totals) > 1 and all(isinstance(t, int) for t in totals):
+        # A split read back together: each order's total said, or the basket's.
+        return all(heard_in({"total_vnd": t}, text) for t in totals) or heard_in({"total_vnd": sum(totals)}, text)
+    total = record.get("total_vnd")
+    if not isinstance(total, int):
+        return False
+    flat = re.sub(r"(?<=\d)[.,\s](?=\d{3}(?!\d))", "", text or "")
+    at = flat.rfind(str(total))
+    # A yes answers the last question asked: after the total, one question at most, the one asking to order.
+    return at >= 0 and flat[at:].count("?") <= 1
 
 
 def authorize(draft_record: Mapping[str, Any], turn_id: str | None) -> dict[str, Any]:

@@ -187,8 +187,10 @@ def test_callback_times_and_codes_are_written_as_the_scenarios_write_them():
     item = scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AF-6L", "value": "2.490.000đ",
                            "quote": "SKU-AF-6L giá 2.490.000đ"})
     assert item and item[0]["value"] == 2490000
-    assert scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AF-6L", "value": 2490000,
-                           "quote": "nồi chiên 6 lít giá 2.490.000đ"}) is None
+    # Words that fit several products as well as this one do not name it: still a price said, kept as price_vnd.
+    unnamed = scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AF-6L", "value": 2490000,
+                              "quote": "nồi chiên giá 2.490.000đ"})
+    assert unnamed and unnamed[0]["slot_or_field"] == "price_vnd"
 
 
 def test_crm_history_is_evidence_for_reused_facts_and_today_is_context():
@@ -211,3 +213,25 @@ def test_order_codes_and_statuses_compare_as_the_tools_write_them():
     assert code and code[0]["value"] == "VN0032TRK"
     # A code the reply does not say is not the agent's claim.
     assert scorers._claim({**claim, "slot_or_field": "order_id", "value": "OD900302", "quote": "đơn của anh"}) is None
+
+
+def test_only_an_active_discount_or_gift_promotion_is_also_promo_active():
+    """BTC's promo_active is a price promotion: false beside an active free COD fee or free shipping."""
+    claim = {"kind": "claim", "speaker": "agent", "source_field": "agent_text", "start": 0, "end": 1, "purpose": ""}
+    fields = lambda field, value: [c["slot_or_field"] for c in scorers._claim(  # noqa: E731
+        {**claim, "slot_or_field": field, "value": value, "quote": "ưu đãi"})]
+    assert fields("promo_COD-0_active", True) == ["promo_COD-0_active"]
+    assert fields("promo_MOM-FREESHIP_active", True) == ["promo_MOM-FREESHIP_active"]
+    assert fields("promo_GIFT-FILTER_active", True) == ["promo_GIFT-FILTER_active", "promo_active"]
+    # One promotion said to be over says nothing of the others.
+    assert fields("promo_RUN-10_active", False) == ["promo_RUN-10_active"]
+
+
+def test_the_price_of_one_of_several_products_counts_when_its_model_is_named():
+    claim = {"kind": "claim", "speaker": "agent", "source_field": "agent_text", "start": 0, "end": 1, "purpose": ""}
+    named = scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AP-Y", "value": 5200000,
+                            "quote": "AirPure Y có khóa trẻ em, giá 5.200.000đ"})
+    assert named and named[0]["slot_or_field"] == "price_vnd:SKU-AP-Y"
+    other = scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AP-Y", "value": 5200000,
+                            "quote": "AirPure Pro giá 5.200.000đ"})
+    assert other and other[0]["slot_or_field"] == "price_vnd"  # names another product: never dropped

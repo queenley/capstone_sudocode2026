@@ -79,7 +79,7 @@ async def test_head_start_waits_at_most_its_moment():
 
 
 def request_for(context, name="order_create", args=None):
-    request = SimpleNamespace(tool_call={"id": "t", "name": name, "args": args or {"sku": "S", "price_vnd": 1}},
+    request = SimpleNamespace(tool_call={"id": "t", "name": name, "args": args or {"sku": "S", "price_vnd": 1, "payment": "COD", "address": "Quận 3"}},
                               runtime=SimpleNamespace(context=context), state={"messages": []})
     request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
     return request
@@ -124,7 +124,7 @@ async def test_jev_decides_agreement_in_the_same_turn_and_the_read_back_is_owed(
     assert await ActionGuardMiddleware().awrap_tool_call(request_for(context), handler) == "executed"
     assert judged[0][0] == "purchase"
     assert context.consent["draft"]["status"] == "authorized"
-    assert "1.000.000đ" in context.consent["read_back"]
+    assert "read_back" not in context.consent  # the model reads the order back from the result
 
 
 @pytest.mark.asyncio
@@ -158,7 +158,7 @@ def test_meaning_is_not_read_by_the_hard_check(text):
 
 @pytest.mark.parametrize("text,passes", [
     ("em đề xuất gọi lại lúc 5 giờ 30 chiều", True),
-    ("Dạ bảo hành 24 tháng ạ", False),
+    ("Dạ bảo hành 24 tháng ạ", True),  # durations are not checked since 2026-11-25
     ("Dạ máy giá 4.900.000đ ạ", False),
 ])
 def test_numbers_are_compared_with_data(text, passes):

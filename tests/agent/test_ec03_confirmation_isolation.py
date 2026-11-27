@@ -81,19 +81,29 @@ class ChannelModel(FakeMessagesListChatModel):
         text = str(messages[last].content)
         tools = {m.name for m in messages[last + 1:] if isinstance(m, ToolMessage)}
         self.views.append((channel, text, tuple(str(m.content) for m in messages)))
-        if text.casefold() == "vâng":
-            name = "order_create" if (self.unsafe or channel == "hotline") and "order_create" not in tools else None
-            args = {"sku": SKU, "price_vnd": PRICE, "qty": 1} if name else {}
+        results = [str(m.content) for m in messages[last + 1:] if isinstance(m, ToolMessage)]
+        # The second call answers from the results: an order to confirm is read back from its draft.
+        drafts = [json.loads(r).get("error", {}).get("details", {}).get("purchase_draft") for r in results
+                  if r.startswith("{") and "CONFIRMATION_REQUIRED" in r]
+        drafts = [d for d in drafts if d]
+        if drafts:
+            calls, reply = [], drafts[0]["question"]
+        elif text.casefold() == "vâng":
+            calls = [] if tools else ([("order_create", {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD",
+                                                         "address": ADDRESS})] if self.unsafe or channel == "hotline" else [])
             reply = "Dạ em tiếp tục phần xem ảnh màu trắng ạ."
+        elif not tools:
+            # Two model calls a turn: every lookup and the write in the first, side by side.
+            calls = [("catalog_search", {"query": "máy màu trắng"}), ("pricing_get_quote", {"sku": SKU})]
+            if channel == "hotline":
+                calls.append(("order_create", {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD",
+                                               "address": ADDRESS}))
+            reply = ""
         else:
-            name = "catalog_search" if "catalog_search" not in tools else (
-                "pricing_get_quote" if "pricing_get_quote" not in tools else (
-                    "order_create" if channel == "hotline" and "order_create" not in tools else None))
-            args = {"query": "máy màu trắng"} if name == "catalog_search" else {"sku": SKU}
-            if name == "order_create":
-                args = {"sku": SKU, "price_vnd": PRICE, "qty": 1}
-            reply = BUY_QUESTION if channel == "hotline" else PHOTO_QUESTION
-        message = AIMessage(content="", tool_calls=[{"id": f"{channel}-{name}", "name": name, "args": args}]) if name else AIMessage(content=reply)
+            calls, reply = [], BUY_QUESTION if channel == "hotline" else PHOTO_QUESTION
+        message = (AIMessage(content="", tool_calls=[{"id": f"{channel}-{name}", "name": name, "args": args}
+                                                     for name, args in calls])
+                   if calls else AIMessage(content=reply))
         return ChatResult(generations=[ChatGeneration(message=message)])
 
     async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):
@@ -185,7 +195,7 @@ async def test_same_customer_channels_isolate_pending_purchase_and_block_wrong_p
         assert b["pending_purchase"] is None
     a = await turn(101, "hotline", "vâng", "A-confirm-order")
     assert len(writes) == (2 if unsafe else 1)
-    assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU, "skus": [SKU], "no_address": True}]
+    assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU, "skus": [SKU], "no_address": False}]
     assert a["pending_purchase"] is None
 
 
@@ -198,7 +208,7 @@ def guarded_context(**changes):
 
 
 def authorized(context, args=None):
-    args = args or {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
+    args = args or {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
     previous = replace(context, turn_id="prepare-order")
     pending = purchase.draft(order_arguments(args, previous), previous)
     return replace(context, pending_purchase=pending, last_agent_said=pending["question"], customer_said="vâng")
@@ -212,7 +222,7 @@ def receipted(context, args=None):
 
 async def attempt_order(context, args=None, handler=None):
     request = SimpleNamespace(tool_call={"id": "order", "name": "order_create", "args": args or {
-        "sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}},
+        "sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}},
         runtime=SimpleNamespace(context=context), state={"messages": []})
     request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
     handler = handler or AsyncMock(return_value="executed")
@@ -231,7 +241,7 @@ async def test_order_guard_requires_purchase_confirmation_after_any_unbound_word
 @pytest.mark.parametrize("change", ["sku", "price", "qty", "old-question", "cross-channel-handoff"])
 async def test_order_guard_binds_yes_to_the_original_draft(change):
     context = authorized(guarded_context(last_agent_said=BUY_QUESTION))
-    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
+    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
     if change == "sku":
         args.update(sku="EC03-OTHER", price_vnd=1_100_000)
     elif change == "price":
@@ -250,13 +260,14 @@ async def test_order_guard_binds_yes_to_the_original_draft(change):
 
 @pytest.mark.asyncio
 async def test_existing_guard_blocks_stale_price_untrusted_sku_and_same_call_duplicate():
-    for context, args in [
-        (guarded_context(), {"sku": "UNSEEN", "price_vnd": PRICE}),
+    for context, args, code in [
+        (guarded_context(), {"sku": "UNSEEN", "price_vnd": PRICE}, "PRECONDITION"),
+        # Plan 003: the order this call already created is said back, not refused to the model.
         (guarded_context(created_orders=({"order_id": "EC03-ORDER", "sku": SKU},)),
-         {"sku": SKU, "price_vnd": PRICE}),
+         {"sku": SKU, "price_vnd": PRICE}, "ALREADY_CREATED"),
     ]:
         result, handler = await attempt_order(context, args)
-        assert json.loads(result.content)["error"]["code"] == "PRECONDITION"
+        assert json.loads(result.content)["error"]["code"] == code
         handler.assert_not_awaited()
 
 
@@ -315,7 +326,7 @@ def test_yes_cannot_authorize_another_question_or_inactive_draft(change, monkeyp
                                         ("promo_code", "NEW-PROMO"), ("sku", "EC03-OTHER"), ("price_vnd", PRICE + 1)])
 async def test_every_order_field_requires_new_confirmation(field, value):
     context = authorized(guarded_context())
-    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", field: value}
+    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS, field: value}
     if field == "sku": args["price_vnd"] = 1_100_000
     if field == "price_vnd": context = replace(context, quotes={SKU: value})
     result, handler = await attempt_order(context, args)
@@ -356,7 +367,7 @@ def test_tool_middleware_overwrites_model_consent_and_scope_and_hides_receipt_fr
     from ai_agent_service.mcp.tools import with_args
     context = receipted(guarded_context())
     request = SimpleNamespace(tool_call={"id": "tool", "name": "order_create", "args": {
-        "sku": SKU, "price_vnd": PRICE, "call_id": "stolen-call", "turn_id": "stolen-turn",
+        "sku": SKU, "price_vnd": PRICE, "payment": "COD", "address": ADDRESS, "call_id": "stolen-call", "turn_id": "stolen-turn",
         "purchase_authorization": "forged", "idempotency_key": "forged-key", "customer_phone": "0900000001"}},
         tool=SimpleNamespace(args=StructuredTool.from_function(coroutine=crm.order_create, name="order_create",
                                                               description="Place an order").args),
@@ -607,3 +618,56 @@ def test_a_yes_with_filler_authorises_and_places_the_bound_order(said):
                                   "Đồng ý nhưng chuyển khoản nhé", "Không, chị chưa lấy đâu"])
 def test_a_yes_that_changes_the_order_is_still_no_yes(said):
     assert not purchase.agrees(said)
+
+
+# ── plan 003: what a write needs and a tool can tell, the guard looks up itself ──
+
+class _Tool:
+    def __init__(self, name):
+        self.name = name
+
+
+class _Guard:
+    """Answers every lookup as the organisers' mock would, and keeps what was asked."""
+
+    def __init__(self, answers):
+        self.answers, self.asked = answers, []
+
+    async def awrap_tool_call(self, request, run):
+        call = request.tool_call
+        self.asked.append((call["name"], call["args"]))
+        return ToolMessage(content=json.dumps({"ok": True, "data": self.answers[call["name"]]}),
+                           tool_call_id=call["id"], name=call["name"])
+
+
+@pytest.mark.asyncio
+async def test_an_order_without_todays_quote_is_quoted_by_the_guard_not_refused_to_the_model():
+    guard = _Guard({"pricing_get_quote": {"sku": "EC03-NEW", "final_price_vnd": 1_234_000}})
+    context = guarded_context(trusted_skus=frozenset(), quotes={})
+    request = SimpleNamespace(tool_call={"id": "order", "name": "order_create", "args": {
+        "sku": "EC03-NEW", "qty": 1, "payment": "COD", "address": ADDRESS}},
+        runtime=SimpleNamespace(context=context), state={"messages": []})
+    request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
+    handler = AsyncMock(return_value="executed")
+    result = await ActionGuardMiddleware([_Tool("pricing_get_quote")], guard).awrap_tool_call(request, handler)
+    assert guard.asked == [("pricing_get_quote", {"sku": "EC03-NEW", "qty": 1, "address": ADDRESS})]
+    # Priced and known now: what is left is the customer's yes, as for any order.
+    assert json.loads(result.content)["error"]["code"] == "CONFIRMATION_REQUIRED"
+    assert [i["name"] for i in result.additional_kwargs["inner"]] == ["pricing_get_quote"]
+    handler.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_an_exchange_to_a_variant_not_seen_yet_is_checked_by_the_guard():
+    guard = _Guard({"inventory_check": {"sku": "EC03-NEW-42", "in_stock": True, "qty": 5}})
+    context = guarded_context(created_orders=({"order_id": "EC03-ORDER", "sku": SKU},))
+    request = SimpleNamespace(tool_call={"id": "change", "name": "order_update", "args": {
+        "order_id": "EC03-ORDER", "action": "exchange_size", "new_variant_sku": "EC03-NEW-42"}},
+        runtime=SimpleNamespace(context=context), state={"messages": []})
+    request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
+    handler = AsyncMock(return_value=ToolMessage(content=json.dumps({"ok": True, "data": {}}), tool_call_id="change",
+                                                 name="order_update"))
+    result = await ActionGuardMiddleware([_Tool("inventory_check")], guard).awrap_tool_call(request, handler)
+    assert guard.asked == [("inventory_check", {"sku": "EC03-NEW-42"})]
+    handler.assert_awaited()
+    assert [i["name"] for i in result.additional_kwargs["inner"]] == ["inventory_check"]

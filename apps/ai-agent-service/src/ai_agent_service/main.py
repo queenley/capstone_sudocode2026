@@ -89,6 +89,7 @@ async def lifespan(app: FastAPI):
     else:
         try:
             await harness.ready()
+            harness.spawn(harness.warm())
             if not jobs.queued():
                 harness.spawn(harness.remember_unfinished())
         except Exception as error:  # noqa: BLE001 - retried on the first turn

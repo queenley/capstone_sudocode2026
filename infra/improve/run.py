@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import os
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -33,7 +34,8 @@ SETTLED, WAITING, NO_ROUND = 0, 1, 2
 
 def _dag():
     os.environ.setdefault("IMPROVE_REPO", str(REPO))
-    os.environ.setdefault("IMPROVE_PYTHON", sys.executable)
+    # Quoted: the steps run through a shell, and a checkout's path may hold a space ("Sudo Code").
+    os.environ.setdefault("IMPROVE_PYTHON", shlex.quote(sys.executable))
     spec = importlib.util.spec_from_file_location("improvement_weekly", DAG_FILE)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)  # Airflow is not installed: the DAG file then only defines STEPS

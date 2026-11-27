@@ -7,7 +7,7 @@ Reads the round's runs in evaluation/runs/<name> (r0-<set>-<i> before, r1-<set>[
 baseline) and checks:
 
   data/dev sample (set <name>): broken 0, no HARM, TSR and hallucination not worse than the runs before vary
-                                (with one run a side that cannot be told: WARN, run with -Runs 2).
+                                (fewer than two runs a side cannot be told: WARN; rounds run k = 3 since 2026-11-16).
   proof set (gap-loop, budget, warranty, conduct): every target case passes every check in every run after; no
                                 control case (one that must stay as it was) is broken.
 
@@ -91,7 +91,7 @@ def main() -> int:
                 detail = f"trước {mean(b):.1f} [{min(b):.1f}-{max(b):.1f}], sau {mean(a):.1f} ({len(b)}/{len(a)} lần chạy)"
                 status = "PASS" if not worse else ("WARN" if len(b) < 2 else "FAIL")
                 if worse and len(b) < 2:
-                    detail += "; một lần chạy mỗi bên không tách được dao động: chạy lại với -Runs 2"
+                    detail += "; một lần chạy mỗi bên không tách được dao động: chạy lại với -Runs 3"
                 check(label, f"{name} không xấu đi quá dao động", status, detail)
             check(label, "fixed (tham khảo)", "INFO", f"{len(result['fixed'])} fixed, {len(result['unstable'])} unstable")
         else:  # a proof set

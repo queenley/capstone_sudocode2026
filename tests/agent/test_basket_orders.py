@@ -43,6 +43,7 @@ async def test_two_purifiers_order_with_the_second_item_discount(mock_without_da
 
 
 def _check(args, placed=(), agent="", customer=""):
+    args = {"address": "Quận 3", **args}  # an order is placed with an address (PB-09)
     return actions.check("order_create", args, tier="VERIFIED", mode="speak", has_phone=True, quotes=QUOTES,
                          trusted=frozenset(QUOTES), placed=placed, last_agent_said=agent, customer_said=customer)
 
@@ -58,11 +59,10 @@ def test_two_six_million_items_on_cod_are_refused():
     assert _check({"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD"}).passed
 
 
-def test_a_split_into_two_orders_needs_the_customers_agreement():
+def test_a_split_order_is_checked_on_its_own_group_and_not_on_the_customers_words():
+    # The customer's agreement is the model's to read (no word gates); each half is held to the COD limit.
     line = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD", "order_group": "1"}
-    assert not _check(line, customer="ok em").passed
-    asked = "Dạ đơn trên 10 triệu không COD được, anh có muốn em tách thành hai đơn không ạ?"
-    assert _check(line, agent=asked, customer="ừ được em").passed
+    assert _check(line, customer="ok em").passed and _check(line, customer="ừ được em").passed
     # The second order of the split: the call already has a group, each order is checked on its own.
     second = {"sku": "SKU-B", "price_vnd": SIX_M, "payment": "COD", "order_group": "2"}
     assert _check(second, placed=[_line("SKU-A", group="1")]).passed
@@ -74,7 +74,7 @@ def test_the_same_sku_in_the_other_half_of_a_split_is_not_a_repeated_order():
     # Upstream's guard books a product once a call; a split (QT-01) of two units of one sku is two orders.
     first = _line("SKU-A", group="1")
     created = [{"order_id": "OD1", "sku": "SKU-A"}]
-    other_half = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD", "order_group": "2"}
+    other_half = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD", "order_group": "2", "address": "Quận 3"}
     assert actions.check("order_create", other_half, tier="VERIFIED", mode="speak", has_phone=True, quotes=QUOTES,
                          trusted=frozenset(QUOTES), placed=[first], created=created).passed
     repeat = {"sku": "SKU-A", "price_vnd": SIX_M, "payment": "COD"}

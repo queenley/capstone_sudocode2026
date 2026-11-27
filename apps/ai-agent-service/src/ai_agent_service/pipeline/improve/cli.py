@@ -113,6 +113,18 @@ def parser() -> argparse.ArgumentParser:
                          help="A learning set's scenarios directory; repeat")
     w_learn.add_argument("--frozen-ids", type=Path, action="append", default=[], required=True,
                          help="A JSON list of frozen ids, so the loop never learns from what it is measured on")
+    # An improved agent, kept (components/improvement/builds.py): what rounds approved, merged onto today's skills.
+    build_ = commands.add_parser("build-agent", help="Merge the changes learning rounds approved into data/agents/<name>")
+    build_.add_argument("--name", required=True, help="The build's name, e.g. improved-1")
+    build_.add_argument("--kb-version", type=int, help="The knowledge version the Gap Loop round published")
+    build_.add_argument("--kb-round", help="The round under evaluation/runs that learned it (default: data/kb as committed)")
+    build_.add_argument("--skills-round", action="append", default=[],
+                        help="A round under evaluation/runs whose approved skill changes are merged; repeat, in order")
+    build_.add_argument("--reviewer", required=True, help="Who asked for the build")
+    use = commands.add_parser("use-agent", help="Install a build's versions and print the run_eval.py arguments")
+    use.add_argument("--name", required=True)
+    use.add_argument("--learned-into", help="Also copy the two files to evaluation/runs/<round>/learned/, so "
+                                            "scripts/evaluation/ablation.py can take --gap-round and --reflection-round <round>")
     return parser
 
 
@@ -143,6 +155,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             return asyncio.run(run_round(args))
         if args.command.startswith("weekly-"):
             return _weekly(args)
+        if args.command == "build-agent":
+            return build_agent(args)
+        if args.command == "use-agent":
+            return use_agent(args.name, learned_into=args.learned_into)
     except (OSError, KeyError, ValueError) as error:
         print(error)
         return 2
@@ -864,4 +880,63 @@ async def _round(args: argparse.Namespace) -> int:
         compare([folder / f"r0-{_label(path)}-{index}" for index in range(1, args.r0_runs + 1)], after)
     _back_to_original(folder, reviewer=gap_loop.SCRIPTED if args.scripted else "round")
     print(f"\nBack to the original agent; what this round learned is in {folder / 'learned'}.")
+    return 0
+
+
+# ── an improved agent, kept (components/improvement/builds.py) ──────────────────────────────────────────────────────
+
+def _runs() -> Path:
+    from ...pipeline.eval.cli import runs_dir
+
+    return runs_dir()
+
+
+def _commit() -> str | None:
+    import subprocess
+
+    try:
+        return subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True,
+                              cwd=Path(__file__).resolve().parent).stdout.strip() or None
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def build_agent(args: argparse.Namespace) -> int:
+    from ...components.improvement import builds
+
+    rounds = [_runs() / name for name in args.skills_round]
+    for folder in rounds:
+        if not folder.is_dir():
+            raise FileNotFoundError(f"{folder} does not exist: the round must be under evaluation/runs")
+    manifest = builds.build(args.name, kb_version=args.kb_version,
+                            kb_round=_runs() / args.kb_round if args.kb_round else None,
+                            skills_rounds=rounds, reviewer=args.reviewer, commit=_commit())
+    print(f"Build {args.name}: {len(manifest['knowledge']['entries'])} knowledge entries, "
+          f"{len(manifest['skills']['patches'])} skill changes, in {builds.agents_dir() / args.name}")
+    for patch in manifest["skills"]["patches"]:
+        print(f"  {patch['round']} v{patch['version']} {patch['skill']}.{patch['part']}: {str(patch['text'])[:100]}")
+    return 0
+
+
+def use_agent(name: str, *, learned_into: str | None = None) -> int:
+    import shutil
+
+    from ...components.improvement import builds
+
+    installed = builds.install(name)
+    source = builds.agents_dir() / name
+    if learned_into:
+        learned = _runs() / learned_into / "learned"
+        for part, file_name, number in (("kb", builds.KB_FILE, installed["kb_version"]),
+                                        ("skills", builds.SKILLS_FILE, installed["skills_version"])):
+            if number:
+                (learned / part).mkdir(parents=True, exist_ok=True)
+                suffix = ".jsonl" if part == "kb" else ".yaml"
+                shutil.copy2(source / file_name, learned / part / f"v{number}{suffix}")
+    print(f"Build {name}: knowledge version {installed['kb_version']}, skills version {installed['skills_version']} "
+          "(installed, not switched on)")
+    print("run_eval.py " + " ".join(builds.run_args(installed)))
+    if learned_into:
+        print(f"ablation.py --gap-round {learned_into} --kb-version {installed['kb_version']} "
+              f"--reflection-round {learned_into} --skills-version {installed['skills_version']} --control <frozen dir>")
     return 0

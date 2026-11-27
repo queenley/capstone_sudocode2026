@@ -10,6 +10,7 @@
 | [RUN-LEDGER.md](RUN-LEDGER.md) | Cohort cố định, phép relabel cùng replies, bằng chứng, kết quả và ngân sách từng attempt |
 | [asr-local.md](asr-local.md) | Kiến trúc ASR, Zipformer greedy mặc định, WER/CER, entity và phép đo âm thanh |
 | [neural-denoiser-comparison.md](neural-denoiser-comparison.md) | RNNoise tùy chọn, so bật/tắt Zipformer trên 148 clip và hai montage; WER/CER/entity diagnostic/latency |
+| [dev-audit-20261119.md](dev-audit-20261119.md) | Soát nhãn `data/dev` theo mock và nghiệp vụ BTC, dự đoán cuộc trượt của agent hiện tại theo agent / dataset / chưa rõ BTC (bảng [dev-prediction-20261119.csv](dev-prediction-20261119.csv)); nghiệp vụ chốt đơn theo BTC; tình trạng vòng cải tiến |
 | [memory-erasure-verification.md](memory-erasure-verification.md) | Smoke `xoa_du_lieu` trước/sau sửa, dữ liệu Memory thực tế, checkpoint/replay và giới hạn của điểm TSR |
 
 Cửa vào của cả phần evaluation (lệnh chạy, quy tắc, bố cục thư mục): [`evaluation/README.md`](../../evaluation/README.md). Chương đánh giá của tài liệu AI: [`docs/ai/05-danh-gia.md`](../ai/05-danh-gia.md).

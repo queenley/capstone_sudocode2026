@@ -373,6 +373,70 @@ def _model_in_context(text: str, previous: str) -> str | None:
     return next(iter(found)) if len(found) == 1 else None
 
 
+def named_products(text: str) -> set[str]:
+    """The catalogue products *text* names by their exact (spoken) name: what the harness may look up ahead."""
+    return _named_products(text)
+
+
+#: How a variant's colour code is said aloud.
+COLOUR_NAMES = {'den': 'đen', 'trang': 'trắng', 'xam': 'xám', 'be': 'be', 'navy': 'xanh navy'}
+
+
+def variants_of(sku: str) -> list[dict]:
+    """The variants of the catalogue product *sku* (sizes, colours); empty for a variant or a product without them."""
+    product = next((p for p in _catalogue()['products'] if p['sku'] == sku), None)
+    return list(product.get('variants') or []) if product else []
+
+
+def product_name(sku: str) -> str | None:
+    """How a code is said aloud: the product's name, and for a variant its size and colour."""
+    for product in _catalogue()['products']:
+        if product['sku'] == sku:
+            return product.get('name')
+        for variant in product.get('variants') or []:
+            if variant['variant_sku'] == sku:
+                colour = COLOUR_NAMES.get(variant.get('color'), variant.get('color'))
+                return f"{product.get('name')} size {variant.get('size')} màu {colour}"
+    return None
+
+
+def category_of(sku: str) -> str | None:
+    """The catalogue category of a product or variant code ("gia-dung/quat"); None for a code it does not hold."""
+    for product in _catalogue()['products']:
+        if product['sku'] == sku or any(v['variant_sku'] == sku for v in product.get('variants') or []):
+            return product.get('category')
+    return None
+
+
+def variant_said(sku: str, text: str) -> str | None:
+    """The one variant of product *sku* whose size and colour *text* states ("RunLite 2 Pro size 41 màu đen");
+    None when the product has no variants or the words do not pick exactly one."""
+    variants = variants_of(sku)
+    if not variants:
+        return None
+    seen = observe(text)['scenario_entities']
+    size, colour = seen.get('size'), seen.get('color')
+    if size is None or not colour:
+        return None
+    matching = [v['variant_sku'] for v in variants if str(v.get('size')) == str(size) and v.get('color') == colour]
+    return matching[0] if len(matching) == 1 else None
+
+
+def named_category(text: str) -> str | None:
+    """The catalogue category of the kind of product *text* names ("máy lọc không khí"); None unless one fits.
+
+    The longest kind said decides; a kind several categories share ("máy lọc": air or water) names none.
+    """
+    surface = f" {_surface(text)} "
+    groups = _kind_groups(*_index_keys())
+    kind = next((k for k in sorted(groups, key=len, reverse=True) if f" {k} " in surface), None)
+    if kind is None:
+        return None
+    category_of = {p['sku']: p.get('category') for p in _catalogue()['products']}
+    categories = {category_of.get(sku) for sku, _ in groups[kind]} - {None}
+    return categories.pop() if len(categories) == 1 else None
+
+
 def _product(text: str) -> str | None:
     explicit = {re.sub(r'\s+', '', match.group()) for match in
                 re.finditer(r'\bSKU\s*-\s*[A-Z0-9]+(?:\s*-\s*[A-Z0-9]+)*\b', text.upper())}

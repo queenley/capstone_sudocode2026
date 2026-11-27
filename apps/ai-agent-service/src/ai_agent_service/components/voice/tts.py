@@ -25,6 +25,11 @@ Engines:
   set); one customer always hears the same voice, an unknown caller (or one
   with no region) a northern one (``VOICE_DEFAULT_REGION``, ``bac`` unless set).
   ``elevenlabs:<voice id>`` is one fixed voice. Paid per character.
+- ``gemini``: Gemini's speech models (``gemini:<voice>``, Kore unless named; model ``GEMINI_TTS_MODEL``,
+  ``gemini-3.8-flash-lite-tts`` unless set) with ``GOOGLE_API_KEY``. Streams 24 kHz pcm like ``openai``; on this
+  laptop the first audio in about 0.7 s and synthesis well ahead of playback. Paid per token.
+- ``remote``: the team's TTS server on a GPU host (``remote:<engine>[:<voice>]``, ``TTS_URL``, ``TTS_API_KEY``),
+  serving local Vietnamese models (ZeroTTS, VieNeu) streamed as 16-bit pcm.
 - ``edge``: Microsoft's neural voices (vi-VN HoaiMy, NamMinh) through the free
   endpoint behind Edge's read-aloud. The same voices Azure Speech sells, but
   the free endpoint refuses a large share of requests without audio (all of
@@ -157,6 +162,126 @@ class OpenAIVoice:
                     del held[:size]
         if len(held) >= 2:
             yield _pcm_speech(bytes(held[:len(held) - len(held) % 2]), started, first)
+
+
+#: Gemini's speech models answer over server-sent events, each event a piece of 24 kHz 16-bit pcm.
+GEMINI_TTS_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:streamGenerateContent"
+
+
+class GeminiVoice:
+    """Gemini's speech models (``gemini:<voice>``): one streamed request per sentence, all sentences at once.
+
+    ``GEMINI_TTS_MODEL``, ``gemini-3.8-flash-lite-tts`` unless set: on 2026-11-19, on this laptop, the first audio
+    of a two-sentence reply in 0.6 to 0.7 s and its 9 s of audio done in 1.8 s, so the stream never starves
+    (``workbench/latency/bench_gemini_tts.py``). Paid per token on ``GOOGLE_API_KEY``.
+    """
+
+    parallel = True  # network-bound
+    _client: httpx.AsyncClient | None = None
+    VOICES = ("Kore", "Aoede", "Leda", "Zephyr", "Puck", "Charon")
+
+    def __init__(self, voice: str | None) -> None:
+        self.voice = voice or "Kore"
+        self.model = os.environ.get("GEMINI_TTS_MODEL", "").strip() or "gemini-3.8-flash-lite-tts"
+
+    @classmethod
+    def _api(cls) -> httpx.AsyncClient:
+        if cls._client is None:
+            from ...config.config_manager import require_api_key
+
+            cls._client = httpx.AsyncClient(
+                headers={"x-goog-api-key": require_api_key("google_genai")}, timeout=20.0,
+                limits=httpx.Limits(keepalive_expiry=KEEP_ALIVE_SECONDS))
+        return cls._client
+
+    async def warm(self) -> None:
+        """Open the connection before the first sentence needs it; listing one model costs nothing."""
+        await self._api().get("https://generativelanguage.googleapis.com/v1beta/models", params={"pageSize": 1})
+
+    async def stream(self, text: str) -> AsyncIterator[Speech]:
+        import base64
+        import json
+
+        started = time.perf_counter()
+        first: float | None = None
+        held = bytearray()
+        body = {"contents": [{"parts": [{"text": text}]}],
+                "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {
+                    "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": self.voice}}}}}
+        async with self._api().stream("POST", GEMINI_TTS_URL.format(model=self.model), params={"alt": "sse"},
+                                      json=body) as response:
+            if response.status_code >= 400:
+                raise RuntimeError(f"Gemini TTS {response.status_code}: {(await response.aread()).decode()[:200]}")
+            async for line in response.aiter_lines():
+                if not line.startswith("data:"):
+                    continue
+                for candidate in json.loads(line[5:]).get("candidates") or []:
+                    for part in (candidate.get("content") or {}).get("parts") or []:
+                        data = part.get("inlineData")
+                        if not data:
+                            continue
+                        if first is None:
+                            first = time.perf_counter() - started
+                        held += base64.b64decode(data["data"])
+                        # One event can hold seconds of audio: sent a quarter second at a time, under the
+                        # gateway's frame limit.
+                        while len(held) >= PCM_CHUNK_BYTES:
+                            yield _pcm_speech(bytes(held[:PCM_CHUNK_BYTES]), started, first)
+                            del held[:PCM_CHUNK_BYTES]
+        if len(held) >= 2:
+            yield _pcm_speech(bytes(held[:len(held) - len(held) % 2]), started, first)
+
+
+class RemoteVoice:
+    """The team's TTS server on a GPU host (``remote:<engine>[:<voice>]``, e.g. ``remote:zerotts``): local Vietnamese
+    models (ZeroTTS, VieNeu) where this laptop's CPU is too slow for them. ``TTS_URL`` and ``TTS_API_KEY``; the server
+    answers ``POST /v1/tts`` with 16-bit pcm as it is made, its rate in ``X-Sample-Rate``."""
+
+    parallel = False  # the server says one sentence at a time per engine
+    _client: httpx.AsyncClient | None = None
+
+    def __init__(self, spec: str | None) -> None:
+        engine, _, voice = (spec or "zerotts").partition(":")
+        self.engine, self.voice = engine or "zerotts", voice or None
+
+    @classmethod
+    def _api(cls) -> httpx.AsyncClient:
+        if cls._client is None:
+            key = os.environ.get("TTS_API_KEY", "").strip()
+            cls._client = httpx.AsyncClient(
+                base_url=os.environ.get("TTS_URL", "").strip().rstrip("/"), timeout=60.0,
+                headers={"Authorization": f"Bearer {key}"} if key else {},
+                limits=httpx.Limits(keepalive_expiry=KEEP_ALIVE_SECONDS))
+        return cls._client
+
+    async def warm(self) -> None:
+        """Load the engine on the server before the first sentence needs it."""
+        (await self._api().post(f"/v1/load/{self.engine}")).raise_for_status()
+
+    async def stream(self, text: str) -> AsyncIterator[Speech]:
+        started = time.perf_counter()
+        first: float | None = None
+        held = bytearray()
+        body = {"engine": self.engine, "text": text, **({"voice": self.voice} if self.voice else {})}
+        async with self._api().stream("POST", "/v1/tts", json=body) as response:
+            if response.status_code >= 400:
+                raise RuntimeError(f"TTS server {response.status_code}: {(await response.aread()).decode()[:200]}")
+            rate = int(response.headers.get("x-sample-rate") or OPENAI_PCM_RATE)
+            size = rate // 2  # a quarter second of 16-bit samples, under the gateway's frame limit
+            async for chunk in response.aiter_bytes():
+                if first is None:
+                    first = time.perf_counter() - started
+                held += chunk
+                while len(held) >= size:
+                    yield _rate_speech(bytes(held[:size]), rate, started, first)
+                    del held[:size]
+        if len(held) >= 2:
+            yield _rate_speech(bytes(held[:len(held) - len(held) % 2]), rate, started, first)
+
+
+def _rate_speech(pcm: bytes, rate: int, started: float, first: float | None) -> Speech:
+    audio = np.frombuffer(pcm, dtype="<i2").astype(np.float32) / 32768
+    return Speech(_wav(audio, rate), "audio/wav", time.perf_counter() - started, first, len(audio) / rate)
 
 
 REGIONS = ("bac", "trung", "nam")
@@ -355,6 +480,11 @@ def voices() -> list[dict[str, str]]:
         offered.append({"name": "elevenlabs:", "label": "ElevenLabs · giọng theo vùng miền của khách, cloud, paid"})
     if has_api_key("openai"):
         offered += [{"name": f"openai:{name}", "label": f"OpenAI {name} · cloud, paid"} for name in OpenAIVoice.VOICES[:4]]
+    if os.environ.get("TTS_URL", "").strip():
+        offered += [{"name": "remote:zerotts", "label": "ZeroTTS · team GPU server (TTS_URL)"},
+                    {"name": "remote:vieneu", "label": "VieNeu-TTS · team GPU server (TTS_URL)"}]
+    if has_api_key("google_genai"):
+        offered += [{"name": f"gemini:{name}", "label": f"Gemini {name} · cloud, paid"} for name in GeminiVoice.VOICES[:4]]
     offered += [
         {"name": "edge:vi-VN-HoaiMyNeural", "label": "HoaiMy · Microsoft neural, free endpoint (unreliable)"},
         {"name": "edge:vi-VN-NamMinhNeural", "label": "NamMinh · Microsoft neural, free endpoint (unreliable)"},
@@ -362,8 +492,12 @@ def voices() -> list[dict[str, str]]:
     return offered
 
 
-def voice(name: str) -> EdgeVoice | ElevenLabsVoice | OpenAIVoice | VieNeuVoice:
+def voice(name: str) -> EdgeVoice | ElevenLabsVoice | GeminiVoice | OpenAIVoice | RemoteVoice | VieNeuVoice:
     engine, _, rest = name.partition(":")
+    if engine == "remote":
+        return RemoteVoice(rest or None)
+    if engine == "gemini":
+        return GeminiVoice(rest or None)
     if engine == "elevenlabs":
         return ElevenLabsVoice(rest or None)
     if engine == "openai":
@@ -373,6 +507,16 @@ def voice(name: str) -> EdgeVoice | ElevenLabsVoice | OpenAIVoice | VieNeuVoice:
     if engine == "vieneu":
         return VieNeuVoice(rest or None)
     raise ValueError(f"Unknown voice {name!r}")
+
+
+#: Two words joined by a slash ("anh/chị"): a reader says the slash ("anh trên chị", 2026-11-19 with VieNeu). Only
+#: letters on both sides, so a figure ("1/2") keeps its slash; a unit of letters ("km/h") loses it too.
+_WORD_SLASH = re.compile(r"(?<=[^\W\d_])/(?=[^\W\d_])")
+
+
+def for_voice(text: str) -> str:
+    """The text a voice reads: what the page shows, without the marks a reader would say aloud."""
+    return _WORD_SLASH.sub(" ", text)
 
 
 _SENTENCE_END = re.compile(r"(?<=[.!?…])\s+")

@@ -104,6 +104,20 @@ async def ready() -> Collaborators:
     return _built
 
 
+async def warm() -> None:
+    """The advisor's first call, made at service start before a customer makes it (``main.lifespan``); a failure
+    only leaves the first turn cold. Not part of :func:`ready`: an evaluation run warms with its own turns."""
+    try:
+        logger.info("Advisor warmed in %.1f s", await (await ready()).advisor.warm())
+    except Exception:  # noqa: BLE001
+        logger.warning("Advisor warm-up failed; the first turn pays for it", exc_info=True)
+    try:
+        from ..llm import decisions
+        logger.info("PolicyAgent connection opened in %.2f s", await decisions.warm())
+    except Exception:  # noqa: BLE001 - no key or no network: the first check opens it
+        logger.info("PolicyAgent connection not opened ahead", exc_info=True)
+
+
 def _advisor(tools: list[Any], overrides: dict[str, Any] | None = None) -> AdvisorAgent:
     if overrides is None:
         overrides = options.advisor_overrides()

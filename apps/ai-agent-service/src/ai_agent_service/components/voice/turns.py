@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import time
 from collections import deque
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -39,6 +40,10 @@ from . import models_dir
 RATE = 16_000
 WINDOW = 512  # samples: 32 ms, what Silero expects at 16 kHz
 WINDOW_MS = WINDOW * 1000 // RATE
+#: Audio kept after the last voiced window, and so the silence after which a turn's audio is whole.
+TAIL_MS = 160
+#: Smart Turn asked ahead runs here, one at a time, beside the thread that feeds the detector.
+_AHEAD = ThreadPoolExecutor(max_workers=1, thread_name_prefix="smart-turn")
 
 
 def _session(path: Path) -> ort.InferenceSession:
@@ -117,10 +122,16 @@ class TurnConfig:
     threshold: float = 0.5  # speech probability to start; continuing uses threshold - 0.15
     min_speech_ms: int = 160  # shorter blips never open a turn
     probe_ms: int = 200  # silence before Smart Turn is asked
+    # Silence after which Smart Turn starts on the speech so far, so its answer is there when probe_ms comes: the
+    # same audio and the same decision, without its inference (about 135 ms on a laptop CPU) added to the wait.
+    ahead_ms: int = 64
     max_silence_ms: int = 1200  # the turn ends after this much silence whatever Smart Turn said
     silence_ms: int = 700  # the fixed endpoint when mode == "silence"
     barge_in_ms: int = 400  # continuous speech that interrupts the agent
-    preroll_ms: int = 320  # audio kept from before the speech onset
+    # Audio kept from before the speech onset. Silero passes a soft first syllable late: on a real microphone
+    # (2026-11-19, call 20) "máy lọc không khí" became "không khí" with 320 ms; 800 ms gave the whole phrase to both
+    # Zipformer models. It is audio already in hand, so it costs no wait.
+    preroll_ms: int = 800
     max_turn_s: int = 30
 
 
@@ -146,6 +157,15 @@ class SpeechStarted:
 @dataclass
 class BargeIn:
     at: float
+
+
+@dataclass
+class EndLikely:
+    """The silence is long enough that the turn's audio is whole (what :class:`TurnEnded` will carry if the caller
+    says no more): recognition may start on it now. Not a decision: speech may resume."""
+
+    audio: np.ndarray
+    speech_end: float
 
 
 @dataclass
@@ -177,6 +197,9 @@ class TurnDetector:
         self._probed = False
         self._probes: list[float] = []
         self._barged = False
+        #: Smart Turn asked ahead of probe_ms: the voiced length it was asked about, and its answer on the way.
+        self._ahead: tuple[int, Future[float]] | None = None
+        self._likely_sent = False
 
     @property
     def in_turn(self) -> bool:
@@ -239,10 +262,14 @@ class TurnDetector:
         if voiced:
             self._silence_ms = 0
             self._probed = False
+            self._likely_sent = False
             self._last_voice_at = at
             self._last_voice_index = len(self._turn)
         else:
             self._silence_ms += WINDOW_MS
+            if self._silence_ms >= TAIL_MS and not self._likely_sent:
+                self._likely_sent = True
+                events.append(EndLikely(audio=self._audio(), speech_end=self._last_voice_at))
 
         if len(self._turn) * WINDOW_MS >= config.max_turn_s * 1000:
             events.append(self._end(at, "length"))
@@ -250,9 +277,17 @@ class TurnDetector:
             if self._silence_ms >= config.silence_ms:
                 events.append(self._end(at, "silence"))
         else:
+            if (config.ahead_ms <= self._silence_ms < config.probe_ms and not self._probed
+                    and (self._ahead is None or self._ahead[0] != self._last_voice_index)):
+                speech = np.concatenate(self._turn[: self._last_voice_index])
+                self._ahead = (self._last_voice_index, _AHEAD.submit(smart_turn(), speech))
             if self._silence_ms >= config.probe_ms and not self._probed:
                 self._probed = True
-                p = smart_turn()(np.concatenate(self._turn[: self._last_voice_index]))
+                if self._ahead is not None and self._ahead[0] == self._last_voice_index:
+                    p = self._ahead[1].result()
+                else:
+                    p = smart_turn()(np.concatenate(self._turn[: self._last_voice_index]))
+                self._ahead = None
                 self._probes.append(p)
                 if p >= 0.5:
                     events.append(self._end(at, "smart", p))
@@ -260,13 +295,15 @@ class TurnDetector:
                 events.append(self._end(at, "timeout"))
         return events
 
-    def _end(self, at: float, reason: str, probability: float | None = None) -> TurnEnded:
+    def _audio(self) -> np.ndarray:
         # Keep 160 ms after the last voiced window: enough for a trailing
         # syllable, without handing the recogniser a second of silence.
-        keep = self._last_voice_index + 160 // WINDOW_MS
-        audio = np.concatenate(self._turn[:keep]).astype(np.float32)
+        keep = self._last_voice_index + TAIL_MS // WINDOW_MS
+        return np.concatenate(self._turn[:keep]).astype(np.float32)
+
+    def _end(self, at: float, reason: str, probability: float | None = None) -> TurnEnded:
         event = TurnEnded(
-            audio=audio,
+            audio=self._audio(),
             speech_end=self._last_voice_at,
             # Wall time, not the window's: Smart Turn has just run, and its
             # inference is part of the wait for the end of the turn.
@@ -280,4 +317,6 @@ class TurnDetector:
         self._preroll.clear()
         self._voiced_ms = 0
         self._silence_ms = 0
+        self._ahead = None
+        self._likely_sent = False
         return event

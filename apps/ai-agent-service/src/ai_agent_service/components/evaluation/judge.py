@@ -143,6 +143,15 @@ def applicable(scenario: Mapping[str, Any], call: str, rows: list[Mapping[str, A
     return sorted(list(ALWAYS) + [key for key, applies in conditions.items() if applies])
 
 
+#: Appended to the organisers' prompt, which asks for "trích 1 câu": what a quote is, since the check is exact.
+QUOTE_RULE = ("\nevidence: chép NGUYÊN VĂN một đoạn liền mạch (ít nhất 4 từ) lấy từ customer_text hoặc agent_text "
+              "trong transcript, giữ đúng chữ, dấu và số; không thêm dấu ngoặc, không diễn giải, không tóm tắt, không "
+              "ghép câu. Tiêu chí PASS vì agent không làm điều sai: trích câu agent liên quan nhất tới tiêu chí đó.")
+#: The one retry when some evidence is not in the transcript.
+RETRY = ("\n\nLần trả lời trước có evidence không có nguyên văn trong transcript:\n{missing}\n"
+         "Trả lại đủ verdict cho mọi tiêu chí; mỗi evidence chép đúng nguyên văn một đoạn của transcript.")
+
+
 class BtcJudge:
     def __init__(self, llm: Any, quoted: Callable[[str, str], bool] | None = None):
         """*quoted* says whether a verdict's evidence is in the call's words; the evaluation keeps the exact match."""
@@ -160,17 +169,30 @@ class BtcJudge:
             scenario_json=json.dumps(told, ensure_ascii=False),
             transcript=json.dumps(transcript, ensure_ascii=False),
             criteria=json.dumps([item for item in self.rubric["criteria"] if item["id"] in ids], ensure_ascii=False))
-        prompt += '\nTrả JSON {"verdicts": [...]} với một verdict cho mỗi tiêu chí.'
+        prompt += '\nTrả JSON {"verdicts": [...]} với một verdict cho mỗi tiêu chí.' + QUOTE_RULE
+        quotes = "\n".join(str(row.get(key) or "") for row in transcript for key in ("customer_text", "agent_text"))
         try:
-            result = await self.writer.ainvoke(prompt)
-            verdicts = result.verdicts
+            verdicts = (await self.writer.ainvoke(prompt)).verdicts
+            unquoted = self._unquoted(verdicts, quotes)
+            retried = False
+            # A paraphrase instead of a quote voided about three calls in four on 2026-11-15: ask once more, naming
+            # the evidence not found. The check itself stays the exact match.
+            if unquoted and sorted(item.criterion_id for item in verdicts) == ids:
+                retried = True
+                verdicts = (await self.writer.ainvoke(prompt + RETRY.format(
+                    missing="\n".join(f"- {key}: {text!r}" for key, text in unquoted)))).verdicts
         except Exception as error:
             return {"status": "INCOMPLETE", "criteria": ids, "verdicts": [], "error": type(error).__name__}
         actual = [item.criterion_id for item in verdicts]
-        quotes = "\n".join(str(row.get(key) or "") for row in transcript for key in ("customer_text", "agent_text"))
-        complete = sorted(actual) == ids and all(item.evidence.strip() and self.quoted(item.evidence, quotes) for item in verdicts)
+        complete = sorted(actual) == ids and not self._unquoted(verdicts, quotes)
         return {"status": "COMPLETE" if complete else "INCOMPLETE", "criteria": ids,
-                "verdicts": [item.model_dump() for item in verdicts]}
+                "verdicts": [item.model_dump() for item in verdicts], **({"retried": True} if retried else {})}
+
+    def _unquoted(self, verdicts: list[Any], quotes: str) -> list[tuple[str, str]]:
+        """The verdicts whose evidence is empty or not the call's own words, as (criterion, evidence)."""
+        # Two words at least: one letter ("x") is in any transcript and quotes nothing.
+        return [(item.criterion_id, item.evidence) for item in verdicts
+                if not (len(item.evidence.split()) >= 2 and self.quoted(item.evidence, quotes))]
 
 
 async def judge_calls(judge: BtcJudge, scenarios: list[Any], rows: list[dict], config: str) -> list[dict]:

@@ -37,9 +37,10 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from functools import lru_cache
-from typing import Any, Literal, Mapping
+from typing import Any, Literal, Mapping, Sequence
 
 from ..components.intake.itn import format_vnd
 from ..components.intake.text import plain
@@ -154,6 +155,7 @@ INTENTS = {
     "change": _ask("Theo luật change, khách đã yêu cầu hoặc đồng ý việc này chưa?"),
     "purchase": _ask("Theo luật purchase, khách đã đồng ý đặt đơn này chưa?"),
     "identity": _ask("Theo luật identity, khách có nói mình là người được nêu tên không?"),
+    "other_model": _ask("Theo luật other_model, khách có xin gợi ý hay so sánh mẫu khác không?"),
 }
 
 #: Provisional, set on Jev (2026-11-01), the model before this one, with no labelled set yet: 0.5 where a wrong "no"
@@ -162,7 +164,47 @@ INTENTS = {
 #: 0.06 or less (asked as a list of messages; asked as two fields it gave 0.38): hence 0.6.
 #: Set again on the FIX scenarios and the team's labels. On the Decisions API a clear yes to a deletion read 0.63 and 0.87,
 #: and a postponement 0.00 (2026-11-07), hence 0.6 for delete.
-INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.6, "one_more": 0.5, "change": 0.5, "identity": 0.6, "purchase": 0.7}
+INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.6, "one_more": 0.5, "change": 0.5, "identity": 0.6, "purchase": 0.7,
+                     "other_model": 0.5}
+
+#: The intents the conversation alone answers, asked together at the start of a turn whose lane has write tools
+#: (plan 002, step 3). ``change`` needs the change itself, from the tool's arguments; ``identity`` is not a tool's.
+EARLY_INTENTS = ("purchase", "handoff", "delete", "one_more", "other_model")
+
+def early_intents_on() -> bool:
+    """``ADVISOR_EARLY_INTENTS=1``: :data:`EARLY_INTENTS` are asked at the start of a turn whose lane has write tools,
+    so the check before a write tool rarely waits (2026-11-15: 2.0 s on an order, 0.9 s on a transfer). Off unless
+    set: it is one more Decisions request a turn, until its effect on the scored metrics is measured."""
+    return os.environ.get("ADVISOR_EARLY_INTENTS", "0").strip().lower() not in ("0", "false", "no", "off", "")
+
+
+#: Plan 002, C: the PolicyAgent is not trusted outright. Per intent, the probability at or above which it is a clear
+#: yes and at or below which it is a clear no; between them it is unsure, and the action takes its safe path (the
+#: caller decides which). Set high on purpose (the user, 2026-11-15: "ngưỡng phải thật chắc"), to be calibrated on
+#: labelled turns: on the bench a plain yes read 0.97-1.00, a price question 0.00-0.18 for a transfer, once 0.74.
+INTENT_BANDS = {"purchase": (0.9, 0.3), "delete": (0.9, 0.3), "handoff": (0.8, 0.2), "change": (0.8, 0.3),
+                "one_more": (0.8, 0.2), "other_model": (0.7, 0.3)}
+
+#: The early check alone may refuse a transfer only when it is this sure none is wanted (plan 002, C4).
+NO_HANDOFF = 0.02
+
+
+def band(intent: str, probability: float | None) -> Literal["yes", "no", "unsure", "unanswered"]:
+    """Where *probability* falls among :data:`INTENT_BANDS`; ``unanswered`` without one (a timeout, a refusal)."""
+    if probability is None:
+        return "unanswered"
+    yes, no = INTENT_BANDS[intent]
+    return "yes" if probability >= yes else "no" if probability <= no else "unsure"
+
+
+def early_verdict(intent: str, probability: float | None) -> bool | None:
+    """True when an early answer is a clear yes; None otherwise, and the action's own check is asked as before.
+
+    The early question does not see the action (the order read back, the reason for a transfer), and facts change
+    the answer (``intent_input``): it may only save the wait, never refuse what the full check would allow, except a
+    transfer it is all but certain nobody asked for (:data:`NO_HANDOFF`).
+    """
+    return True if band(intent, probability) == "yes" else None
 
 
 @dataclass(frozen=True)
@@ -295,6 +337,36 @@ class PolicyAgent(BaseAgent):
         failed += [f"{name}:declined" for name in declined]
         return PolicyVerdict(passed=not failed, reasons=tuple(CHANGE_REASONS.get(name.split(":")[0], name) for name in failed),
                              failed=tuple(failed), probabilities=probabilities, seconds=round(decision.seconds, 3))
+
+    async def probabilities(self, intents: Sequence[str], state: Mapping[str, Any]) -> dict[str, float]:
+        """Several :data:`INTENTS` in one request, as probabilities; those without an answer are left out.
+
+        Asked at the start of a turn, beside the advisor's first model round (plan 002, step 3), from what is known
+        then: the conversation, not an action's arguments. :func:`early_verdict` says which answers may stand.
+        """
+        try:
+            decision = await self.evaluate(intent_input(state), {name: INTENTS[name] for name in intents})
+        except DecisionUnavailable as unavailable:
+            logger.info("Early intent check skipped: %s", unavailable)
+            return {}
+        found = {name: answer.probability for name, answer in decision.answers.items() if answer.probability is not None}
+        logger.info("Early intent check: %s", {name: round(p, 2) for name, p in found.items()})
+        return found
+
+    async def probability(self, intent: str, state: Mapping[str, Any]) -> float | None:
+        """What the customer means for one action (:data:`INTENTS`), as the API's probability; None without an answer.
+
+        The caller reads it through :func:`band`: a yes, a no, or unsure, never one threshold.
+        """
+        try:
+            decision = await self.evaluate(intent_input(state), {intent: INTENTS[intent]})
+        except DecisionUnavailable as unavailable:
+            logger.info("Intent check %s skipped: %s", intent, unavailable)
+            return None
+        probability = decision.answers[intent].probability
+        logger.info("Intent check %s: %s (%s)", intent, "declined" if probability is None else f"{probability:.2f}",
+                    band(intent, probability) if intent in INTENT_BANDS else "")
+        return probability
 
     async def judge(self, intent: str, state: Mapping[str, Any]) -> bool | None:
         """What the customer means for one action (:data:`INTENTS`); None when the API gave no answer in time.

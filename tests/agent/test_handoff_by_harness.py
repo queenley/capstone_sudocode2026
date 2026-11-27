@@ -64,7 +64,7 @@ async def test_a_second_model_failure_in_a_row_puts_the_call_through_in_the_same
     brief = tools.calls[0][1]["brief"]
     assert brief["escalation_reason"] == "loi_he_thong"
     assert "máy lọc nước" in brief["conversation_summary"] and len(brief["conversation_summary"]) >= 20
-    assert update["draft"]["text"] == fallback.LINES["bridging"]
+    assert update["draft"]["text"] == fallback.line("bridging")
     assert update["model_failures"] == 0
     transfer = update["tool_results"][-1]
     assert transfer["name"] == "handoff.transfer" and transfer["result"]["ok"]
@@ -76,7 +76,7 @@ async def test_the_handoff_lane_transfers_without_a_model():
     update = await advise(tools, lane="HANDOFF", route_reason="tools failing", tool_failures=2)
     assert [name for name, _ in tools.calls] == ["handoff_transfer"]
     assert "tra cứu" in tools.calls[0][1]["brief"]["escalation_reason_detail"]
-    assert update["draft"]["text"] == fallback.LINES["bridging"]
+    assert update["draft"]["text"] == fallback.line("bridging")
 
 
 @pytest.mark.asyncio

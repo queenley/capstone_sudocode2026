@@ -68,6 +68,9 @@ class StopSwitch(BaseCallbackHandler):
     """Checks the stop file before each chat model call; ``raise_error`` makes LangChain end the call with it."""
 
     raise_error = True
+    # A file check: run on the event loop, not handed to a thread for every event of an async call (LangChain's
+    # default for a sync handler; 2026-11-26, a fake 120-chunk stream: 142 ms with the hand-off, 55 ms without).
+    run_inline = True
 
     def on_chat_model_start(self, serialized: dict[str, Any], messages: Any, **kwargs: Any) -> None:
         check()

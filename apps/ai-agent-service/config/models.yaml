@@ -110,10 +110,16 @@ agents:
   # its model is one line of config like theirs, on the advisor's OpenAI key.
   extractor:
     provider: openai
-    model: gpt-4.1-mini
+    # 2026-11-27: gpt-4.1-mini read a free COD fee as freeship, an expired promotion as promo_active false and a
+    # rival product's price as the asked one's (22 of 52 wrong claims on the 43-scenario run); a reasoning model
+    # at low effort reads the sentence's meaning, at a lower price.
+    model: gpt-5.6-luna
     generation:
-      # Per-item quotes and spans exceed 1024 tokens on long turns (Oct 17 run).
-      max_tokens: 4096
+      temperature: null
+      reasoning_effort: low
+      use_responses_api: false
+      # Per-item quotes and spans exceed 1024 tokens on long turns (Oct 17 run); reasoning tokens count too.
+      max_tokens: 8192
 
   # docs/design.md section 5.4: the MemoryAgent reads the customer's words
   # with one structured-output call after the call; its rules stand in when

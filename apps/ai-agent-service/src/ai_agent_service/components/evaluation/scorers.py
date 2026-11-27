@@ -26,8 +26,8 @@ under :data:`CLAIM_FIELDS`, the keys the organisers' scenario format uses in
 grader compares a claim's value with the truth exactly, type included
 (``5200000`` is not ``"5.200.000đ"``), so a claim whose value cannot be coerced
 is set aside rather than written in a shape that would count as false. A claim
-about a named promotion is written in both forms the scenario format uses,
-``promo_<CODE>_active`` and ``promo_active``.
+that a named discount or gift promotion is active is written in both forms the
+scenario format uses, ``promo_<CODE>_active`` and ``promo_active``.
 
 It is a measuring instrument: temperature 0, labels cached on disk and shared
 between runs (Appendix D), keyed by the prompt, the model and the whole input,
@@ -55,7 +55,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from ...config.config_manager import ROOT
+from ...config.config_manager import ROOT, btc_data_dir
 from ...llm import structured
 from ...llm.structured import Report, StructuredOutput, StructuredOutputError
 from ..memory.ontology import CORE, INDUSTRIES
@@ -63,7 +63,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v13"
+VERSION = "product-extractor-v14"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -667,8 +667,11 @@ def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:
     field, quote = item["slot_or_field"], item.get("quote") or ""
     named = bool(PROMO_FIELD.match(field))
     per_item = bool(PRICE_SKU_FIELD.match(field))
-    if per_item and field.split(":", 1)[1] not in quote.upper():
-        return None  # The price of one item is the agent's claim only when it names that item's code.
+    if per_item and not _names_item(field.split(":", 1)[1], quote):
+        # Filed under one product the sentence does not name: it is still a price the agent stated, so it is kept as
+        # the price of the call's product, where the grader checks it, never dropped (a missed claim).
+        field, per_item = "price_vnd", False
+        item = {**item, "slot_or_field": field}
     type_ = "bool" if named else "int" if per_item else CLAIM_FIELDS.get(field)
     if type_ is None:
         return None
@@ -694,7 +697,55 @@ def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:
         if value not in ORDER_STATUSES:
             return None
     claim = {**item, "value": value}
-    return [claim, {**claim, "slot_or_field": "promo_active"}] if named else [claim]
+    if named and value is True and field[len("promo_"):-len("_active")] in _price_promotions():
+        # A free COD fee or free shipping is not what promo_active asks: the organisers' public SAMPLE-02 has it false
+        # on a day the free COD fee applies to every order. A promotion said to be off says nothing of the others, so
+        # only an active one is written in both forms.
+        return [claim, {**claim, "slot_or_field": "promo_active"}]
+    return [claim]
+
+
+def _names_item(sku: str, quote: str) -> bool:
+    """Whether *quote* names the product *sku*: its code, or words of its name that fit it better than any other
+    product of the catalogue. A name's fit is the weight of its words the quote says over the weight of all its
+    words, a word weighing more the fewer names it is in: a product whose rarer words went unsaid fits worse than
+    one whose unsaid words are those every product of its kind has."""
+    if sku.upper() in quote.upper():
+        return True
+    said = set(re.findall(r"\w+", quote.casefold()))
+    names, weight = _names()
+    scores = {code: sum(weight[w] for w in words & said) / sum(weight[w] for w in words)
+              for code, words in names.items() if words & said}
+    if not scores:
+        return False
+    best = max(scores.values())
+    return scores.get(sku.upper()) == best and sum(1 for v in scores.values() if v == best) == 1
+
+
+@lru_cache(maxsize=1)
+def _names() -> tuple[dict[str, frozenset[str]], dict[str, float]]:
+    """Each catalogue sku's name as a set of lower-case words, and each word's weight (log of names / names with it)."""
+    import math
+
+    data = json.loads((btc_data_dir() / "catalog/products.json").read_text(encoding="utf-8"))
+    products = data["products"] if isinstance(data, dict) else data
+    names = {str(p["sku"]).upper(): frozenset(re.findall(r"\w+", str(p.get("name") or "").casefold())) for p in products}
+    counts: dict[str, int] = {}
+    for words in names.values():
+        for word in words:
+            counts[word] = counts.get(word, 0) + 1
+    return names, {word: math.log((len(names) + 1) / n) for word, n in counts.items()}
+
+
+#: Promotion types that are not a discount: what ``promo_active`` leaves out.
+NOT_A_DISCOUNT = frozenset({"freecod", "freeship"})
+
+
+@lru_cache(maxsize=1)
+def _price_promotions() -> frozenset[str]:
+    """The codes of the organisers' promotions that lower the price or give a gift (``catalog/promotions.json``)."""
+    data = json.loads((btc_data_dir() / "catalog/promotions.json").read_text(encoding="utf-8"))
+    return frozenset(str(p["promo_code"]).upper() for p in data["promotions"] if p.get("type") not in NOT_A_DISCOUNT)
 
 
 MONEY = re.compile(r"\d{1,3}(?:[.,\s]\d{3})+|\d+")

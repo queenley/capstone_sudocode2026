@@ -82,8 +82,8 @@ async def order_create(
 ) -> dict[str, Any]:
     """Place one order once the customer has asked to buy it.
 
-    One unit of one product: sku, qty and price_vnd, the final_price_vnd
-    pricing_get_quote gave for this sku today. More than one unit (two
+    One unit of one product: sku and qty; the price is today's
+    pricing_get_quote of this call, which the system fills in. More than one unit (two
     products, or two of one): one call with lines, the prices
     pricing_quote_order gave, one line per unit price (two units of one sku at
     different prices are two lines of qty 1). Any other price is refused.
@@ -95,15 +95,18 @@ async def order_create(
 
     Args:
         sku: The product sku or variant_sku being bought; leave it out with lines.
-        price_vnd: The unit price from pricing_get_quote, in VND; leave it out with lines.
+        price_vnd: The unit price, today's pricing_get_quote of this call: set by the system.
         qty: How many units; leave it out with lines.
         lines: An order of more than one unit: [{"sku", "qty", "price_vnd"}], each price_vnd one unit's
             final_price_vnd from pricing_quote_order.
-        promo_code: The promotion applied, as pricing_get_quote named it.
+        promo_code: Worked out by the system from the quote; leave it out.
         payment: COD, bank, momo or zalopay: what the customer chose, or what the
-            Call Brief records; COD when neither says, read back so the customer
-            can change it. Never a reason to wait with the order.
-        address: The delivery address the customer gave; leave it out when none was given.
+            Call Brief records; COD when neither says (VC-03), never a reason to
+            ask before placing the order.
+        address: The delivery address the customer gave in this call, else the Call
+            Brief's ("giao về địa chỉ cũ" means the Call Brief's); an area (district,
+            province) is enough. Leave it out when neither has one: the order is
+            still placed, never held back to ask for it.
         basket_skus: Only for an order split in two with the customer's agreement (QT-01): the air purifiers
             of the other order, so the second-item promotion is counted once.
         order_group: Only for an order split with the customer's agreement: which of the orders this line is in.
@@ -128,10 +131,18 @@ async def order_create(
     from ...runtime import shop_orders
 
     if shop_orders.enabled():
-        await asyncio.to_thread(shop_orders.mirror_create, result, {
+        # In the background: the copy creates the website customer (a password hash) and takes seconds, and the order
+        # is placed already (2026-11-19, call 27: the copy pushed order_create past its limit). A failure only logs.
+        task = asyncio.create_task(asyncio.to_thread(shop_orders.mirror_create, result, {
             "customer_phone": customer_phone, "sku": sku, "qty": qty, "price_vnd": price_vnd, "lines": lines,
-            "payment": payment, "address": address})
+            "payment": payment, "address": address}))
+        _MIRRORS.add(task)
+        task.add_done_callback(_MIRRORS.discard)
     return result
+
+
+#: Website copies still being written: kept referenced so the event loop does not drop them midway.
+_MIRRORS: set = set()
 
 
 def _lines(lines: list[dict[str, Any]] | None) -> list[dict[str, Any]] | None:
@@ -157,7 +168,7 @@ async def schedule_callback(
 
     Args:
         callback_at: Date and time in Vietnam time, no offset, e.g. 2026-10-17T19:00.
-        note: What the call back is about.
+        note: Set by the system; leave it out.
         customer_phone: Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
     """

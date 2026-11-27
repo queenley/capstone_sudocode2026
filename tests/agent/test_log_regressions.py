@@ -41,15 +41,16 @@ async def test_last_model_call_has_no_tools_and_preserves_previous_results():
         return json.dumps({"ok": True, "data": {"items": []}})
 
     model = InspectModel(responses=[AIMessage(content="", tool_calls=[{
-        "name": "catalog_search", "id": str(i), "args": {"query": str(i)}}]) for i in range(7)]
-        + [AIMessage(content="Dạ em chưa tìm được sản phẩm phù hợp ạ.")])
+        "name": "catalog_search", "id": "0", "args": {"query": "0"}}]),
+        AIMessage(content="Dạ em chưa tìm được sản phẩm phù hợp ạ.")])
     tool = StructuredTool.from_function(coroutine=lookup, name="catalog_search", description="Find product")
     agent = AdvisorAgent(llm=model, tools=[tool], retries=0)
     draft = await agent.draft([HumanMessage(content="Tìm sản phẩm")], AgentContext(call_id="fixture", lane="NEW"))
-    assert len(draft.tool_results) == 7
+    # Two model calls a turn at most: the tools in the first, the answer in the second, which may not call a tool.
+    assert len(draft.tool_results) == 1
     # The tools stay bound, so the prompt cache holds; the last call may not use them.
     assert observed[-1] == "none" and "none" not in observed[:-1]
-    assert draft.model_calls == 8
+    assert draft.model_calls == 2
 
 
 @pytest.mark.asyncio
@@ -57,10 +58,15 @@ async def test_last_model_call_has_no_tools_and_preserves_previous_results():
 async def test_model_failure_preserves_executed_order_in_hot_state(mode):
     class BrokenGraph:
         async def astream(self, *args, **kwargs):
-            yield "updates", {"model": {"messages": [AIMessage(content="", tool_calls=[{
-                "id": "order", "name": "order_create", "args": {"sku": "SKU-TEST"}}])]}}
-            yield "updates", {"tools": {"messages": [ToolMessage(name="order_create", tool_call_id="order",
-                content=json.dumps({"ok": True, "data": {"order_id": "ORDER-TEST"}}))]}}
+            # A lookup beside the order, so the turn goes on to the model after the order's line is said.
+            yield "updates", {"model": {"messages": [AIMessage(content="", tool_calls=[
+                {"id": "order", "name": "order_create", "args": {"sku": "SKU-TEST"}},
+                {"id": "look", "name": "delivery_estimate", "args": {}}])]}}
+            yield "updates", {"tools": {"messages": [
+                ToolMessage(name="order_create", tool_call_id="order",
+                            content=json.dumps({"ok": True, "data": {"order_id": "ORDER-TEST"}})),
+                ToolMessage(name="delivery_estimate", tool_call_id="look",
+                            content=json.dumps({"ok": True, "data": {"days": 2}}))]}}
             raise RuntimeError("fixture model failure after the order")
 
     agent = AdvisorAgent(llm=Model(responses=[AIMessage(content="unused")]), tools=[], retries=0)
@@ -120,3 +126,29 @@ def test_order_lookup_uses_verified_caller_without_exposing_phone_to_model(tier,
     request.override = lambda **changes: SimpleNamespace(**{**vars(request),**changes})
     adjusted = ToolGuardMiddleware(['crm_get_customer'],retries=0)._with_context(request)
     assert adjusted.tool_call['args']==expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("name, limit", [("order_create", 10.0), ("schedule_callback", 10.0), ("pricing_get_quote", 2.0)])
+async def test_a_write_tool_is_given_long_enough_to_answer_and_a_lookup_keeps_two_seconds(monkeypatch, name, limit):
+    """2026-11-19, call 27: an order placed 70 ms after a 2 s limit was reported to the customer as failed."""
+    from types import SimpleNamespace
+
+    from ai_agent_service.mcp import tools
+
+    seen = []
+
+    async def wait_for(awaitable, timeout):
+        seen.append(timeout)
+        return await awaitable
+
+    guard = tools.ToolGuardMiddleware([name], retries=0)
+    monkeypatch.setattr(guard, "_with_context", lambda request: request)
+    monkeypatch.setattr(tools.asyncio, "wait_for", wait_for)
+    request = SimpleNamespace(tool_call={"id": "t", "name": name, "args": {}})
+
+    async def handler(_request):
+        return ToolMessage(content='{"ok": true, "data": {}}', tool_call_id="t")
+
+    await guard.awrap_tool_call(request, handler)
+    assert seen == [limit]

@@ -15,6 +15,7 @@ import logging
 
 from typing import Any, Literal
 
+from ...components.guardrails import actions
 from ..server_base import Server, ToolFailure, apply_schema
 from . import btc
 
@@ -82,11 +83,19 @@ async def order_update(
     m = btc.mock()
     from ...runtime import shop_orders
 
+    day = on or btc.reference_date()
+    if action in actions.WINDOW_ACTIONS:
+        # The organisers' mock books a return of any order; DT-01 closes the window 7 days after receipt.
+        known = (m.order_status(order_id=order_id) or {}).get("orders") or []
+        if any(o.get("order_id") == order_id and actions.past_return_window(o, day) for o in known):
+            raise ToolFailure("RETURN_WINDOW_CLOSED",
+                              f"Đơn {order_id} đã hết hạn đổi trả {actions.RETURN_DAYS} ngày kể từ khi nhận hàng (DT-01): "
+                              "không trả hay đổi được.")
     try:
         result = await btc.call(
             "order.update", _with_address(m), idempotency_key=idempotency_key,
             order_id=order_id, action=action, new_variant_sku=new_variant_sku, new_address=new_address,
-            reason=reason, on=on or btc.reference_date(),
+            reason=reason, on=day,
         )
     except ToolFailure as failure:
         # Not an order the mock holds: one placed on the website, or the CRM's history the website keeps. A live

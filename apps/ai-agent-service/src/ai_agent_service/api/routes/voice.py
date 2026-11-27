@@ -226,9 +226,18 @@ class Session:
         self.pause_generation = 0
         self.recognition_generation = 0
         self.asr_pending = 0
+        #: Recognition started on a turn the detector has not called over yet: (its speech end, the task).
+        self.early_asr: "tuple[float, asyncio.Task[Any]] | None" = None
         self.playback_events: list[dict[str, Any]] = []
         self.capture_profile = "standard"
         self.capture_settings: dict[str, Any] = {}
+        #: VOICE_HOLD_MS: a lookup is running and nothing was heard this long after the caller stopped: the line the
+        #: harness gave for that lookup takes the turn (plan 002, A2).
+        self.hold_ms = int(os.environ.get("VOICE_HOLD_MS", "0") or 0)
+        #: The hold lines' audio, by voice and line, synthesised as the lookup starts and kept for the next time.
+        self.hold_audio: dict[tuple[int, str], list[Any]] = {}
+        #: The turn's hold line, once the harness gave one, and whether its deadline has passed.
+        self.pending_hold: dict[str, str] = {}
 
     # ── plumbing ──────────────────────────────────────────────────────────
 
@@ -296,7 +305,7 @@ class Session:
     async def audio(self, data: bytes, arrived: float) -> None:
         import numpy as np
 
-        from ...components.voice.turns import BargeIn, SpeechStarted, TurnEnded
+        from ...components.voice.turns import BargeIn, EndLikely, SpeechStarted, TurnEnded
 
         samples = self.resampler.resample_chunk(np.frombuffer(data, dtype=np.float32))
         if samples.size == 0:
@@ -313,12 +322,19 @@ class Session:
                 await self.send({"type": "state", "state": "user"})
             elif isinstance(event, BargeIn):
                 await self.pause()
+            elif isinstance(event, EndLikely):
+                # Recognition starts while the detector still waits to call the turn over: the audio is the one
+                # TurnEnded will carry, so the words are the same and are there sooner. Speech resuming drops it.
+                self.early_asr = (event.speech_end, asyncio.create_task(self._recognise(event.audio)))
+                self.early_asr[1].add_done_callback(lambda task: task.cancelled() or task.exception())
             elif isinstance(event, TurnEnded):
                 # Whether the agent was busy is decided now, when the caller
                 # stopped speaking, not after recognition.
                 self.recognition_generation += 1
+                early, self.early_asr = self.early_asr, None
+                started = early[1] if early is not None and early[0] == event.speech_end else None
                 self.spawn(self.turn(event, busy=self.busy(), generation=self.recognition_generation,
-                                     pause_generation=self.pause_generation))
+                                     pause_generation=self.pause_generation, recognising=started))
 
     def _save_recording(self) -> None:
         import numpy as np
@@ -421,18 +437,24 @@ class Session:
         outcome = await self._take(turn_id, None, self.timings[turn_id]["origin"])
         await self._answer(turn_id, outcome)
 
+    async def _recognise(self, audio: Any) -> Any:
+        from ...components.voice import asr
+
+        return await asyncio.wait_for(
+            asyncio.to_thread(asr.transcribe, self.settings.asr, audio, self.lexicon.hotwords), timeout=asr.TIMEOUT)
+
     async def turn(self, event: Any, *, busy: bool, generation: int, pause_generation: int,
-                   typed: str | None = None) -> None:
+                   typed: str | None = None, recognising: "asyncio.Task[Any] | None" = None) -> None:
         from ...components.voice import asr
 
         echo_text = self.echo_window(event.speech_end - len(event.audio) / 16000, event.speech_end)
         capture = {"profile": self.capture_profile, **self.capture_settings}
         self.asr_pending += 1
         try:
-            heard = asr.Transcript("bench", typed, 0.0, 0.0) if typed else await asyncio.wait_for(
-                asyncio.to_thread(asr.transcribe, self.settings.asr, event.audio, self.lexicon.hotwords),
-                timeout=asr.TIMEOUT,
-            )
+            if typed:
+                heard = asr.Transcript("bench", typed, 0.0, 0.0)
+            else:
+                heard = await (recognising if recognising is not None else self._recognise(event.audio))
         except Exception:
             if generation == self.recognition_generation:
                 await self.send({"type": "error", "text": "Chưa nhận dạng được giọng nói. Vui lòng nói lại."})
@@ -472,8 +494,10 @@ class Session:
                                   "asr_done": asr_done, "reason": event.reason, "capture": capture}
         self.timings[turn_id] = timing
         self.thinking.add(turn_id)
+        if self.hold_ms:
+            self.spawn(self._hold(turn_id, event.speech_end))
         await self.send({"type": "state", "state": "thinking"})
-        await self.send({"type": "transcript", "turn": turn_id, "text": text, "raw": heard.text,
+        await self.send({"type": "transcript", "turn": turn_id, "text": self._shown(text), "raw": heard.text,
                          "corrections": applied, "asr_ms": int(heard.seconds * 1000),
                          "audio_seconds": round(heard.audio_seconds, 2), "endpointing": event.reason,
                          "removed_words": decision.removed_words, "policy_version": POLICY_VERSION})
@@ -493,6 +517,17 @@ class Session:
             await self.send({"type": "reply", "turn": turn_id, "text": outcome.content, "superseded": True})
             return
         await self._answer(turn_id, outcome)
+
+    def _shown(self, text: str) -> str:
+        """The caller's words as the page shows them: numbers written as numbers (a phone number read digit by digit
+        shows as 0984726714), as the harness itself reads them. What the agent receives is unchanged."""
+        from ...components import clock
+        from ...components.intake import itn, text as intake_text
+
+        try:
+            return itn.normalise(intake_text.clean(text)[0], clock.at(self.row.get("business_day") or options.business_day()))
+        except Exception:  # noqa: BLE001 - the words as heard rather than none
+            return text
 
     async def _take(self, turn_id: str, text: str | None, arrived: float, *, emit: Any = None) -> harness.Outcome:
         """One turn through the harness, one at a time, under the call's lease."""
@@ -563,7 +598,17 @@ class Session:
         from ...components.voice import tts
 
         async def sink(kind: str, text: str) -> None:
-            if turn_id in self.cancelled or not text.strip() or kind not in ("sentence", "filler"):
+            if turn_id in self.cancelled or not text.strip():
+                return
+            if kind == "hold_line":
+                # The harness's line for the lookup now running: said only if the deadline finds nothing heard.
+                if self.hold_ms:
+                    self.pending_hold[turn_id] = text
+                    if (id(self.voice), text) not in self.hold_audio:
+                        self.spawn(self._synthesise_hold(text))
+                    await self._maybe_hold(turn_id)
+                return
+            if kind not in ("sentence", "filler", "hold"):
                 return
             queue = self.streams.get(turn_id)
             if queue is None:
@@ -573,6 +618,9 @@ class Session:
             if kind == "filler":
                 if os.environ.get("VOICE_FILLER", "0") == "1":
                     queue.put_nowait(("filler", text))
+                return
+            if kind == "hold":
+                queue.put_nowait(("hold", text))
                 return
             self.timings[turn_id].setdefault("agent_done", time.perf_counter())
             for part in tts.sentences(text):
@@ -591,9 +639,16 @@ class Session:
         order: asyncio.Queue[Any] = asyncio.Queue()
         pumps: list[asyncio.Task[None]] = []
 
-        async def pump(text: str, out: "asyncio.Queue[Any]") -> None:
+        from ...components.voice.tts import for_voice
+
+        async def pump(kind: str, text: str, out: "asyncio.Queue[Any]") -> None:
             try:
-                async for speech in self.voice.stream(text):
+                ready = self.hold_audio.get((id(self.voice), text)) if kind == "hold" else None
+                if ready is not None:
+                    for speech in ready:
+                        out.put_nowait(speech)
+                    return
+                async for speech in self.voice.stream(for_voice(text)):
                     out.put_nowait(speech)
             finally:
                 out.put_nowait(None)
@@ -602,7 +657,7 @@ class Session:
             while (item := await queue.get()) is not None:
                 out: asyncio.Queue[Any] = asyncio.Queue()
                 if self.voice.parallel:
-                    pumps.append(asyncio.create_task(pump(item[1], out)))
+                    pumps.append(asyncio.create_task(pump(item[0], item[1], out)))
                 order.put_nowait((*item, out))
             order.put_nowait(None)
 
@@ -616,21 +671,34 @@ class Session:
                     spoken.append(text)
                     index = len(spoken) - 1
                 if not self.voice.parallel:
-                    pumps.append(asyncio.create_task(pump(text, out)))
+                    pumps.append(asyncio.create_task(pump(kind, text, out)))
                 offset = 0.0
                 while (speech := await out.get()) is not None:
                     if turn_id in self.cancelled:
                         return
+                    if kind == "sentence" and offset == 0.0:
+                        # The words go with their voice: the page shows a sentence as it starts to play, not the whole
+                        # reply when the turn ends (2026-11-19: text lagged the voice by seconds).
+                        await self.send({"type": "reply_part", "turn": turn_id, "index": index, "text": text})
                     chunks.append({"sentence": index, "offset": offset, "duration": speech.duration})
                     offset += speech.duration or 0.0
                     await self.send({"type": "audio", "turn": turn_id, "seq": seq, "sentence": index, "mime": speech.mime,
                                      "data": base64.b64encode(speech.audio).decode("ascii")})
                     if kind == "filler":
                         timing.setdefault("filler_audio", time.perf_counter())
-                    elif "first_audio" not in timing:
-                        timing["first_audio"] = time.perf_counter()
-                        await self._record(turn_id)
-                        await self.metrics(turn_id)
+                    else:
+                        # TTFA ends at the first audio played (the organisers' guide), a hold line's included; the
+                        # first audio of the answer itself is kept apart (ttfa_answer_ms).
+                        first = "first_audio" not in timing
+                        answer = kind == "sentence" and "answer_audio" not in timing
+                        now = time.perf_counter()
+                        timing.setdefault("first_audio", now)
+                        if answer:
+                            timing["answer_audio"] = now
+                        if first or answer:
+                            await self._record(turn_id)
+                        if first:
+                            await self.metrics(turn_id)
                     seq += 1
             if turn_id not in self.cancelled:
                 await self.send({"type": "audio_end", "turn": turn_id, "last_seq": seq - 1})
@@ -639,13 +707,41 @@ class Session:
             for job in pumps:
                 job.cancel()
 
+    async def _synthesise_hold(self, text: str) -> None:
+        """A hold line's audio, made while the lookup runs, so saying it costs no synthesis (plan 002, A2)."""
+        key = (id(self.voice), text)
+        if key not in self.hold_audio:
+            from ...components.voice.tts import for_voice
+
+            self.hold_audio[key] = [speech async for speech in self.voice.stream(for_voice(text))]
+
+    async def _hold(self, turn_id: str, speech_end: float) -> None:
+        """The turn's hold deadline: ``VOICE_HOLD_MS`` after the caller stopped."""
+        await asyncio.sleep(max(0.0, speech_end + self.hold_ms / 1000 - time.perf_counter()))
+        timing = self.timings.get(turn_id)
+        if timing is not None:
+            timing["hold_due"] = True
+            await self._maybe_hold(turn_id)
+
+    async def _maybe_hold(self, turn_id: str) -> None:
+        """Say the turn's hold line once its deadline has passed, if the caller has heard nothing yet. Only a turn
+        whose answer waits on a lookup has a line: a one-round answer never gets one."""
+        timing = self.timings.get(turn_id) or {}
+        text = self.pending_hold.get(turn_id)
+        if (not text or not timing.get("hold_due") or "hold" in timing or "agent_done" in timing
+                or turn_id in self.cancelled or turn_id not in self.thinking):
+            return
+        timing["hold"] = time.perf_counter()
+        await self._sink(turn_id)("hold", text)
+
     async def _record(self, turn_id: str) -> None:
         """TTFA at the server boundary, written onto the turn."""
         timing = self.timings[turn_id]
         figures = _figures(timing)
         if timing.get("kind") == "turn" and figures.get("ttfa_ms") is not None:
             await harness.record_ttfa(self.call_id, turn_id, figures["ttfa_ms"], {
-                k: figures[k] for k in ("endpoint_ms", "asr_ms", "agent_ms", "tts_first_ms", "ttfa_without_asr_ms", "filler_ms") if figures.get(k) is not None
+                k: figures[k] for k in ("endpoint_ms", "asr_ms", "agent_ms", "tts_first_ms", "ttfa_without_asr_ms", "filler_ms",
+                                     "ttfa_answer_ms", "hold_ms") if figures.get(k) is not None
             } | {"asr_model": self.settings.asr, "endpointing": self.settings.endpointing, "tts": self.settings.tts,
                  "capture": timing.get("capture"), "voice_policy_version": POLICY_VERSION})
 
@@ -763,6 +859,9 @@ def _figures(t: dict[str, Any]) -> dict[str, Any]:
         "ttfa_without_asr_ms": (lambda a, b: a - b if a is not None and b is not None else None)(
             ms("speech_end", "first_audio"), ms("turn_end", "asr_done")),
         "filler_ms": ms("speech_end", "filler_audio"),
+        # Plan 002, A2: to the first audio of the answer, and to the hold line when one was said.
+        "ttfa_answer_ms": ms("speech_end", "answer_audio"),
+        "hold_ms": ms("speech_end", "hold"),
         "ttfa_client_ms": ms("speech_end", "play_start"),
         "ttft_ms": latency.get("ttft_ms"),
         "reason": t.get("reason"),

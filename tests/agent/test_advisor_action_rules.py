@@ -7,11 +7,11 @@ def test_order_is_prepared_then_requires_confirmation_of_the_exact_payload():
     body = SKILLS["place-order"]["body"]
     assert "CONFIRMATION_REQUIRED" in body
     assert "giá do hệ thống điền từ báo giá" in body
-    assert "tự lấy từ catalog_search" in body
+    assert "lượt này tra, lượt sau mới đặt" in body and "không xin khách mã" in body
 
 
 def test_handoff_without_asking_again():
-    assert "Luôn gọi tool trước, có kết quả rồi mới nói đang chuyển" in HARD_RULES
+    assert "Luôn gọi tool trước, có kết quả thành công rồi mới nói đang kết nối" in HARD_RULES
     assert "không hỏi lại \"anh có muốn chuyển không\"" in HARD_RULES
 
 

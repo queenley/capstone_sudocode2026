@@ -87,9 +87,9 @@ def test_handoff_schema_violations_reach_the_model(change, expected):
     assert any(expected in p for p in problems)
 
 
-def test_handoff_without_a_phone_only_blocks_on_the_hotline():
+def test_handoff_without_a_phone_asks_for_it_on_every_channel():
     chat = actions.fill_handoff(MODEL_BRIEF, {**HANDOFF_DEFAULTS, "customer_phone": "", "channel": "web_chat"})
-    assert actions.handoff_problems(chat) == []
+    assert any("số điện thoại" in p for p in actions.handoff_problems(chat))
     call = actions.fill_handoff(MODEL_BRIEF, {**HANDOFF_DEFAULTS, "customer_phone": ""})
     assert any("số điện thoại" in p for p in actions.handoff_problems(call))
 

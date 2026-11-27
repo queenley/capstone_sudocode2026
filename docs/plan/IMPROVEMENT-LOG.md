@@ -21,6 +21,371 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-19 · Đơn đã tạo nhưng báo lỗi: tool ghi được chờ 10 giây, bản sao lên website chạy nền
+
+Loại: harness / tool · Trạng thái: đang đo · Chỉ số: TSR (tạo đơn trên kênh voice)
+
+- **Vấn đề:** Cuộc gọi voice 27: khách đọc số điện thoại, `order.create` trả TIMEOUT hai lần ("did not answer within 2s"), cầu dao khóa tool 60 giây, agent nói "hệ thống phản hồi chậm" rồi chuyển máy. Thực tế đơn 149.000đ đã ghi vào `commerce.orders` lúc 16:10:31,34, chỉ 70 ms sau khi agent bỏ chờ.
+- **Bằng chứng:** Log agent 16:10:31,275 "Circuit open for tool order_create … after TIMEOUT"; bảng `commerce.orders` có đơn tạo lúc 16:10:31,34. `crm.order_create` chờ `shop_orders.mirror_create` (tạo khách trên website, có băm mật khẩu) trước khi trả kết quả.
+- **Sửa:**
+  - `mcp/tools.py` `ToolGuardMiddleware`: tool ghi (`WRITE_TOOLS`) được chờ `WRITE_TIMEOUT` = 10 giây; tool tra cứu giữ 2 giây.
+  - `mcp/servers/crm.py`: bản sao lên website chạy nền (task giữ tham chiếu trong `_MIRRORS`), `order_create` trả kết quả ngay khi đơn đã tạo.
+- **Đã kiểm:** `tests/agent/test_log_regressions.py::test_a_write_tool_is_given_long_enough_to_answer_and_a_lookup_keeps_two_seconds`. Bộ `tests/agent`: 1862 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo lại trên cuộc gọi thật.
+- **Còn lại:** Ở cùng cuộc, agent hỏi địa chỉ trước khi biết số điện thoại của khách lạ (skill `place-order` không cần địa chỉ), nên mất thêm một lượt; chưa sửa.
+
+### 2026-11-19 · Voice: chữ của agent hiện theo từng câu cùng lúc với tiếng; số trong lời khách hiện bằng chữ số
+
+Loại: voice / giao diện · Trạng thái: đang đo · Chỉ số: trải nghiệm (không có chỉ số BTC)
+
+- **Vấn đề:** Trên trang gọi, chữ của agent chỉ hiện khi cả lượt xong, chậm hơn tiếng vài giây. Lời khách hiện số điện thoại bằng chữ ("không chín tám bốn…").
+- **Bằng chứng:** `api/routes/voice.py` chỉ gửi `reply` sau `_take`, trong khi audio stream từng câu. `transcript` gửi văn bản trước ITN; ITN chỉ chạy trong harness. Kiểm `itn.normalise`: chuỗi trên ra `0984726714`.
+- **Sửa:**
+  - `api/routes/voice.py`: gửi `reply_part` khi mẩu audio đầu tiên của mỗi câu được gửi; `transcript` gửi `_shown(text)` (đã qua ITN). Văn bản đưa vào harness không đổi.
+  - `apps/web/src/features/voice/voice-call.tsx`: `reply_part` nối vào dòng của agent; `reply` thay toàn bộ dòng đó thay vì thêm dòng trùng.
+- **Đã kiểm:** Bộ `tests/agent` qua. Kiểm kiểu của web chạy trong `next build` của image (build thành công).
+- **Số đo:** chưa đo.
+- **Còn lại:** Câu giữ lượt (`VOICE_HOLD_MS`) vẫn tính từ lúc khách ngừng nói để đo TTFA đúng như BTC. Với ASR qua Colab (1,2–1,8 giây), câu này bật gần như mọi lượt và có lúc đi liền với câu mở trước tra cứu của model; chưa sửa.
+
+### 2026-11-19 · ASR và TTS chạy trên GPU Colab (engine giọng `remote`, PhoWhisper large/medium trong asr-service)
+
+Loại: voice / hạ tầng · Trạng thái: đang đo · Chỉ số: WER/CER, TTFA
+
+- **Vấn đề:** Laptop Intel không có GPU dùng được trong Docker: VieNeu trên CPU có RTF 3–4; ASR Zipformer sai nhiều ở tên tiếng Anh.
+- **Bằng chứng:** Bộ 120 câu TTS (4 giọng OpenAI, bản sạch và bản điện thoại, không commit): `phowhisper-large` WER 10,1%/10,4%, CER 3,7%/3,7%; `zipformer-30m` 10,2%/10,7%, CER 6,2%/7,9%; `phowhisper-medium` 10,6%/12,1%; `whisper-turbo` 10,9%/14,3% (còn bịa câu khi audio nhiễu). Một câu 4,2 giây qua tunnel: `phowhisper-large` 1,0–1,25 giây. TTS trên T4: VieNeu v3 Turbo (`device="cuda"`) tiếng đầu khoảng 170 ms trên Colab, khoảng 450 ms qua tunnel, RTF 0,82–0,94; ZeroTTS tiếng đầu khoảng 330 ms, RTF 0,88–0,91.
+- **Sửa:**
+  - `apps/asr-service/src/asr_service/engines.py`: thêm `phowhisper-medium`, `phowhisper-large`.
+  - `components/voice/tts.py`: engine `RemoteVoice` (`remote:<engine>[:<voice>]`, `TTS_URL`, `TTS_API_KEY`).
+  - `docker-compose.yml`, `.env.example`: `TTS_URL`, `TTS_API_KEY`.
+  - Máy chủ TTS và script cài đặt Colab nằm ngoài repo (scratchpad).
+- **Đã kiểm:** `tests/agent/test_voice_transport.py::test_remote_voice_reads_the_rate_the_server_names_and_sends_quarter_second_wav_chunks`; test ASR qua.
+- **Số đo:** chưa đo TTFA trên cuộc gọi thật. Riêng ASR qua Colab đã thêm 1–2 giây mỗi lượt, nên TTFA khó đạt 2,5 giây.
+- **Còn lại:** Colab miễn phí tắt phiên sau một thời gian (16:29 phiên `voice` bị tắt, phải tạo lại). Muốn demo ổn định cần máy GPU thuê.
+
+### 2026-11-19 · Voice: giữ 800 ms trước khi khách bắt đầu nói (preroll), để ASR không mất âm đầu
+
+Loại: voice (cắt lượt) · Trạng thái: đang đo · Chỉ số: độ đúng ASR trên cuộc gọi thật
+
+- **Vấn đề:** Cuộc gọi thật: khách nói "máy lọc không khí", ASR ghi "không khí"; agent nhận câu cụt.
+- **Bằng chứng:** Ghi âm `VOICE_RECORD=1`, cuộc 20 (không commit). Năng lượng tiếng bắt đầu ở giây 26,75, nhưng `TurnDetector` mở lượt ở 27,49 vì Silero cho âm đầu nhẹ qua muộn, nên lượt bắt đầu từ 27,33 (preroll 320 ms). Phát lại bản ghi qua `TurnDetector`: preroll 320 ms ra "không khí" với cả hai model; 800 ms ra "máy lọc không khí" với cả `zipformer-30m` và `zipformer-2025`. Câu "25 mét vuông" giữ nguyên ở mọi mức.
+- **Sửa:** `components/voice/turns.py`: `TurnConfig.preroll_ms` từ 320 lên 800. Phần đệm là audio đã có từ trước nên không thêm thời gian chờ.
+- **Đã kiểm:** Bộ `tests/agent`: 1944 qua, 1 fail sẵn ở `test_improve_runner.py`. Image đã build lại; trong container `preroll_ms` là 800.
+- **Số đo:** chưa đo trên nhiều cuộc gọi thật (mới có 1 bản ghi).
+- **Còn lại:** Câu "bạn bán gì" vẫn sai ở mọi mức preroll ("mày bán gì", "mang gì"); đây là lỗi của model, cần thêm bản ghi để so `zipformer-30m` với `zipformer-2025` trên giọng thật. Rủi ro: preroll dài có thể kéo theo tiếng vọng từ loa của agent nếu khách nói ngay sau khi agent dừng.
+
+### 2026-11-19 · Giọng đọc Gemini Flash TTS (`gemini:<voice>`), ghi âm cuộc gọi để chẩn đoán ASR
+
+Loại: tính năng (voice) · Trạng thái: đang đo · Chỉ số: TTFA, chất lượng giọng (nghe)
+
+- **Vấn đề:** Trên laptop Intel không có GPU, VieNeu sinh audio chậm hơn tốc độ phát 3–4 lần nên giọng đứt quãng. Một lượt đo được TTFA 33,3 giây (cuộc 16), và lúc khởi động phải mất 580 giây để nạp. Người dùng chê `openai:coral` đọc tiếng Việt nghe lạ. Log ASR có cuộc không thu được tiếng (cuộc 17, mức âm 0,0) và cuộc mức âm quá nhỏ (cuộc 18, 0,002–0,01, VAD tối đa 0,35).
+- **Bằng chứng:**
+  - VieNeu đo trong container: RTF 2,84–3,97.
+  - Bench Gemini TTS (`workbench/latency`, 3 lần mỗi model, cùng một câu): `gemini-3.8-flash-lite-tts` cho tiếng đầu sau 0,7 giây, sinh 8,9 giây audio trong 1,8 giây. `gemini-3.8-flash-tts` 1,1 giây; `gemini-3.1-flash-tts-preview` 0,9 giây; `gemini-2.5-flash-preview-tts` 7,0 giây.
+  - ASR trên `data/dev/asr_test` (24 cuộc, 34 phút, ghép theo đoạn): `zipformer-30m` WER 7,9% CER 3,7% RTF 0,029; `zipformer-30m-beam4` 7,8%/3,7%/0,038; `zipformer-2025` 9,0%/4,0%/0,042. Model hiện tại đã là tốt nhất trong số có trên máy; `phowhisper-small` thiếu `tokenizer.json` nên không nạp được.
+- **Sửa:**
+  - `components/voice/tts.py`: thêm engine `GeminiVoice` (`gemini:<voice>`, mặc định Kore). Model lấy từ `GEMINI_TTS_MODEL`, mặc định `gemini-3.8-flash-lite-tts`. Stream pcm 24 kHz, gửi từng mẩu 0,25 giây để lọt giới hạn frame của gateway. Có trong danh sách chọn giọng khi có `GOOGLE_API_KEY`.
+  - `docker-compose.yml`, `.env.example`: thêm `GEMINI_TTS_MODEL` và `VOICE_RECORD` (ghi audio mic vào `runs/voice/` của container).
+  - `docs/channels.md`: thêm một dòng vào bảng giọng.
+- **Đã kiểm:**
+  - `tests/agent/test_voice_transport.py::test_gemini_voice_streams_its_pcm_as_small_wav_chunks_and_is_offered_with_a_google_key`.
+  - Trong container: voice sẵn sàng sau 8,8 giây (VieNeu 580 giây). 3 lần đọc một câu: tiếng đầu sau 0,85–1,03 giây, xong trong 1,5–2,1 giây cho 4,7–5,3 giây audio, không khựng lần nào.
+- **Số đo:** chưa đo TTFA trên cuộc gọi thật.
+- **Còn lại:** Người dùng nghe thử và chọn giọng. Ghi âm cuộc gọi thật để xác định lỗi nhận dạng là do mic hay do model. Lượt đầu sau khi máy rảnh lâu (connection và prompt cache nguội) có TTFA 6,6 giây (cuộc 19 turn 2).
+
+### 2026-11-19 · Guard COD: máy đã nằm trong đơn nhiều dòng không bị cộng lần nữa
+
+Loại: hard guard · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Khi tạo đơn mới có `basket_skus`, `_cod_order` cộng thêm giá các máy trong giỏ chưa đặt. Nếu máy đó đã nằm trong một đơn nhiều dòng (`lines`) đặt trước trong cuộc, nó vẫn bị tính là chưa đặt: `placed_lines` ghi `sku` của đơn nhiều dòng là chuỗi ghép ("A,B"), nên phép loại trừ không khớp. Hậu quả: guard chặn sai với lý do "COD vượt 10.000.000đ".
+- **Bằng chứng:** Tái hiện offline: đơn đã đặt gồm 4.890.000đ + 1.590.000đ, thêm máy 1.095.000đ đi cùng giỏ → guard báo 12.465.000đ. Lần chạy `router` ngày 15/11, SCN-ADV-0060 call_2 turn 3 cũng báo "COD vượt 10.000.000đ" khi tổng chỉ 5.985.000đ (code lúc đó khác, đơn một món nay đã tính đúng).
+- **Sửa:** `components/guardrails/actions.py` `_cod_order`: tập `done` lấy mọi `skus` của đơn đã đặt, không lấy chuỗi `sku` ghép.
+- **Đã kiểm:** `tests/agent/test_order_lines.py::test_a_basket_product_already_in_a_placed_order_of_lines_is_not_counted_twice_for_cod`. Bộ `tests/agent`: 1857 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Không gỡ trượt của SCN-ADV-0060 call_2. Ca này là nhãn trái BTC (xem mục dưới).
+
+### 2026-11-19 · Rà nhãn dev theo BTC: chốt đơn, thanh toán, máy thứ hai, trả hàng (không sửa agent)
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Sau mục 18/11 (COD khi khách chưa nói), 7 ca A3 của `data/dev` có thể trượt lại. Câu hỏi: agent hay nhãn đúng với BTC?
+- **Bằng chứng:**
+  - BTC: `mock_tools.order_create` mặc định `payment="COD"`. Trace mẫu `eval/runs/full.jsonl` gọi `order.create` ngay ở lượt khách giục chốt (SAMPLE-01 turn 3 "lên đơn", SAMPLE-02 turn 3 "chị lấy cái đó"), không hỏi thanh toán.
+  - `order.update` chỉ có `exchange_size | exchange_product | return | update_address`: không đổi được thanh toán, không hủy.
+  - KM-05: AIR-2ND-50 chỉ áp khi hai máy trong cùng một đơn.
+  - SAMPLE-03: khách nói rõ "em làm thủ tục đổi cho anh nhé" rồi mới `order.update`.
+- **Kết luận:** agent hiện tại đúng BTC. Các nhãn sau trái BTC:
+  - **7 ca A3:** SCN-ADV-0017 c3, ADV-0078 c3, ADV-0099 c2, ADV-0105 c1, GEN-0034 c2, GEN-0061 c2, GEN-0234 c2. Khách nói chốt hoặc đặt trước rồi mới nói chuyển khoản, nhãn vẫn đòi `payment: bank`.
+  - **SCN-ADV-0060 c2:** khách chốt máy X ở turn 2, thêm Mini ở turn 3, nhãn đòi Mini giá giảm 50% (1.095.000đ). Theo KM-05, máy khác đơn thì không được giảm.
+  - **SCN-ADV-0071 c2:** khách chỉ hỏi có trả được không và hoàn bao nhiêu, chưa lần nào đồng ý trả, nhãn đòi `order.update return`.
+- **Sửa:** Không sửa agent. Cách sửa nhãn đề xuất: đưa câu thanh toán lên trước câu chốt, hoặc ghi `payment: COD`; ADV-0060 c2 gộp hai máy trước câu chốt; ADV-0071 c2 thêm câu khách đồng ý trả.
+- **Đã kiểm:** Đọc nguồn BTC và transcript `router` ngày 15/11 (`docs/evaluation/conversations.csv`); không chạy model.
+- **Số đo:** chưa đo
+- **Còn lại:** Nhãn là của người làm dữ liệu (`build_dev_r4.py`): cần họ đồng ý trước khi sửa. 20 ca khác cùng kiểu "chốt trước, chuyển khoản sau" vẫn qua ngày 16/11 vì PolicyAgent chưa cho tạo đơn ở câu đầu; đó là may, không phải thiết kế.
+
+### 2026-11-18 · Cuộc gọi thoại: mọi con số viết bằng chữ số, không chỉ số tiền
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Trên kênh hotline, agent viết "tám phần trăm", "mười lăm ngày". Bộ chấm BTC so chuỗi `must_say_any` ("8%", "7 ngày"), nên câu đúng nội dung vẫn trượt.
+- **Bằng chứng:** `evaluation/runs/fix-a3-20261118-hard-v2`, SCN-HARD-04 call_1 turn 2, lý do "thiếu must_say_any: 8%".
+- **Sửa:** `config/prompts/agent/advisor/notes.yaml` `spoken`: câu "Số tiền vẫn viết bằng chữ số" đổi thành "Mọi con số (tiền, %, số ngày, số tháng) vẫn viết bằng chữ số (4.890.000đ, 8%, 15 ngày), không viết bằng chữ". Khớp quy tắc 17 của `rules.md`; ghi chú cũ chỉ nói số tiền nên model viết chữ cho phần còn lại.
+- **Đã kiểm:** không có test (prompt); YAML đọc được; bộ `tests/agent`: 1809 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** chạy lại hard-cases và 7 mẫu BTC trên kênh thoại.
+
+### 2026-11-18 · Đơn không chờ thanh toán hay địa chỉ: COD khi chưa chọn, địa chỉ cũ lấy từ Call Brief (đảo một phần A3)
+
+Loại: hard guard / prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Sau bản sửa A3 ngày 16/11, ở cuộc 2 của mẫu BTC, khách nói "lấy cái đó", "lên đơn cho chị" mà không nêu cách thanh toán hay địa chỉ. Agent hỏi COD hay chuyển khoản và khu vực giao, trong khi lượt đó là lượt cuối của kịch bản, nên đến hết cuộc vẫn chưa có đơn. SAMPLE-03 cũng trượt vì A3: cuộc 1 nói COD nhưng không nói địa chỉ, guard chặn đơn, nên cuộc 2 không còn đơn để `order.update`.
+- **Bằng chứng:** báo cáo của người dùng 18/11: TSR 7 mẫu BTC 28,6% (12/11: 85,7%), SAMPLE-01 đến 05 trượt cả khi chạy theo kịch bản viết sẵn. Bản cập nhật 11-2026 của BTC (trùng byte với `data/btc`): `schemas/tools.schema.json` có `address: string?`; `mock_tools.order_create` mặc định `payment="COD"`; `reference_eval.check_call` bỏ qua lệnh tạo đơn trả lỗi ("cod_limit_exceeded rồi tạo lại bằng chuyển khoản"); trace mẫu `eval/runs/full.jsonl` tạo đơn SAMPLE-01, 02, 04, 05 không có `payment`, `address`. CRM của BTC không có địa chỉ, chỉ có `region`.
+- **Sửa:** `components/guardrails/actions.py`: bỏ `_payment_reason`. `components/guardrails/purchase.py`: bỏ `missing` (không còn nơi gọi, viết ngược quyết định này); câu đọc lại khi không có địa chỉ là "chưa có trong hồ sơ". `config/prompts/agent/advisor/skills.yaml` `place-order` dòng 12: khách đã nói đặt thì tạo đơn; thanh toán theo lời khách hoặc Call Brief, chưa có thì COD (VC-03); địa chỉ theo lời khách, rồi Call Brief ("địa chỉ cũ"), không có thì bỏ trống. `mcp/servers/crm.py`: mô tả `payment`, `address` theo cùng ý. `agents/advisor.py` khối "Đơn đã tạo trong cuộc này": bỏ "đổi thanh toán thì gọi order_update" (không có tool đổi thanh toán, đây là nguồn câu "đã đổi sang chuyển khoản"). Giữ của A3: đơn đã tạo thì không nói đã đổi thanh toán (skill dòng 15); guard VC-03 cho COD trên 10 triệu.
+- **Đã kiểm:** `tests/agent/test_dev_run_fixes.py`: test cũ thay bằng `test_an_order_the_customer_asked_for_is_placed_without_a_payment_or_an_address`. Bộ `tests/agent`: 1809 qua, 1 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** hard-cases (5 kịch bản, một lần, bật hết công tắc v2): `evaluation/runs/fix-a3-20261118-hard-v2` TSR 80% (4/5), HR 0%, 0 vi phạm guardrail; TTFT p95 9.014 ms trên 19 lượt (dưới 100 lượt, chưa có ý nghĩa). Ca trượt SCN-HARD-04 call_1 không có đơn nên không do sửa này: kênh hotline, agent nói "tám phần trăm" thay vì "8%", thiếu `must_say_any`. Run cũ `base-40fea307-hard` (commit khác, bản 1) 5/5. 7 mẫu BTC và 20 kịch bản dev: chưa đo.
+- **Còn lại:** 7 ca A3 của dev (ADV-0017 c3, ADV-0078 c3, ADV-0099 c2, ADV-0105 c1, GEN-0034 c2, GEN-0061 c2, GEN-0234 c2): khách nói chốt rồi lượt sau mới nói chuyển khoản, đơn ghi COD nên có thể trượt lại. Người dùng chọn ưu tiên định dạng BTC (18/11).
+
+### 2026-11-18 · Reflection vòng `reflection-2`: 3 dòng skill `conversation` (skills v1)
+
+Loại: skill (học tự động) · Trạng thái: bỏ · Chỉ số: TSR / CCR / HR
+
+- **Vấn đề:** Vòng Reflection mới học từ lỗi trên 40 kịch bản dev cộng 4 kịch bản budget, đề xuất skill mới cho agent.
+- **Bằng chứng:**
+  - Run `evaluation/runs/reflection-2/`.
+  - Có 169 lỗi, 63+3 thẻ bài học, gom thành 3 đề xuất, đều vào skill `conversation`:
+    - dùng lựa chọn đã biết khi chốt đơn (18 khách);
+    - hỏi lại món khi khách chưa nói rõ (3 khách);
+    - giữ danh xưng khách đã tự xưng (3 khách).
+- **Sửa:** Không sửa code. Skill được publish thành skills v1 nhưng chỉ lưu ở `evaluation/runs/reflection-2/learned/`. Agent vẫn ở v0.
+- **Đã kiểm:** Người dùng chưa duyệt. Việc duyệt do `scripted-eval` làm.
+- **Số đo:**
+  - R0/R1 trên 7 kịch bản frozen, mỗi bên 1 lần:
+    - TSR giữ 80.0 → 80.0.
+    - CCR giảm 52.4 → 42.9.
+    - HR price tăng 10.5 → 14.3.
+    - Sửa được 1 lỗi, làm hỏng 4.
+  - Full `data/dev` với v1 bị dừng ở 190/409 kịch bản, theo yêu cầu người dùng để tiết kiệm. Báo cáo ở `full-dev/report.partial-190.json`.
+    - Gắn nhãn bù bằng `--relabel` (extractor v13) ở `relabel-190b`. Không có lượt lỗi.
+    - Kết quả: TSR 66.3 (126/190), hard 61.9, RQR 4.4, CCR 50.4, HR 7.7.
+  - So với v0 trên cùng kịch bản (cùng ngày, cùng code, cùng extractor), theo thứ tự TSR / RQR / CCR / HR:
+    - 15 kịch bản của `20261117-judge/dev`: v0 73.3 / 0.0 / 66.0 / 5.7, v1 60.0 / 14.8 / 59.6 / 3.5.
+    - 24 kịch bản của `learn-reflection-2` (trong mẫu học): v0 70.8 / 9.5 / 47.4 / 8.0, v1 66.7 / 5.8 / 49.5 / 8.4.
+- **Còn lại:** Không áp v1 vào agent.
+
+### 2026-11-17 · Mẫu BTC trượt vì agent đòi thanh toán và địa chỉ trước khi tạo đơn
+
+Loại: hard guard / skill · Trạng thái: đang đo (chưa sửa, chờ quyết định) · Chỉ số: TSR
+
+- **Vấn đề:** ở cuộc 2 của `SAMPLE-01`, `02`, `04`, `05`, khách nói "lấy cái đó", "lên đơn cho chị" nhưng không nói cách thanh toán; agent hỏi COD hay chuyển khoản và khu vực giao, đến lượt chốt cuối vẫn chưa tạo đơn. `SAMPLE-03` trượt tương tự với `order.update`.
+- **Bằng chứng:** `evaluation/runs/20261117-judge/btc` (theo kịch bản viết sẵn): TSR mẫu BTC 28,6% (2/7, chỉ `SAMPLE-06`, `07` đạt), trong khi ngày 12/11 là 85,7% (cohort cùng 7 mẫu, khác commit). Ví dụ `SAMPLE-02 call_2 turn 3–4`, `SAMPLE-04 call_2 turn 3–4`. Simulator cho cùng kết quả ở cả 3 seed (`20261117-sim-btc5`). Trên 20 kịch bản dev cùng ngày TSR 75% (15/20), hard-cases 100% (5/5): bộ dev có khách nói cách thanh toán, mẫu BTC thì không.
+- **Sửa:** chưa. Nguyên nhân khớp với sửa A3 ngày 16/11 (`f7fbd2ba`: guard bắt hỏi khi `order_create` thiếu `payment` hoặc `address`; skill `place-order` bỏ "chưa chọn thì để COD"). `success_if` của mẫu BTC chỉ đối chiếu `sku` và `price_vnd`.
+- **Đã kiểm:** đọc trace, không chạy lại.
+- **Số đo:** chưa đo sau sửa.
+- **Còn lại:** chọn cách sửa: mặc định COD khi khách giục đặt mà chưa chọn (và dùng địa chỉ cũ trong bộ nhớ khi khách nói "giao về địa chỉ cũ"), hay giữ A3 và chấp nhận trượt mẫu BTC. Bộ test ẩn của BTC cùng định dạng với mẫu công khai.
+- **Cập nhật 18/11:** đã sửa theo hướng mặc định COD và địa chỉ từ Call Brief, xem mục "2026-11-18 · Đơn không chờ thanh toán hay địa chỉ".
+
+### 2026-11-17 · Rubric judge: hỏi lại một lần khi trích dẫn không nguyên văn
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: rubric J01–J12 (tỉ lệ cuộc gọi COMPLETE), kappa với người
+
+- **Vấn đề:** judge đánh giá đòi trích dẫn khớp chính xác (nhóm cố ý giữ, `test_the_evaluation_judge_keeps_its_exact_quote`), nhưng model hay diễn giải. Ngày 15/11 khoảng 3/4 cuộc gọi bị INCOMPLETE nên không dùng được để đo kappa. Ngoài ra trích dẫn một chữ ("x") vẫn được tính là có trong transcript.
+- **Bằng chứng:** mục 15/11 bên dưới (388 cuộc gọi; 501 trích dẫn diễn giải); thử `dev-1/r1-dev-1`: 4/20 COMPLETE.
+- **Sửa:** `components/evaluation/judge.py`: thêm `QUOTE_RULE` vào cuối prompt của BTC (evidence chép nguyên văn ≥ 4 từ, PASS vì không làm sai thì trích câu agent liên quan nhất); khi đủ tiêu chí mà có trích dẫn không khớp, hỏi lại một lần kèm danh sách trích dẫn không tìm thấy (`RETRY`), ghi `retried: true`; trích dẫn phải có ít nhất 2 từ. Luật so khớp vẫn là khớp chính xác.
+- **Đã kiểm:** `tests/agent/test_rubric_judge.py::test_a_paraphrased_quote_is_asked_once_more_and_still_checked_exactly`; `test_rubric_judge.py`, `test_gap_review_and_judge.py`, `test_approval_agent.py` qua. Chạy khô `--judge-run` → `--judge-sample` → `--judge-agreement` với judge giả trên trace mẫu của BTC: đủ ba bước, ra `agreement.json`.
+- **Số đo:** `evaluation/runs/20261117-judge` (mẫu BTC 7, `data/hard-cases` 5, 20 kịch bản dev mỗi kịch bản một persona; `full`, advisor `gpt-5.6-luna`, extractor `product-extractor-v13`, judge `gpt-4.1-mini`): 51/53 cuộc gọi COMPLETE (96%; ngày 15/11 khoảng 25% trên cohort khác), 3 cuộc được hỏi lại. 200 cặp (cuộc, tiêu chí): 197 PASS, 3 FAIL. Số judge trước sửa không so trực tiếp được với số sau (đổi prompt là đổi dụng cụ đo).
+- **Còn lại:**
+  - Phiếu mù 60 cặp (`evaluation/runs/20261117-judge/human-review`) rút ngẫu nhiên ra 60/60 PASS: kappa sẽ không tính được hoặc vô nghĩa. Cần chọn: chỉ báo % đồng thuận (rubric BTC cho phép), rút phiếu phân tầng gồm cả 3 FAIL, hoặc chấm thêm cấu hình `baseline_no_memory` để có nhiều FAIL hơn (tốn phí).
+  - Người chấm tay phiếu mù.
+
+### 2026-11-17 · Simulator khách theo spec BTC, chạy nhiều seed (`run_eval.py --simulate`)
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR theo seed (trung bình, độ lệch, biên độ ≤ 10 điểm)
+
+- **Vấn đề:** BTC chấm simulator theo 8 luật, độ lặp lại qua 3 seed (biên độ TSR ≤ 10 điểm trên 5 kịch bản) và không rò nhãn. Lõi 8 luật (`agents/simulator.py`) vẫn còn nhưng lệnh chạy nhiều seed (`pipeline/improve measure --seeds`) bị gỡ ngày 07/11 (commit `b5ab1f00`); `WAITING-FOR-USER.md` vẫn ghi lệnh đã gỡ.
+- **Bằng chứng:** `git show b5ab1f00 --stat` (xóa `pipeline/improve/explore.py`); không còn chỗ nào gọi `SimulatorAgent`.
+- **Sửa:**
+  - `pipeline/eval/simulate.py` mới: mỗi seed chơi từng kịch bản qua agent thật với khách mô phỏng, chỉ cấu hình `full`, ghi `seed-<n>.jsonl` theo schema trace BTC, chấm bằng `reference_eval.py` nguyên bản, ghi `simulator.jsonl` (log bắt buộc của spec) và `summary.json` (TSR từng seed, trung bình, độ lệch chuẩn, biên độ, `within_10_points`).
+  - Mỗi seed có thread checkpoint riêng và cache observer riêng; model persona nhận `seed` của provider.
+  - Agent có lượt chốt cuối (`customer_text` rỗng) như run thường, trừ khi khách bỏ đi, hết lượt hay đã chuyển máy.
+  - Kiểm rò rỉ trước khi gọi model: prompt persona không được chứa `must_not_ask`, `success_if`, `must_carry_over`, `ground_truth_facts`, `memory_expectation` (trừ slot khách vốn biết); có rò thì không chạy.
+  - `pipeline/eval/cli.py`: `--simulate`, `--seeds` (mặc định 0 1 2); từ chối `--config`, `--judge`, `--relabel`, `--no-extract`, `--resume`; không ghi đè thư mục có sẵn.
+  - Docstring `agents/simulator.py` cập nhật: vòng khám phá đã gỡ, người dùng duy nhất là `--simulate`.
+  - `Session.observe` gọi `Extractor.label()` theo chữ ký trước 07/11 (`customer_text=`, `agent_text=`), làm lần chạy thật đầu tiên dừng ở lượt 1 (`evaluation/runs/20261117-sim-smoke.failed-observe-api`). Nay đưa đúng `scorers.turn_input` (lời agent, tool đã gọi, ngày cuộc gọi); test `test_the_observer_is_given_the_extractor_input_of_today`.
+- **Đã kiểm:** `tests/agent/test_simulate_seeds.py` (35 test: không rò nhãn trên 7 mẫu BTC và 20 kịch bản dev đầu, bắt được nhãn bị chèn, tóm tắt và ngưỡng 10 điểm, chấm bằng script BTC, từ chối tùy chọn sai, không ghi đè, thread và seed riêng); `test_improvement_loop.py` qua. Toàn bộ `tests/`: 1.945 qua, 18 bỏ qua, 3 hỏng có từ trước trong `tests/agent/test_extractor_v9.py` (file chưa theo dõi).
+  - Lõi kernel (người dùng duyệt 17/11): `challenge` của persona là phản ứng của luật 3, trừ 1 kiên nhẫn, hết kiên nhẫn thì khách bỏ đi (luật 2). Trước đó một khách không đồng ý lặp một câu 10 lần tới hết 12 lượt (`evaluation/runs/20261117-sim-smoke.before-challenge-rule`). Test `test_a_challenge_costs_patience_and_the_customer_leaves_when_it_runs_out`, `test_a_hold_costs_nothing`.
+  - `Session.reply` trả None sau câu chào khi khách đã bỏ đi; trước đó vòng chơi hỏi lõi thêm một lần và dừng với "The call is over" (`evaluation/runs/20261117-sim-btc5.failed-call-over`). Lỗi có từ trước, lộ ra khi khách bỏ đi thường hơn.
+- **Số đo:** `evaluation/runs/20261117-sim-btc5` (`SAMPLE-01`–`05`, seed 0 1 2, advisor `gpt-5.6-luna`, simulator `gpt-4.1-mini`): 30 cuộc, 0 lỗi; TSR 0 / 0 / 0 (biên độ 0, đạt ngưỡng 10 điểm nhưng không có thông tin). Kết thúc: 20 do agent, 7 khách bỏ đi, 3 hết lượt. Cùng 5 mẫu chạy theo kịch bản viết sẵn (`20261117-judge/btc`) cũng trượt cả 5, cùng lý do (không có `order.create`/`order.update` khớp), nên 0% là của agent, không phải của simulator: xem mục "Mẫu BTC trượt vì đòi thanh toán" bên dưới.
+- **Còn lại:**
+  - Đo lại độ lặp lại sau khi sửa lỗi tạo đơn của agent: với TSR 0 ở mọi seed, biên độ 0 không chứng minh gì.
+  - Khách nói lời `customer_turns` sạch, nên kịch bản đầu vào ASR (`SAMPLE-06`) không mang lỗi ASR khi mô phỏng.
+  - Nhãn câu hỏi/claim trong lượt mô phỏng do observer của simulator gắn (bộ trích của sản phẩm trên model simulator), không phải extractor của evaluation.
+  - Provider coi `seed` là cố gắng tốt nhất, không bảo đảm lặp lại từng chữ.
+
+### 2026-11-16 · Giờ hẹn nói "19 giờ tối", không "19:00"
+
+Loại: harness / tool · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Với `ADVISOR_REPLY_PLAN=1` câu soạn sẵn của `schedule_callback` và câu cố định của harness điền giờ bằng `clock.moment_label` ("19:00 thứ Sáu…"), trái skill và không khớp "7 giờ"/"19 giờ" của nhãn. Lỗi riêng của kiến trúc mới.
+- **Bằng chứng:** Chạy thử `fix-check-20261116`: SCN-GEN-0004 call_1, SCN-ADV-0002 call_2 từ qua thành fail. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`.
+- **Sửa:** `components/clock.py` `spoken_moment`; dùng trong `guardrails/fallback.py` (câu soạn sẵn, câu cố định) và `guardrails/hard.moved_callback`.
+- **Đã kiểm:** `test_dev_run_fixes.py`; sửa kỳ vọng trong `test_latency_head_starts.py`, `test_reply_plan.py`, `test_callback_time.py`.
+- **Số đo:** `fix-check-20261116-2`: hai cuộc trên qua lại.
+- **Còn lại:** Đo trên cohort đủ lớn.
+
+### 2026-11-16 · Giá nửa sau của đơn tách lấy từ báo giá cả giỏ (`pricing_quote_order`)
+
+Loại: harness · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Model báo giá giỏ bằng `pricing_quote_order`; harness điền giá đơn thứ hai từ báo giá lẻ 6.490.000đ thay vì 3.245.000đ, guard từ chối.
+- **Bằng chứng:** SCN-ADV-0125 call_2 ở `fix-check-20261116`. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`.
+- **Sửa:** `agents/advisor.py` `_guarded`: đơn có `basket_skus` lấy giá máy đó trong `pricing_quote_order` của các máy cả giỏ, nếu chưa có `pricing_get_quote` cùng giỏ.
+- **Đã kiểm:** `test_dev_run_fixes.py::test_half_of_a_split_order_takes_its_price_from_the_quote_of_the_whole_basket`.
+- **Số đo:** `fix-check-20261116-2`: tạo đủ hai đơn, đúng giá; cuộc còn fail do claim `cod_allowed` của nhãn/extractor.
+- **Còn lại:** Đo trên cohort đủ lớn.
+
+### 2026-11-16 · KM-02: chặn cả ngày bắt đầu của đợt khuyến mãi chưa diễn ra
+
+Loại: hard guard · Trạng thái: đang đo · Chỉ số: TSR, guardrail
+
+- **Vấn đề:** Skill cấm nhắc đợt sale chưa bắt đầu nhưng model vẫn nói "chương trình 11/11"; hard guard cũ chỉ bắt mã `11-11`.
+- **Bằng chứng:** SCN-ADV-0022 call_1 ở `fix-check-20261116`. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`.
+- **Sửa:** `components/guardrails/hard.py` `_not_started`: trong câu nói về khuyến mãi, ngày bắt đầu ("11/11", "11 tháng 11") của đợt có `start` sau ngày gọi trong `promotions.json` cũng bị chặn; ngày giao "11/11" không bị chặn.
+- **Đã kiểm:** `test_dev_run_fixes.py` (4 câu).
+- **Số đo:** `fix-check-20261116-2`: SCN-ADV-0022 call_1 qua.
+- **Còn lại:** Đo trên cohort đủ lớn.
+
+### 2026-11-16 · Rà toàn bộ prompt agent: bỏ chỗ tự mâu thuẫn
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Rà `rules.md`, `skills.yaml`, `notes.yaml`, `policy_rules.md` tìm thấy 7 chỗ mâu thuẫn hoặc thiếu (bảng ở mục "Rà prompt agent" của báo cáo): tạo đơn thiếu địa chỉ, "gọi order_create ngay" khi chưa đủ thông tin, hạn đổi trả tính từ ngày mua, "trả ngay" so với "quá hạn thì không", giới hạn số câu, luật 9 khó đọc, tra bằng mã biến thể. Thêm: khách "quyết định mua" không nêu mẫu là mẫu vừa tư vấn.
+- **Bằng chứng:** Rà tay; SCN-GEN-0004 call_2 (đổi mẫu) ở `fix-check-20261116-2`. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`.
+- **Sửa:** `config/prompts/agent/advisor/rules.md` luật 3, 9; `skills.yaml` `place-order`, `change-order`; `notes.yaml` `preamble`.
+- **Đã kiểm:** Bộ `tests/agent`: 1805 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Dòng "khách quyết định mua là mẫu vừa tư vấn" chưa chạy lại.
+
+### 2026-11-16 · Đo 2×2 cho GapLoop, Reflection và Combined; k = 3; bỏ vòng học `combined_1`
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR / CCR / RQR / HR
+
+- **Vấn đề:** Cột Combine là vòng học riêng `combined_1` (kb v5 + skills v1) nên không chứng minh được hai cột riêng; mỗi cột đo trên bộ khác nhau, 2 lần mỗi bên, trong khi Router chạy lại dao động 55–65 trên 20 kịch bản.
+- **Bằng chứng:** Mục "Vì sao cột Combine không tốt hơn" của báo cáo. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`.
+- **Sửa:** `scripts/evaluation/ablation.py` (4 cấu hình với đúng phiên bản của hai vòng đơn, một bộ đo chung: control + gap-loop + bộ Reflection, k = 3 lần chạy thật, chạy xen kẽ); `ablation_verdict.py` (không gọi model: trung bình [min–max], tỉ lệ đạt theo kịch bản, bootstrap ghép cặp, tiêu chí không làm hỏng theo dao động Router, ca mục tiêu đạt mọi lần, ca đối chứng không mất, tương tác C − G − R + R0, kiểm bộ học và bộ chứng minh tách rời); `combined.ps1` gọi hai script này; `_round.ps1` `-Runs 3` và bỏ kind `combined`; `full_dev.ps1` Combined = kb v5 của `gaploop-5` + skills v2 của `reflection-1`; `method_metrics.py --ablation`; `pipeline/eval/runner.py` ghi `intent_probabilities` vào diagnostics. Không ghi/phát lại câu trả lời model (quyết định người dùng).
+- **Đã kiểm:** `tests/agent/test_ablation_verdict.py` (5 test); chạy `ablation_verdict.py` đầu cuối trên trace thật, TSR khớp `report.json`. Kiểm tách rời trên dữ liệu hiện tại: budget WARN (câu "em tính giúp anh hai món này hết bao nhiêu nhé" có ở cả bộ học và bộ chứng minh).
+- **Số đo:** chưa đo: các run `gaploop-5`, `reflection-1` và file đã học nằm ở máy chạy vòng học.
+- **Còn lại:** Viết lại ca chứng minh budget trùng câu với bộ học.
+
+### 2026-11-16 · Đổi trả theo ngày đơn; khu vực là đủ địa chỉ để tạo đơn
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR, HR
+
+- **Vấn đề:** Agent nói "vẫn trả được nếu còn trong 7 ngày" trước khi xem ngày đơn, và tạo yêu cầu trả hàng sau khi chính nó đã nói quá hạn (mock BTC không tự kiểm hạn). Agent xin "địa chỉ cụ thể" khi khách đã nói khu vực, đơn không được tạo.
+- **Bằng chứng:** SCN-ADV-0043 call_1, SCN-ADV-0138 call_1, SCN-GEN-0105 call_2. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`.
+- **Sửa:** `config/prompts/agent/advisor/skills.yaml`: `change-order` thêm một dòng (xem ngày đơn trước; quá hạn DT-01 thì không gọi `order_update`; lỗi nhà sản xuất 30 ngày); `place-order` thêm câu "khu vực là đủ địa chỉ".
+- **Đã kiểm:** không có test (prompt); bộ `tests/agent` vẫn qua (1794, 2 fail sẵn ở `test_improve_runner.py`).
+- **Số đo:** chưa đo
+- **Còn lại:** Hard guard chặn đổi/trả quá hạn cần người duyệt: hạn tính từ ngày ký nhận mà trace chỉ có ngày tạo đơn.
+
+### 2026-11-16 · Hai người chung SĐT: nhận câu tự giới thiệu giữa câu và câu "đúng rồi" sau câu hỏi của agent
+
+Loại: identity / harness · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Khách nói "chị Dung đây, hôm trước…" nhưng `pick_by_name` chỉ nhận câu chỉ có tên; câu "ừ đúng rồi" sau khi agent hỏi "mình là chị Dung ạ?" cũng không được nhận. Tier kẹt AMBIGUOUS, guard chặn `order_create`.
+- **Bằng chứng:** 18 cuộc persona `hai_nguoi_chung_sdt`, vd SCN-GEN-0004 call_2, SCN-GEN-0115 call_2. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `components/identity/resolver.py` (`_here`: nhận "<danh xưng> <tên> đây/nè" ở bất kỳ đâu, đọc có dấu để không nhầm "đấy", không nhận sau "không phải"); `pipeline/hot/nodes.py` (`_bind_named`: khi còn AMBIGUOUS, mỗi lượt vẫn thử nhận tên, hoặc nhận lời xác nhận khi câu trước của agent nêu đúng một ứng viên).
+- **Đã kiểm:** `tests/agent/test_dev_run_fixes.py` (4 câu nhận đúng, 3 câu không nhận); offline trên 42 cuộc chung SĐT của dev: 30/30 lượt có nói tên nhận đúng người, 0 nhầm. Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Nhánh `_bind_named` có gọi PolicyAgent `identity` khi câu trước của agent nêu tên một ứng viên: thêm một request ở lượt đó.
+
+### 2026-11-16 · Sản phẩm có biến thể: không tra trước và không đặt đơn bằng mã cha
+
+Loại: hard guard / tool · Trạng thái: đang đo · Chỉ số: TSR, HR
+
+- **Vấn đề:** Khách nói đủ mẫu, size, màu mà agent tra và đặt bằng `SKU-SN-RUN2`: báo còn hàng khi biến thể đã hết, báo giá có RUN-10 cho size 43 vốn bị loại trừ, đơn ghi mã cha (mock BTC nhận). Tra trước của plan 002 đưa sẵn giá và tồn kho của mã cha cho model.
+- **Bằng chứng:** 15 cuộc, vd SCN-GEN-0026 call_2, SCN-GEN-0108 call_1, SCN-GEN-0014 call_3. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `components/intake/commerce.py` (`variants_of`, `variant_said`, `product_name`); `components/guardrails/actions.py` (`_parent_reason` cho `order_create`, đơn nhiều dòng và `new_variant_sku`); `mcp/tools.py` `named_lookups` tra biến thể khi lời khách đủ size và màu, bỏ qua mã cha.
+- **Đã kiểm:** test guard và tra trước trong `test_dev_run_fixes.py`; offline trên mọi lượt khách của dev: 92 lần tra biến thể, 0 lệch nhãn. Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Model phải gọi lại với mã biến thể: thêm một vòng ở lượt đặt mã cha.
+
+### 2026-11-16 · Không tạo đơn với COD tự chọn, không tạo đơn thiếu địa chỉ
+
+Loại: hard guard / prompt · Trạng thái: đang đo · Chỉ số: TSR, HR
+
+- **Vấn đề:** Khách nói chốt trước khi nói cách thanh toán: đơn tạo với COD mặc định, sau đó agent nói đã đổi sang chuyển khoản dù không tool nào đổi được thanh toán.
+- **Bằng chứng:** 7 cuộc, vd SCN-ADV-0017 call_3, SCN-GEN-0034 call_2. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `actions._payment_reason` chặn `order_create` thiếu `payment` (ActionGuard chạy trước khi ToolGuard điền mặc định); mô tả `payment` trong `mcp/servers/crm.py`; `config/prompts/agent/advisor/skills.yaml` `place-order`: hỏi thanh toán trước, đơn đã tạo không nói đã đổi thanh toán. Đảo quyết định cũ "COD khi chưa nói, không bao giờ là lý do chờ".
+- **Đã kiểm:** test trong `test_dev_run_fixes.py`; sửa fixture `test_ec03_confirmation_isolation.py`, `test_reviews_beside_stream.py` (đơn có `payment`). Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chạy thử 16/11 (`evaluation/runs/fix-check-20261116`, một lần mỗi kịch bản): SCN-ADV-0017 call_3 0 → 1; SCN-GEN-0004 call_2 tạo đơn sau khi có thanh toán và địa chỉ. Chưa đo trên cohort.
+- **Còn lại:** Có thể thêm một câu hỏi ở lượt chốt: theo dõi RQR và `max_agent_questions`.
+- **Bổ sung (16/11, theo người dùng):** dòng skill cũ "khách giục đặt mà chưa có địa chỉ thì bỏ trống address, xin sau khi tạo đơn" trái PB-09 và mâu thuẫn với dòng mới; gộp thành một dòng: cần đủ sản phẩm, thanh toán, địa chỉ (khu vực là đủ). Guard (`actions._payment_reason`) chặn cả thiếu `address`; mô tả tham số `address` trong `crm.py` sửa theo. Fixture của `test_basket_orders`, `test_cache_and_strict_tools`, `test_ec03_confirmation_isolation`, `test_intents_by_decisions`, `test_order_follow_up`, `test_reviews_beside_stream` thêm địa chỉ.
+
+### 2026-11-16 · ITN: chữ số trước "triệu", giờ hẹn có từ đệm, ngày ghi rõ, câu không dấu
+
+Loại: ITN · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** "5 triệu bảy trăm" thành `5 1.700.000đ`; "tối thứ Bảy này tầm 10 giờ" thành 10:00 hôm nay; "(19/10)", "ngày 11/11" bị bỏ qua; "toi thu hai 19 10 tam 7 gio" không đọc được.
+- **Bằng chứng:** 6 cuộc: SCN-GEN-0136 call_2, SCN-GEN-0170 call_2, SCN-ADV-0036 call_1, SCN-ADV-0099 call_1, SCN-ADV-0153 call_1, SCN-ADV-0154 call_1. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `components/intake/itn.py`: chữ số làm đầu số tiền; MOMENT nhận "tầm/khoảng/lúc", "này"; ngày ghi rõ và buổi trước thứ trong cùng câu (không nhận "tối đa"); `MOMENT_TONELESS` cho câu không dấu.
+- **Đã kiểm:** `test_dev_run_fixes.py` (8 câu); `test_itn.py`, `test_callback_time.py`, `test_money_sources.py`, `test_asr_entities.py` vẫn qua. Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Ngày ghi rõ đã qua trong năm được hiểu là năm sau.
+
+### 2026-11-16 · Không chuyển máy cho việc ngoài mua bán và cho yêu cầu thông tin người khác
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR, guardrail (chuyển máy thừa)
+
+- **Vấn đề:** Agent chuyển máy khi khách hỏi công thức phở, nhờ viết bài văn, hay đòi số điện thoại/đơn của người nhà; có lượt viết hộ bài văn.
+- **Bằng chứng:** 12 cuộc, vd SCN-ADV-0002 call_1, SCN-ADV-0034 call_1, SCN-ADV-0080 call_1. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `config/prompts/agent/advisor/rules.md` luật 4 và 9; `config/prompts/agent/policy_rules.md` mục handoff. Câu hỏi về shop mà tài liệu không có vẫn chuyển máy như quyết định 2026-11-01.
+- **Đã kiểm:** không có test (prompt). Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Cần chạy để xác nhận model theo.
+
+### 2026-11-16 · Không nhắc lại ngày đợt sale chưa công bố
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR, guardrail
+
+- **Vấn đề:** Agent từ chối nói về đợt sale nhưng lặp lại "11/11" khách vừa nêu.
+- **Bằng chứng:** 4 cuộc: SCN-ADV-0022, 0054, 0117, 0149 call_1. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `skills.yaml` dòng KM-02.
+- **Đã kiểm:** không có test (prompt). Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Cần chạy để xác nhận.
+
+### 2026-11-16 · Handoff Brief điền sản phẩm và giá khi Call Brief không có
+
+Loại: harness · Trạng thái: đang đo · Chỉ số: TSR (chuyen_may)
+
+- **Vấn đề:** Chuyển máy ở lượt đầu để trống `product_advised`, `price_quoted_vnd`; `reference_eval.py` coi là thiếu trường.
+- **Bằng chứng:** SCN-ADV-0017 call_2, SCN-ADV-0144 call_1. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `pipeline/hot/nodes.py` `_handoff_product`: sản phẩm tư vấn, rồi sản phẩm đã báo giá trong cuộc, rồi đơn gần nhất; `components/memory/brief.py` mang `price_vnd` của đơn.
+- **Đã kiểm:** test trong `test_dev_run_fixes.py`. Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Khách lạ không có đơn và chưa báo giá vẫn để trống.
+
+### 2026-11-16 · Không tự chọn hay đổi mẫu khách chưa chọn
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Lời khách khớp nhiều mẫu thì agent tự chọn; có lượt đổi sang mẫu thay thế khách không chọn.
+- **Bằng chứng:** 4 cuộc, vd SCN-GEN-0182 call_1, SCN-GEN-0177 call_2. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `skills.yaml` `place-order`.
+- **Đã kiểm:** không có test (prompt). Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Cần chạy để xác nhận.
+
+### 2026-11-16 · Đơn tách COD: giá máy thứ hai theo báo giá cùng giỏ
+
+Loại: harness · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** Đơn tách (QT-01) lấy giá máy thứ hai từ báo giá lẻ, guard từ chối; câu đọc lại cộng tổng giỏ theo giá lẻ.
+- **Bằng chứng:** SCN-ADV-0030, 0059, 0125 call_2. Báo cáo `docs/evaluation/tsr-fail-analysis-20261116.md`, bảng `docs/evaluation/tsr-fail-causes-20261116.csv`; run `router` trên `data/dev` trong `docs/evaluation/conversations.csv` (CSV không có tool_calls, suy từ lời thoại và mock BTC).
+- **Sửa:** `agents/advisor.py` `_basket_quotes_in`, `_quotes_in` không để báo giá có `basket_skus` ghi đè giá lẻ; `components/guardrails/purchase.py` chỉ đọc tổng giỏ từ `pricing_quote_order` của cả giỏ.
+- **Đã kiểm:** test trong `test_dev_run_fixes.py`; sửa `test_a_read_back_of_a_basket_gives_the_whole_total`. Bộ `tests/agent`: 1794 qua, 2 fail sẵn ở `test_improve_runner.py`.
+- **Số đo:** chưa đo
+- **Còn lại:** Model phải gọi `pricing_get_quote` với `basket_skus`.
+
 ### 2026-11-22 · Gọi thoại trên EKS không trả lời; thẻ sản phẩm lặp dưới mỗi câu
 
 Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Chỉ số: cuộc gọi thoại có lượt trả lời; số thẻ sản phẩm mỗi cuộc chat

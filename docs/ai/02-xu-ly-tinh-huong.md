@@ -34,6 +34,7 @@ flowchart TD
     P -- "phủ nhận / không rõ" --> S["Như người lạ<br/>(xóa giá, brief khỏi state)"]
     A -- "nói tên khớp" --> V
     A -- "không trả lời" --> G["Tư vấn chung, không hỏi lại tên,<br/>không đọc gì riêng"]
+    G -- "lượt sau tự giới thiệu,<br/>hoặc 'đúng rồi' khi agent<br/>hỏi đúng một tên" --> V
 ```
 
 Những điểm hay bị hỏi:
@@ -42,6 +43,7 @@ Những điểm hay bị hỏi:
 - **Câu hỏi tên trên số dùng chung do harness nói**, không phải model, để không lỡ để lộ tên ai ("Có phải chị Lan hay anh Tuấn?").
 - Khách đã `VERIFIED` mà đọc thêm một số khác (số giao hàng, số người nhà): **không đổi danh tính**.
 - Khách đăng nhập web có tên tài khoản: tên đó được dùng để chọn đúng người trên số dùng chung.
+- **Tên nói lướt cũng được nhận** (16/11/2026): "Alo, chị Dung đây, hôm trước em tư vấn cho cô Loan" chọn chị Dung, vì "<danh xưng> <tên> đây/nè" là câu tự giới thiệu; cô Loan chỉ được nhắc tới. Câu "không phải chị Dung đây" không chọn ai; "đấy" không phải "đây". Khi còn `AMBIGUOUS`, mỗi lượt sau vẫn thử nhận tên, và câu "ừ đúng rồi" trả lời câu hỏi của agent có nêu đúng một ứng viên cũng được nhận (PolicyAgent đọc, danh sách từ chỉ dùng khi PolicyAgent không trả lời). Trước bản sửa, 18 cuộc chung số của `data/dev` kẹt ở `AMBIGUOUS` và không lên được đơn. Code: [`resolver.py`](../../apps/ai-agent-service/src/ai_agent_service/components/identity/resolver.py) (`_here`), [`nodes.py`](../../apps/ai-agent-service/src/ai_agent_service/pipeline/hot/nodes.py) (`_bind_named`).
 
 ---
 
@@ -52,7 +54,7 @@ Những điểm hay bị hỏi:
 | **Hỏi giá** | gọi `pricing_get_quote`, chỉ nói giá cuối trong kết quả | prompt quy tắc 1 + hard guard chặn mọi số tiền không có nguồn | `advisor.py`, `hard.py` |
 | **Hỏi còn hàng** | gọi `inventory_check` trước khi nói "còn hàng" | hard guard `STOCK`: câu "còn hàng/hết hàng/chỉ còn N" cần tool của lượt nói giống vậy | `hard.py` |
 | **Chưa biết chọn mẫu nào** | hỏi nhu cầu còn thiếu, mỗi lượt **một** câu hỏi; đối chiếu nhu cầu với thuộc tính sản phẩm (`room_area_m2`, `child_safe_lock`...) | prompt quy tắc 19; ngân sách "tầm, khoảng" được nới ~10% | `advisor.py` |
-| **Đồng ý mua** | trong cùng lượt: `pricing_get_quote` → `delivery_estimate` → `order_create` với đúng giá cuối, rồi đọc lại đơn một lần | prompt quy tắc 12 + guard trước khi ghi kiểm mã SKU tin cậy, đơn giá = báo giá hôm nay | `actions.py` |
+| **Đồng ý mua** | trước hết phải có đủ ba thứ: sản phẩm (đúng biến thể size, màu), cách thanh toán khách chọn, địa chỉ giao (khu vực là đủ); thiếu thì hỏi gộp một câu. Đủ rồi thì trong cùng lượt: `pricing_get_quote` → `delivery_estimate` → `order_create` với đúng giá cuối, đọc lại đơn một lần (PB-09). Khách không nêu mẫu thì là mẫu vừa tư vấn; nêu nhiều mẫu thì hỏi | skill `place-order` + guard trước khi ghi: mã SKU tin cậy, không phải mã sản phẩm chung khi có biến thể, có `payment` và `address` (không tự để COD: đơn đã tạo không đổi được thanh toán), đơn giá = báo giá hôm nay | `actions.py` |
 | **Nhiều sản phẩm** | báo giá từng món với `basket_skus` là các món còn lại, rồi `order_create` từng món với cùng `basket_skus` (máy lọc thứ hai được AIR-2ND-50) | prompt quy tắc 12; `order_create` chuyển `basket_skus` cho mock | `crm.py` |
 | **Đơn COD > 10 triệu** | đề nghị chuyển khoản, hoặc hỏi khách có muốn **tách thành hai đơn**; chỉ khi khách đồng ý mới đặt `order_group` "1"/"2" cho từng món | guard cộng mọi món COD đã đặt trong **cả cuộc gọi** (cùng `order_group`) với món đang đặt: vượt 10.000.000đ thì chặn (VC-03). Tách đơn chỉ được khi lượt trước của agent hoặc lời khách có "tách", hoặc cuộc đã có một món trong nhóm (QT-01) | `actions.py` (`_cod_order`, `placed_lines`) |
 | **Đơn COD > 2 triệu** | báo thêm "nhân viên sẽ gọi xác nhận trước khi giao" | prompt, theo cờ `needs_confirmation_call` của tool | `advisor.py` |
@@ -60,9 +62,9 @@ Những điểm hay bị hỏi:
 | **Hết hàng lúc khách quyết** | không tạo đơn; nói ngày dự kiến có lại nếu tool có; gợi ý mẫu khác hoặc hẹn báo lại | prompt quy tắc 11 (FAQ-10, FAQ-17) | `advisor.py` |
 | **Chê đắt / so giá bên khác** | không bình luận giá đối thủ, không tự giảm; nêu quyền lợi có thật (bảo hành, quà, đổi trả) | prompt quy tắc 8 (PB-02, PB-04) + Jev bắt câu "hàng bên kia là hàng nhái" | `advisor.py`, `policy.py` |
 | **Cần hỏi người nhà** | không ép, đề nghị hẹn giờ gọi lại; không tạo khan hiếm giả | prompt quy tắc 9 (PB-03) + Jev | |
-| **Hẹn gọi lại** | `schedule_callback` với giờ ISO +07:00 | ITN đổi "tối mai 8 giờ"; guard kiểm trong giờ làm việc (T2–T7 08:00–21:00, CN 09:00–18:00), không ở quá khứ; ngày nghỉ thì tool dời sang ngày làm việc gần nhất và trợ lý báo giờ mới (LN-02) | `itn.py`, `actions.py` |
+| **Hẹn gọi lại** | `schedule_callback` với giờ ISO +07:00; báo khách bằng dạng nói "19 giờ tối thứ Sáu…", không "19:00" | ITN đổi "tối mai 8 giờ", "tối thứ Bảy này tầm 10 giờ", "tối thứ Hai (19/10) tầm 7 giờ", cả câu gõ không dấu; guard kiểm trong giờ làm việc (T2–T7 08:00–21:00, CN 09:00–18:00), không ở quá khứ; ngày nghỉ thì tool dời sang ngày làm việc gần nhất và trợ lý báo giờ mới (LN-02) | `itn.py`, `actions.py` |
 | **Khuyến mãi đã hết** | nói thẳng là đã hết, báo giá hiện tại, không giữ giá cũ | prompt quy tắc 10 (KM-01); `refresh` của brief sinh cảnh báo khi giá đổi | `recall.py` |
-| **Khuyến mãi chưa bắt đầu** | không nhắc tới | hard guard so mã KM với ngày bắt đầu (KM-02) | `hard.py` |
+| **Khuyến mãi chưa bắt đầu** | không nhắc tới, kể cả khi khách nêu ngày sale: nói chương trình sắp tới em chưa có thông tin, báo giá hiện tại | hard guard so mã KM với ngày bắt đầu, và trong câu nói về khuyến mãi chặn cả ngày bắt đầu đó ("11/11", "11 tháng 11") (KM-02) | `hard.py` |
 | **KM loại trừ một size** | báo giá đúng theo tool (ví dụ size 43 không áp RUN-10, +50.000đ phụ thu) | giá luôn từ `pricing_get_quote` của BTC | mock BTC |
 | **Liên hệ ≥ 3 lần chưa chốt** | không ép, ghi nhận nhu cầu, chỉ hẹn khi có chương trình mới | route thêm ghi chú PB-11 | `rules.py` |
 
@@ -101,7 +103,9 @@ Lane `ORDER_SERVICE` khi khách có đơn và câu nói khớp regex về đơn 
 | Tình huống | Xử lý |
 |---|---|
 | Hỏi đơn đang ở đâu | `order_status`. Khách đã xác minh không nói mã đơn thì tự tra; một đơn chưa giao thì dùng luôn, nhiều đơn thì đọc danh sách cho chọn. **Không xin khách đọc mã đơn** (quy tắc 20) |
-| Đổi size / đổi sản phẩm | `order_update` với `exchange_size` / `exchange_product`; nói đúng số tiền hoàn hoặc phụ thu tool trả |
+| Đổi size / đổi sản phẩm | `order_update` với `exchange_size` / `exchange_product` bằng mã biến thể (guard từ chối mã sản phẩm chung); nói đúng số tiền hoàn hoặc phụ thu tool trả |
+| Đổi hay trả khi có thể đã quá hạn | xem ngày đơn (Call Brief hoặc `order_status`) trước khi nói còn hạn; quá hạn DT-01 thì nói rõ và không gọi `order_update`, kể cả khi khách năn nỉ (mock BTC không tự kiểm hạn); lỗi nhà sản xuất của gia dụng, mẹ và bé có hạn 30 ngày |
+| Đổi cách thanh toán của đơn đã tạo | không có tool làm được: không nói đã đổi, nói thật đơn đang ghi cách thanh toán nào. Vì vậy đơn chỉ tạo khi khách đã chọn cách thanh toán |
 | Đổi địa chỉ | `order_update update_address`; địa chỉ thật được harness điền lại từ vault (model chỉ thấy `<ADDR_1>`) |
 | Hỏi theo chính sách cũ | chính sách được chọn theo **ngày đặt đơn** (CL-01): đơn đặt trước 01/10 theo bản cũ (14 ngày), đơn mới theo bản hiện hành (7 ngày). Đoạn không áp dụng bị lọc khỏi kết quả nên model không đọc con số cũ; mục changelog đi kèm để giải thích khi khách nhắc mức cũ. Khách có đơn ở cả hai bản mà chưa nói đơn nào thì agent hỏi trước khi nêu con số |
 | Đơn trên website | khách đăng nhập có `account_orders`, `account_cart` (mã dạng `#ABCD1234`); đơn qua hotline/Zalo vẫn tra bằng `order_status` |
@@ -148,6 +152,7 @@ Bộ tri thức trả về kèm một quyết định **từ chối** với lý 
 | `absence` | câu trong đoạn mà câu hỏi nhắm tới chính là câu "không có thông tin" / "không được tư vấn" | hỏi về radon (FAQ-03), sale chưa công bố (KM-02) | như trên |
 | `restricted` | đoạn tốt nhất là tài liệu nội bộ | "giá nhập bao nhiêu?", "nhà cung cấp là ai?", "giá sàn?" | "đây là thông tin nội bộ em không cung cấp được" |
 
+- **Câu hỏi về shop mà tài liệu không có** thì nói "Dạ hiện em chưa có thông tin về…" và gọi `handoff_transfer` với `ngoai_pham_vi_tai_lieu` (quyết định 01/11/2026 theo giải đáp BTC). **Việc không thuộc mua bán của shop** (nấu ăn, làm bài, học thêm, chuyện riêng) thì khác: không làm hộ, không chuyển máy, nói em chưa có thông tin về việc đó vì em chỉ hỗ trợ sản phẩm và đơn hàng, rồi mời khách quay lại sản phẩm (`rules.md` luật 4, `policy_rules.md` handoff; 16/11/2026). Lần chạy thử 16/11 cho thấy model vẫn chuyển máy khi khách hỏi lại lần hai (SCN-ADV-0002); chưa sửa xong.
 - Đoạn nội bộ **không bao giờ đưa nguyên văn** vào prompt, chỉ đưa chỉ dẫn từ chối. Nếu đoạn nội bộ có một thông tin dùng được qua tool (ví dụ ngày có hàng lại), model được chỉ sang tool đó.
 - Hard guard chặn thêm mọi câu có "giá nhập", "giá vốn", "biên lợi nhuận", "nhà cung cấp", "giá sàn".
 - Câu thừa nhận thiếu thông tin phải dùng **đúng một trong 6 cụm** mà code chấm BTC đọc ("không có thông tin", "chưa có thông tin", "em chưa rõ", "em không chắc", "em sẽ kiểm tra", "chưa nắm được"); viết kiểu khác thì hard guard bắt viết lại.
@@ -162,6 +167,7 @@ Bộ tri thức trả về kèm một quyết định **từ chối** với lý 
 | Câu trả lời có PII thô hoặc dãy 10–14 chữ số | bị chặn | hard guard |
 | Câu trả lời có token không thuộc cuộc này | bị chặn (chống lộ dữ liệu người khác) | hard guard |
 | Khách gửi CCCD / số tài khoản qua chat | không nhận qua hội thoại, chỉ đọc lại 4 số cuối (PB-08, QT-04) | prompt quy tắc 16 |
+| Khách đòi số điện thoại, địa chỉ hay đơn của người khác, kể cả xưng người nhà, đang gấp | từ chối vì bảo mật thông tin cá nhân, mời người đó tự liên hệ; **không chuyển máy** | `rules.md` luật 9, `policy_rules.md` (handoff) |
 | **"Em là người hay máy?"** | nói thật là trợ lý ảo, đề nghị chuyển nhân viên nếu muốn (PB-07) | tín hiệu `asks_if_human` + hard guard chặn mọi câu nhận là người |
 | **Xin xóa dữ liệu** | hỏi xác nhận một câu → khách đồng ý → `memory_request_deletion` → "hệ thống sẽ xóa trong 72 giờ" (QT-06). Sau cuộc gọi, after_call xóa dưới quyền admin, lần sau là người lạ | guard trước khi ghi: chỉ chạy khi lượt trước đã hỏi xác nhận và khách vừa đồng ý |
 | Gửi dữ liệu ra ngoài (Jev, Langfuse) | chỉ gửi văn bản đã che token | `models.yaml`: `zero_data_retention: false` nên không bao giờ gửi văn bản thô |

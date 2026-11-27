@@ -21,7 +21,9 @@ them is another ``init_chat_model``-style call in this same file.
 
 from __future__ import annotations
 
+import logging
 import os
+import time
 from threading import Lock
 from typing import Any
 
@@ -34,6 +36,7 @@ from . import tracing
 from .callback_handler import TokenTrackingCallback
 from .spend_guard import StopSwitch
 from . import shared_limiter
+from .websocket import SocketClient
 from .rate_limiter import AdvancedTokenRateLimiter
 
 # Provider ids understood by init_chat_model, mapped to the package that
@@ -53,6 +56,30 @@ SUPPORTED_PROVIDERS = {
 # into the request body, so `max_retries: null` is the only way to call it.
 GENERATION_PARAMS = ("temperature", "max_tokens", "timeout", "max_retries", "reasoning_effort", "use_responses_api",
                      "service_tier", "store", "include", "output_version")
+
+logger = logging.getLogger(__name__)
+
+
+async def _sent(request: httpx.Request) -> None:
+    request.extensions["sent_at"] = time.perf_counter()
+
+
+def _answered(agent: str):
+    """Log where a call's wait went once its headers are in (a stream's first token comes ~30 ms later): the
+    server's own processing (``openai-processing-ms``) and the rest, network and queueing before it (2026-11-15:
+    a slow first token had 1 s outside the server's processing)."""
+
+    async def hook(response: httpx.Response) -> None:
+        sent = response.request.extensions.get("sent_at")
+        if sent is None:
+            return
+        headers_ms = int((time.perf_counter() - sent) * 1000)
+        server = response.headers.get("openai-processing-ms")
+        outside = headers_ms - int(server) if server and server.isdigit() else None
+        logger.info("LLM http %s: headers %d ms, server %s ms, outside %s ms, status %d, request %s", agent, headers_ms,
+                    server, outside, response.status_code, response.headers.get("x-request-id"))
+    return hook
+
 
 # One limiter per model of a provider, shared by every agent that calls it.
 #
@@ -88,6 +115,12 @@ def limiter_stats() -> dict[str, dict[str, Any]]:
 #: Agents whose runs pass the Langfuse handler themselves (BaseAgent.run_config); tracing them here too would count
 #: each call twice.
 RUN_TRACED = frozenset({"advisor"})
+
+
+def over_sockets() -> bool:
+    """``ADVISOR_TRANSPORT=websocket``: the advisor's calls go to the Responses API over kept WebSockets
+    (``llm/websocket.py``). Empty: Chat Completions over HTTP."""
+    return os.environ.get("ADVISOR_TRANSPORT", "").strip().lower() == "websocket"
 
 
 def cache_options(provider: str, agent_name: str) -> dict[str, Any]:
@@ -149,8 +182,13 @@ class LLMFactory:
 
         if provider == "openai":
             # A call's turns are further apart than the client's default 5 s of keep-alive.
+            # One number was every timeout, connecting included: a connection that hangs held the turn for the whole
+            # minute. Connecting and waiting for the pool are short; reading keeps the configured time, since the
+            # same client serves models whose calls are long and not streamed (the MemoryAgent's).
             kwargs["http_async_client"] = httpx.AsyncClient(
-                limits=httpx.Limits(keepalive_expiry=120), timeout=config.get("timeout") or 60)
+                limits=httpx.Limits(keepalive_expiry=120),
+                timeout=httpx.Timeout(config.get("timeout") or 60, connect=3.0, pool=2.0),
+                event_hooks={"request": [_sent], "response": [_answered(agent_name)]})
 
         if rate_limited:
             limiter = limiter_for(provider, config.get("rate_limits") or {}, model)
@@ -179,6 +217,24 @@ class LLMFactory:
         if provider == "openai":
             # A client of our own turns this off by default, and without it a streamed call reports no tokens.
             kwargs["stream_usage"] = True
+            # ADVISOR_SERVICE_TIER: the advisor's processing tier for a bench or a run, without editing models.yaml
+            # (2026-11-15, 14 calls: priority cut the slowest first token from 1.78 s to 1.15 s, at twice the price).
+            tier = os.environ.get("ADVISOR_SERVICE_TIER", "").strip()
+            if tier and agent_name == "advisor":
+                kwargs["service_tier"] = tier
+            # ADVISOR_REASONING_EFFORT: the advisor's reasoning effort for a bench or a run, without editing models.yaml
+            # (2026-11-26: tool preambles, which OpenAI's guides place after the chain of thought).
+            effort = os.environ.get("ADVISOR_REASONING_EFFORT", "").strip().lower()
+            if effort and agent_name == "advisor":
+                kwargs["reasoning_effort"] = effort
+            if agent_name == "advisor" and over_sockets():
+                # The Responses API, which is what a socket speaks; nothing kept on OpenAI's side (store false), as
+                # every request carries its whole input.
+                kwargs["use_responses_api"] = True
+                kwargs["store"] = False
+                if kwargs.get("reasoning_effort") not in (None, "none"):
+                    # With nothing stored, the reasoning of a tool round reaches the next round only encrypted.
+                    kwargs["include"] = ["reasoning.encrypted_content"]
         else:
             for name in ("service_tier", "store", "include", "output_version"):
                 kwargs.pop(name, None)
@@ -190,10 +246,13 @@ class LLMFactory:
             kwargs.setdefault("temperature", 0.0)
 
         try:
-            return init_chat_model(model, model_provider=provider, **kwargs)
+            chat = init_chat_model(model, model_provider=provider, **kwargs)
         except ImportError as error:
             package = SUPPORTED_PROVIDERS[provider]
             raise ImportError(
                 f"Provider {provider!r} needs {package}. "
                 f"Run: pip install -r requirements.txt"
             ) from error
+        if provider == "openai" and agent_name == "advisor" and over_sockets():
+            chat.root_async_client = SocketClient(chat.root_async_client)
+        return chat

@@ -39,7 +39,7 @@ def context(**changes):
 def test_what_never_changes_is_the_same_whatever_the_turn_brings():
     one, turn_one, _ = prompt_parts(context(knowledge_note="a", lane="NEW"))
     two, turn_two, _ = prompt_parts(context(now=NOW + timedelta(days=3), knowledge_note="b", brief_lines=(), warnings=("w",)))
-    assert one == two and "Hôm nay:" not in one and "Nguồn sự thật" in one
+    assert one == two and "Hôm nay:" not in one and "<luat>" in one
     assert "Hôm nay:" in turn_one and turn_one != turn_two
 
 
@@ -230,9 +230,7 @@ def test_a_number_told_in_an_earlier_turn_and_the_systems_total_are_sourced():
     assert check(GuardInput(text=said, earlier_numbers=frozenset({6490000}), **view)).passed
     assert check(GuardInput(text="Dạ tổng 10.860.000đ ạ.", basket_total=10860000, **view)).passed
     assert nodes._earlier_numbers([{"tool": "catalog.search", "result": "6490000"}]) == frozenset()
-    warranty = "Dạ máy bảo hành 24 tháng ạ."
-    assert not check(GuardInput(text=warranty, **view)).passed
-    assert check(GuardInput(text=warranty, earlier_counts=frozenset({24}), **view)).passed
+    assert check(GuardInput(text="Dạ máy bảo hành 24 tháng ạ.", **view)).passed  # durations: not checked (2026-11-25)
 
 
 @pytest.mark.parametrize("said,value", [("ngan sach tam 5 trieu ruoi", 5_500_000), ("5 trieu rưỡi thoi", 5_500_000),
@@ -272,7 +270,7 @@ async def test_an_order_the_customer_asked_for_is_read_back_and_placed_in_the_sa
         placed.append(request.tool_call["args"])
         return ToolMessage(json.dumps({"ok": True, "data": {"order_id": "OD1"}}), tool_call_id="1", name="order_create")
 
-    call = {"name": "order_create", "args": {"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD"}, "id": "1"}
+    call = {"name": "order_create", "args": {"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD", "address": "Quận 3"}, "id": "1"}
     ctx = order_context(judge=judge, trusted_skus=frozenset({"A"}), quotes={})
     state = {"messages": [ToolMessage(json.dumps({"ok": True, "data": {"sku": "A", "final_price_vnd": 100000}}),
                                       tool_call_id="q", name="pricing_get_quote")]}
@@ -280,7 +278,7 @@ async def test_an_order_the_customer_asked_for_is_read_back_and_placed_in_the_sa
     answer = await ActionGuardMiddleware().awrap_tool_call(request, handler)
     assert asked == ["purchase"]
     if asked_for_it:
-        assert len(placed) == 1 and ctx.consent["read_back"].startswith("Dạ em đọc lại đơn")
+        assert len(placed) == 1 and "read_back" not in ctx.consent  # the model reads the order back, not the harness
     else:
         assert placed == [] and json.loads(answer.content)["error"]["code"] == "CONFIRMATION_REQUIRED"
 
@@ -295,13 +293,18 @@ def test_cod_limit_counts_the_basket_this_order_goes_with():
 
 
 def test_a_read_back_of_a_basket_gives_the_whole_total():
+    # The total is the quote of every machine together (the second-item promotion is in it), never a sum of the
+    # one-machine quotes.
     record = purchase.draft({"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD", "basket_skus": ["B"]},
-                            order_context(), quotes={"B": 50000})
-    assert "tổng cả giỏ 150.000đ" in record["read_back"] and "tổng cả giỏ 150.000đ" in record["question"]
+                            order_context(), quotes={"B": 50000}, order_quotes={"A|B": [["A", 100000], ["B", 25000]]})
+    assert "tổng cả giỏ 125.000đ" in record["read_back"] and "tổng cả giỏ 125.000đ" in record["question"]
+    alone = purchase.draft({"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD", "basket_skus": ["B"]},
+                           order_context(), quotes={"B": 50000})
+    assert "tổng cả giỏ" not in alone["read_back"]
 
 
 @pytest.mark.asyncio
-async def test_the_address_an_order_lacks_needs_no_agreement_but_any_other_change_does():
+async def test_a_change_to_an_order_asks_the_policy_agent_nothing():
     asked = []
 
     async def judge(intent, state):
@@ -312,9 +315,10 @@ async def test_the_address_an_order_lacks_needs_no_agreement_but_any_other_chang
     bare = [{"order_id": "OD1", "sku": "A", "no_address": True}]
     assert await advisor._intents("order_update", {"order_id": "OD1", "action": "update_address"}, ctx, bare) == {}
     assert asked == []
-    assert (await advisor._intents("order_update", {"order_id": "OD1", "action": "return"}, ctx, bare))["change"] is False
+    assert await advisor._intents("order_update", {"order_id": "OD1", "action": "return"}, ctx, bare) == {}
     full = [{"order_id": "OD1", "sku": "A", "no_address": False}]
-    assert (await advisor._intents("order_update", {"order_id": "OD1", "action": "update_address"}, ctx, full))["change"] is False
+    assert await advisor._intents("order_update", {"order_id": "OD1", "action": "update_address"}, ctx, full) == {}
+    assert asked == []  # the model decides when the customer has chosen (2026-11-25)
 
 
 def test_the_placeholder_mark_never_reaches_the_customer():
@@ -524,3 +528,25 @@ async def test_a_run_sends_the_boundary_strict_tools_and_chains_the_quote():
     done = events[-1].draft
     assert [r["name"] for r in done.tool_results] == ["catalog.search", "pricing.get_quote", "inventory.check"]
     assert done.model_calls == 2 and done.text.startswith("Dạ AirPure X")
+
+
+def test_the_tools_a_state_takes_away_are_sent_last():
+    from ai_agent_service.mcp.tools import _offered_late
+
+    names = ["account_cart", "memory_get_episodes", "handoff_transfer", "order_create", "memory_request_deletion",
+             "catalog_search", "pricing_get_quote"]
+    assert sorted(names, key=_offered_late) == ["catalog_search", "pricing_get_quote", "order_create",
+                                                "memory_request_deletion", "handoff_transfer", "memory_get_episodes",
+                                                "account_cart"]
+
+
+
+def test_an_order_read_back_again_after_a_change_says_only_what_changed():
+    context = order_context()
+    first = purchase.draft({"sku": "N", "qty": 1, "price_vnd": 100000, "payment": "COD"}, context, names={"N": "Quạt N"})
+    assert "Quạt N" in first["read_back"]
+    from dataclasses import replace
+    context = replace(context, pending_purchase=first)
+    again = purchase.draft({"sku": "N", "qty": 1, "price_vnd": 100000, "payment": "bank"}, context, names={"N": "Quạt N"})
+    assert "chuyển khoản" in again["read_back"] and "Quạt N" not in again["read_back"]
+    assert "100.000đ" in again["read_back"]  # the total is always said

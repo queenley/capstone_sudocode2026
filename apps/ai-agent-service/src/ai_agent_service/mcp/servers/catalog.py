@@ -178,6 +178,9 @@ async def delivery_estimate(address: str | None = None, on: str | None = None) -
     address the area decides, so the answer gives each area and no single
     figure: ask for the address, or tell the customer both.
 
+    It gives the day only: nothing about a time of day, a delivery slot or a
+    note to the courier. Whether the shop offers those is not in this result.
+
     Args:
         address: The delivery address the customer gave, when known.
         on: The day of the call, YYYY-MM-DD. Set by the system; leave it out.

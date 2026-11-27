@@ -45,7 +45,7 @@ def test_a_deletion_needs_the_customers_agreement_read_by_jev():
 
 def test_one_more_order_of_the_same_product_is_read_by_jev():
     def create(wants_more, said="Giao ở quận 3 nhé"):
-        return actions.check("order_create", {"sku": "SKU-A", "price_vnd": 1_000_000, "qty": 1, "payment": "COD"},
+        return actions.check("order_create", {"sku": "SKU-A", "price_vnd": 1_000_000, "qty": 1, "payment": "COD", "address": "Quận 3"},
                              tier="VERIFIED", mode="speak", has_phone=True, quotes={"SKU-A": 1_000_000},
                              trusted=frozenset({"SKU-A"}), created=[{"order_id": "OD1", "sku": "SKU-A"}],
                              customer_said=said, intents={"one_more": wants_more})
@@ -72,8 +72,7 @@ async def test_jev_is_asked_only_when_the_action_depends_on_the_customer():
     assert await _intents("memory_request_deletion", {}, context, ()) == {"delete": True}
     assert await _intents("order_create", {"sku": "SKU-A"}, context, ()) == {}  # nothing ordered yet
     assert await _intents("order_create", {"sku": "SKU-A"}, context, ({"sku": "SKU-A"},)) == {"one_more": True}
-    assert await _intents("order_update", {"order_id": "OD1", "action": "exchange_size"}, context, ()) == {"change": True}
-    assert judge.asked[-1][1]["change"] == {"order_id": "OD1", "action": "exchange_size"}
+    assert await _intents("order_update", {"order_id": "OD1", "action": "exchange_size"}, context, ()) == {}
     assert await _intents("schedule_callback", {}, context, ()) == {}
     asked = len(judge.asked)
     in_handoff_lane = AgentContext(call_id="x", tier="VERIFIED", lane="HANDOFF", judge=judge)

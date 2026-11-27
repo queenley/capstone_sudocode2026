@@ -190,6 +190,70 @@ Dòng skill được publish ở `proof-warranty`:
 
 ---
 
+## 6b. Đo GapLoop, Reflection và Combined cùng nhau (2×2, từ 16/11/2026)
+
+Bảng bốn chỉ số theo phương pháp trước đây có ba vấn đề (phân tích đầy đủ: [`docs/evaluation/tsr-fail-analysis-20261116.md`](../evaluation/tsr-fail-analysis-20261116.md), mục "Vì sao cột Combine không tốt hơn"):
+
+1. Cột Combine là một vòng học riêng (`combined_1`, kb v5 + skills v1), không phải hai phiên bản của cột GapLoop (kb v5) và cột Reflection (skills v2) ghép lại, nên không chứng minh được "cộng hai cải tiến vẫn giữ được cả hai".
+2. Mỗi cột đo trên 20 kịch bản dev frozen, không chứa ca nào thuộc chủ đề đã học; mỗi kịch bản là 5 điểm TSR.
+3. Router chạy lại trên cùng 20 kịch bản dao động 55–65, lớn hơn mọi chênh lệch giữa các cột.
+
+Cách đo mới, theo quyết định của người dùng ngày 16/11: bỏ vòng học `combined_1`; Combined là đúng hai phiên bản hai vòng đơn đã học và được duyệt; mọi cấu hình chạy k = 3 lần thật trên cùng một bộ đo; không ghi rồi phát lại câu trả lời model.
+
+Câu hỏi sơ đồ trả lời: một lần đo chạy những gì và kết luận từ đâu.
+
+```mermaid
+flowchart LR
+    subgraph IN["Đầu vào: không học thêm"]
+        G["kb vN<br/>của vòng GapLoop"]
+        R["skills vM<br/>của vòng Reflection"]
+    end
+    subgraph CFG["4 cấu hình"]
+        C0["router<br/>kb v0, skills v0"]
+        C1["gaploop<br/>kb vN"]
+        C2["reflection<br/>skills vM"]
+        C3["combined<br/>kb vN + skills vM"]
+    end
+    subgraph SUITE["Một bộ đo chung"]
+        S1["control:<br/>mẫu frozen data/dev"]
+        S2["gap-loop:<br/>10 ca mục tiêu + 3 đối chứng"]
+        S3["budget / warranty / conduct"]
+    end
+    G --> C1 & C3
+    R --> C2 & C3
+    CFG -- "k = 3 lần thật,<br/>chạy xen kẽ" --> SUITE
+    SUITE --> V["ablation_verdict.py<br/>(không gọi model)"]
+```
+
+| Bước | Làm gì | Ở đâu |
+|---|---|---|
+| Đặt phiên bản | Chép `learned/kb/v<N>.jsonl` của vòng GapLoop và `learned/skills/v<M>.yaml` của vòng Reflection vào chỗ của chúng cho lần đo, gỡ ra khi xong; agent đang bật vẫn là v0, mỗi run chọn phiên bản bằng `--kb-version`/`--skills-version`. KB v1–v5 đã commit trong `data/kb`: file có sẵn phải giống từng byte bản vòng đã học | [`scripts/evaluation/ablation.py`](../../scripts/evaluation/ablation.py) (`Installed`) |
+| Bộ đo | `control` là mẫu frozen data/dev của vòng GapLoop (kiểm giống mẫu của vòng Reflection, khác thì dừng); `gap-loop`; mỗi `--proof` của Reflection. Báo theo từng bộ, không trộn thành một số | `ablation.py` (`suite`) |
+| Chạy | 4 cấu hình × số bộ × k = 3, xen kẽ (lần 1 của mọi cấu hình, rồi lần 2…) để thay đổi theo giờ chia đều; mỗi run qua `pipeline/improve/cli._evaluate` (run đã xong không chạy lại, run dừng giữa chừng được giữ bên cạnh) | `ablation.py` |
+| Chấm | Bằng hàm của `reference_eval.py`: TSR, HR, RQR, CCR trung bình 3 lần kèm [thấp nhất–cao nhất]; tỉ lệ số lần đạt của từng kịch bản; chênh với Router có khoảng tin cậy 95% bootstrap ghép cặp theo kịch bản (2000 lần, seed cố định) | [`scripts/evaluation/ablation_verdict.py`](../../scripts/evaluation/ablation_verdict.py) |
+| Không làm hỏng | Trên `control`: TSR trung bình không dưới lần thấp nhất của Router, HR không trên lần cao nhất của Router, khoảng tin cậy không nằm hẳn dưới 0 | `control_checks` |
+| Chứng minh học | GapLoop và Combined đạt mọi ca mục tiêu gap-loop ở cả 3 lần; Reflection và Combined đạt mọi ca mục tiêu của bộ Reflection ở cả 3 lần; không ca đối chứng nào Router luôn đạt mà cấu hình đó làm rớt. Báo kèm tỉ lệ đạt của Router trên ca mục tiêu | `proof_checks` |
+| Hai cải tiến có cản nhau không | Tương tác TSR `C − G − R + R0` theo từng bộ: gần 0 là cộng được | `ablation.json` |
+| Học thật hay nhớ | Bộ học và bộ chứng minh không chung kịch bản (FAIL) và không chung lượt khách từ 5 chữ (WARN, có danh sách) | `apart` |
+
+Kiểm tách rời trên dữ liệu ngày 16/11: `warranty` PASS; `gap-loop` và `conduct` WARN vì vài câu xã giao chung; `budget` WARN vì câu "em tính giúp anh hai món này hết bao nhiêu nhé" có ở cả bộ học và bộ chứng minh, đúng câu bộ đó chứng minh. Nên viết lại ca chứng minh đó bằng cách hỏi khác.
+
+Vòng đơn (`_round.ps1`, `gaploop.ps1`, `reflection.ps1`) cũng đổi mặc định `-Runs 3`; `verdict.py` nhắc chạy lại với `-Runs 3` khi chỉ có một lần mỗi bên. `full_dev.ps1 -Method combined` dùng kb v5 của `gaploop-5` + skills v2 của `reflection-1`. Bảng theo cột BTC lấy từ lần đo 2×2: `method_metrics.py --ablation <tên>`, mỗi ô "trung bình [min–max]"; cột "GapLoop + Reflection" không còn trỏ vào `combined1`.
+
+Chạy (Windows, từ gốc repo; tốn phí: 4 × 3 × khoảng 20 + 13 + 6 kịch bản):
+
+```powershell
+.\scripts\evaluation\combined.ps1 -Name abl-1 -GapRound gaploop-5 -KbVersion 5 -ReflectionRound reflection-1 -SkillsVersion 2
+.\scripts\evaluation\combined.ps1 -Name abl-1 -Step verdict      # chấm lại, không gọi model
+python scripts/evaluation/method_metrics.py --ablation abl-1
+```
+
+Trên macOS, Linux: `apps/ai-agent-service/.venv/bin/python scripts/evaluation/ablation.py --name abl-1 --gap-round gaploop-5 --kb-version 5 --reflection-round reflection-1 --skills-version 2`, rồi `ablation_verdict.py --name abl-1`.
+
+Test không gọi model: `tests/agent/test_ablation_verdict.py` (khoảng tin cậy lặp lại được, tỉ lệ đạt, tiêu chí bộ chứng minh, không làm hỏng theo dao động Router, tách rời). Đã chạy `ablation_verdict.py` đầu cuối trên trace thật; số TSR khớp `report.json` của run. **Chưa có lần đo 2×2 thật**: các run và file đã học của `gaploop-5`, `reflection-1` nằm ở máy chạy vòng học.
+
+---
+
 ## 7. Chạy
 
 Từ thư mục gốc repo. Mỗi vòng gọi model thật và tốn phí (khoảng 0,3 USD một bộ khi đo hai lần mỗi phía).
@@ -254,6 +318,6 @@ PYTHONPATH=apps/ai-agent-service/src:packages/backend-common apps/ai-agent-servi
 - Rubric chưa là tín hiệu học: J11 (minh bạch ngân sách) và các tiêu chí khác ngoài J01, J06, J08 vẫn phân vào `product`, chỉ dùng để đo.
 - Chưa có giao diện để người duyệt đề xuất; người duyệt sửa file JSON.
 - Chưa có bộ nhãn để hiệu chỉnh ApprovalAgent và PolicyAgent (ngưỡng của PolicyAgent là tạm).
-- Mỗi bộ frozen chỉ 6–13 cuộc, chưa đủ để nói khác biệt nhỏ có ý nghĩa thống kê.
+- Mỗi bộ frozen chỉ 6–13 cuộc, chưa đủ để nói khác biệt nhỏ có ý nghĩa thống kê. Từ 16/11 mỗi phía chạy 3 lần và so với khoảng dao động của Router (mục 6b), nhưng cỡ bộ vẫn nhỏ.
 - Bài học được ghi thẳng vào thân skill. Khi nhiều bài học dồn vào một skill, nên chuyển sang ghi chú theo tình huống.
 - `docs/design.md` mục 10 chưa cập nhật theo ApprovalAgent, `expected.yaml` và cách gom theo tình huống.

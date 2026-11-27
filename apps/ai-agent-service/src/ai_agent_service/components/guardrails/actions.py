@@ -25,6 +25,7 @@ from datetime import datetime
 from typing import Any, Mapping, Sequence
 
 from .. import btc_schemas, clock
+from ..intake import commerce
 from ..intake.itn import format_vnd
 from ..intake.text import plain
 from . import Verdict, purchase
@@ -51,7 +52,6 @@ ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
 AGREED = re.compile(r"\b(dong y|dung roi|dung vay|xoa di|xoa giup|xoa het|ok|oke|vang|da|u|uh|co)\b")
 DECLINED = re.compile(r"\b(khong|thoi|chua|de sau)\b")
 #: Splitting an order was proposed or asked for (QT-01: only if the customer agrees).
-SPLIT = re.compile(r"\btach\b")
 
 
 def check(
@@ -75,6 +75,8 @@ def check(
     created: Sequence[Mapping[str, Any]] = (),
     updated: Sequence[Mapping[str, Any]] = (),
     placed: Sequence[Mapping[str, Any]] = (),
+    heard_basket: Sequence[str] = (),
+    order_records: Sequence[Mapping[str, Any]] = (),
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
@@ -90,6 +92,11 @@ def check(
     ``order_update`` calls that succeeded in this call: the same change is not
     made twice.
     *placed* are the order lines already created this call (:func:`placed_lines`).
+    *order_records* are the orders ``order_status`` showed this call, with their status and date: a return or an
+    exchange of one past its return window is refused before it reaches the tool (DT-01).
+    *heard_basket* is the skus of the last basket of more than one product priced on an earlier turn: the order the
+    customer heard the total of, which a quote made in the same round as the order does not replace. Kept for TSR:
+    without it the 2026-11-26 run ordered one product of a two-product basket twice (``also_ordered`` failed).
     """
     created_ids = frozenset(str(o["order_id"]) for o in created if o.get("order_id"))
     if name in CUSTOMER_READ_TOOLS:
@@ -115,11 +122,13 @@ def check(
                                               order_quotes=order_quotes or {}, trusted=trusted,
                                               created=created, customer_said=customer_said, placed=placed,
                                               said=f"{last_agent_said or ''} {customer_said or ''}",
-                                              wants_more=(intents or {}).get("one_more")),
+                                              wants_more=(intents or {}).get("one_more"),
+                                              heard_basket=heard_basket),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
-                                                    updated=updated, agreed=(intents or {}).get("change"))),
+                                                    updated=updated, agreed=(intents or {}).get("change"),
+                                                    records=order_records, now=now)),
         "schedule_callback": lambda: _schedule_callback(args, now=now, has_phone=has_phone),
         "handoff_transfer": lambda: _handoff(args, lane=lane, warranted=(intents or {}).get("handoff")),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said,
@@ -151,6 +160,31 @@ def placed_lines(results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return list(lines.values())
 
 
+def cod_split(units: Sequence[tuple[str, int]], limit: int = COD_LIMIT_VND) -> tuple[list[tuple[str, int]], list[tuple[str, int]]] | None:
+    """Two COD orders for a basket above the limit (QT-01, VC-03): ``(order 1, order 2)`` units, each at most *limit*,
+    the most even split, the dearest unit in order 1; None when the basket fits one order or no two orders can hold it.
+
+    *units* are ``(sku, unit price)`` as one ``pricing.quote_order`` of the whole basket priced them, so a unit keeps
+    the price it has beside the others (the second machine's discount: QT-01 keeps it across the two orders).
+    """
+    units = sorted(units, key=lambda u: -u[1])
+    total = sum(price for _, price in units)
+    if total <= limit or not units or len(units) > 12:
+        return None
+    best: tuple[int, int] | None = None
+    for mask in range(1 << (len(units) - 1)):  # the dearest unit always in order 1
+        first = units[0][1] + sum(units[i + 1][1] for i in range(len(units) - 1) if mask >> i & 1)
+        second = total - first
+        if first <= limit and second <= limit and second > 0 and (best is None or abs(first - second) < best[0]):
+            best = (abs(first - second), mask)
+    if best is None:
+        return None
+    mask = best[1]
+    one = [units[0], *(units[i + 1] for i in range(len(units) - 1) if mask >> i & 1)]
+    two = [units[i + 1] for i in range(len(units) - 1) if not mask >> i & 1]
+    return one, two
+
+
 def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str, Any]], said: str,
                quotes: Mapping[str, int] | None = None) -> list[str]:
     """VC-03 on the whole order: the COD lines of this call in the same ``order_group`` with this one.
@@ -160,30 +194,48 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
     earlier line of the call is already in a group.
     """
     group = args.get("order_group")
-    if group is not None and not SPLIT.search(plain(said)) and not any(p.get("order_group") for p in placed):
-        return ["Chỉ tách đơn khi khách đã đồng ý; hỏi khách có muốn tách thành hai đơn không trước khi đặt order_group."]
+    # Whether the customer agreed to split is read from the conversation by the model, not from their words here
+    # (no word gates, 2026-11-26): the order still waits for its read-back and a yes before it is placed.
     if (args.get("payment") or "COD") != "COD":
         return []
     same = [p for p in placed if p.get("order_group") == group and p.get("payment") == "COD"]
     total = line + sum(int(p["price_vnd"]) * int(p["qty"]) for p in same)
     if group is None:  # the rest of the basket this order goes with, not yet placed
-        done = {p.get("sku") for p in same} | {args.get("sku")}
+        # An order of lines placed earlier holds every one of its skus, not the joined target string.
+        done = {sku for p in same for sku in (p.get("skus") or [p.get("sku")])} | {args.get("sku")}
         total += sum(int((quotes or {}).get(sku) or 0) for sku in args.get("basket_skus") or [] if sku not in done)
     if total <= COD_LIMIT_VND:
         return []
     with_placed = f" (gồm {len(same)} món đã đặt trong cuộc gọi)" if same else ""
     if group is None:
         return [f"Đơn COD {format_vnd(total)}{with_placed} vượt giới hạn {format_vnd(COD_LIMIT_VND)}; đề nghị chuyển "
-                "khoản, hoặc hỏi khách có muốn tách thành hai đơn, mỗi đơn COD tối đa 10.000.000đ (order_group \"1\", \"2\")."]
+                "khoản, hoặc hỏi khách có muốn tách đơn; khách đồng ý thì gọi order_split_cod với cả giỏ."]
     return [f"Đơn tách {group} COD {format_vnd(total)}{with_placed} vẫn vượt giới hạn {format_vnd(COD_LIMIT_VND)}; "
-            "xếp lại các món giữa hai đơn hoặc đề nghị chuyển khoản."]
+            "gọi order_split_cod với cả giỏ để hệ thống xếp lại, hoặc đề nghị chuyển khoản."]
+
+
+def repeated_order(args: Mapping[str, Any], *, created: Sequence[Mapping[str, Any]], placed: Sequence[Mapping[str, Any]],
+                   customer_said: str | None, wants_more: bool | None) -> Mapping[str, Any] | None:
+    """The order this call already created for the same products, when the customer did not ask for more: what an
+    ``order.create`` of *args* would book a second time (plan 003: said back, not refused to the model)."""
+    lines = purchase.lines_of(args)
+    skus = {line["sku"] for line in lines}
+    if not skus:
+        return None
+    again = [o for o in created if skus & set(o.get("skus") or [o.get("sku")])]
+    # The same sku in the other half of a split order (QT-01) is the order the customer agreed to, not a repeat.
+    other_half = args.get("order_group") is not None and all(
+        p.get("order_group") != args.get("order_group") for p in placed if p.get("sku") in skus)
+    if wants_more is None:
+        wants_more = bool(ONE_MORE.search(plain(customer_said or "")))  # Jev gave no answer
+    return again[-1] if again and not other_half and not wants_more else None
 
 
 def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes: Mapping[str, int],
                   trusted: frozenset[str] | None, created: Sequence[Mapping[str, Any]] = (),
                   customer_said: str | None = None, placed: Sequence[Mapping[str, Any]] = (),
                   said: str = "", wants_more: bool | None = None,
-                  order_quotes: Mapping[str, Any] | None = None) -> list[str]:
+                  order_quotes: Mapping[str, Any] | None = None, heard_basket: Sequence[str] = ()) -> list[str]:
     if args.get("lines"):
         return _order_of_lines(args, tier=tier, has_phone=has_phone, trusted=trusted, created=created,
                                customer_said=customer_said, placed=placed, said=said, wants_more=wants_more,
@@ -200,13 +252,23 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
                 "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
     reasons = []
+    held = list(heard_basket)
+    if len(set(held)) > 1 and args.get("sku") in held and args.get("order_group") is None:
+        # The customer last heard the whole basket priced together: an order of one of its items is asked about once.
+        reasons.append(f"Khách vừa nghe tổng đơn {len(held)} món ({', '.join(sorted(set(held)))}): gọi order_create "
+                       "với lines đủ các món đó; chỉ bỏ món nào khi khách nói bỏ.")
     if not has_phone:
         reasons.append("Chưa có số điện thoại của khách để tạo đơn; xin số điện thoại trước.")
     if tier in ("PROBABLE", "AMBIGUOUS"):
         reasons.append("Danh tính khách chưa được xác nhận; hỏi xác nhận trước khi tạo đơn.")
     sku, price = args.get("sku"), args.get("price_vnd")
-    if not sku or price is None:
-        return reasons + ["Thiếu sku hoặc price_vnd."]
+    if not sku:
+        return reasons + ["Thiếu sku."]
+    if price is None:
+        # The price is not the model's to write: it is today's quote of this call (plan 002).
+        return reasons + [f"Chưa có giá hôm nay của {sku} trong cuộc này: gọi pricing_get_quote cho {sku} rồi gọi lại order_create."]
+    if parent := _parent_reason(sku):
+        return reasons + [parent]
     if trusted is not None and sku not in trusted:
         reasons.append(f"Mã {sku} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search để lấy đúng mã trước.")
     elif sku not in quotes:
@@ -220,6 +282,20 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         return reasons + ["Số lượng phải là số nguyên dương."]
     qty = quantity
     return reasons + _cod_order(args, int(price) * qty, placed, said, quotes)
+
+
+def _parent_reason(sku: str | None) -> str | None:
+    """Why *sku* cannot be ordered: a product sold in sizes and colours is ordered by its variant, never by the
+    product's code, which the shop's mock accepts at a price no variant has (2026-11-16: orders booked as
+    SKU-SN-RUN2 when the customer had said size 42, màu đen)."""
+    if not sku:
+        return None
+    variants = commerce.variants_of(sku)
+    if not variants:
+        return None
+    codes = ", ".join(v["variant_sku"] for v in variants[:40])
+    return (f"{sku} có nhiều size/màu: đặt bằng đúng mã biến thể size và màu khách đã chọn, trong các mã: {codes}. "
+            "Khách chưa nói size hay màu thì hỏi khách.")
 
 
 def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trusted: frozenset[str] | None,
@@ -245,6 +321,9 @@ def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trus
         reasons.append("Danh tính khách chưa được xác nhận; hỏi xác nhận trước khi tạo đơn.")
     if any(line["qty"] < 1 for line in lines):
         return reasons + ["Số lượng mỗi dòng phải là số nguyên dương."]
+    parents = [reason for sku in sorted(skus) if (reason := _parent_reason(sku))]
+    if parents:
+        return reasons + parents
     unknown = sorted(sku for sku in skus if trusted is not None and sku not in trusted)
     if unknown:
         return reasons + [f"Mã {', '.join(unknown)} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search để "
@@ -263,10 +342,14 @@ def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trus
 
 
 def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,
-                  updated: Sequence[Mapping[str, Any]] = (), agreed: bool | None = None) -> list[str]:
+                  updated: Sequence[Mapping[str, Any]] = (), agreed: bool | None = None,
+                  records: Sequence[Mapping[str, Any]] = (), now: datetime | None = None) -> list[str]:
     order_id, action = args.get("order_id"), args.get("action")
     if not order_id:
         return ["Thiếu order_id."]
+    if action in WINDOW_ACTIONS and any(o.get("order_id") == order_id and past_return_window(o, now) for o in records):
+        return [f"Đơn {order_id} đã hết hạn đổi trả {RETURN_DAYS} ngày kể từ khi nhận hàng (DT-01): không trả hay đổi "
+                "được, kể cả khi khách năn nỉ. Nói rõ với khách, không gọi order_update."]
     if any(done.get("order_id") == order_id and done.get("action") == action
            and done.get("new_variant_sku") == args.get("new_variant_sku")
            and done.get("new_address") == args.get("new_address") for done in updated):
@@ -285,6 +368,8 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
     if action in ("exchange_size", "exchange_product"):
         if not new:
             reasons.append("Đổi size hay đổi sản phẩm cần new_variant_sku.")
+        elif parent := _parent_reason(new):
+            reasons.append(parent)
         elif trusted is not None and new not in trusted:
             reasons.append(f"Mã {new} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search hoặc inventory_check trước.")
     if agreed is False:
@@ -336,19 +421,22 @@ def _handoff(args: Mapping[str, Any], *, lane: str | None, warranted: bool | Non
     return reasons + handoff_problems(args.get("brief") or {})
 
 
+#: A transfer refused only for the customer's number: once the number is given, the harness puts it through.
+NEEDS_NUMBER = "Chưa có số điện thoại để tư vấn viên liên hệ; xin số điện thoại của khách trước khi chuyển."
+
+
 def handoff_problems(brief: Mapping[str, Any]) -> list[str]:
     """The brief against ``schemas/handoff_brief.schema.json`` itself, after the harness filled it.
 
-    One exception: a chat customer who never gave a number. The consultant
-    answers them in the same chat, so the brief goes without a phone; on the
-    hotline a person must be able to call back, so the number is asked for.
+    A brief without the customer's number is asked for on every channel (2026-11-24): the organisers grade the
+    brief's fields (``brief_must_contain``), and with the number the harness fills the customer's orders, product and
+    price into it, so the person who takes over does not ask again (rubric J05).
     """
     problems: list[str] = []
     for error in btc_schemas.errors("handoff_brief", dict(brief)):
         field = error.split(":", 1)[0]
         if field == "customer_phone" and not brief.get("customer_phone"):
-            if brief.get("channel") == "hotline":
-                problems.append("Chưa có số điện thoại để tư vấn viên gọi lại; xin số điện thoại của khách trước khi chuyển.")
+            problems.append(NEEDS_NUMBER)
             continue
         problems.append(f"Handoff Brief sai schema ở {error}")
     # Never more than a few lines back to the model: the first ones say enough.
@@ -390,16 +478,76 @@ def deletion_succeeded(name: str, envelope: Mapping[str, Any]) -> bool:
     return False
 
 
-def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any]) -> dict[str, Any]:
+#: What the person taking the call does first, by the reason it was handed over: the brief's ``next_action`` when the
+#: model did not write one (``ADVISOR_SHORT_BRIEF``, plan 002 step 5).
+NEXT_ACTION = {
+    "cau_hoi_y_te": "Trả lời câu hỏi y tế của khách hoặc hướng khách tới chuyên gia phù hợp.",
+    "ngoai_pham_vi_tai_lieu": "Trả lời câu khách hỏi mà tài liệu của shop chưa có.",
+    "khach_yeu_cau_gap_nguoi": "Nhận cuộc gọi và hỏi khách cần hỗ trợ gì tiếp.",
+    "khieu_nai_nghiem_trong": "Xin lỗi khách và xử lý khiếu nại theo quy trình.",
+    "loi_he_thong": "Xin lỗi khách vì hệ thống trục trặc rồi trả lời tiếp câu khách đang hỏi.",
+    "khach_mat_kien_nhan": "Xin lỗi khách vì phải chờ và giải quyết ngay việc khách cần.",
+}
+NEXT_ACTION_DEFAULT = "Gọi lại khách và trả lời câu hỏi còn mở."
+
+
+def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any], *, customer_said: str | None = None) -> dict[str, Any]:
     """The model's brief with what the harness already knows filled in.
 
     The harness's values win for identity and time; the model's win for what
     only the conversation knows (reason, summary, open questions, next step).
+    Open questions the model left out are the customer's last words; the next
+    step left out follows from the reason.
     """
     filled = {k: v for k, v in known.items() if v is not None or k in ("product_advised", "price_quoted_vnd", "customer_name")}
     filled.update({k: v for k, v in brief.items() if k not in ("customer_phone", "generated_at", "customer_id")})
     questions = filled.get("open_questions")
     filled["open_questions"] = [questions] if isinstance(questions, str) else list(questions or [])
-    filled.setdefault("next_action", "Gọi lại khách và trả lời câu hỏi còn mở.")
+    if not filled["open_questions"] and customer_said and customer_said.strip():
+        filled["open_questions"] = [customer_said.strip()[:300]]
     filled.setdefault("escalation_reason", "khac")
+    if not filled.get("next_action"):
+        filled["next_action"] = NEXT_ACTION.get(str(filled["escalation_reason"]), NEXT_ACTION_DEFAULT)
     return filled
+
+
+#: Days a delivered order may be returned or exchanged (DT-01: 7 days from receipt), the longer window of household
+#: and mother-and-baby goods with a manufacturing defect (DT-01, DT-05: 30 days), and the most a delivery takes
+#: (VC-01): the order date plus that delivery is the earliest the customer can have received it, so a window counted
+#: from there never closes before the real one.
+RETURN_DAYS = 7
+DEFECT_DAYS = 30
+DEFECT_CATEGORIES = ("gia-dung", "me-be")
+LONGEST_DELIVERY_DAYS = 7
+#: The actions the return window closes (DT-01: an exchange is a return of the item first).
+WINDOW_ACTIONS = frozenset({"return", "exchange_size", "exchange_product"})
+
+
+def _days_since_receipt(order: Mapping[str, Any], day: Any) -> int | None:
+    """Days since the latest day a delivered order can have arrived; None when it is not recorded as delivered (the
+    customer may have it before the record says so) or the dates are unreadable."""
+    if order.get("status") != "delivered" or not order.get("date") or day is None:
+        return None
+    try:
+        placed = datetime.fromisoformat(str(order["date"])[:10]).date()
+        today = datetime.fromisoformat(str(day)[:10]).date() if isinstance(day, str) else getattr(day, "date", lambda: day)()
+    except ValueError:
+        return None
+    return (today - placed).days - LONGEST_DELIVERY_DAYS
+
+
+def return_window(order: Mapping[str, Any], day: Any) -> str | None:
+    """What DT-01 leaves of a delivered order's return window on *day*: None while 7 days are not over, "defect"
+    when only a manufacturing defect of household or mother-and-baby goods can still be exchanged, "closed" after."""
+    days = _days_since_receipt(order, day)
+    if days is None or days <= RETURN_DAYS:
+        return None
+    category = commerce.category_of(str(order.get("sku") or ""))
+    if category and category.startswith(DEFECT_CATEGORIES) and days <= DEFECT_DAYS:
+        return "defect"
+    return "closed"
+
+
+def past_return_window(order: Mapping[str, Any], day: Any) -> bool:
+    """Whether no return or exchange of the order is possible on *day*, a manufacturing defect included."""
+    return return_window(order, day) == "closed"

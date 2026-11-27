@@ -14,6 +14,21 @@ import {
 } from "@/services/voice";
 import Icon from "@/components/ui/Icon";
 
+// The agent's words appear one at a time, about the pace the voice reads them (four to five syllables a second),
+// instead of a whole sentence at once while the voice is still on its first word.
+const WORD_MS = 200;
+
+function Typed({ text }: { text: string }) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    if (shown >= words.length) return;
+    const timer = setTimeout(() => setShown((n) => n + 1), WORD_MS);
+    return () => clearTimeout(timer);
+  }, [shown, words.length]);
+  return <>{words.slice(0, shown).join(" ")}</>;
+}
+
 type Line = {
   id: string;
   who: "caller" | "agent" | "note";
@@ -21,6 +36,8 @@ type Line = {
   heard?: string;
   superseded?: boolean;
   ttfaMs?: number;
+  // The whole reply has arrived: sentences reported later as they play add nothing.
+  final?: boolean;
 };
 type Input = {
   level: number;
@@ -109,6 +126,19 @@ export default function VoiceCallPanel({
               { id: `${m.turn}-caller`, who: "caller", text: String(m.text) },
             ]);
             break;
+          case "reply_part":
+            // A sentence as its voice starts: the agent's line grows with what the caller hears.
+            setLines((all) => {
+              const id = `${m.turn}-agent`;
+              const at = all.findIndex((l) => l.id === id);
+              if (at < 0) return [...all, { id, who: "agent", text: String(m.text) }];
+              // The reply can arrive before its last sentence plays: once whole, the line is not added to.
+              if (all[at].final) return all;
+              const next = [...all];
+              next[at] = { ...next[at], text: `${next[at].text} ${String(m.text)}` };
+              return next;
+            });
+            break;
           case "reply":
             if (m.waiting)
               setLines((all) => [
@@ -120,15 +150,21 @@ export default function VoiceCallPanel({
                 },
               ]);
             else if (m.text)
-              setLines((all) => [
-                ...all,
-                {
+              setLines((all) => {
+                // The whole reply replaces the sentences shown as they played; a reply not spoken yet is added.
+                const line = {
                   id: `${m.turn}-agent`,
-                  who: "agent",
+                  who: "agent" as const,
                   text: String(m.text),
                   superseded: Boolean(m.superseded),
-                },
-              ]);
+                  final: true,
+                };
+                const at = all.findIndex((l) => l.id === line.id);
+                if (at < 0) return [...all, line];
+                const next = [...all];
+                next[at] = { ...next[at], ...line };
+                return next;
+              });
             break;
           case "truncated":
             setLines((all) =>
@@ -340,7 +376,13 @@ export default function VoiceCallPanel({
               >
                 <small>{line.who === "caller" ? "Bạn" : "Trợ lý AI"}</small>
                 <p className={line.superseded ? "faded" : ""}>
-                  {line.heard != null ? line.heard : line.text}
+                  {line.heard != null ? (
+                    line.heard
+                  ) : line.who === "agent" ? (
+                    <Typed text={line.text} />
+                  ) : (
+                    line.text
+                  )}
                   {line.heard != null && line.text.startsWith(line.heard) && (
                     <span className="faded">
                       {line.text.slice(line.heard.length)}

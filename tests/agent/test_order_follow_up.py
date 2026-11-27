@@ -28,7 +28,7 @@ def test_the_sales_lanes_can_correct_an_order_the_call_created():
 
 
 def create(sku="SKU-A", said="Giao ở quận 3 nhé", created=(), tier="VERIFIED"):
-    return actions.check("order_create", {"sku": sku, "price_vnd": 1_000_000, "qty": 1, "payment": "COD"},
+    return actions.check("order_create", {"sku": sku, "price_vnd": 1_000_000, "qty": 1, "payment": "COD", "address": "Quận 3"},
                          tier=tier, mode="speak", has_phone=True, quotes={"SKU-A": 1_000_000, "SKU-B": 1_000_000},
                          trusted=frozenset({"SKU-A", "SKU-B"}), customer_said=said, created=created)
 
@@ -129,12 +129,14 @@ class Stepwise:
 
 
 @pytest.mark.asyncio
-async def test_a_sentence_stopped_after_the_first_is_regenerated_from_what_was_said():
+async def test_a_leaking_sentence_after_the_first_is_regenerated_from_what_was_said():
+    # Only what must not be said is rewritten (2026-11-26): here the shop's purchase price (KM-06).
     first = "Dạ bên em có mẫu máy lọc phù hợp với phòng của chị ạ."
+    leak = "Giá nhập mẫu này thấp nên bên em bán rẻ ạ."
     stock = "Mẫu này giá 1.000.000đ ạ."
     inventory = {"name": "pricing.get_quote", "args": {"sku": "SKU-A"},
                  "result": {"ok": True, "data": {"sku": "SKU-A", "final_price_vnd": 1000000}}}
-    advisor = Stepwise((f"{first} {stock}", ()), (f"{first} {stock}", (inventory,)))
+    advisor = Stepwise((f"{first} {leak}", ()), (f"{first} {stock}", (inventory,)))
     spoken = []
 
     async def emit(kind, text):
@@ -147,7 +149,26 @@ async def test_a_sentence_stopped_after_the_first_is_regenerated_from_what_was_s
     assert spoken == [first, stock]  # the repeated first sentence is not said twice
     assert not update["draft"]["fallback"] and "safe_lines" not in update
     assert advisor.views[1].already_said == (first,) and advisor.views[1].block_reasons
+    assert advisor.views[1].answer_only  # the rewrite answers in its one call, without tools
     assert update["regen_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_an_amount_no_tool_gave_is_left_out_without_a_rewrite():
+    first = "Dạ bên em có mẫu máy lọc phù hợp với phòng của chị ạ."
+    unsourced = "Mẫu này giá 1.000.000đ ạ."
+    advisor = Stepwise((f"{first} {unsourced}", ()))
+    spoken = []
+
+    async def emit(kind, text):
+        if kind == "sentence":
+            spoken.append(text)
+
+    state = {"call_id": "fixture", "turn_id": "t1", "mode": "speak", "tier": "VERIFIED", "lane": "NEW",
+             "now": datetime.now(timezone.utc), "messages": [HumanMessage(content="Phòng chị 20 mét vuông")]}
+    update = await nodes.advisor(state, SimpleNamespace(context=HotContext(advisor=advisor, emit=emit)))
+    assert spoken == [first] and len(advisor.views) == 1  # one model run: no rewrite
+    assert not update["draft"]["fallback"] and "safe_lines" not in update
 
 
 def test_an_address_that_says_there_is_none_never_reaches_a_tool():
@@ -242,3 +263,19 @@ def test_an_address_change_needs_the_address_and_a_second_one_is_a_new_change():
     second = {**bare, "new_address": "Hà Nội"}
     assert not actions.check("order_update", first, updated=[first], **common).passed
     assert actions.check("order_update", second, updated=[first], **common).passed
+
+
+@pytest.mark.asyncio
+async def test_a_turn_whose_only_sentence_is_left_out_says_the_safe_line_not_nothing():
+    advisor = Stepwise(("Mẫu này giá 1.000.000đ ạ.", ()))
+    spoken = []
+
+    async def emit(kind, text):
+        if kind == "sentence":
+            spoken.append(text)
+
+    state = {"call_id": "fixture", "turn_id": "t1", "mode": "speak", "tier": "VERIFIED", "lane": "NEW",
+             "now": datetime.now(timezone.utc), "messages": [HumanMessage(content="Giá bao nhiêu em?")]}
+    update = await nodes.advisor(state, SimpleNamespace(context=HotContext(advisor=advisor, emit=emit)))
+    assert len(spoken) == 1 and "1.000.000" not in spoken[0]  # the safe line, not silence, not the made-up price
+    assert update["draft"]["fallback"] and update["safe_lines"] == 1

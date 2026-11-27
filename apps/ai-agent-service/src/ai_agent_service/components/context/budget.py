@@ -14,7 +14,7 @@ from typing import NamedTuple, Sequence
 
 #: Sections that are never cut, whatever the allowance.
 PROTECTED = frozenset({"rules", "skills", "today", "knowledge", "products", "earlier", "basket", "orders", "warnings", "lane", "brief",
-                       "tool_results", "opening", "blocked", "packs", "summary", "call_state"})
+                       "tool_results", "said", "opening", "blocked", "no_handoff", "packs", "summary", "call_state"})
 
 
 class Section(NamedTuple):

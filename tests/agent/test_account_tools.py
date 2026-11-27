@@ -25,7 +25,8 @@ def offered(account_id):
 
 def test_account_tools_are_offered_only_to_a_logged_in_shopper():
     assert offered(None) == ["catalog_search"]
-    assert offered("cust-1") == ["account_cart", "catalog_search"]
+    # A tool some state takes away goes after the ones always offered, so the cached prefix of the tools stays whole.
+    assert offered("cust-1") == ["catalog_search", "account_cart"]
 
 
 def test_the_account_is_the_call_s_never_the_model_s():

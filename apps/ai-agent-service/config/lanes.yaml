@@ -26,11 +26,14 @@ lanes:
     - account_orders
     - account_profile
     - catalog_search
+    # The team's own (plan 002, B3); offered only with ADVISOR_PRODUCT_ADVISE=1.
+    - product_advise
     - inventory_check
     - pricing_get_quote
     - pricing_quote_order
     - delivery_estimate
     - order_create
+    - order_split_cod
     # An order the customer has (order_status, or crm_get_customer when no
     # code was given) and the change they ask on it (order_update): a change
     # is never a new order (change-order in config/prompts/agent/advisor/skills.yaml).
@@ -47,11 +50,14 @@ lanes:
     - account_orders
     - account_profile
     - catalog_search
+    # The team's own (plan 002, B3); offered only with ADVISOR_PRODUCT_ADVISE=1.
+    - product_advise
     - inventory_check
     - pricing_get_quote
     - pricing_quote_order
     - delivery_estimate
     - order_create
+    - order_split_cod
     - order_status
     - crm_get_customer
     - order_update

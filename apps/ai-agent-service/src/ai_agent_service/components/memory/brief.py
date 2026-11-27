@@ -283,7 +283,7 @@ def render(
         # The day an order was placed decides which returns policy it keeps (CL-01, section 7.2).
         "orders": [
             {"order_id": o.get("order_id"), "variant_sku": o.get("sku") or o.get("variant_sku"), "status": o.get("status"),
-             "date": o.get("date") or o.get("created_at")}
+             "date": o.get("date") or o.get("created_at"), "price_vnd": o.get("price_vnd")}
             for o in orders
         ],
         "open_blockers": [str(f["value"]) for f in blockers],
