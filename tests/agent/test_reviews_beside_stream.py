@@ -8,7 +8,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 
 from ai_agent_service.agents import policy
 from ai_agent_service.agents.advisor import ActionGuardMiddleware, AgentContext, _filled_order
@@ -93,13 +93,28 @@ def context_for(**changes):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("name", ["order_create", "order_update", "schedule_callback", "handoff_transfer",
-                                  "memory_request_deletion"])
-async def test_a_tool_with_an_effect_does_not_run_on_a_flagged_sentence(name):
+async def test_a_flagged_sentence_no_longer_stops_the_action_and_the_result_asks_for_the_correction():
+    async def judge(intent, state):
+        return True
+
+    done = ToolMessage(content=json.dumps({"ok": True, "data": {"order_id": "OD1"}}), tool_call_id="1",
+                       name="order_create")
+    handler = AsyncMock(return_value=done)
+    context = context_for(judge=judge, review_flags=AsyncMock(return_value=["sai"]), customer_said="lên đơn",
+                          recent=(("customer", "lên đơn"),))
+    result = await ActionGuardMiddleware().awrap_tool_call(request_for(context), handler)
+    handler.assert_awaited_once()
+    envelope = json.loads(result.content)
+    assert envelope["ok"] is True and "sai" in envelope["correct_first"]
+
+
+@pytest.mark.asyncio
+async def test_a_guard_block_carries_its_status_for_the_reply_to_tell_the_customer():
     handler = AsyncMock(return_value="executed")
-    context = context_for(review_flags=AsyncMock(return_value=["sai"]))
-    result = await ActionGuardMiddleware().awrap_tool_call(request_for(context, name), handler)
-    assert json.loads(result.content)["error"]["code"] == "PRECONDITION"
+    result = await ActionGuardMiddleware().awrap_tool_call(request_for(context_for(tier="PROBABLE")), handler)
+    envelope = json.loads(result.content)
+    assert envelope["status"] == "blocked" and envelope["notify_customer"] is True
+    assert envelope["error"]["code"] == "PRECONDITION" and result.additional_kwargs["blocked_by"] == "guardrail"
     handler.assert_not_awaited()
 
 

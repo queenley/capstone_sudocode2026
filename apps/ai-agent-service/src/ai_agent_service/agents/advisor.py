@@ -568,22 +568,14 @@ class ActionGuardMiddleware(AgentMiddleware):
             return await handler(request)
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
-            return ToolMessage(content=json.dumps({"ok": False, "error": {"code": "PRECONDITION",
-                "retryable": False, "message": "Missing trusted runtime context."}}),
-                tool_call_id=call["id"], name=name, additional_kwargs={"blocked_by": "guardrail"})
+            return guard_block(call, {}, "PRECONDITION", "Missing trusted runtime context.", notify=False)
         args = dict(call.get("args") or {})
-        if name in actions.WRITE_TOOLS and context.review_flags is not None:
-            flagged = await context.review_flags()
-            if flagged:
-                envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message":
-                            "Câu vừa nói với khách có lỗi, đính chính trước khi làm: " + " ".join(flagged)}}
-                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
-                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
+        # A flagged sentence no longer stops the action (2026-11-27, the user's decision: the guard was too strict):
+        # the tool runs and its result carries the correction, which the reply then makes.
+        flagged = await context.review_flags() if name in actions.WRITE_TOOLS and context.review_flags is not None else []
         if name == "handoff_transfer":
             if context.lane != "HANDOFF" and actions.early_transfer(args, _asked_together(request)):
-                envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": actions.EARLY_TRANSFER}}
-                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
-                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
+                return guard_block(call, args, "PRECONDITION", actions.EARLY_TRANSFER, notify=False)
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
         if name == "schedule_callback" and not args.get("customer_phone") and context.customer_phone:
             args["customer_phone"] = context.customer_phone
@@ -628,23 +620,50 @@ class ActionGuardMiddleware(AgentMiddleware):
                 # The customer heard this very order and did not agree: answer them, it is not read a second time.
                 message = ("Khách đã nghe đơn này và chưa đồng ý: trả lời điều khách đang nói, không gọi lại order_create."
                            if heard else "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.")
-                envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False, "message": message,
-                    "details": {} if heard else {"purchase_draft": record}}}
-                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
-                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
+                # The system reads the order back itself; a customer who heard it is answered, not told of a block.
+                return guard_block(call, args, "CONFIRMATION_REQUIRED", message, notify=False,
+                                   details={} if heard else {"purchase_draft": record})
             context.consent["draft"] = purchase.authorize(record, context.turn_id)
             if not heard:
                 context.consent["read_back"] = record["read_back"]
         if not verdict.passed:
-            envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
-            return ToolMessage(
-                content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
-                additional_kwargs={"args": args, "blocked_by": "guardrail"},
-            )
+            return guard_block(call, args, "PRECONDITION", " ".join(verdict.reasons), notify=context.mode != "copilot")
         if name == "schedule_callback" and args.get("callback_at"):
             # The shop's clock is Vietnam's, to the minute; the tool's own answer carries no offset.
             args["callback_at"] = re.sub(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::\d{2})?(?:\.\d+)?(?:\+07:00|Z)?$", r"\1", str(args["callback_at"]))
-        return await handler(request.override(tool_call={**call, "args": args}))
+        result = await handler(request.override(tool_call={**call, "args": args}))
+        return with_correction(result, flagged)
+
+
+#: What a tool result says when a guard stopped the call: the reply reads it (advisor rule 7), the console and the turn's
+#: meta show it (``guard_tool_blocks``).
+BLOCKED = "blocked"
+
+
+def guard_block(call: Mapping[str, Any], args: Mapping[str, Any], code: str, message: str, *, notify: bool = True,
+                details: Mapping[str, Any] | None = None) -> ToolMessage:
+    """A tool call a guard stopped, as the tool's own failure: nothing happened in the business.
+
+    ``status`` says it was the guard, not the tool; ``notify_customer`` says the reply must tell the customer what is
+    missing or why it is not done yet, in their words. It is False where the system already answers for it (the order
+    read back) or where no customer hears the agent (copilot) or the block is the agent's own order of work."""
+    error: dict[str, Any] = {"code": code, "retryable": False, "message": message}
+    if details is not None:
+        error["details"] = dict(details)
+    envelope = {"ok": False, "status": BLOCKED, "notify_customer": notify, "error": error}
+    return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=call["name"],
+                       additional_kwargs={"args": dict(args), "blocked_by": "guardrail"})
+
+
+def with_correction(result: Any, flagged: Sequence[str]) -> Any:
+    """*result* with what the reviews flagged in the sentence just said, for the reply to correct."""
+    if not flagged or not isinstance(result, ToolMessage):
+        return result
+    envelope = parse_envelope(result.content)
+    if envelope is None:
+        return result
+    envelope["correct_first"] = "Câu vừa nói với khách có lỗi, đính chính trong câu trả lời: " + " ".join(flagged)
+    return result.model_copy(update={"content": json.dumps(envelope, ensure_ascii=False)})
 
 
 def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mapping[str, int],

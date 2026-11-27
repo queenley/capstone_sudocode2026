@@ -6,12 +6,15 @@ a tool error with the reason, and nothing happens in the business.
 
 | Tool | Checked |
 |---|---|
-| ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer wants one more (*intents* ``one_more``, read by Jev; the word list :data:`ONE_MORE` only when Jev gave no answer) |
+| ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); today's ``pricing.get_quote`` for that code exists (the harness writes its price in); COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer wants one more (*intents* ``one_more``, read by Jev; the word list :data:`ONE_MORE` only when Jev gave no answer) |
 | ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made, in any turn (a second exchange is charged, DT-03); the customer asked for this change or agreed to it (*intents* ``change``, read by Jev: a complaint alone, "size M hơi chật", is not a choice yet). An order this call created may be corrected by its caller whatever the tier |
 | ``schedule.callback`` | a date and time in Vietnam time, not in the past, inside working hours (LN-01) or on a holiday, which the tool itself moves (LN-02, ``moved_from``, and the customer is told); otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | the advisor decides; outside lane HANDOFF the PolicyAgent checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | VERIFIED, and the customer agreed when asked to confirm (QT-06): *intents* ``delete``, read by Jev; the word lists only when Jev gave no answer |
 | any write tool in copilot mode | refused: the consultant acts, the advisor only suggests (section 4.6) |
+
+A refusal reaches the model as the tool's failure with ``"status": "blocked"`` and ``notify_customer``
+(``agents/advisor.py`` ``guard_block``): the reply tells the customer what is missing (advisor rule 7).
 
 A customer the shop has never met may order on their own line: UNKNOWN with
 a phone from the connection is allowed; PROBABLE and AMBIGUOUS are not,
@@ -50,8 +53,6 @@ ONE_MORE = re.compile(
 ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
 AGREED = re.compile(r"\b(dong y|dung roi|dung vay|xoa di|xoa giup|xoa het|ok|oke|vang|da|u|uh|co)\b")
 DECLINED = re.compile(r"\b(khong|thoi|chua|de sau)\b")
-#: Splitting an order was proposed or asked for (QT-01: only if the customer agrees).
-SPLIT = re.compile(r"\btach\b")
 
 
 def check(
@@ -155,13 +156,11 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
                quotes: Mapping[str, int] | None = None) -> list[str]:
     """VC-03 on the whole order: the COD lines of this call in the same ``order_group`` with this one.
 
-    QT-01: an order above the limit may be split, if the customer agrees; the
-    agent's previous turn proposed it or the customer asked (``tach``), or an
-    earlier line of the call is already in a group.
+    QT-01: an order above the limit may be split, if the customer agrees. That agreement is the read-back's: each
+    half is read back as "đơn 1 của phần tách đơn" and placed only on the customer's yes, so the word ``tach`` is
+    no longer asked for here (2026-11-27: a split the customer agreed to in other words was refused).
     """
     group = args.get("order_group")
-    if group is not None and not SPLIT.search(plain(said)) and not any(p.get("order_group") for p in placed):
-        return ["Chỉ tách đơn khi khách đã đồng ý; hỏi khách có muốn tách thành hai đơn không trước khi đặt order_group."]
     if (args.get("payment") or "COD") != "COD":
         return []
     same = [p for p in placed if p.get("order_group") == group and p.get("payment") == "COD"]
@@ -211,8 +210,8 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         reasons.append(f"Mã {sku} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search để lấy đúng mã trước.")
     elif sku not in quotes:
         reasons.append(f"Chưa có báo giá hôm nay cho {sku}; gọi pricing_get_quote trước.")
-    elif int(price) != quotes[sku]:
-        reasons.append(f"price_vnd {format_vnd(int(price))} khác giá hôm nay của {sku} là {format_vnd(quotes[sku])}.")
+    # The price is not compared with the quote: the harness writes today's quote into price_vnd before this check
+    # (``agents/advisor.py`` ``_filled_order``), so a difference could only be the model's and is already overwritten.
     quantity = args.get("qty", 1)
     if quantity is None:
         quantity = 1

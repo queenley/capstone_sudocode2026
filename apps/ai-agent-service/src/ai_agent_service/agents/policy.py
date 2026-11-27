@@ -162,7 +162,7 @@ INTENTS = {
 #: 0.06 or less (asked as a list of messages; asked as two fields it gave 0.38): hence 0.6.
 #: Set again on the FIX scenarios and the team's labels. On the Decisions API a clear yes to a deletion read 0.63 and 0.87,
 #: and a postponement 0.00 (2026-11-07), hence 0.6 for delete.
-INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.6, "one_more": 0.5, "change": 0.5, "identity": 0.6, "purchase": 0.7}
+INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.6, "one_more": 0.5, "change": 0.5, "identity": 0.6, "purchase": 0.5}
 
 
 @dataclass(frozen=True)

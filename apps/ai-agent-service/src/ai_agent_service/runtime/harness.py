@@ -415,6 +415,12 @@ class CallStore:
             "call_facts": dict(state.get("call_facts") or {}),
             "tool_calls": [self._tool(r) for r in state.get("tool_results") or []],
             "guard": state.get("guard") or {}, "blocked_drafts": state.get("blocked_drafts") or [],
+            # The tool calls a guard stopped this turn, and why: what the reply was asked to tell the customer.
+            "guard_tool_blocks": [
+                {"name": r.get("name"), "code": ((r.get("result") or {}).get("error") or {}).get("code"),
+                 "reason": ((r.get("result") or {}).get("error") or {}).get("message"),
+                 "notify_customer": bool((r.get("result") or {}).get("notify_customer"))}
+                for r in state.get("tool_results") or [] if r.get("blocked_by") == "guardrail"],
             "regenerations": state.get("regen_count") or 0,
             "call_brief_latency_ms": state.get("call_brief_latency_ms"),
             "handoff": state.get("handoff") if (state.get("handoff") or {}).get("status") in ("pending", "accepted") else None,

@@ -126,24 +126,6 @@ def _owner(context: Any) -> str:
     return hashlib.sha256(_json([context.customer_id, context.customer_phone]).encode()).hexdigest()
 
 
-def missing(args: Mapping[str, Any], order: Mapping[str, Any], delivery: str | None) -> list[str]:
-    """What the order still lacks before it may be read back (PB-09), in the words the model is told.
-
-    Product and today's price are the action guard's (a trusted code, the current quote); the quantity reads back as
-    1 unless said. The payment must be one the model passed, from the customer or the brief: :func:`payload` would
-    write COD for a missing one, and a read-back the customer answers by naming the payment is a read-back wasted
-    (eval2: 116 of 153 read-backs were answered with a missing field, not a yes).
-    """
-    gaps = []
-    if not args.get("payment"):
-        gaps.append("phương thức thanh toán khách chọn (COD hay chuyển khoản)")
-    if not order.get("address"):
-        gaps.append("địa chỉ giao hàng (lời khách hoặc Call Brief)")
-    if not delivery:
-        gaps.append("ngày giao dự kiến (gọi delivery_estimate với địa chỉ giao)")
-    return gaps
-
-
 def estimated_delivery(results: Any) -> str | None:
     """The day the latest successful ``delivery.estimate`` of the call gave, ``YYYY-MM-DD``."""
     for result in reversed(list(results or ())):
@@ -222,6 +204,7 @@ def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, tur
            said: str, last_reply: str | None) -> dict[str, Any] | None:
     """The fallback when the PolicyAgent gave no answer: a short yes to a read-back the customer just heard, nothing else."""
     opened = still_open(pending, call_id=call_id, channel=channel, turn_id=turn_id)
+    # The read-back must end the last reply: a yes after a later question ("Muốn xem ảnh không?") answers that one.
     if (opened is None or not last_reply or not last_reply.endswith(opened.get("question") or "\0")
             or not agrees(said)):
         return None
