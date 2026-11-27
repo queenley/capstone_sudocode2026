@@ -27,7 +27,7 @@ from src.api.routes.shared import bearer
 
 from ...mcp.client import dotted
 from ...pipeline.hot.graph import NODES
-from ...runtime import calls, harness, platform
+from ...runtime import calls, harness, options, platform
 from ...runtime.calls import Actor, CallError
 
 logger = logging.getLogger(__name__)
@@ -52,6 +52,10 @@ class TurnRequest(BaseModel):
     memory_enabled: bool = True
     #: Chosen by the client so a retried turn replays the stored reply.
     turn_id: str | None = Field(default=None, min_length=1, max_length=64)
+    #: Testing aid: when this message was sent, ``YYYY-MM-DDTHH:MM`` in Vietnam time (or a bare day).
+    #: The agent reads stock, promotions and working hours on that moment. Ignored when
+    #: ``options.client_clock_allowed()`` is off (production by default).
+    sent_at: str | None = Field(default=None, max_length=40)
 
 
 #: Marks a line of a customer message the customer spoke (a voice message, ``/voice-message``), not typed. Kept in
@@ -132,6 +136,10 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
             raise HTTPException(error.status, str(error)) from error
         return {**_result(row, turn_id, None, stored["content"]), "replayed": True}
 
+    try:
+        sent_at = options.sent_at(data.sent_at)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
     message, spoken = unmark_voice(data.message)
     if spoken:
         message = f"{message}\n{voice_note(spoken)}"
@@ -146,7 +154,8 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
         account = conversation.customer_id if conversation.channel == "web" else None
         signed_in = {"account_id": str(account), "account_name": await platform.account_name(app, account)} if account else {}
         outcome = await harness.spawn(calls.take_turn(row, content=message, turn_id=turn_id, arrived=arrived,
-                                                      actor=actor, memory=data.memory_enabled, emit=emit, **signed_in))
+                                                      actor=actor, memory=data.memory_enabled, emit=emit,
+                                                      sent_at=sent_at, **signed_in))
     except CallError as error:
         raise HTTPException(error.status, str(error)) from error
     if outcome.kind == "error":

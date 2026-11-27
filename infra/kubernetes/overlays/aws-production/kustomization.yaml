@@ -52,6 +52,10 @@ configMapGenerator:
       # The weekly improvement round runs as CronJobs (improve.yaml); /admin's pipeline view and its "Chạy vòng mới"
       # button drive them through the Kubernetes API (runtime/k8s_pipeline.py), not Airflow.
       - IMPROVE_RUNNER=kubernetes
+      # The chat window's "Thời điểm gửi" picker (runtime/options.py, sent_at): a tester runs a message or a call on
+      # another day and hour (stock, promotions, working hours). Off by default with ENVIRONMENT=production, since any
+      # shopper can then choose the agent's clock; delete this line for a real shop.
+      - CLIENT_CLOCK=1
       # The Zalo channel talks to the Zalo mock (zalo-mock.yaml), with the mock's own keys: they open nothing but the
       # mock. A real Official Account: delete these six, and put its keys in the app secret instead.
       - ZALO_APP_ID=mock-app

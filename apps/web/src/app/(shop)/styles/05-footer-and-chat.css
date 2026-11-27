@@ -125,6 +125,54 @@
   padding: 8px 14px;
   border-bottom: 1px solid var(--s-line);
 }
+/* Testing aid: the moment messages and calls say they were sent (lib/sent-at.ts). */
+.s-chat-clock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--s-line);
+}
+.s-chat-clock label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.s-chat-clock label span,
+.s-chat-clock small,
+.s-chat-clock-reset {
+  white-space: nowrap;
+}
+.s-chat-clock {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.s-chat-clock input {
+  min-width: 13.5rem;
+}
+.s-chat-clock input {
+  font: inherit;
+  padding: 2px 6px;
+  border: 1px solid var(--s-line);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+.s-chat-clock small {
+  opacity: 0.7;
+}
+.s-chat-clock-reset {
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .s-chat-body {
   flex: 1;
   min-height: 0;

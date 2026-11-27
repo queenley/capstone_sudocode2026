@@ -5,6 +5,7 @@
 // person (the agent hands off; staff reply from /calls or /ban-hang).
 import { useEffect, useRef, useState } from "react";
 import { ChatCartLine, streamTurn, transcribeVoice } from "@/services/api";
+import { useSentAt } from "@/lib/sent-at";
 import { VoiceCall } from "@/services/voice";
 import VoiceCallPanel from "@/features/voice/voice-call";
 import ChatProducts from "@/components/shop/ChatProducts";
@@ -94,6 +95,8 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   const [doneSteps, setDoneSteps] = useState<Map<string, { steps: TurnStep[]; ms: number }>>(() => new Map());
   const [error, setError] = useState("");
   const [call, setCall] = useState<VoiceCall | null>(null);
+  // Testing aid: when messages and calls say they were sent (lib/sent-at.ts).
+  const [sentAt, setSentAt] = useSentAt();
   const bottom = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const fab = useRef<HTMLButtonElement>(null);
@@ -537,6 +540,27 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
               </button>
             </div>
           </header>
+          <div className="s-chat-clock">
+            <label>
+              <span>Thời điểm gửi</span>
+              <input
+                type="datetime-local"
+                value={sentAt}
+                min="2026-01-01T00:00"
+                max="2027-12-31T23:59"
+                title="Thử agent ở một ngày giờ khác (tồn kho, khuyến mãi, giờ làm việc). Để trống: giờ của cửa hàng."
+                disabled={call !== null}
+                onChange={(event) => setSentAt(event.target.value)}
+              />
+            </label>
+            {sentAt ? (
+              <button type="button" className="s-chat-clock-reset" disabled={call !== null} onClick={() => setSentAt("")}>
+                Dùng giờ cửa hàng
+              </button>
+            ) : (
+              <small>Giờ cửa hàng</small>
+            )}
+          </div>
           {sku && (
             <div className="s-chat-context">
               Đang xem: <b>{productName || sku}</b>

@@ -88,6 +88,21 @@ def parse_local(value: object) -> datetime | None:
     return moment.astimezone(VIETNAM)
 
 
+def parse_sent_at(value: object) -> datetime | None:
+    """The moment a tester says a turn was sent: ``2026-10-20T19:30`` (Vietnam
+    time unless an offset is given), or a bare day, read as :data:`CALL_TIME`.
+    None when *value* is neither."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    moment = parse_local(value)
+    if moment is not None:
+        return moment
+    try:
+        return at(date.fromisoformat(value.strip()))
+    except ValueError:
+        return None
+
+
 def tool_time(moment: datetime) -> str:
     """``2026-10-16T20:00``: minutes in Vietnam time, no offset, as tools take a time and the organisers' labels write it."""
     return moment.astimezone(VIETNAM).strftime("%Y-%m-%dT%H:%M")

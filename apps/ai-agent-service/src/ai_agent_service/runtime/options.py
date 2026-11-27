@@ -18,9 +18,10 @@ from __future__ import annotations
 import os
 
 from dataclasses import dataclass, field, replace
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 
+from ..components import clock
 from ..components.clock import REFERENCE_DAY
 from ..config.config_manager import get_models_config
 
@@ -87,3 +88,30 @@ def business_day() -> str:
 def set_business_day(day: str | None) -> str:
     _options.business_day = date.fromisoformat(day).isoformat() if day else REFERENCE_DAY
     return _options.business_day
+
+
+def client_clock_allowed() -> bool:
+    """Whether a chat message or a call may say when it was sent (``sent_at``).
+
+    A testing aid: it lets a tester see the agent on another day's stock,
+    promotions and working hours without moving the business day for everyone.
+    On unless ``ENVIRONMENT=production``; ``CLIENT_CLOCK=1`` turns it on there
+    too, ``CLIENT_CLOCK=0`` off everywhere."""
+    flag = os.environ.get("CLIENT_CLOCK", "").strip().lower()
+    if flag in ("1", "true", "yes", "on"):
+        return True
+    if flag in ("0", "false", "no", "off"):
+        return False
+    return os.environ.get("ENVIRONMENT", "development") != "production"
+
+
+def sent_at(value: object) -> datetime | None:
+    """The turn's clock a client chose, when it may choose one; None means the
+    business day at :data:`clock.CALL_TIME`. Raises ``ValueError`` on a value
+    that is not a date or a date and time."""
+    if value in (None, "") or not client_clock_allowed():
+        return None
+    moment = clock.parse_sent_at(value)
+    if moment is None:
+        raise ValueError(f"sent_at must be YYYY-MM-DD or YYYY-MM-DDTHH:MM, not {value!r}")
+    return moment

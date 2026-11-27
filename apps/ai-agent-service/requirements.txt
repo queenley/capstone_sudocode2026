@@ -33,5 +33,8 @@ onnxruntime==1.23.2
 tokenizers==0.23.2
 huggingface_hub==1.32.0
 
+# Call-backs on Google Calendar (runtime/google_calendar.py): a service account's token; the API over httpx.
+google-auth[requests]==2.61.0
+
 # The after-call job queue (runtime/jobs.py, ai_agent_service.worker): SQS, used only when JOBS_QUEUE_URL is set.
 boto3==1.43.120

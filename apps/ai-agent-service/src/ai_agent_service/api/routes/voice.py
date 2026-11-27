@@ -106,6 +106,8 @@ async def _voice_call(ws: WebSocket, conversation_id: str) -> None:
         sample_rate = float(hello.get("sample_rate", 48_000))
         if not math.isfinite(sample_rate) or not 8000 <= sample_rate <= 192000:
             raise ValueError("Invalid sample rate")
+        # Testing aid: the moment the whole call is placed at (options.sent_at); None is the business day at 10:00.
+        sent_at = options.sent_at(hello.get("sent_at"))
     except WebSocketDisconnect:
         return
     except (ValueError, TypeError, asyncio.TimeoutError):
@@ -137,7 +139,7 @@ async def _voice_call(ws: WebSocket, conversation_id: str) -> None:
     # The browser matters: its echo canceller decides how much of the caller
     # survives while the assistant is speaking.
     logger.info("Call %s: voice from %s, %s Hz", row["id"], ws.headers.get("user-agent", "?")[:160], hello.get("sample_rate"))
-    session = Session(ws, row, user_id=actor.id, sample_rate=sample_rate)
+    session = Session(ws, row, user_id=actor.id, sample_rate=sample_rate, sent_at=sent_at)
     try:
         await session.run()
     except WebSocketDisconnect:
@@ -178,7 +180,8 @@ def valid_control(message: Any) -> bool:
 
 
 class Session:
-    def __init__(self, ws: WebSocket, row: dict[str, Any], *, user_id: str, sample_rate: float) -> None:
+    def __init__(self, ws: WebSocket, row: dict[str, Any], *, user_id: str, sample_rate: float,
+                 sent_at: Any = None) -> None:
         # Imported here: numpy, onnxruntime and friends are optional.
         import soxr
 
@@ -190,6 +193,7 @@ class Session:
         self.row = row
         self.call_id = int(row["id"])
         self.user_id = user_id
+        self.sent_at = sent_at
         self.settings = options.voice()
         self.detector = TurnDetector(config_for(self.settings.endpointing, self.settings.barge_in_ms))
         self.voice = tts.voice(self.settings.tts)
@@ -505,7 +509,8 @@ class Session:
                 return harness.Outcome("error", turn_id, error="another turn holds the call")
             try:
                 return await harness.run_turn(self.row, content=text, turn_id=turn_id, arrived=arrived, emit=emit,
-                                              user_id=self.user_id, input_mode="asr_transcript" if text else None)
+                                              user_id=self.user_id, input_mode="asr_transcript" if text else None,
+                                              sent_at=self.sent_at)
             finally:
                 await calls.release_lease(self.call_id)
 

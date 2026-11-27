@@ -19,6 +19,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Awaitable, Callable
 
 from langchain_core.messages import AIMessage
@@ -158,7 +159,8 @@ async def stored_reply(call_id: int, turn_id: str) -> dict[str, Any] | None:
 async def take_turn(row: dict[str, Any], *, content: str, turn_id: str, arrived: float,
                     actor: Actor, memory: bool = True,
                     emit: Callable[[str, str], Awaitable[None]] | None = None,
-                    account_id: str | None = None, account_name: str | None = None) -> harness.Outcome:
+                    account_id: str | None = None, account_name: str | None = None,
+                    sent_at: datetime | None = None) -> harness.Outcome:
     """Run one customer turn under the call's lease. Raises :class:`CallError` if busy or ended.
 
     *emit* hears each checked sentence as it may be said (``harness.run_turn``).
@@ -174,7 +176,7 @@ async def take_turn(row: dict[str, Any], *, content: str, turn_id: str, arrived:
             return harness.Outcome("message", turn_id, content=stored["content"], meta={"replayed": True})
         return await harness.run_turn(row, content=content, turn_id=turn_id, arrived=arrived,
                                       user_id=actor.id, memory=memory, emit=emit, account_id=account_id,
-                                      account_name=account_name)
+                                      account_name=account_name, sent_at=sent_at)
     finally:
         await release_lease(row["id"])
 

@@ -1,3 +1,4 @@
+import { getSentAt } from "@/lib/sent-at";
 // The caller's side of a voice call: microphone up, spoken answers down.
 //
 // Ported from the reference agent's frontend (services/voice.js). Everything
@@ -159,7 +160,7 @@ export class VoiceCall {
       );
       this.ws.binaryType = "arraybuffer";
       this.ws.onopen = () => {
-        this.send({ token, sample_rate: ctx.sampleRate });
+        this.send({ token, sample_rate: ctx.sampleRate, sent_at: getSentAt() || null });
         this.send({ type: "capture_settings", ...this.captureSettings() });
       };
       this.ws.onmessage = (event) => {

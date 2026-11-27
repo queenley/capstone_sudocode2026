@@ -173,10 +173,15 @@ async def schedule_callback(
 
     if not customer_phone:
         raise ToolFailure("BAD_REQUEST", "A call back needs the customer's number: ask for it first")
-    return await btc.call(
+    booked = await btc.call(
         "schedule.callback", book, idempotency_key=idempotency_key,
         customer_phone=customer_phone, callback_at=callback_at, note=note,
     )
+    # A live channel puts it on the shop's Google Calendar too, after this answer (runtime/google_calendar.py).
+    from ...runtime import google_calendar
+
+    google_calendar.add_callback_later(booked, customer_phone=customer_phone)
+    return booked
 
 
 # The harness calls it too: in lane HANDOFF the model may be what is failing (route rule 1).
@@ -209,7 +214,8 @@ if __name__ == "__main__":
     apply_schema(btc.STATE_SCHEMA)
     # The organisers' mock and the website's database opened now, not inside the first call's 2-second budget.
     btc.mock()
-    from ...runtime import shop_orders
+    from ...runtime import google_calendar, shop_orders
 
     shop_orders.warm()
+    google_calendar.warm()
     server.run()

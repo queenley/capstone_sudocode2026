@@ -21,6 +21,51 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-27 · Chọn thời điểm gửi cho tin nhắn chat và cuộc gọi
+
+Loại: tính năng (kiểm thử, giao diện) · Trạng thái: đang đo · Chỉ số: không có (công cụ để kiểm thử bằng tay)
+
+- **Vấn đề:** mọi lượt chat và gọi đều chạy lúc 10:00 ngày làm việc. Ngày đó mặc định là 15/10/2026 và chỉ đổi được trên /admin, áp cho mọi người. Người kiểm thử không thử được tồn kho (`inventory_timeline`), khuyến mãi theo ngày hay giờ làm việc ở ngày giờ khác ngay trong cửa sổ chat.
+- **Bằng chứng:** yêu cầu của người dùng; `harness._run_turn` luôn tính `now = clock.at(business_day)`.
+- **Sửa:**
+  - [clock.py](../../apps/ai-agent-service/src/ai_agent_service/components/clock.py) thêm `parse_sent_at`. Hàm nhận `YYYY-MM-DDTHH:MM` theo giờ Việt Nam, hoặc chỉ ngày (khi đó tính là 10:00).
+  - [options.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/options.py) thêm `sent_at` và `client_clock_allowed`. Mặc định tắt khi `ENVIRONMENT=production`. `CLIENT_CLOCK=1` bật lại, `CLIENT_CLOCK=0` tắt ở mọi môi trường.
+  - `sent_at` đi qua `harness.run_turn` và `calls.take_turn`, rồi thay `now` và `on` của lượt đó, nên công cụ và bộ nhớ đều đọc theo ngày này.
+  - Chat: thêm trường `sent_at` trong `TurnRequest` ([conversations.py](../../apps/ai-agent-service/src/ai_agent_service/api/routes/conversations.py)). Giá trị sai trả về 422.
+  - Gọi: thêm `sent_at` trong frame đầu của websocket ([voice.py](../../apps/ai-agent-service/src/ai_agent_service/api/routes/voice.py)), áp cho cả cuộc gọi.
+  - Web: thêm ô "Thời điểm gửi" dưới tiêu đề [ChatWidget.tsx](../../apps/web/src/components/shop/ChatWidget.tsx). Giá trị lưu trong localStorage ([lib/sent-at.ts](../../apps/web/src/lib/sent-at.ts)) và được `streamTurn` cùng `VoiceCall` gửi đi. Ô bị khoá khi đang gọi.
+  - Evaluation không đổi, vì runner không đi qua các route này.
+- **Đã kiểm:** `tests/agent/test_sent_at.py` 13 test qua. Các test voice, handoff và callback qua (70 test). 2 test lỗi do giới hạn biến môi trường của Windows với test id 256 KB, không liên quan đến thay đổi này. `tsc --noEmit` của web không có lỗi. Chưa thử trên trình duyệt.
+- **Số đo:** chưa đo.
+- **Còn lại:**
+  - `calls.business_day` vẫn ghi ngày làm việc chung. Console hiện ngày đó, không phải ngày đã chọn.
+  - Trên EKS (production), muốn dùng thì phải đặt `CLIENT_CLOCK=1`.
+
+### 2026-11-27 · Lịch gọi lại của agent lên Google Calendar
+
+Loại: tính năng (công cụ, hạ tầng) · Trạng thái: đang đo · Chỉ số: số lịch gọi lại có sự kiện trên lịch
+
+- **Vấn đề:** lịch gọi lại do agent đặt (`schedule.callback`) chỉ nằm trong mock của BTC và trang **Hẹn gọi lại** của console. Tư vấn viên lên kế hoạch ngày làm việc trên lịch, nên không thấy và không được nhắc.
+- **Bằng chứng:** yêu cầu tính năng của người dùng; `crm.schedule_callback` không ghi ra ngoài mock.
+- **Sửa:**
+  - [runtime/google_calendar.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/google_calendar.py) tạo sự kiện trên một lịch dùng chung qua Calendar API (service account, `google-auth` + `httpx`). Sự kiện dài 15 phút theo giờ Việt Nam, nhắc trước 10 phút. Nội dung gồm tên khách nếu số chỉ thuộc một khách CRM, 4 số cuối, ghi chú, giờ khách hẹn nếu lịch đã bị dời, và link console. Không gửi số điện thoại đầy đủ cho Google.
+  - [crm.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers/crm.py) gọi `add_callback_later` sau khi đặt lịch thành công. Việc ghi chạy ở luồng nền, nên không tốn ngân sách 2 giây của tool. Lỗi phía Google chỉ ghi warning, lịch gọi lại vẫn đặt được.
+  - Id sự kiện suy ra từ `callback_id`. Một lần ghi lặp lại cùng idempotency key nhận 409, không tạo sự kiện thứ hai.
+  - Thông báo:
+    - Google lưu nhắc nhở theo từng người. Nhắc nhở do service account đặt chỉ đến chính service account, không đến tư vấn viên. Vì vậy:
+    - `GOOGLE_CALENDAR_REMINDERS` (`popup:10,email:60`, mặc định `popup:10`) đặt giờ nhắc.
+    - `GOOGLE_CALENDAR_ATTENDEES` mời tư vấn viên, gửi kèm `sendUpdates=all`. Google gửi email mời và nhắc theo giờ đã đặt.
+    - Mời người chỉ làm được trên Google Workspace, khi service account đóng vai một người dùng trong domain (`GOOGLE_CALENDAR_SUBJECT`, domain-wide delegation). Nếu Google trả lỗi 403 `forbiddenForServiceAccounts`, log ghi rõ cần đặt biến nào.
+    - Người chỉ theo dõi lịch tự bật thông báo trong cài đặt Google Calendar của mình.
+  - Chỉ bật khi có `GOOGLE_CALENDAR_ID` và key (`GOOGLE_CALENDAR_CREDENTIALS_JSON` hoặc `GOOGLE_CALENDAR_CREDENTIALS`). Luôn tắt với database `*_eval`, nên evaluation không đổi.
+  - Thêm biến vào `.env.example` và `docker-compose.yml`. Thêm `google-auth[requests]` vào requirements. Trên EKS chỉ cần thêm hai key vào secret app, vì secret đó đã được nạp vào pod MCP.
+- **Đã kiểm:** `tests/agent/test_google_calendar.py` 11 test qua, cùng `test_callback_time.py` (37 test). Chưa gọi Google thật.
+- **Số đo:** chưa đo.
+- **Còn lại:**
+  - Cần một service account và một lịch thật để thử end-to-end.
+  - Đổi giờ hoặc huỷ lịch gọi lại chưa đồng bộ lên lịch, vì tool chưa hỗ trợ hai việc này.
+  - Ghi chú do model viết sẽ được gửi sang Google.
+
 ### 2026-11-24 · Vòng cải tiến hằng tuần chạy trên EKS, có nút bấm tay trên /admin
 
 Loại: tính năng (hạ tầng, giao diện) · Trạng thái: đang đo · Chỉ số: số vòng cải tiến chạy được trên production

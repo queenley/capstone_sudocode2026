@@ -1,4 +1,5 @@
 import type { TurnStep } from "@/components/ui/StepTrail";
+import { getSentAt } from "@/lib/sent-at";
 
 /** GET /api/agent/welcome: authenticated agent memory, with no call/message side effect. */
 export type ReturningCustomerWelcome = {
@@ -258,6 +259,7 @@ export async function streamTurn(
         selected_sku: selectedSku || null,
         cart: cartLines,
         turn_id: options.turnId,
+        sent_at: getSentAt() || null,
       }),
       signal: options.signal
         ? AbortSignal.any([options.signal, AbortSignal.timeout(120_000)])

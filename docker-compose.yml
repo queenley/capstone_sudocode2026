@@ -166,6 +166,13 @@ services:
       # 1: the orders the agent places or changes are kept on the website too, and order.status lists the
       # customer's website orders (runtime/shop_orders.py). Never set for an evaluation run.
       SHOP_ORDERS: ${SHOP_ORDERS:-1}
+      # The call-backs the agent books, on this Google Calendar too (runtime/google_calendar.py). Off while empty.
+      GOOGLE_CALENDAR_ID: ${GOOGLE_CALENDAR_ID:-}
+      GOOGLE_CALENDAR_CREDENTIALS_JSON: ${GOOGLE_CALENDAR_CREDENTIALS_JSON:-}
+      GOOGLE_CALENDAR_SLOT_MINUTES: ${GOOGLE_CALENDAR_SLOT_MINUTES:-15}
+      GOOGLE_CALENDAR_REMINDERS: ${GOOGLE_CALENDAR_REMINDERS:-popup:10}
+      GOOGLE_CALENDAR_ATTENDEES: ${GOOGLE_CALENDAR_ATTENDEES:-}
+      GOOGLE_CALENDAR_SUBJECT: ${GOOGLE_CALENDAR_SUBJECT:-}
       # Zalo OA (apps/ai-agent-service/src/ai_agent_service/runtime/zalo.py).
       ZALO_APP_ID: ${ZALO_APP_ID:-}
       ZALO_OA_ID: ${ZALO_OA_ID:-}

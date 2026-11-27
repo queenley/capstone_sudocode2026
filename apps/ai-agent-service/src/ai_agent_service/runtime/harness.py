@@ -196,8 +196,12 @@ async def _run_turn(
     emit: Callable[[str, str], Awaitable[None]] | None = None,
     account_id: str | None = None,
     account_name: str | None = None,
+    sent_at: datetime | None = None,
 ) -> Outcome:
     """Take one turn through the hot graph; the caller holds the call's lease.
+
+    *sent_at* is the moment a tester chose for this turn (``options.sent_at``);
+    without it the turn is at 10:00 on the call's business day.
 
     *emit* hears each sentence the moment the guard lets it be said, its
     tokens already restored for the customer (section 4.8); the whole reply
@@ -211,7 +215,7 @@ async def _run_turn(
     async def say(kind: str, text: str) -> None:
         if emit is not None:
             await emit(kind, pii.for_customer(text, vault))
-    now = clock.at(row.get("business_day") or options.business_day())
+    now = sent_at or clock.at(row.get("business_day") or options.business_day())
     turn_no = await _customer_turns(call_id) + (0 if content is None else 1)
     context = HotContext(
         text=content,
