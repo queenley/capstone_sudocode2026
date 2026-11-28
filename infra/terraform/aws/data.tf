@@ -68,7 +68,7 @@ resource "aws_dlm_lifecycle_policy" "data" {
 # --- RDS PostgreSQL 16 (use_rds = true) ----------------------------------------------------------------------
 # Single-AZ, automated backups and point-in-time recovery. The master password is RDS-managed in Secrets Manager:
 # it never enters this state. The runtime role (telesales_runtime) and the app_db_eval database are made once by
-# hand (docs/deployment/aws-terraform-cicd.md, step 5).
+# hand.
 resource "aws_db_subnet_group" "main" {
   count      = var.use_rds ? 1 : 0
   name       = local.prefix
@@ -148,7 +148,7 @@ resource "aws_efs_backup_policy" "main" {
 # --- Container images ----------------------------------------------------------------------------------------
 
 locals {
-  # Repository names: docs/deployment/README.md section 2, plus asr and the weekly round.
+  # Repository names: the services, plus asr and the weekly round.
   repositories = ["backend-common", "gateway", "commerce", "identity", "sales", "ai-agent", "web", "asr", "improve"]
 }
 
@@ -249,7 +249,7 @@ resource "aws_ssm_parameter" "release" {
   }
 }
 
-# The application's secrets as one JSON object (keys: docs/deployment/aws-plan.md section 5). Terraform makes the
+# The application's secrets as one JSON object. Terraform makes the
 # container only: the values are put by a person (aws secretsmanager put-secret-value) and never enter the state.
 resource "aws_secretsmanager_secret" "app" {
   name                    = "${var.name}/${var.environment}/app"

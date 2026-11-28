@@ -4,7 +4,6 @@
 # - empty (DNS elsewhere): Terraform requests the certificate and prints the record to add by hand
 #   (output certificate_validation_records); the Ingress gets no HTTPS listener until ACM has issued it.
 # The record pointing the domain at the ALB is not here: the Load Balancer Controller makes the ALB
-# (docs/deployment/eks-deploy.md, section 2.8).
 
 locals {
   request_certificate = var.certificate_arn == ""

@@ -1,4 +1,4 @@
-"""The routing table of ``docs/design.md`` section 4.3, applied. Pure, so every row is a unit test.
+"""The routing table, applied. Pure, so every row is a unit test.
 
 | # | Condition | Lane |
 |---|---|---|
@@ -26,7 +26,7 @@ signature, since a field that is not here cannot be read.
 
 A lane's instruction gains notes when they apply: PB-10 when the customer is
 impatient, PB-11 after three contacts without a close, and on a shared number whose name
-question went unanswered, what may not be said (section 4.2).
+question went unanswered, what may not be said.
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ class RouteInput:
     sessions_without_close: int = 0
     #: The confirming question is still to be asked or answered. Once it has
     #: been asked and not answered, the call goes on as a stranger's
-    #: (section 4.2: the question is asked once).
+    #: (the question is asked once).
     awaiting_identity: bool = True
     #: A transfer refused last turn only because the customer's number was missing, and a number is known now.
     transfer_waiting: bool = False

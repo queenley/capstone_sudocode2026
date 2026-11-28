@@ -145,7 +145,7 @@ def create_test_app(settings: Settings, database: Database) -> FastAPI:
 
 class StreamingAgent(ScriptedAgent):
     """As :class:`ScriptedAgent`, but the reply is said a checked sentence at a
-    time through ``emit``, as the real graph does (``docs/design.md`` 4.8)."""
+    time through ``emit``, as the real graph does."""
 
     SENTENCES = ("Dạ, bên em có mẫu này ạ.", "Anh/chị muốn xem thêm không?")
 

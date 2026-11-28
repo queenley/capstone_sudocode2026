@@ -1,4 +1,4 @@
-"""The questions each policy section answers, written once, indexed with it. ``docs/design.md`` section 7.3.
+"""The questions each policy section answers, written once, indexed with it.
 
 Customers do not ask in the documents' words: "shipper tới mà nhà không có ai thì đơn có bị hủy không" is VC-07,
 "Giao hàng thất bại", and neither BM25 nor the embedding found it in the five passages the advisor reads. So each

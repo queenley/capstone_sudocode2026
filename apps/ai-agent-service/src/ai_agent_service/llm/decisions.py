@@ -1,7 +1,7 @@
 """Typed answers from OpenAI's Decisions API: the probability that a statement holds.
 
 ``POST /v1/decisions`` on ``gpt-6-luna`` reads shared input and answers up to 400 questions, each independently, and
-writes no text. That is the soft guardrail's job in ``docs/design.md`` section 4.5, which is why the PolicyAgent asks it
+writes no text. That is the soft guardrail's job, which is why the PolicyAgent asks it
 rather than prompting a chat model for a verdict: the answer is a probability to threshold, not a word to parse.
 
 What the guide (developers.openai.com/api/docs/guides/decisions) says about the shape of a request, and this module does:
@@ -17,7 +17,7 @@ The discipline of the chat path stays: one shared limiter, a slot reserved befor
 waiting, so there is no retry, and an answer that is not here within the evaluator's ``timeout`` is
 :class:`DecisionUnavailable`. The caller then decides by rule.
 
-Nothing reaches this API that intake has not tokenised (section 4.1): no raw customer text.
+Nothing reaches this API that intake has not tokenised: no raw customer text.
 """
 
 from __future__ import annotations

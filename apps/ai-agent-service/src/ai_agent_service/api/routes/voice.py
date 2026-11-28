@@ -1,4 +1,4 @@
-"""The voice channel's WebSocket: a phone call on a platform conversation. ``docs/design.md`` section 4.11.
+"""The voice channel's WebSocket: a phone call on a platform conversation.
 
 Ported from the reference ``api/voice.py``. The socket is
 ``/api/conversations/{conversation_id}/voice``; the first frame is
@@ -65,7 +65,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["voice"])
 
-#: Said when a turn fails, so the call never goes silent (section 4.9).
+#: Said when a turn fails, so the call never goes silent.
 FALLBACK = "Dạ em xin lỗi, hệ thống bên em đang tra cứu hơi chậm. Anh chị nói lại giúp em một lần nữa được không ạ?"
 
 

@@ -39,7 +39,7 @@ TURN_LEASE_SECONDS = 180
 IDLE_MINUTES = 30
 JOINED_MARK = "[consultant joined]"
 
-#: Platform conversation channel -> the agent's channel (docs/design.md section 4.2).
+#: Platform conversation channel -> the agent's channel.
 CHANNELS = {"web": "web", "chat": "web", "call": "hotline", "hotline": "hotline", "zalo": "zalo", "fanpage": "facebook"}
 
 
@@ -261,7 +261,7 @@ async def open_conversation_ids() -> list[str]:
         return [str(r["conversation_id"]) for r in await cursor.fetchall()]
 
 
-# ── handoff and copilot, docs/design.md sections 4.6 and 4.10 ─────────────
+# ── handoff and copilot ─────────────
 
 
 async def request_handoff(call_id: int, *, reason: str) -> dict[str, Any]:
@@ -403,7 +403,7 @@ async def suggestion_feedback(call_id: int, *, actor: Actor, thumb: str, reason:
 
 
 async def save_faq(call_id: int, *, actor: Actor, question: str, answer: str) -> dict[str, Any]:
-    """Gap Loop step 6c (section 10.2): the consultant's answer becomes a FAQ entry, live at once."""
+    """Gap Loop step 6c: the consultant's answer becomes a FAQ entry, live at once."""
     await call_row(call_id)
     admin = ToolBox(await mcp_client.tools_for("admin"))
     envelope = await admin.call("kb_upsert", source="faq", title=question, text=answer,

@@ -1,6 +1,6 @@
 """mcp-memory: the ledger of what the shop knows about each customer.
 
-``docs/design.md`` sections 5 and 6. The one server the brief requires by
+The one server the brief requires by
 name. Its tables:
 
 | Table | Holds |
@@ -9,18 +9,18 @@ name. Its tables:
 | ``episodes`` | one line per call |
 | ``identities`` | hashed keys (phone, Zalo, Facebook) to customers; a key may point to several |
 
-Roles decide who may do what (section 6.2), checked here on every call:
+Roles decide who may do what, checked here on every call:
 ``advisor`` and ``harness`` read; ``harness`` may link a key provisionally;
 only ``memory_writer`` (the MemoryAgent, after the call) commits facts and
 episodes and confirms identities; ``admin`` deletes a customer.
 
-The ledger is append-only (section 5.3). A change of mind closes the old
+The ledger is append-only. A change of mind closes the old
 row's window and opens a new one; ``current`` facts are those active and in
 force on the day asked about, so two contradicting values are never live
 together. Keys arrive already hashed: the raw phone number never reaches
 this server.
 
-**Integrity with several writers** (section 5.3), for instance two calls of
+**Integrity with several writers**, for instance two calls of
 one customer ending on two channels the same evening:
 
 1. ``memory.commit_facts`` runs in one transaction under an advisory lock on
@@ -32,7 +32,7 @@ one customer ending on two channels the same evening:
    changed since, so "update the row I saw" becomes "update whatever is
    active", and a value already held is skipped.
 
-**Forgetting a customer** (QT-06, section 5.4): the advisor records a
+**Forgetting a customer** (QT-06): the advisor records a
 request (``memory.request_deletion``); ``after_call`` carries it out under
 the ``admin`` role (``memory.delete_customer``), which removes the facts,
 episodes, identities and vault rows and keeps a tombstone, so the next call
@@ -78,11 +78,11 @@ CREATE INDEX IF NOT EXISTS facts_customer_idx ON facts (customer_id, slot);
 ALTER TABLE facts DROP CONSTRAINT IF EXISTS facts_status_check;
 ALTER TABLE facts ADD CONSTRAINT facts_status_check
     CHECK (status IN ('active', 'invalidated', 'disputed', 'unconfirmed'));
--- The idempotency key of section 5.4: a replayed after_call writes nothing twice.
+-- The idempotency key: a replayed after_call writes nothing twice.
 CREATE UNIQUE INDEX IF NOT EXISTS facts_once_idx ON facts (
     customer_id, slot, (source->>'call_id'), (source->>'turn'), (source->>'extractor_version')
 );
--- Section 5.3: one active value per slot. Doubles left by a ledger written
+-- One active value per slot. Doubles left by a ledger written
 -- before this index existed are closed first, the newest kept.
 UPDATE facts f SET status = 'invalidated', valid_to = COALESCE(f.valid_to, CURRENT_DATE)
 WHERE f.status = 'active' AND f.kind <> 'open_note' AND EXISTS (

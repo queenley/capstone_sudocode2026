@@ -1,6 +1,6 @@
 """Actions that depend on what the customer means are decided in context by Jev, not by word lists.
 
-``docs/design.md`` section 4.4. No network: Jev is a fixture.
+No network: Jev is a fixture.
 """
 
 from types import SimpleNamespace

@@ -1,4 +1,4 @@
-"""The PolicyAgent beside a streamed answer. ``docs/design.md`` section 4.8.
+"""The PolicyAgent beside a streamed answer.
 
 A sentence is said at once and reviewed in the background, so a review never
 delays the first token. Sentences arriving while a review runs wait and go

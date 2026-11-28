@@ -1,4 +1,4 @@
-"""The skills the advisor reads, version by version. ``docs/design.md`` section 10.3.
+"""The skills the advisor reads, version by version.
 
 Reflection changes skills, one sentence at a time, never by writing a skill again: a rewrite shortens it and loses
 what it held. Version 0 is ``config/prompts/agent/advisor/skills.yaml``; each published change writes

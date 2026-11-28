@@ -1,6 +1,6 @@
 """What this pod is doing, for scaling, and what the model has cost, for early warning.
 
-``docs/deployment/eks-architecture.md`` sections 3.6 and 3.7, in the agent's Valkey (``AGENT_REDIS_URL``):
+In the agent's Valkey (``AGENT_REDIS_URL``):
 
 - **Load** (3.6). This process counts the turns it is taking and the voice WebSockets it holds open; every
   :data:`PUBLISH_SECONDS` it writes them to ``load:turns:<pod>`` and ``load:calls:<pod>`` with a 30-second TTL, so a
@@ -10,7 +10,7 @@
 - **Spend** (3.7). Each turn's model cost (``llm/token_ledger``, at the prices of ``config/models.yaml``) is added to
   ``spend:day:<UTC date>`` and ``spend:conv:<conversation>`` (7 days). Counted only: the thresholds that would hand a
   conversation to staff or switch to a cheaper model change what the agent does, so they wait for a decision and an
-  evaluation run (``docs/plan/README.md``). The provider's invoice stays the real figure; ``EVAL_BUDGET_DB`` is
+  evaluation run. The provider's invoice stays the real figure; ``EVAL_BUDGET_DB`` is
   evaluation's own.
 
 Without ``AGENT_REDIS_URL`` the counts stay in this process (``/internal/load`` answers for this pod alone) and no

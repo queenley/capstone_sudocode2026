@@ -1,6 +1,6 @@
 "use client";
 // The admin's review of the weekly improvement round: each change Reflection proposed, its evidence, the decision;
-// then the round's measurement (R0 against the candidate) and the switch. docs/plan/001, part C.
+// then the round's measurement (R0 against the candidate) and the switch.
 // Every decision and switch is checked again by the API (admin only, under the signed-in account).
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/services/api";

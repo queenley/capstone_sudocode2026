@@ -1,4 +1,4 @@
-"""After the call, nobody waiting. ``docs/design.md`` sections 2, 4.7 and 5.4.
+"""After the call, nobody waiting.
 
 Hanging up hands the call to ``runtime/jobs.py``: with ``JOBS_QUEUE_URL`` set (a
 deployment) it goes to the SQS queue and ``ai_agent_service.worker`` runs

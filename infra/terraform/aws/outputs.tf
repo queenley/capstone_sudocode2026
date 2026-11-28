@@ -12,7 +12,7 @@ output "certificate_validation_records" {
 }
 
 output "app_secret_arn" {
-  description = "Put the application's secrets here as one JSON object (docs/deployment/aws-terraform-cicd.md, step 3)."
+  description = "Put the application's secrets here as one JSON object."
   value       = aws_secretsmanager_secret.app.arn
 }
 

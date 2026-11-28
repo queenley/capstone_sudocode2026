@@ -1,4 +1,4 @@
-"""A call put through to a person by the harness itself (route rule 1, ``docs/design.md`` 4.9).
+"""A call put through to a person by the harness itself (route rule 1).
 
 No model and no database: the advisor fails on purpose, the harness's tools are a fixture.
 """

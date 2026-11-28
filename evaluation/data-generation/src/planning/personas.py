@@ -123,7 +123,7 @@ BTC_PLANS: dict[str, PersonaPlan] = {p.persona_id: p for p in (
 # Personas where an anxious agent is tempted to hand off; a handoff there is over-escalation.
 ESCALATION_TEMPTATION = frozenset({"khach_goi_lan_3_het_kien_nhan", "khach_da_kenh_mau_thuan", "khach_so_gia"})
 
-# Customers reserved for fixed hard cases (README: C031–C035).
+# Customers reserved for fixed hard cases (C031–C035).
 RESERVED_CUSTOMERS = ("C031", "C032", "C033", "C034", "C035")
 # Order in which reserved customers open the dataset: (customer, persona, variant name).
 OPENING_CASES = (("C031", "khach_quay_lai_sau_8_thang", "c031_ttl_trade_in"),

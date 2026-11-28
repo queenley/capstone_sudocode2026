@@ -1,8 +1,8 @@
 """Langfuse tracing.
 
-``docs/design.md`` section 2 puts Langfuse Cloud on the Hobby plan by default and
+The design puts Langfuse Cloud on the Hobby plan by default and
 keeps a self-hosted profile for later: the self-hosted build wants six
-containers and about 8 GB of RAM, too much for a demo laptop. Section 16 makes
+containers and about 8 GB of RAM, too much for a demo laptop. The design makes
 the consequence explicit — the project's own Postgres tables are the source of
 truth and Langfuse is a screen to look through, because Hobby keeps data for
 30 days and allows two users.
@@ -36,8 +36,8 @@ from ..config import config_manager  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
-# Patterns redacted before anything leaves the machine. docs/design.md section 8
-# requires that traces carry only tokenised text; this is the backstop for when
+# Patterns redacted before anything leaves the machine. Traces
+# must carry only tokenised text; this is the backstop for when
 # something slips through, not the tokeniser itself.
 _PII_PATTERNS = (
     # Vietnamese mobile numbers, written locally or with the country code.

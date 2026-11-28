@@ -1,4 +1,4 @@
-"""The hard check on a reply: code only, a few milliseconds a sentence. ``docs/design.md`` section 4.5.
+"""The hard check on a reply: code only, a few milliseconds a sentence.
 
 Only what has a fixed shape and must never reach a customer, whatever the
 sentence means:
@@ -60,7 +60,7 @@ MARKUP = re.compile(r"(\*\*|__|```|^\s*[-*•]\s+|^\s*#{1,6}\s+)", re.MULTILINE)
 
 @dataclass(frozen=True)
 class GuardInput:
-    """What the hard check may read (section 3.2)."""
+    """What the hard check may read."""
 
     text: str
     tool_results: tuple[dict[str, Any], ...]
@@ -125,7 +125,7 @@ def allowed_amounts(view: GuardInput) -> set[int]:
     is not: a search listing eight products would make dozens of numbers
     "derived", a fabricated discount among them. An amount from a passage
     counts only from the organisers' documents: a Knowledge Gap Loop or playbook entry
-    written in the console is not a source of prices (section 10.2, gate 2).
+    written in the console is not a source of prices.
     The customer's amounts are not here: :func:`_money` lets them through, and
     the PolicyAgent judges whether a sentence passes one off as the shop's.
     """

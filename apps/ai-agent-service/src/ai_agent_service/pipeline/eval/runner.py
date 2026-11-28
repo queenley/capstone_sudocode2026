@@ -1,8 +1,8 @@
-"""The agent, assembled for an evaluation run, and one call through it. ``docs/design.md`` section 9.2.
+"""The agent, assembled for an evaluation run, and one call through it.
 
 The organisers' command (:mod:`.cli`) runs calls through this module: the
 business tools are our MCP servers and :func:`run_scenario` writes one trace
-line per agent turn (Appendix A).
+line per agent turn.
 
 A call is a :class:`CallSession`:
 
@@ -19,7 +19,7 @@ A call is a :class:`CallSession`:
    so the next call reads what this one left.
 
 ``full`` and ``baseline_no_memory`` differ in one switch, ``memory``, read by
-``retrieve`` alone (section 9.5): ``after_call`` and ``seed_history`` are
+``retrieve`` alone: ``after_call`` and ``seed_history`` are
 written in both, and only the baseline's next call does not read them. A run
 has its own database, ``*_eval``, emptied before every scenario
 (:func:`reset`), and an in-memory checkpointer, so no evaluation call lands
@@ -106,7 +106,7 @@ def utc_now() -> str:
 
 @dataclass
 class Rig:
-    """What every turn is handed: the hot graph and its collaborators (section 3.2)."""
+    """What every turn is handed: the hot graph and its collaborators."""
 
     graph: Any
     advisor: AdvisorAgent
@@ -275,7 +275,7 @@ async def _seed_data(rig: Rig, tool: str, stage: str, **args: Any) -> dict[str, 
 
 async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: str | None,
                customer_name: str | None) -> str:
-    """Write a scenario's prior sessions to its customer's ledger, before the call (section 9.2, step 2).
+    """Write a scenario's prior sessions to its customer's ledger, before the call.
 
     The customer is who the organisers' CRM says owns *customer_phone*; on a
     number two people share, the one the scenario names. A customer the CRM
@@ -379,7 +379,7 @@ class TurnResult:
 
     state: dict[str, Any]
     total_ms: int
-    #: The first token of the answer from the turn's start: the first sentence said (section 4.8).
+    #: The first token of the answer from the turn's start: the first sentence said.
     first_token_ms: int | None
     error: str | None
     request_at: str
@@ -485,7 +485,7 @@ async def take_turn(
     """One customer turn through the graph: the state, and the error if it failed.
 
     *arrived* is when the turn was handed in (``time.perf_counter``), where
-    the first token's latency starts, as at the API's boundary (section 4.8).
+    the first token's latency starts, as at the API's boundary.
     """
     context = HotContext(
         text=text, vault=vault, identity_secret=IDENTITY_SECRET, arrived=arrived,

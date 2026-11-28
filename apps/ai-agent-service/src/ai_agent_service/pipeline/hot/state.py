@@ -1,11 +1,11 @@
-"""The hot graph's state. ``docs/design.md`` section 3.1.
+"""The hot graph's state.
 
 One ``TypedDict``, checkpointed by the hot graph's own checkpointer under
 ``thread_id = call-<id>``. Each customer turn is one invocation on that
 thread; the checkpointer restores the rest, so working memory needs no table
 of its own. The ``calls`` table is a projection of this state for the
 screens, never a second place state is kept. No agent has a checkpointer:
-each is handed a slice of this and returns a result (section 3.2).
+each is handed a slice of this and returns a result.
 
 Three rules shape this file.
 
@@ -49,12 +49,12 @@ class TurnInput(TypedDict, total=False):
 
     call_id: str
     channel: Channel
-    #: The virtual clock (Appendix A). The API sets the business day, the
+    #: The virtual clock. The API sets the business day, the
     #: evaluation runner the scenario's day. No node reads the system clock.
     now: datetime
     #: ``YYYY-MM-DD``, the day of ``now`` in Vietnam: every tool's ``on``.
     on: str
-    #: ``{"memory": bool}``: off is the baseline (section 9.5).
+    #: ``{"memory": bool}``: off is the baseline.
     switches: dict[str, Any]
     mode: Mode
     phase: Phase
@@ -65,7 +65,7 @@ class TurnInput(TypedDict, total=False):
 
 
 class HotState(TurnInput, total=False):
-    """Section 3.1. The comment on each group is the node that writes it."""
+    """The comment on each group is the node that writes it."""
 
     # load_context
     customer_id: str | None
@@ -79,7 +79,7 @@ class HotState(TurnInput, total=False):
     phone_last4: str | None
     #: The vault token of the customer's phone, never the number.
     phone_token: str | None
-    #: The one confirming question of section 4.2 is out, and the next words
+    #: The one confirming question is out, and the next words
     #: settle it: "confirm" (PROBABLE) or "name" (AMBIGUOUS). Settled either
     #: way, it is not asked again.
     awaiting: str | None
@@ -179,7 +179,7 @@ class HotState(TurnInput, total=False):
     suggestion: dict[str, Any] | None
 
     # advisor and respond: ``{first_token_ms, filler_ms}`` from the request's
-    # arrival, on the monotonic clock (section 4.8)
+    # arrival, on the monotonic clock
     latency: dict[str, Any]
 
     # perceive
@@ -226,11 +226,11 @@ class HotContext:
     fb_id: str | None = None
     #: This call's personal data, token to value.
     vault: Vault = field(default_factory=Vault)
-    #: The secret keys are hashed with (section 4.2).
+    #: The secret keys are hashed with.
     identity_secret: str = ""
     user_id: str | None = None
     #: When the turn's request reached the backend (``time.perf_counter``):
-    #: where TTFT starts (section 4.8). ``perceive`` stamps it when the caller did not.
+    #: where TTFT starts. ``perceive`` stamps it when the caller did not.
     arrived: float | None = None
     #: Where a checked sentence goes the moment it may be said: ``emit(kind,
     #: text)`` with kind ``sentence`` or ``filler``, the text tokenised. The

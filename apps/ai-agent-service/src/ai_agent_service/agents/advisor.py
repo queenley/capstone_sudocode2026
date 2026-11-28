@@ -1,4 +1,4 @@
-"""AdvisorAgent: drafts what the shop says on one turn. ``docs/design.md`` section 4.4.
+"""AdvisorAgent: drafts what the shop says on one turn.
 
 A ReAct loop, ``langchain.agents.create_agent``: a model node calls the
 lane's tools, a tool node runs them, until the model answers without a tool
@@ -6,11 +6,11 @@ call, at most twenty tool calls and eight model calls a turn (an order of
 several items needs a quote, a stock check and an order each). The model
 comes from config through :class:`~src.agents.base.BaseAgent`; the tools from
 MCP under the ``advisor`` role. The knowledge base is not one of them: the
-harness retrieves the turn's passages before the advisor runs (section 4.2)
+harness retrieves the turn's passages before the advisor runs
 and they arrive in the context.
 
 **Stateless** (principle 2). The agent holds no checkpointer and nothing
-between calls: the hot graph hands it a slice of its state (section 3.2) as
+between calls: the hot graph hands it a slice of its state as
 :class:`AgentContext` and the recent turns as messages, and gets back a
 draft and the tool results. Its ReAct messages live only inside one call.
 The conversation itself is the hot graph's ``messages``, checkpointed there
@@ -18,7 +18,7 @@ and nowhere else, so there are never two copies of a call to keep in step.
 
 Around the loop, as middleware:
 
-- the context prompt, assembled in section 4.4's order and cut from the
+- the context prompt, assembled in a fixed order and cut from the
   bottom (:mod:`~src.components.context.budget`);
 - one retry of a failed model call, a cap on model calls and on tool calls;
 - the lane's tools only (``config/lanes.yaml``);
@@ -30,8 +30,8 @@ Around the loop, as middleware:
 
 **Output** is plain text marking the brief lines it used, ``[B3]``; the
 harness strips the marks before anyone reads the reply and keeps them for
-tracing (section 5.5). Plain text rather than a structured object so the
-same reply can later be streamed sentence by sentence (Appendix E).
+tracing. Plain text rather than a structured object so the
+same reply can later be streamed sentence by sentence.
 """
 
 from __future__ import annotations
@@ -88,7 +88,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class AgentContext:
-    """The advisor's slice of the state for one turn (section 3.2).
+    """The advisor's slice of the state for one turn.
 
     Runtime context, not graph state: LangGraph hands it to middleware as
     ``runtime.context`` and never writes it to a checkpoint, which is why the
@@ -140,12 +140,12 @@ class AgentContext:
     shared_phone: bool = False
     vault: pii.Vault = field(default_factory=pii.Vault, repr=False, compare=False)
     #: This call's address tokens and the addresses behind them, raw, the
-    #: latest last: filled into the tools that take an address (section 4.4).
+    #: latest last: filled into the tools that take an address.
     addresses: Mapping[str, str] = field(default_factory=dict)
     #: What the harness fills into a Handoff Brief.
     handoff_defaults: Mapping[str, Any] = field(default_factory=dict)
     switches: Mapping[str, Any] = field(default_factory=dict)
-    #: This turn, for the idempotency key of a write tool (section 6.1).
+    #: This turn, for the idempotency key of a write tool.
     turn_id: str | None = None
     #: The turn's passages from the knowledge base, already filtered by the
     #: harness: a restricted one carries no text, one not in force never arrives.
@@ -241,7 +241,7 @@ class AdvisorEvent:
     results: tuple[dict[str, Any], ...] = ()
 
 
-#: Section 4.4, "Luật làm đúng từ đầu": every rule the organisers' documents
+#: "Luật làm đúng từ đầu": every rule the organisers' documents
 #: and grader make knowable is in the first release (principle 8), each
 #: also enforced in code where code can (the guard, the before-write check).
 #: The codes in brackets are the policy sections the rule comes from.
@@ -251,7 +251,7 @@ HARD_RULES = load_prompt("advisor/rules.md")
 _NOTES = load_prompt_yaml("advisor/notes.yaml")
 LANE_NOTES: dict[str, str] = _NOTES["lanes"]
 
-#: CONFIRM_IDENTITY by its reason (section 4.2): one question, nothing private before it is answered.
+#: CONFIRM_IDENTITY by its reason: one question, nothing private before it is answered.
 #: A shared number has no note: its question is the harness's fixed line, and no model is called.
 CONFIRM_NOTES: dict[str, str] = _NOTES["confirm_identity"]
 
@@ -279,7 +279,7 @@ ADVISE_NOTE = _NOTES["advise"]
 PREAMBLE_NOTE = _NOTES["preamble"]
 
 
-#: Passages shown to the model per turn (section 4.2: five retrieved, three allowed in).
+#: Passages shown to the model per turn (five retrieved, three allowed in).
 KNOWLEDGE_SHOWN = 3
 #: Passages read on earlier turns of the call that stay shown, the latest first.
 EARLIER_SHOWN = 3
@@ -328,7 +328,7 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
 def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str, str, tuple[str, ...]]:
     """What never changes, what this turn adds, and the sections that were cut.
 
-    The first part is the rules and the skills. The second, in section 4.4's order: the day, warnings, the lane, the
+    The first part is the rules and the skills. The second, in this order: the day, warnings, the lane, the
     products and orders of the call, the brief lines the tier allows, the summary of older turns (the last four
     travel as messages), the turn's knowledge passages, the playbook entries of the situation, results of earlier
     turns, tool results already gathered (a regeneration), why the previous draft was blocked. Required evidence
@@ -392,7 +392,7 @@ def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping
     takes the place of the first three.
 
     The guard checks a reply against these and no others: a number from a
-    passage the model never saw cannot be a number it read (section 4.5).
+    passage the model never saw cannot be a number it read.
     """
     earlier = [p for p in knowledge if p.get("earlier")][:EARLIER_SHOWN]
     documents = [p for p in knowledge if p.get("source") != "playbook" and not p.get("explains") and not p.get("earlier")]
@@ -635,7 +635,7 @@ def _asked_together(request: Any) -> list[str]:
 
 
 class ActionGuardMiddleware(AgentMiddleware):
-    """The guardrail before act (section 4.4): a write tool runs only if its arguments pass.
+    """The guardrail before act: a write tool runs only if its arguments pass.
 
     What the write needs and a tool can tell, the guard looks up itself rather than refusing the call back to the model
     (plan 003, a second model round each time): today's quote of the order (``pricing_get_quote``, or
@@ -1055,7 +1055,7 @@ def _agreed(verdict: str) -> bool | None:
 
 async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, created: Sequence[Mapping[str, Any]],
                    state: Mapping[str, Any] | None = None) -> dict[str, bool | None]:
-    """What the customer means, for the one action about to run, read by the PolicyAgent (section 4.4).
+    """What the customer means, for the one action about to run, read by the PolicyAgent.
 
     Asked only when the action depends on it: a transfer outside lane
     HANDOFF, a deletion, a change to an order, an order for a product this
@@ -1255,7 +1255,7 @@ class AdvisorAgent(BaseAgent):
         llm: BaseChatModel | None = None,
     ) -> None:
         """``retries`` is the one retry of a failed model call and of a
-        retryable tool failure (sections 4.9 and 6.1). An evaluation harness
+        retryable tool failure. An evaluation harness
         that must see every attempt sets it to 0. ``llm`` replaces the model
         from config, for offline tests."""
         super().__init__("advisor", provider=provider, model=model, generation=generation, llm=llm)
@@ -1330,8 +1330,7 @@ class AdvisorAgent(BaseAgent):
         so a sentence can be checked against them before the run ends. The
         last event is ``done`` with the whole :class:`Draft`, as :meth:`draft`
         would return it. Closing the iterator early stops the run: that is how
-        the harness abandons a draft whose sentence the guard blocked
-        (section 4.8).
+        the harness abandons a draft whose sentence the guard blocked.
         """
         started = time.perf_counter()
         produced: list[Any] = []

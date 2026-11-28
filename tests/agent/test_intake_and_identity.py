@@ -1,4 +1,4 @@
-"""Intake (``docs/design.md`` 4.1) and identity resolution (4.2): no model, no database."""
+"""Intake and identity resolution: no model, no database."""
 
 from datetime import datetime
 

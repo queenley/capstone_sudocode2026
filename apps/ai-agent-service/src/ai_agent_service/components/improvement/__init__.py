@@ -1,4 +1,4 @@
-"""Improvement, L6: the system gets better without retraining. ``docs/design.md`` section 10.
+"""Improvement, L6: the system gets better without retraining.
 
 The brief's Case 4: QA hears about 2% of calls, so the script never learns
 from the other 98%. **Reflection** (C.5 mechanism 3) changes the skills the

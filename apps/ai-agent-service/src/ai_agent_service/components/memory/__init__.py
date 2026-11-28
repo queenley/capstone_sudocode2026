@@ -1,4 +1,4 @@
-"""Memory: what the shop knows about each customer. ``docs/design.md`` section 5, figure C.
+"""Memory: what the shop knows about each customer.
 
 Read side, in ``load_context`` during a call:
 

@@ -6,8 +6,7 @@ vault, the memory ledger (facts, episodes, identities), the knowledge chunks
 and the organisers' mock state. Every connection the service, its MCP
 servers and the checkpointer open sets ``search_path`` to that schema, so the
 SQL ported from the reference project stays unqualified and never touches the
-tables other services own (``docs/architecture/microservices-target-structure.md``:
-"AI Agent owns AI runtime behavior and its retrieval/memory implementation").
+tables other services own ("AI Agent owns AI runtime behavior and its retrieval/memory implementation").
 
 The connection string is the platform's ``DATABASE_URL`` (SQLAlchemy form,
 ``postgresql+psycopg://``) unless ``AGENT_DATABASE_URL`` gives the agent a

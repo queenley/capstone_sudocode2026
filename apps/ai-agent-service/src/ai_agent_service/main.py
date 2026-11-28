@@ -1,4 +1,4 @@
-"""AI Agent Service: the telesales agent of ``docs/design.md`` behind the platform gateway.
+"""AI Agent Service: the telesales agent behind the platform gateway.
 
 Startup order (each step logged; a failure degrades /health instead of killing
 the process, so the cause can be read):

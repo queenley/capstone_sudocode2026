@@ -1,9 +1,9 @@
-"""Meaning-based retrieval: a local multilingual embedding model. ``docs/design.md`` section 7.3.
+"""Meaning-based retrieval: a local multilingual embedding model.
 
 Keyword search misses a question that shares no words with its answer
 ("giao về Cần Thơ mất mấy ngày" against a table of delivery zones); an
 embedding of the question and of each passage finds it by meaning. The model
-runs on this machine (Appendix C: embedding is local), as ONNX on CPU, with
+runs on this machine (embedding is local), as ONNX on CPU, with
 the tokenizer and runtime the project already installs (``tokenizers``,
 ``onnxruntime``): no PyTorch, no new dependency.
 

@@ -1,13 +1,13 @@
-"""What a run leaves beside its trace, and the organisers' grader over it. ``docs/design.md`` sections 9.2, 9.6, 9.10.
+"""What a run leaves beside its trace, and the organisers' grader over it.
 
 - :func:`problems`: what went wrong in a run. The :data:`BLOCKING` ones void
   the numbers, because a table over failed turns or missing labels looks like
   a result and is not one; the rest are reported beside the table.
-- :func:`manifest`: Appendix D, as far as this run can state it: what ran, on
+- :func:`manifest`: as far as this run can state it: what ran, on
   which models, prompts, knowledge and scenarios, with which switches.
 - :func:`grade`: ``eval/reference_eval.py``, the organisers' own script, run
   on a frozen copy of the scenarios that were attempted, so the official
-  table is computed exactly as the organisers compute it (Appendix A).
+  table is computed exactly as the organisers compute it.
 - :func:`errors`: every scenario the grader failed, with its reasons and the
   turns to read: the material for the report's analysis of at least ten
   failures (the brief, section F).
@@ -88,7 +88,7 @@ def manifest(
     database: str, found: Mapping[str, Mapping[str, int]], profile: str = "router",
     kb_version: int | None = None, skills_version: int | None = None,
 ) -> dict[str, Any]:
-    """Appendix D: what ran, on what, with which models, prompts and switches."""
+    """What ran, on what, with which models, prompts and switches."""
     models = get_models_config()
     policy = models.evaluator_config("policy")
     return {
@@ -140,7 +140,7 @@ def manifest(
 
 
 def knowledge_record() -> dict[str, Any]:
-    """Section 7.5: the version of the approved entries, its file's hash, and how retrieval is set."""
+    """The version of the approved entries, its file's hash, and how retrieval is set."""
     config = get_knowledge_config()
     version = corpus.version_file(kb_dir(), config.version)
     return {
@@ -258,7 +258,7 @@ def team_checks(scenarios_dir: Path, traces: Mapping[str, Path]) -> dict[str, di
     """``success_if.say_at_most`` per configuration: the calls with more agent turns matching a pattern than its max.
 
     The team's key (contracts/scenario/scenario-keys.yaml): "say AIR-2ND-50 once", "never with wrong conditions".
-    A diagnostic beside the organisers' numbers, which stay ``reference_eval``'s (evaluation/README.md rule 1).
+    A diagnostic beside the organisers' numbers, which stay ``reference_eval``'s.
     A configuration whose trace holds none of the calls that carry the key is None: nothing was checked.
     """
     limits: dict[tuple[str, str], list[Mapping[str, Any]]] = {}

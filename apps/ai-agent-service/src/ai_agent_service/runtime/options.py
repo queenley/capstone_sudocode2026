@@ -7,7 +7,7 @@ record of what a deployment runs, and a runtime change is an experiment by
 the person at the console. A restart returns to the file.
 
 The business day exists because the organisers' catalogue, promotions and
-stock are written for 2026-10-15 (``docs/design.md`` Appendix A): a live call
+stock are written for 2026-10-15: a live call
 on today's wall clock would find October's promotions not yet started. It
 defaults to that date; advancing it is how a demo shows call 2 two days
 after call 1, the way the evaluation runner does with ``days_later``.

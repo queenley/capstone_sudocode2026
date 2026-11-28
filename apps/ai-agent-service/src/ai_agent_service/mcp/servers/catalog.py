@@ -1,6 +1,6 @@
 """mcp-catalog: products, stock by day, the price of a product on a day, and when it would arrive.
 
-``docs/design.md`` section 6.1. Four tools under the organisers' names and
+Four tools under the organisers' names and
 required arguments, ``catalog.search``, ``inventory.check``,
 ``pricing.get_quote`` and ``pricing.quote_order`` (an order of more than one
 unit, added by the organisers in 11/2026), each a thin wrapper over the reference mock

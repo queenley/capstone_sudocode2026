@@ -1,4 +1,4 @@
-"""``after_call``: what the call leaves behind. ``docs/design.md`` sections 4.7 and 5.4.
+"""``after_call``: what the call leaves behind.
 
 Memory poisoning is stopped here: facts are written only to a customer the
 call confirmed. VERIFIED writes to that customer and confirms the keys seen.
@@ -17,7 +17,7 @@ A call in which the customer asked to be forgotten (QT-06) writes nothing
 either: the request recorded during the call is carried out here, under the
 ``admin`` role, and the next call is a stranger's.
 
-The steps of section 5.4: ``extract`` (the MemoryAgent), ``gate`` (the win
+The steps: ``extract`` (the MemoryAgent), ``gate`` (the win
 rule inside the call, then each candidate against the ledger), ``commit``
 (through ``memory.commit_facts``, which decides again under the customer's
 lock), ``summarize`` (one episode line, the next brief's precomputed part).
@@ -204,7 +204,7 @@ async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, w
 
 def plan_writes(candidates: Sequence[gate.Candidate], current: list[dict[str, Any]], *, source: dict[str, Any],
                 on: str) -> list[ledger.Decision]:
-    """The call's candidates through the gate, as ledger decisions (section 5.4, ``gate`` and ``commit``).
+    """The call's candidates through the gate, as ledger decisions (``gate`` and ``commit``).
 
     The win rule settles the call first (the newest word, the tool over the
     customer); each survivor is then measured against the ledger, a

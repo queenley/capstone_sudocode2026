@@ -1,10 +1,10 @@
 "use client";
-// The evaluation history of the scored runs `run_eval.py --ingest` kept (docs/plan/001, part D), in five tabs:
+// The evaluation history of the scored runs `run_eval.py --ingest` kept, in five tabs:
 // the organisers' four rates week by week, performance (latency, tokens, cost), quality (errors, guardrails),
 // a comparison of two runs, and each scenario of one run. The pieces are in ./evaluation.
 //
 // Only runs of one cohort (same scenario files) and one extractor are shown together: numbers of different cohorts
-// or extractors are not comparable (evaluation/README.md), so the cohort is a filter, never a mixed line.
+// or extractors are not comparable, so the cohort is a filter, never a mixed line.
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/services/api";
 import { cohortKey, PURPOSE, Round, Run } from "./evaluation/model";

@@ -1,6 +1,6 @@
 """Intake: what the customer said, made into text the system can trust.
 
-``docs/design.md`` section 4.1 and figure A. Three sources — a chat message,
+Three sources — a chat message,
 a live call through local ASR, a recording — each with its own cleanup, then
 one normaliser for all of them, because two normalisers drift apart within
 weeks and number normalisation is exactly where Entity Accuracy is scored.

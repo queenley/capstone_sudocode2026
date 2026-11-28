@@ -1,6 +1,6 @@
 """One MCP client per role, and the tools it may see.
 
-``docs/design.md`` section 6.2: four roles — advisor, harness, memory_writer,
+Four roles — advisor, harness, memory_writer,
 admin — each with its own client, and the server checks the role on every
 call. The role travels as an environment variable when the server is a
 subprocess over stdio, and as a request header when the server is reached

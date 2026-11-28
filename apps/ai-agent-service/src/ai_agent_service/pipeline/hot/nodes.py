@@ -1,4 +1,4 @@
-"""The hot graph's seven nodes. ``docs/design.md`` section 4.
+"""The hot graph's seven nodes.
 
 Each node builds the input a component or an agent declares from
 :class:`~.state.HotState`, calls it, and writes the result back into the
@@ -56,7 +56,7 @@ CALL_LOG_CHARS = 500
 CUSTOMER_WORDS = 12
 #: How many of the documents' passages the guards remember for the rest of a call.
 PASSAGES_READ = 9
-#: Section 4.5: two regenerations, then the safe line.
+#: Two regenerations, then the safe line.
 MAX_REGENERATIONS = 1
 #: Turns a transfer waits for the customer's number after it was refused for want of one.
 WAIT_FOR_NUMBER_TURNS = 3
@@ -91,7 +91,7 @@ def lines_used(text: str) -> list[str]:
 
 
 async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.1, ``components.intake``: clean, NFC, ITN, tokenise.
+    """``components.intake``: clean, NFC, ITN, tokenise.
 
     Writes the tokenised utterance to ``messages`` under ``customer-<turn_id>``
     (a retried turn replaces its first copy), the input mode, and
@@ -115,7 +115,7 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
         return update
 
     if state.get("input_mode") == "asr_transcript" or context.asr_confidence is not None:
-        # Recognised speech: the product-name dictionary first (section 4.1, step 3).
+        # Recognised speech: the product-name dictionary first.
         raw = lexicon.correct(raw)
     cleaned, teencode = intake_text.clean(raw)
     written = itn.normalise(cleaned, state["now"])
@@ -148,7 +148,7 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
 
 
 async def load_context(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.2: who is speaking, what the shop knows about them, and what the documents say.
+    """Who is speaking, what the shop knows about them, and what the documents say.
 
     Identity works on the first turn of a call (keys from the connection),
     whether the agent opened it or the customer spoke first, as in the
@@ -156,8 +156,8 @@ async def load_context(state: HotState, runtime: Runtime[HotContext]) -> dict[st
     a confirming question. The Call Brief's latency runs from the
     identification event to the brief being ready, ``refresh`` included.
 
-    Then, on every turn with words, the knowledge base is searched for them
-    (section 7.3), after identity, because a question about an order already
+    Then, on every turn with words, the knowledge base is searched for them,
+    after identity, because a question about an order already
     placed is answered by the policy of the day it was placed (CL-01).
     """
     context = runtime.context
@@ -221,7 +221,7 @@ def _order_day(order: Mapping[str, Any]) -> str:
 
 
 async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
-    """Who is speaking: the tier, the profile and its brief (section 4.2)."""
+    """Who is speaking: the tier, the profile and its brief."""
     flags = state.get("flags") or {}
     opening = state.get("phase") == "opening"
     # No key seen yet: the connection's keys (caller id, channel identity)
@@ -287,7 +287,7 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
                   awaiting="confirm" if tier == "PROBABLE" else None)
     if tier == "PROBABLE":
         # Kept whatever the answer: if the call ends unsure, after_call asks the
-        # MemoryAgent whether the whole call showed it is them (section 4.2, step 4).
+        # MemoryAgent whether the whole call showed it is them.
         update["provisional"] = {"customer_id": match.customer_id, "name": match.name, "honorific": match.honorific}
         if context.harness is not None:
             for key in keys:
@@ -309,7 +309,7 @@ STRANGER: dict[str, Any] = {
 
 
 async def _settle(state: HotState, context: HotContext, answer: str) -> dict[str, Any]:
-    """The answer to the one confirming question (section 4.2). Either way, it is not asked again."""
+    """The answer to the one confirming question. Either way, it is not asked again."""
     if state.get("awaiting") == "name":
         # No one named: general advice, nothing private, the name not asked again.
         return await _bind_named(state, context, answer) or {"awaiting": None}
@@ -336,7 +336,7 @@ def _denies(answer: str) -> bool:
 
 
 async def _bind_named(state: HotState, context: HotContext, answer: str) -> dict[str, Any] | None:
-    """The one candidate on a shared key the caller says they are (AMBIGUOUS, section 4.2), with their brief; None
+    """The one candidate on a shared key the caller says they are (AMBIGUOUS), with their brief; None
     when the answer names no one.
 
     Either the words name them, or the agent's last reply named exactly one candidate, as the caller had called
@@ -357,7 +357,7 @@ async def _bind_named(state: HotState, context: HotContext, answer: str) -> dict
 
 
 async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
-    """Whether the answer to the confirming question confirms who the caller is (section 4.2).
+    """Whether the answer to the confirming question confirms who the caller is.
 
     Read by the PolicyAgent with the question asked; the word list (``resolver.confirms``)
     only when it gives no answer in time. A wrong "yes" would open someone
@@ -499,7 +499,7 @@ def _waiting_transfer(state: HotState) -> dict[str, Any] | None:
 
 
 async def route(state: HotState) -> dict[str, Any]:
-    """Section 4.3, ``components.orchestration.rules``: the lane, by rules, and its notes."""
+    """``components.orchestration.rules``: the lane, by rules, and its notes."""
     flags = state.get("flags") or {}
     decision = decide(RouteInput(
         tier=state.get("tier") or "UNKNOWN",
@@ -521,14 +521,14 @@ async def route(state: HotState) -> dict[str, Any]:
 
 
 async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.4, ``AdvisorAgent``: the draft, from the slice of section 3.2.
+    """``AdvisorAgent``: the draft, from its slice of the state.
 
     Folds old turns into ``working_summary`` once the call grows long. Below
     VERIFIED the model is not shown a brief line carrying a price, an address
     or an order code: withheld here, not merely forbidden in the prompt.
 
     Speaking to the customer, the answer streams and is said a sentence at a
-    time, each checked first (section 4.8, :func:`_streamed`); the ``guard``
+    time, each checked first (:func:`_streamed`); the ``guard``
     node then has nothing left to check. A suggestion for a consultant is
     drafted whole, and ``guard`` checks it as one.
     """
@@ -545,7 +545,7 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         messages = kept
 
     if state.get("lane") == "CONFIRM_IDENTITY" and state.get("awaiting") == "name":
-        # Section 4.2: on a shared number the question is the harness's, word for word, not a model's.
+        # On a shared number the question is the harness's, word for word, not a model's.
         update["draft"] = {"text": fallback.AMBIGUOUS_QUESTION, "model": None, "model_calls": 0, "seconds": 0.0,
                            "fixed": True}
         return update
@@ -571,7 +571,7 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         try:
             with stopwatch.span("advisor"):
                 draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
-        except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
+        except Exception as error:  # noqa: BLE001 - a failure is never silence
             logger.exception("Advisor failed on call %s", state.get("call_id"))
             produced = list(error.partial.tool_results) if isinstance(error, AdvisorFailure) else []
             update.update(await _model_failed(state, context, agent_context, produced, error, summary=summary))
@@ -590,7 +590,7 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
 async def _model_failed(state: HotState, context: HotContext, agent_context: AgentContext,
                         produced: Sequence[Mapping[str, Any]], error: BaseException, *,
                         summary: str | None) -> dict[str, Any]:
-    """Section 4.9: the model gave no draft. Ask again once; a second turn in a row goes to a person.
+    """The model gave no draft. Ask again once; a second turn in a row goes to a person.
 
     Counted like a tool failure (route rule 1), and acted on in the same turn: a
     customer who heard "nhắc lại giúp em" once is not asked a second time.
@@ -674,7 +674,7 @@ def _handoff_product(products: Sequence[Mapping[str, Any]], quotes: Mapping[str,
 
 
 def _agent_context(state: HotState, context: HotContext, summary: str | None) -> AgentContext:
-    """The slice of the state the advisor may read (section 3.2), with what the tier withholds left out."""
+    """The slice of the state the advisor may read, with what the tier withholds left out."""
     tier = state.get("tier") or "UNKNOWN"
     lines = [BriefLine(l["id"], l["text"], l["sensitive"], tuple(l.get("fact_ids") or ()), l.get("kind", "other"))
              for l in state.get("brief_lines") or []]
@@ -688,7 +688,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
     phone = context.vault.get(state.get("phone_token") or "")
     products = brief.get("products_advised") or []
     # Codes the brief stands behind; codes in this turn's tool results are
-    # trusted by the before-write check itself (section 4.4, "mã tin cậy").
+    # trusted by the before-write check itself ("mã tin cậy").
     trusted = frozenset(state.get("trusted_skus") or []) | (frozenset(
         [p["sku"] for p in products if p.get("sku")]
         + [o[key] for o in brief.get("orders") or [] for key in ("variant_sku", "sku") if o.get(key)]
@@ -993,7 +993,7 @@ def _offered(results: Sequence[Mapping[str, Any]], before: Sequence[Mapping[str,
     return offered
 
 
-# ── 4b. the streamed answer, section 4.8 ──────────────────────────────────
+# ── 4b. the streamed answer ──────────────────────────────────
 
 
 @dataclass
@@ -1089,7 +1089,7 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
             carried = list(attempt.said)
             view = replace(view, block_reasons=tuple(reasons), tool_results=earlier + tuple(produced),
                            already_said=tuple(unmarked(s) for s in carried), answer_only=True)
-    except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
+    except Exception as error:  # noqa: BLE001 - a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
         pending = error.partial.tool_results if isinstance(error, AdvisorFailure) else attempt.results
         produced += [r for r in pending if r not in produced]
@@ -1254,7 +1254,7 @@ async def _waited(stream: Any) -> Any:
 
 
 def _flagged(attempt: _Attempt) -> bool:
-    """A review flagged what was said: stop the stream, and the next run corrects it (section 4.8)."""
+    """A review flagged what was said: stop the stream, and the next run corrects it."""
     flag = attempt.reviews.take()
     if flag is None:
         return False
@@ -1451,7 +1451,7 @@ def _who(state: HotState) -> str:
 
 
 async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.5: the hard check, then ``PolicyAgent``.
+    """The hard check, then ``PolicyAgent``.
 
     Blocked with regenerations left: back to the advisor with the reasons.
     Blocked with none left: the lane's safe line, counted (two in a call send
@@ -1461,7 +1461,7 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
     context = runtime.context
     draft = state.get("draft") or {}
     if draft.get("streamed"):
-        return {}  # every sentence was checked before it was said (section 4.8)
+        return {}  # every sentence was checked before it was said
     if draft.get("fallback"):
         return {"guard": {"passed": True, "fallback": True}}
     text = unmarked(draft.get("text") or "")
@@ -1517,7 +1517,7 @@ def in_force_texts() -> tuple[str, ...]:
 
 
 def guard_input(state: HotState, context: HotContext, text: str, results: tuple[dict[str, Any], ...]) -> GuardInput:
-    """What the hard check reads of a draft, or of one sentence of a streamed one (section 4.5)."""
+    """What the hard check reads of a draft, or of one sentence of a streamed one."""
     brief = state.get("brief") or {}
     tier = state.get("tier") or "UNKNOWN"
     policy, playbook = shown_passages(_passages(state))
@@ -1655,7 +1655,7 @@ def after_guard(state: HotState) -> str:
 
 
 async def respond(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.6: say it, or hand it to the consultant.
+    """Say it, or hand it to the consultant.
 
     The ``[Bn]`` marks are stripped and kept as the lines used. In speak
     mode the reply joins ``messages``, tokenised; the API restores the
@@ -1725,7 +1725,7 @@ AUTO_ACCEPTOR = "auto"
 
 
 async def persist(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.7: the checkpointer has saved working memory by now; this
+    """The checkpointer has saved working memory by now; this
     writes the transcript row and the ``calls`` projection through the store
     the caller handed in (the API's tables, or the evaluation runner's trace)."""
     store = runtime.context.store
@@ -1746,7 +1746,7 @@ async def persist(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
 # ── helpers ───────────────────────────────────────────────────────────────
 
 
-#: Told to the advisor when the turn's words were searched and nothing relevant came back (section 7.3).
+#: Told to the advisor when the turn's words were searched and nothing relevant came back.
 NOTHING_RELEVANT = "Tài liệu: không có đoạn nào đủ liên quan tới câu khách vừa nói."
 
 

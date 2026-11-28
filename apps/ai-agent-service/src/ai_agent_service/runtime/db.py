@@ -1,6 +1,6 @@
 """The agent's PostgreSQL access: one async pool, the LangGraph checkpointer, the call tables.
 
-Ported from the reference project's ``api/db.py`` (``docs/design.md`` section 3.1)
+Ported from the reference project's ``api/db.py``
 with two changes for this platform:
 
 * Everything is in the agent's own schema (``config.database``): the pool's
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 SCHEMA = """
 -- A call is a platform conversation while the assistant is active; a conversation that
--- goes idle is remembered and its next message opens a new call (docs/design.md 3.1).
+-- goes idle is remembered and its next message opens a new call.
 CREATE TABLE IF NOT EXISTS calls (
     id                   BIGSERIAL PRIMARY KEY,
     conversation_id      UUID,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS turns (
 CREATE UNIQUE INDEX IF NOT EXISTS turns_turn_idx ON turns (call_id, turn_id, speaker);
 CREATE INDEX IF NOT EXISTS turns_call_idx ON turns (call_id, created_at);
 
--- docs/design.md section 4.1: a call's personal data, one row per token, the
+-- A call's personal data, one row per token, the
 -- value encrypted. The model, the checkpoint and the transcript hold only the token.
 CREATE TABLE IF NOT EXISTS pii_vault (
     call_id     BIGINT NOT NULL REFERENCES calls(id) ON DELETE CASCADE,
@@ -188,7 +188,7 @@ class ErasureSafeSaver(AsyncPostgresSaver):
 
 
 async def init_checkpointer() -> AsyncPostgresSaver:
-    """The hot graph's working memory (section 3.1), over the shared pool, once."""
+    """The hot graph's working memory, over the shared pool, once."""
     global _checkpointer
     if _checkpointer is None:
         serde = JsonPlusSerializer(

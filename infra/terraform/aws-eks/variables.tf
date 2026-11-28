@@ -28,7 +28,7 @@ variable "single_nat_gateway" {
 variable "nat_gateway" {
   type        = bool
   default     = true
-  description = "false only while the cluster is destroyed (docs/deployment/eks-deploy.md, section 5): the nodes need the NAT to reach the model APIs, ECR and SQS."
+  description = "false only while the cluster is destroyed: the nodes need the NAT to reach the model APIs, ECR and SQS."
 }
 
 variable "kubernetes_version" {

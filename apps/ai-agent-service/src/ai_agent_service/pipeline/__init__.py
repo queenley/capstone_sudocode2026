@@ -6,9 +6,8 @@ each step lives in ``src/components`` (what the system can do) and
 state, calls it, and writes the result back. Neither components nor agents
 import from here.
 
-- :mod:`.hot`: while a customer waits, one turn at a time. ``docs/design.md``
-  section 4.
+- :mod:`.hot`: while a customer waits, one turn at a time.
 - :mod:`.cold`: after the call, nobody waiting: remembering the customer
-  (MemoryAgent) and scoring (QaAgent). Sections 4.7 and 5.4.
-- :mod:`.eval`: the offline test that drives both over scenarios. Section 9.
+  (MemoryAgent) and scoring (QaAgent).
+- :mod:`.eval`: the offline test that drives both over scenarios.
 """

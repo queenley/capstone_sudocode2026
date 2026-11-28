@@ -1,4 +1,4 @@
-"""The PII vault's rows. ``docs/design.md`` sections 4.1 and 5.3.
+"""The PII vault's rows.
 
 A call's tokens and the values behind them, encrypted with AES-GCM under a key
 derived from the platform secret. Loaded into a
@@ -19,7 +19,7 @@ from .db import connection, require_writable_call
 
 
 def identity_secret() -> str:
-    """The secret identity keys are hashed with (section 4.2)."""
+    """The secret identity keys are hashed with."""
     return derived_key("identity").hex()
 
 

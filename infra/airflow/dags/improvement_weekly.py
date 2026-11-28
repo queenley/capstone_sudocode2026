@@ -1,6 +1,6 @@
 """The weekly improvement round, every Monday at 02:00 (Asia/Ho_Chi_Minh).
 
-docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md, part C. Each task runs one command of the agent's
+Each task runs one command of the agent's
 ``pipeline.improve`` (pipeline/improve/weekly.py documents them); this file only orders them:
 
     restate_gaps -> weekly_learn -> wait_for_review -> weekly_measure

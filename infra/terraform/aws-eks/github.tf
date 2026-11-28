@@ -1,4 +1,4 @@
-# GitHub Actions deploys to this cluster (.github/workflows/deploy-eks.yml; docs/deployment/eks-cicd.md) with a role
+# GitHub Actions deploys to this cluster (.github/workflows/deploy-eks.yml) with a role
 # it assumes through OIDC: no AWS key is stored in GitHub. Only a run in the repository's "aws-production"
 # environment may assume it, and that environment asks a person to approve each run.
 #
@@ -101,6 +101,6 @@ resource "aws_ssm_parameter" "overlay" {
 }
 
 output "github_deploy_role_arn" {
-  description = "GitHub repository variable AWS_EKS_DEPLOY_ROLE_ARN (docs/deployment/eks-cicd.md)."
+  description = "GitHub repository variable AWS_EKS_DEPLOY_ROLE_ARN."
   value       = one(aws_iam_role.github_deploy[*].arn)
 }

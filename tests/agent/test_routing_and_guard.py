@@ -1,4 +1,4 @@
-"""Lanes by rules (``docs/design.md`` 4.3) and the hard guard (3.2): no model, no database."""
+"""Lanes by rules and the hard guard: no model, no database."""
 
 import pytest
 

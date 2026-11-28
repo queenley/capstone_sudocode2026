@@ -64,7 +64,7 @@ variable "health_check_grace_seconds" {
 variable "health_check_type" {
   type        = string
   default     = "ELB"
-  description = "ELB replaces an instance whose app is unhealthy. EC2 only for the first bootstrap, before any release exists (docs/deployment/aws-terraform-cicd.md, step 2)."
+  description = "ELB replaces an instance whose app is unhealthy. EC2 only for the first bootstrap, before any release exists."
   validation {
     condition     = contains(["ELB", "EC2"], var.health_check_type)
     error_message = "ELB or EC2."
@@ -85,7 +85,7 @@ variable "use_rds" {
     false (default, the cheapest): PostgreSQL runs as a container on the one instance, its files on an EBS data
     volume that outlives the instance (data_volume_gb), with daily snapshots and a nightly pg_dump to S3.
     true: RDS PostgreSQL (db_* below), up to asg_max instances, the weekly round on Fargate. Switching moves no data:
-    pg_dump from one, restore into the other (docs/deployment/aws-terraform-cicd.md, section 10).
+    pg_dump from one, restore into the other.
   EOT
 }
 
@@ -175,7 +175,7 @@ variable "alarm_email" {
 variable "monthly_budget_usd" {
   type        = number
   default     = 250
-  description = "AWS spend warning (model API spend is the provider's, not AWS's). The default single CPU host is about 215 USD a month on demand (docs/deployment/aws-plan.md section 9)."
+  description = "AWS spend warning (model API spend is the provider's, not AWS's). The default single CPU host is about 215 USD a month on demand."
 }
 
 # --- GitHub Actions ------------------------------------------------------------------------------------------

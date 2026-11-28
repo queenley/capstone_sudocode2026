@@ -1,7 +1,6 @@
 """The agent's touch points with platform-owned data, in one place.
 
-Transitional, as ``docs/architecture/microservices-target-structure.md``
-describes: Sales owns conversations, messages and handoffs, and the shared
+Transitional: Sales owns conversations, messages and handoffs, and the shared
 PostgreSQL still holds them. Until Sales exposes these as APIs/events, the AI
 service:
 

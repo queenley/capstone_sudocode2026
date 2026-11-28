@@ -1,4 +1,4 @@
-"""The improvement loop, one command per step. ``docs/design.md`` section 10.
+"""The improvement loop, one command per step.
 
 Two mechanisms and nothing else. Run from the repository's root with the agent's interpreter::
 

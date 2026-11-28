@@ -1,4 +1,4 @@
-"""The virtual clock, and the shop's working hours. ``docs/design.md`` Appendix A.
+"""The virtual clock, and the shop's working hours.
 
 Business logic reads ``now`` from the state, never the system clock: the
 evaluation runner sets it to the scenario's day, the API to the business day
@@ -21,7 +21,7 @@ from datetime import date, datetime, time, timedelta, timezone
 
 VIETNAM = timezone(timedelta(hours=7))
 
-#: Appendix A: the time of day every call is placed at, recorded in the manifest.
+#: The time of day every call is placed at, recorded in the manifest.
 CALL_TIME = time(10, 0)
 
 #: The organisers' reference date, the default business day.

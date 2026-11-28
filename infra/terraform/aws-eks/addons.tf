@@ -1,4 +1,4 @@
-# The cluster add-ons the manifests rely on (section 6, item 2), as Helm releases. The helm provider talks to the
+# The cluster add-ons the manifests rely on, as Helm releases. The helm provider talks to the
 # cluster this root creates: apply the cluster first (versions.tf). Chart versions are pinned; Karpenter's must
 # match kubernetes_version, so it is a variable.
 

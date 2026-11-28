@@ -1,9 +1,9 @@
-"""What is live, and going back. ``docs/design.md`` sections 7.5 and 10.4.
+"""What is live, and going back.
 
 The knowledge base the advisor reads is the organisers' corpus plus one
 version file, ``data/kb/v<N>.jsonl``, named by ``version`` in
 ``config/knowledge.yaml``. Everything that changes between rounds changes
-here, and nowhere else (section 10.1):
+here, and nowhere else:
 
 - :func:`publish` writes the next version: the one in force plus the
   approved entries. It never edits a file that exists, so every version a

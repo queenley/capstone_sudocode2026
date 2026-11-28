@@ -1,17 +1,17 @@
 """mcp-crm: who the customer is, and the three things the advisor may do for them.
 
-``docs/design.md`` section 6.1. ``crm.get_customer``, ``order.create``,
+``crm.get_customer``, ``order.create``,
 ``schedule.callback`` and ``handoff.transfer``, under the organisers' names and
 required arguments, each wrapping the reference mock (:mod:`.btc`): the COD
 limit, a price that must equal the quote of the day, a callback moved off a
 holiday, a Handoff Brief that must carry every required field.
 
 Each write tool takes an ``idempotency_key`` the harness sets: a write is
-never retried (section 6.1), and the same key seen twice returns the first
+never retried, and the same key seen twice returns the first
 outcome rather than a second order.
 
 The three write tools are the advisor's alone. Before any of them runs, the
-harness has already checked its arguments (section 4.4, the guardrail before
+harness has already checked its arguments (the guardrail before
 act); the mock checks again, so a price that slipped past one is refused by
 the other.
 """
@@ -118,7 +118,7 @@ async def order_create(
         purchase_authorization: Signed consent supplied by the system; leave it out.
     """
     m = btc.mock()
-    # order_group is the team's own: the organisers' mock does not take it (the guard reads it, section 4.4).
+    # order_group is the team's own: the organisers' mock does not take it (the guard reads it).
     result = await btc.call(
         "order.create", m.order_create, idempotency_key=idempotency_key,
         call_id=call_id, turn_id=turn_id, purchase_authorization=purchase_authorization, order_group=order_group,

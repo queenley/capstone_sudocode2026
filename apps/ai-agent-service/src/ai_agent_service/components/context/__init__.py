@@ -1,6 +1,6 @@
 """Context: what reaches the prompt, what is cut, and when the thread is compacted.
 
-``docs/design.md`` section 4.4. The brief asks outright "what goes into the
+The brief asks outright "what goes into the
 prompt and what is cut", so the answer is a declared order, not something
 buried in a prompt.
 

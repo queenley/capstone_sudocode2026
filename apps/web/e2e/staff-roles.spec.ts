@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md, part A: the admin has a workspace of its own, and the sales
+// The admin has a workspace of its own, and the sales
 // team's page links to it only for an admin. Access itself is the API's (403), so the page is only checked for where
 // it sends a person and which links it offers.
 test.use({ channel: process.env.CI ? undefined : "chrome" });

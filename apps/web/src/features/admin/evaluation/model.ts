@@ -1,5 +1,5 @@
 // The evaluation history as the API returns it (GET /api/developer/evaluations), and what each number means.
-// Numbers of two runs compare only on the same cohort (scenario files) and extractor (evaluation/README.md).
+// Numbers of two runs compare only on the same cohort (scenario files) and extractor.
 
 export type Run = {
   run_id: string;

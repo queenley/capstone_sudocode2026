@@ -1,6 +1,6 @@
-"""Deciding the write for a candidate that passed the gate. ``docs/design.md`` section 5.4, step ``commit``.
+"""Deciding the write for a candidate that passed the gate.
 
-The ledger is never overwritten and never deleted from (section 5.3). For a
+The ledger is never overwritten and never deleted from. For a
 closed slot the operation follows from the win rule, so it is code:
 
 - nothing held for the slot: **add**;

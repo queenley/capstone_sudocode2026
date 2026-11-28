@@ -1,8 +1,8 @@
-"""Who approves what, and the one log of every change. ``docs/design.md`` section 10.4.
+"""Who approves what, and the one log of every change.
 
 | Change | Approved before it goes live by | After |
 |---|---|---|
-| Knowledge Gap Loop entry | a person, entry by entry, after the gate of section 10.2 | revocable; adds a growth case |
+| Knowledge Gap Loop entry | a person, entry by entry, after the gate | revocable; adds a growth case |
 | Skill change from Reflection | the screen and the PolicyAgent check, the ApprovalAgent where the set states what it expects, then a person | a pointer back (rollback) |
 
 **No agent both writes and approves.** The QaAgent scores and diagnoses, the

@@ -1,5 +1,5 @@
 # Demo data on a cluster, as the `seed` service does locally (docker-compose.yml): the BTC catalogue, 70 CRM customers
-# and their earlier orders, product photos. Run once after the migration Job (docs/deployment/eks-deploy.md 2.6);
+# and their earlier orders, product photos. Run once after the migration Job;
 # safe to run again, each row is skipped when it is already there. The data ships in the backend-common image
 # (data/seed, apps/ai-agent-service/data/btc). Same image swap as migrate-job.yaml, and one more: kustomize names
 # the config map telesales-config-<hash>, so replace telesales-config with the name the app's pods use.

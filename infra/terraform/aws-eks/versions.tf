@@ -1,4 +1,4 @@
-# AWS on EKS (docs/deployment/eks-architecture.md): VPC over three AZs, EKS with Karpenter, Aurora PostgreSQL
+# AWS on EKS: VPC over three AZs, EKS with Karpenter, Aurora PostgreSQL
 # Serverless v2, ElastiCache Serverless (Valkey), EFS, SQS, ECR, Pod Identity, and the cluster add-ons (AWS Load
 # Balancer Controller, External Secrets, KEDA, metrics-server, Karpenter, EFS CSI). The manifests that run on it are
 # infra/kubernetes/overlays/aws-production.
@@ -9,7 +9,7 @@
 #   terraform apply -target=module.vpc -target=module.eks      # the cluster first: the helm provider needs it
 #   terraform apply
 #
-# Spends money while it exists (section 5): about 120-150 USD a month with nodes at zero and Aurora paused.
+# Spends money while it exists: about 120-150 USD a month with nodes at zero and Aurora paused.
 terraform {
   required_version = ">= 1.10.0"
 

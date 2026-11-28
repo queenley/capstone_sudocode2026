@@ -1,6 +1,6 @@
-"""One line of the organisers' trace per agent turn. ``docs/design.md`` section 9.3.
+"""One line of the organisers' trace per agent turn.
 
-The grader reads the trace and nothing else (section 0.4), so a line holds
+The grader reads the trace and nothing else, so a line holds
 exactly what ``schemas/trace_log.schema.json`` names; what helps a person
 read a run but is not graded (the lane, the guard's verdicts, an error) goes
 to the run's diagnostics file instead. Every line is checked against the
@@ -16,7 +16,7 @@ How each field is filled, matching ``eval/reference_eval.py``:
   a later call acts on (organisers' answer 10). A call the guardrail before
   act refused never ran, so it is not here. The idempotency key is
   transport, not business: dropped.
-- ``facts_used``: first section 5.5's chain, the ``[Bn]`` the reply cited, the
+- ``facts_used``: first the citation chain, the ``[Bn]`` the reply cited, the
   ``fact_ids`` of those brief lines, the slots of those facts (only facts in
   force are resolved; a line with no ledger fact behind it names no slot).
   When the extractor runs, the slots it saw reused from an earlier call come
@@ -24,7 +24,7 @@ How each field is filled, matching ``eval/reference_eval.py``:
 - ``memory_writes``: on the last line of each call, what ``after_call``
   wrote, as ``{key, value, op, source, customer_id}``. Never ``fact_id``: a
   twelve-character hex id can be all digits, and any run of 10 to 14 digits in
-  ``memory_writes`` counts as leaked personal data (section 0.5, trap 4).
+  ``memory_writes`` counts as leaked personal data.
 - ``call_brief_latency_ms``: on turn 1 of ``call_2`` and ``call_3``.
 - ``customer_input_mode``: the scenario's ``input_mode`` when the call gives
   ``customer_turns_asr``, else ``clean``.
@@ -76,7 +76,7 @@ def tool_result(envelope: Any) -> Any:
 
 
 def facts_used(state: Mapping[str, Any]) -> list[str]:
-    """Slots of the facts behind the brief lines the reply cited (section 5.5)."""
+    """Slots of the facts behind the brief lines the reply cited."""
     brief = state.get("brief") or {}
     cited = (state.get("reply") or {}).get("used_lines") or []
     return used_slots(cited, state.get("brief_lines") or [], brief.get("profile_facts") or {})

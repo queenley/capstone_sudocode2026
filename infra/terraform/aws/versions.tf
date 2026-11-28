@@ -1,6 +1,5 @@
-# AWS phase 2 (docs/deployment/aws-plan.md, section 3): ALB + an Auto Scaling group of EC2 running Docker Compose,
-# RDS PostgreSQL, EFS, ECR, and the weekly improvement round on Fargate. How to apply it and wire GitHub Actions:
-# docs/deployment/aws-terraform-cicd.md.
+# AWS phase 2: ALB + an Auto Scaling group of EC2 running Docker Compose,
+# RDS PostgreSQL, EFS, ECR, and the weekly improvement round on Fargate.
 #
 # Deliberately absent (aws-plan.md 3.1): EKS, NAT Gateway, interface endpoints, ElastiCache, WAF, MWAA, MSK.
 terraform {

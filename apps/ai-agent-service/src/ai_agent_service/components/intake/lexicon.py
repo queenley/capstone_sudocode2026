@@ -1,4 +1,4 @@
-"""The product-name dictionary for recognised speech. ``docs/design.md`` section 4.1, step 3.
+"""The product-name dictionary for recognised speech.
 
 One module for text and voice: a scenario's ``customer_turns_asr`` and a live
 call's recogniser output are corrected by the same rules (the brief, page 3:

@@ -1,4 +1,4 @@
-"""``kb:changed``: tell every knowledge server that ``kb_chunks`` changed (``eks-architecture.md`` section 3.2).
+"""``kb:changed``: tell every knowledge server that ``kb_chunks`` changed.
 
 The writer saves to Postgres first, then publishes on the agent's Valkey (``AGENT_REDIS_URL``). Each ``mcp-knowledge``
 process listens from its first search and, on a message, marks its index stale: the next search compares

@@ -1,4 +1,4 @@
-"""The guardrail before act: checking a write tool's arguments. ``docs/design.md`` section 4.4.
+"""The guardrail before act: checking a write tool's arguments.
 
 The brief's figure puts GUARDRAIL before ACT. Before a tool with an effect
 runs, the harness checks its arguments; a failure goes back to the model as
@@ -11,7 +11,7 @@ a tool error with the reason, and nothing happens in the business.
 | ``schedule.callback`` | a date and time in Vietnam time, not in the past, inside working hours (LN-01) or on a holiday, which the tool itself moves (LN-02, ``moved_from``, and the customer is told); otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | the advisor decides; outside lane HANDOFF the PolicyAgent checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | VERIFIED, and the customer agreed when asked to confirm (QT-06): *intents* ``delete``, read by Jev; the word lists only when Jev gave no answer |
-| any write tool in copilot mode | refused: the consultant acts, the advisor only suggests (section 4.6) |
+| any write tool in copilot mode | refused: the consultant acts, the advisor only suggests |
 
 A customer the shop has never met may order on their own line: UNKNOWN with
 a phone from the connection is allowed; PROBABLE and AMBIGUOUS are not,
@@ -30,7 +30,7 @@ from ..intake.itn import format_vnd
 from ..intake.text import plain
 from . import Verdict, purchase
 
-#: Tools with an effect wait for the reviews of what was just said (section 4.8).
+#: Tools with an effect wait for the reviews of what was just said.
 #: They are the write tools, so the two sets are one.
 WRITE_TOOLS = frozenset({"order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion"})
 CUSTOMER_READ_TOOLS = frozenset({"order_status", "crm_get_customer"})

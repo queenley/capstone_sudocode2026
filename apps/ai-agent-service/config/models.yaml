@@ -43,7 +43,7 @@
 # fall back to whatever the provider defaults to. `null` is different from
 # unset and means "make the call without this parameter at all".
 defaults:
-  # docs/design.md section 9.6 and Appendix D: every call is temperature 0, or a
+  # Every call is temperature 0, or a
   # run cannot be reproduced and the evaluation cache never hits. This is the
   # one number that makes `eval replay` mean anything, so it is a default
   # rather than something each agent remembers to set.
@@ -104,7 +104,7 @@ agents:
       # is a parse failure and a wasted regeneration, not a shorter answer.
       max_tokens: 2048
 
-  # docs/design.md section 9.4 and Appendix C: the evaluation's extractor of
+  # The evaluation's extractor of
   # questions, claims and fact use (ai_agent_service/components/evaluation/scorers.py). Not
   # an agent of the product; named here so
   # its model is one line of config like theirs, on the advisor's OpenAI key.
@@ -121,7 +121,7 @@ agents:
       # Per-item quotes and spans exceed 1024 tokens on long turns (Oct 17 run); reasoning tokens count too.
       max_tokens: 8192
 
-  # docs/design.md section 5.4: the MemoryAgent reads the customer's words
+  # The MemoryAgent reads the customer's words
   # with one structured-output call after the call; its rules stand in when
   # this model cannot answer. Off the hot path, so chosen for reading
   # Vietnamese rather than for speed.
@@ -131,7 +131,7 @@ agents:
     generation:
       max_tokens: 2048
 
-  # Section 4.4: folds the turns of a long call into working_summary. On the
+  # Folds the turns of a long call into working_summary. On the
   # hot path, but only once a call passes sixteen messages.
   compactor:
     provider: openai
@@ -139,7 +139,7 @@ agents:
     generation:
       max_tokens: 1024
 
-  # Section 10.3: the QaAgent scores a learning run's calls on the BTC rubric
+  # The QaAgent scores a learning run's calls on the BTC rubric
   # and says what kind of failure each is. Not the evaluation's judge: that one
   # is pinned on the evaluation side and no improvement round ever changes it.
   # 2026-11-09: the advisor's own model, with reasoning: whether a skill
@@ -155,7 +155,7 @@ agents:
       # Reasoning tokens count against this budget before the answer does.
       max_tokens: 8192
 
-  # Section 7.3: the questions each policy section answers, written once into
+  # The questions each policy section answers, written once into
   # data/kb/questions.jsonl and indexed with it (components/knowledge/expand.py).
   # Offline and once per section's words; never on the hot path.
   knowledge:
@@ -167,7 +167,7 @@ agents:
       use_responses_api: false
       max_tokens: 4096
 
-  # Section 10.3: the advisor's reflection on its own calls, after they end:
+  # The advisor's reflection on its own calls, after they end:
   # lesson cards, and the one sentence of a skill several cards share. A larger
   # model than the advisor's (2026-11-10): off the hot path, a few calls a
   # round, and the lessons are only as good as the model drawing them (ACE).
@@ -188,7 +188,7 @@ agents:
       use_responses_api: true
       max_tokens: 8192
 
-  # Section 10.4: decides a Reflection change against what the people who
+  # Decides a Reflection change against what the people who
   # wrote the learning set expect it to learn (agents/approval.py). One call
   # per change, on a model as strong as the one that wrote it.
   approval:
@@ -328,7 +328,7 @@ providers:
 # ── Evaluation models ────────────────────────────────────────────────────────
 # An evaluation model reads a piece of state and answers typed questions with a
 # probability. It writes no text. That is the shape of the soft guardrail of
-# docs/design.md section 4.5 ("does this draft promise free shipping the tools
+# ("does this draft promise free shipping the tools
 # did not give"), so the PolicyAgent asks one of these.
 #
 # Kept apart from `providers` and `agents` on purpose: these are not chat
@@ -359,7 +359,7 @@ evaluators:
     timeout: 1.5
 
 # ── Voice ────────────────────────────────────────────────────────────────────
-# docs/design.md section 4.11 and Appendix C: VAD, ASR and TTS run locally.
+# VAD, ASR and TTS run locally.
 # These are the choices a call starts with; the Admin page may change them for
 # this process, the way it changes the advisor's model. The weights are not
 # in the repository: `python -m src.components.voice.fetch` downloads them into
@@ -386,7 +386,7 @@ voice:
   # vieneu: local and streaming. edge:<voice> uses Microsoft's free endpoint,
   # which refuses a share of requests, so it is for listening, not timing.
   tts: "vieneu:"
-  # Section 4.11: brand names the recogniser is told to expect (the
+  # Brand names the recogniser is told to expect (the
   # catalogue's brands are added on their own), and what it wrote -> what was
   # said. Only errors actually heard in the lab belong here.
   lexicon:

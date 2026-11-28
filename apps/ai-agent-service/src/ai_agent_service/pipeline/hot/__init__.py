@@ -1,4 +1,4 @@
-"""The hot graph: one customer turn, while the customer waits. ``docs/design.md`` section 4, figure 1.
+"""The hot graph: one customer turn, while the customer waits.
 
 - :mod:`.state`: ``HotState`` (checkpointed per call), ``TurnInput``,
   ``HotContext`` (the raw turn and the collaborators, never checkpointed).

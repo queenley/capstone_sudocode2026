@@ -1,6 +1,6 @@
 """Reading the ledger, and checking what it cites against the tools.
 
-``docs/design.md`` section 4.2, the ``retrieve`` and ``refresh`` halves of
+The ``retrieve`` and ``refresh`` halves of
 ``load_context``.
 
 :func:`retrieve` is the memory switch, and the only door memory has into a
@@ -35,7 +35,7 @@ from ..intake.itn import format_vnd
 from .brief import CHANNELS
 from .ontology import coerce
 
-#: An episode older than this is reported as stale (section 5.3, the address TTL).
+#: An episode older than this is reported as stale (the address TTL).
 STALE_DAYS = 180
 
 
@@ -119,7 +119,7 @@ async def refresh(
     """Products and orders as they stand today, and the warnings for what changed.
 
     *channel* is this call's channel; with it, a contact on another channel
-    newer than the last one on this channel becomes a warning (section 4.2):
+    newer than the last one on this channel becomes a warning:
     the customer may be calling about what they were told there.
     """
     warnings: list[str] = []
