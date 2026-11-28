@@ -10,13 +10,13 @@ import { RANGE, ROWS, TERMS } from "./content";
 // The home page's sections, in page order (HomeStore, app/(shop)/page.tsx): a store front, as shoppers expect one.
 // A short hero whose window turns through four featured products; then the products lead the page.
 
-const HERO_MS = 5000;
+const HERO_MS = 4000;
 
 /**
- * The hero: what the shop sells and its two actions on the left; on the right its four featured products, one at a
- * time, as a shop window. Each moves on after a few seconds; the thumbnails under it say which is showing and how
- * long until the next (the bar), and pick one directly. It holds still while the pointer or the keyboard is on it,
- * when paused and under reduced motion; on a phone a swipe turns it.
+ * The hero: a full-width band on the brand green whose four slides, one featured product each, move on by
+ * themselves every four seconds, in a loop; the four dots under them say which one shows and pick one. The band
+ * holds still while the pointer or the keyboard is on it, when paused, and under reduced motion; a swipe turns
+ * it on a phone. (The client's choice over the taste kit's "no carousel" rule, 2026-11-28.)
  */
 export function HomeHero({ products }: { products: ShopProduct[] | null }) {
   const slides = (products || []).slice(0, 4);
@@ -45,102 +45,92 @@ export function HomeHero({ products }: { products: ShopProduct[] | null }) {
 
   return (
     <section className="s-home-hero s-home-block" data-enter aria-labelledby="home-h">
-      <div className="s-wrap s-home-hero__grid">
-        <div className="s-home-hero__copy">
-          <p className="s-home-hero__kicker">Quivo · mua sắm cho cả nhà</p>
-          <h1 id="home-h">Gia dụng, thời trang và đồ mẹ bé chính hãng</h1>
-          <p className="s-home-hero__lede">Giao miễn phí cho đơn từ 2.000.000₫ · Đổi trả trong 7 ngày · Trả tiền khi nhận hàng</p>
-          <div className="s-home-hero__actions">
-            <Link className="s-btn s-btn-lg" href="/khuyen-mai">Xem hàng giảm giá</Link>
-            <button type="button" className="s-btn s-btn-outline s-btn-lg" onClick={() => shopContext.openChat()}>
-              <Icon name="assistant" size={20} /> Hỏi tư vấn
-            </button>
-          </div>
-        </div>
-
-        <div
-          className="s-home-show"
-          aria-roledescription="băng chuyền"
-          aria-label="Sản phẩm nổi bật"
-          onMouseEnter={() => setHeld(true)}
-          onMouseLeave={() => setHeld(false)}
-          onFocus={() => setHeld(true)}
-          onBlur={() => setHeld(false)}
-          onTouchStart={(event) => { touch.current = event.touches[0].clientX; }}
-          onTouchEnd={(event) => {
-            const from = touch.current;
-            touch.current = null;
-            if (from === null) return;
-            const moved = event.changedTouches[0].clientX - from;
-            if (Math.abs(moved) > 40) go(index + (moved < 0 ? 1 : -1));
-          }}
-        >
-          {slides.length > 0 ? (
-            <>
-              <div className="s-home-show__stage">
+      <h1 id="home-h" className="s-home-hero__h1 s-wrap">Gia dụng, thời trang và đồ mẹ bé chính hãng</h1>
+      <div
+        className="s-home-show"
+        aria-roledescription="băng chuyền"
+        aria-label="Sản phẩm nổi bật"
+        onMouseEnter={() => setHeld(true)}
+        onMouseLeave={() => setHeld(false)}
+        onFocus={() => setHeld(true)}
+        onBlur={() => setHeld(false)}
+        onTouchStart={(event) => { touch.current = event.touches[0].clientX; }}
+        onTouchEnd={(event) => {
+          const from = touch.current;
+          touch.current = null;
+          if (from === null) return;
+          const moved = event.changedTouches[0].clientX - from;
+          if (Math.abs(moved) > 40) go(index + (moved < 0 ? 1 : -1));
+        }}
+      >
+        {slides.length > 0 ? (
+          <>
+            <div className="s-home-show__viewport">
+              <div className="s-home-show__track" style={{ transform: `translateX(-${index * 100}%)` }}>
                 {slides.map((product, i) => {
                   const off = discountPercent(product.price, product.listPrice);
                   return (
-                    <Link
+                    <div
                       key={product.ref}
-                      href={`/san-pham/${encodeURIComponent(product.ref)}`}
                       className={`s-home-show__slide${i === index ? " is-on" : ""}`}
                       aria-hidden={i !== index}
-                      tabIndex={i === index ? 0 : -1}
                       aria-roledescription="trang"
                       aria-label={`${i + 1} / ${slides.length}: ${product.name}`}
                     >
-                      <span className="s-home-show__pic">
-                        {product.image && <img src={product.image} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" />}
-                        {off > 0 && <span className="s-home-show__off">-{off}%</span>}
-                      </span>
-                      <span className="s-home-show__info">
-                        <span className="s-home-show__cat">{categoryName(product.category)}</span>
-                        <strong>{product.name}</strong>
-                        <span className="s-home-show__price">
-                          {money(product.price)}
-                          {off > 0 && <s>{money(product.listPrice)}</s>}
-                        </span>
-                        <span className="s-home-show__cta">Xem sản phẩm →</span>
-                      </span>
-                    </Link>
+                      <div className="s-wrap s-home-show__row">
+                        <div className="s-home-show__info">
+                          <span className="s-home-show__cat">{categoryName(product.category)}</span>
+                          <strong>{product.name}</strong>
+                          <span className="s-home-show__price">
+                            {money(product.price)}
+                            {off > 0 && <s>{money(product.listPrice)}</s>}
+                            {off > 0 && <span className="s-home-show__off">-{off}%</span>}
+                          </span>
+                          <span className="s-home-show__actions">
+                            <Link className="s-btn s-btn-lg s-home-show__buy" href={`/san-pham/${encodeURIComponent(product.ref)}`}
+                              tabIndex={i === index ? 0 : -1}>
+                              Xem sản phẩm
+                            </Link>
+                            <button type="button" className="s-btn s-btn-lg s-home-show__ask" tabIndex={i === index ? 0 : -1}
+                              onClick={() => shopContext.openChat()}>
+                              <Icon name="assistant" size={20} /> Hỏi tư vấn
+                            </button>
+                          </span>
+                        </div>
+                        <Link className="s-home-show__pic" href={`/san-pham/${encodeURIComponent(product.ref)}`}
+                          tabIndex={-1} aria-hidden="true">
+                          {product.image && <img src={product.image} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" />}
+                        </Link>
+                      </div>
+                    </div>
                   );
                 })}
-                {slides.length > 1 && (
-                  <>
-                    <button type="button" className="s-home-round s-home-show__prev" onClick={() => go(index - 1)} aria-label="Sản phẩm trước">‹</button>
-                    <button type="button" className="s-home-round s-home-show__next" onClick={() => go(index + 1)} aria-label="Sản phẩm tiếp theo">›</button>
-                  </>
-                )}
               </div>
-              <div className="s-home-show__thumbs">
-                {slides.map((product, i) => (
-                  <button
-                    key={product.ref}
-                    type="button"
-                    aria-label={`Xem ${product.name}`}
-                    aria-current={i === index ? "true" : undefined}
-                    className={`s-home-show__thumb${i === index ? " is-on" : ""}`}
-                    onClick={() => go(i)}
-                  >
-                    {product.image ? <img src={product.image} alt="" loading="lazy" decoding="async" /> : <span>{i + 1}</span>}
-                    {i === index && running && (
-                      <span className="s-home-show__bar" key={index} style={{ animationDuration: `${HERO_MS}ms` }} />
-                    )}
-                  </button>
-                ))}
-                {!still && slides.length > 1 && (
-                  <button type="button" className="s-home-pause" onClick={() => setPaused((value) => !value)}
-                    aria-pressed={paused} aria-label={paused ? "Chạy tiếp" : "Tạm dừng"} title={paused ? "Chạy tiếp" : "Tạm dừng"}>
-                    {paused ? "▶" : "❚❚"}
-                  </button>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="s-home-show__stage s-home-skeleton" aria-hidden="true" />
-          )}
-        </div>
+            </div>
+            <div className="s-home-show__dots">
+              {slides.map((product, i) => (
+                <button
+                  key={product.ref}
+                  type="button"
+                  className={`s-home-show__dot${i === index ? " is-on" : ""}`}
+                  aria-label={`Xem ${product.name}`}
+                  aria-current={i === index ? "true" : undefined}
+                  onClick={() => go(i)}
+                >
+                  <span style={i === index && running ? { animationDuration: `${HERO_MS}ms` } : undefined} key={`${i}-${index}`} />
+                </button>
+              ))}
+              {!still && slides.length > 1 && (
+                <button type="button" className="s-home-show__pause" onClick={() => setPaused((value) => !value)}
+                  aria-pressed={paused} aria-label={paused ? "Chạy tiếp" : "Tạm dừng"} title={paused ? "Chạy tiếp" : "Tạm dừng"}>
+                  {paused ? "▶" : "❚❚"}
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="s-wrap"><div className="s-home-show__placeholder s-home-skeleton" aria-hidden="true" /></div>
+        )}
       </div>
     </section>
   );
