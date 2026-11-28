@@ -1,4 +1,4 @@
-"""Signals: where the system learns it did something badly. ``docs/design.md`` 10.1.
+"""Signals: where the system learns it did something badly.
 
 The brief's four sources, each feeding exactly one place:
 
@@ -12,7 +12,7 @@ The brief's four sources, each feeding exactly one place:
 Plus ``oos_early`` and ``oos_late`` for the Gap Loop. A violation (a wrong
 promise, a leak) waits for nothing: branch B alerts QA at once.
 
-Every row keeps ``call_id`` and ``turn_id`` (section 5.5).
+Every row keeps ``call_id`` and ``turn_id``.
 
 Two kinds of record live here:
 

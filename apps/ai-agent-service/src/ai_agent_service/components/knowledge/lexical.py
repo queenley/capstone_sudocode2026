@@ -1,4 +1,4 @@
-"""Keyword retrieval: Okapi BM25 over syllables and syllable pairs. ``docs/design.md`` section 7.3.
+"""Keyword retrieval: Okapi BM25 over syllables and syllable pairs.
 
 Vietnamese words are written as syllables separated by spaces, and the unit
 that carries meaning is often two of them ("đổi trả", "bảo hành"), so a pair
@@ -120,7 +120,7 @@ def fuse(rankings: Sequence[Sequence[tuple[str, float]]], *, k: int = 60) -> lis
 
     Rank, not score, is what is combined, because a BM25 score and a cosine
     are on scales nothing relates; that is also why the fused score cannot
-    carry the abstain threshold (``docs/design.md`` section 7.3).
+    carry the abstain threshold.
     """
     fused: dict[str, float] = {}
     for ranking in rankings:

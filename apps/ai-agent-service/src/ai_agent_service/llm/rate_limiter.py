@@ -18,7 +18,7 @@ Three changes follow from that:
 
 ``aacquire`` also sleeps with asyncio rather than ``time.sleep``, which in the
 original stalled the whole event loop — enough to serialise the parallel tool
-calls that ``docs/design.md`` section 4.2 depends on for its latency budget.
+calls that the turn depends on for its latency budget.
 """
 
 from __future__ import annotations

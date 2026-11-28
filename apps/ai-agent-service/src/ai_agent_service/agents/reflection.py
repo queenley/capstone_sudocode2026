@@ -1,4 +1,4 @@
-"""ReflectionAgent: the advisor's reflection on its own calls. ``docs/design.md`` section 10.3.
+"""ReflectionAgent: the advisor's reflection on its own calls.
 
 The brief, C.5 mechanism 3: "sau mỗi cuộc gọi, agent tự viết 'bài học rút
 ra' có cấu trúc, được kiểm tra rồi mới ghi vào bộ nhớ". This is the agent

@@ -1,4 +1,4 @@
-"""Compacting a long call. ``docs/design.md`` section 4.4.
+"""Compacting a long call.
 
 Past :data:`THRESHOLD` messages, the turns before the last four are folded
 into ``working_summary`` and removed from the thread, so the prompt stays
@@ -26,7 +26,7 @@ from ...llm.structured import StructuredOutput
 
 logger = logging.getLogger(__name__)
 
-#: Turns kept whole: section 4.4's "bốn lượt gần nhất", a turn being a customer
+#: Turns kept whole: the "bốn lượt gần nhất", a turn being a customer
 #: message and its answer.
 KEEP_MESSAGES = 8
 #: Fold once the thread holds this many messages.

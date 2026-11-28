@@ -1,4 +1,4 @@
-"""Chat cleanup and Unicode normalisation. ``docs/design.md`` section 4.1.
+"""Chat cleanup and Unicode normalisation.
 
 Teencode and abbreviations ("k" for không, "sp" for sản phẩm, "đc" for được)
 into plain Vietnamese, word by word and only where the word stands alone,

@@ -1,4 +1,4 @@
-# AWS, phase 2 (docs/deployment/aws-plan.md, section 3): the same stack on the EC2 of the Auto Scaling group,
+# AWS, phase 2: the same stack on the EC2 of the Auto Scaling group,
 # behind an ALB, with EFS for the agent's shared files. PostgreSQL is, by default, a container on the one instance
 # (Terraform use_rds = false, profile local-database), or RDS (use_rds = true). The instance's user data
 # (infra/terraform/aws/templates/user_data.sh.tftpl) writes .env and runs:

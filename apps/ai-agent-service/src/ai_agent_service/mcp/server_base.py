@@ -1,15 +1,15 @@
 """The skeleton every MCP server is built on.
 
-``docs/design.md`` section 6 has five small FastMCP processes, all alike in
+There are five small FastMCP processes, all alike in
 three ways, so those three ways live here once:
 
-- **A role on every call.** Section 6.2's four roles — advisor, harness,
+- **A role on every call.** The four roles — advisor, harness,
   memory_writer, admin — and the rule that a tool is callable by some of them
   and refused to the rest, by the server, whatever the client claims. Over
   HTTP the role is a request header; over stdio there is no header, so it is
   an environment variable the client sets when it starts the subprocess.
   Either way the check happens in one middleware, before the tool runs.
-- **One error contract.** Section 6.1: every tool answers
+- **One error contract.** Every tool answers
   ``{"ok": true, "data": ...}`` or ``{"ok": false, "error": {"code",
   "retryable", "message", "details"}}``. A business outcome such as an
   expired quote is an error the model should read and act on, so it is
@@ -55,8 +55,8 @@ ROLES = frozenset({"advisor", "harness", "memory_writer", "admin"})
 class ToolFailure(Exception):
     """A tool's business-level failure, returned to the caller as data.
 
-    ``retryable`` is what the adapter reads to decide on its one retry
-    (section 6.1); ``details`` carries anything the caller can act on, such
+    ``retryable`` is what the adapter reads to decide on its one retry;
+    ``details`` carries anything the caller can act on, such
     as the replacement for an expired quote.
     """
 
@@ -167,7 +167,7 @@ class Server:
         return decorator
 
     def run(self, argv: Sequence[str] | None = None) -> None:
-        """Serve. stdio by default, one subprocess per role (section 2);
+        """Serve. stdio by default, one subprocess per role;
         ``--transport http`` when several sessions share one server.
 
         Over stdio, stdout is the protocol channel: nothing in a server may

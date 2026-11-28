@@ -1,6 +1,6 @@
 """Turn persona plans into fully-labelled scenarios, using BTC ``mock_tools`` as ground truth.
 
-Flow (README "Label derivation")::
+Flow::
 
     plan_scenarios()  -> ScenarioPlan   customer, product, dates, outcomes; every tool call the ideal
                                         agent makes is EXECUTED on a fresh BTC mock (order ids, refunds,

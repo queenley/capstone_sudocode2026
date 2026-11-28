@@ -1,4 +1,4 @@
-"""The hot graph's wiring. ``docs/design.md`` section 4.
+"""The hot graph's wiring.
 
 Seven nodes, one to one with the brief's figure C.2:
 
@@ -19,7 +19,7 @@ a call and on a turn that brings a new key or answers the confirming
 question; on every other turn it passes straight through.
 
 Hanging up is not in the graph: the API starts ``after_call`` as a task,
-because nobody waits for it (section 2).
+because nobody waits for it.
 """
 
 from __future__ import annotations

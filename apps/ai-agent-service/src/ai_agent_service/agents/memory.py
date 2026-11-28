@@ -1,4 +1,4 @@
-"""MemoryAgent: what to remember about this customer. ``docs/design.md`` section 5.4.
+"""MemoryAgent: what to remember about this customer.
 
 Runs after verified web turns and in ``after_call`` under the ``memory_writer``
 role, the only path into the ledger. Of the five steps, two are judgements and live here; the gate and

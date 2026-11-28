@@ -2,14 +2,14 @@
 performance (latency, tokens, cost, with and without after_call), the quality counts and one row per scenario.
 
 ``run_eval.py --ingest`` keeps it in the database (:mod:`ai_agent_service.runtime.evaluations`) so the admin's
-dashboard can draw each week's numbers (``docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md``, parts B and D).
+dashboard can draw each week's numbers.
 Nothing here is computed again: the rates are the organisers' ``report.json`` (written by ``reference_eval.py``), the
 latency and cost the free reading of :func:`ai_agent_service.pipeline.eval.performance.measure`.
 
 Two layouts are read: a run directory of both configurations (``manifest.json``, ``full.jsonl``, ``report.json``),
 and a directory beside one trace (``full.manifest.json``, ``full.jsonl``, ``report.json``), which is what the
-improvement loop writes. Points of the history are comparable only on the same scenarios and the same extractor
-(``evaluation/README.md``): the record carries both, as ``cohort_sha256`` and ``extractor_version``.
+improvement loop writes. Points of the history are comparable only on the same scenarios and the same extractor:
+the record carries both, as ``cohort_sha256`` and ``extractor_version``.
 """
 
 from __future__ import annotations

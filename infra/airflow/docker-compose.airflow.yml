@@ -1,6 +1,6 @@
 # The weekly improvement round on Airflow, beside the app's compose (it uses its postgres network and the agent's
 # shared volumes). Local only: one container runs the scheduler and the webserver. On AWS the same commands
-# run as a Fargate task on an EventBridge schedule (infra/improve, docs/deployment/aws-plan.md 3.7).
+# run as a Fargate task on an EventBridge schedule (infra/improve).
 #
 #   docker compose -f docker-compose.yml -f infra/airflow/docker-compose.airflow.yml up -d --build airflow
 #   # UI: http://127.0.0.1:8080 (user admin, password AIRFLOW_ADMIN_PASSWORD: airflow-admin-local-only by default)

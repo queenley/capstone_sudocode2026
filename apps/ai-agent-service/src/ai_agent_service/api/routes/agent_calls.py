@@ -1,7 +1,6 @@
 """Staff console for the agent's calls: queue, transcript, handoff, copilot replies, FAQ, hang-up.
 
-Ported from the reference ``api/calls.py`` (``docs/design.md`` sections 4.6,
-4.10, 10.2). Customers take turns through ``/api/conversations/{id}/turns``;
+Ported from the reference ``api/calls.py``. Customers take turns through ``/api/conversations/{id}/turns``;
 these endpoints are for consultants (platform roles ``admin`` and ``agent``).
 """
 
@@ -59,7 +58,7 @@ class HandoffRequest(BaseModel):
 
 class ConsultantReply(BaseModel):
     content: str = Field(min_length=1, max_length=4000)
-    #: The feedback signal of section 4.6: "used" approves the suggestion, the other two reject it.
+    #: The feedback signal: "used" approves the suggestion, the other two reject it.
     action: Literal["used", "edited", "own"] = "own"
     #: Send even though the guard warned.
     force: bool = False

@@ -1,4 +1,4 @@
-"""What the shop's documents say, cut where the organisers cut them. ``docs/design.md`` sections 7.1, 7.2 and 7.5.
+"""What the shop's documents say, cut where the organisers cut them.
 
 Three sources end up in one knowledge base, each entry a :class:`Chunk`:
 
@@ -8,7 +8,7 @@ Three sources end up in one knowledge base, each entry a :class:`Chunk`:
   never split or merged, not even DT-01 with DT-OLD-01, which share a title.
 - **faq** and **playbook**: entries the improvement loop adds after a person
   approved them. Approved entries ship in the repository as
-  ``data/kb/v<N>.jsonl`` (section 7.5), because the organisers grade the final
+  ``data/kb/v<N>.jsonl``, because the organisers grade the final
   build from the README; entries saved during a demo stay in the database.
 
 Every chunk carries what retrieval needs to be safe as well as relevant:
@@ -32,7 +32,7 @@ Source = Literal["policy", "faq", "gap", "playbook"]
 SECTION = re.compile(r"^## \[([A-Z]+(?:-[A-Z]+)?-\d+)\]\s*(.*)$", re.MULTILINE)
 TITLE = re.compile(r"^# (.+)$", re.MULTILINE)
 
-#: Section 7.2: restricted chunk by chunk, not only document by document. A
+#: Restricted chunk by chunk, not only document by document. A
 #: document whose title marks it internal or for staff only is restricted
 #: whole; KM-06 sits in a public document but holds the price floor percentages.
 INTERNAL_MARKS = ("NỘI BỘ", "không dùng để tư vấn khách")
@@ -42,13 +42,13 @@ RESTRICTED_SECTIONS = frozenset({"KM-06"})
 
 #: Restricted chunks whose one usable fact reaches the customer through a tool
 #: instead: NB-02's restock dates come from ``inventory.check``
-#: (``restock_expected``), never from the note itself (section 7.2).
+#: (``restock_expected``), never from the note itself.
 THROUGH_TOOLS = {"NB-02": "inventory_check"}
 
 
 @dataclass(frozen=True)
 class Governs:
-    """One row of section 7.2's fixed table: which chunks a changelog entry
+    """One row of the fixed table: which chunks a changelog entry
     governs, and the window it puts them in force."""
 
     entry: str
@@ -61,7 +61,7 @@ class Governs:
         return chunk_id in self.ids or any(chunk_id.startswith(p) for p in self.prefixes)
 
 
-#: ``changelog.md``, read once by a person and fixed here (section 7.2).
+#: ``changelog.md``, read once by a person and fixed here.
 #:
 #: Only CL-01 puts chunks in windows, because only the returns policy exists
 #: in two versions in the corpus: the 2026-06 text (DT-OLD) for orders placed
@@ -118,7 +118,7 @@ class Chunk:
     campaign: str | None = None
     #: What an entry is about, as ``promotions.json`` writes it: ``SKU-AP-X``, ``category:gia-dung``, ``*``.
     applies_to: tuple[str, ...] = ()
-    #: For a team entry: where it came from, who approved it, what it cites (section 5.5).
+    #: For a team entry: where it came from, who approved it, what it cites.
     provenance: Mapping[str, Any] = field(default_factory=dict)
     #: The questions a customer would ask of it, in their words (:mod:`.expand`): indexed, never read to the advisor.
     questions: tuple[str, ...] = ()
@@ -127,7 +127,7 @@ class Chunk:
     def indexed(self) -> str:
         """The text the indexes see: the document and section titles first.
 
-        The deterministic form of Contextual Retrieval (section 7.3): a section
+        The deterministic form of Contextual Retrieval: a section
         such as "Hoàn tiền" means nothing on its own, "Chính sách đổi trả ...
         Hoàn tiền ..." does, and no model is needed to say so.
         """
@@ -200,7 +200,7 @@ def _industry(chunk_id: str) -> str | None:
 
 # ── the team's entries ────────────────────────────────────────────────────
 
-#: Fields every line of ``data/kb/v<N>.jsonl`` must have (section 7.5).
+#: Fields every line of ``data/kb/v<N>.jsonl`` must have.
 ENTRY_REQUIRED = ("chunk_id", "source", "title", "text")
 
 
@@ -291,7 +291,7 @@ def version_file(directory: Path, version: int) -> Path:
 
 
 def load_version(directory: Path, version: int) -> list[Chunk]:
-    """The approved entries of one knowledge version (section 7.5).
+    """The approved entries of one knowledge version.
 
     A missing file is an error, not an empty base: the configured version is
     what the run's manifest records, so it must exist.

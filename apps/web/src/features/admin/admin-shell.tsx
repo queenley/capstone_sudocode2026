@@ -1,7 +1,7 @@
 "use client";
 // The admin workspace's frame (app/admin/layout.tsx), apart from the sales team's (/ban-hang): the sign-in gate, the
 // sidebar with one link per section, the top bar and the notice line. The section itself is the route's page
-// (app/admin/<slug>/page.tsx). docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md, part A.
+// (app/admin/<slug>/page.tsx).
 //
 // Every section asks the API, which refuses any role but admin (403): the page never decides access on its own.
 import Link from "next/link";

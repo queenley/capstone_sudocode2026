@@ -1,6 +1,6 @@
 """What the system can do, one package per function.
 
-Each package holds the logic of one function of ``docs/design.md`` and knows
+Each package holds the logic of one function of the agent and knows
 nothing about the order things run in; that is ``src/pipeline``'s job. A
 component takes typed input and returns typed output, so the same check
 serves the advisor's draft, the consultant's text in copilot mode, and the

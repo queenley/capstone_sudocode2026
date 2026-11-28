@@ -1,12 +1,12 @@
-"""What the ledger can hold. ``docs/design.md`` section 5.2.
+"""What the ledger can hold.
 
 Slot names are exactly the organisers' (the grader matches strings), and
 flat. Where the design's names differ from the organisers' scenario format,
 the format wins (design, "Nguồn ràng buộc"): the objection slot is
 ``objection``, and ``alt_suggested`` is the second product an agent offered.
 
-Each slot has a kind, which decides who wins a conflict (section 5.4), a
-lifetime (section 5.3: a blocker or purchase intent lasts 30 days, an address
+Each slot has a kind, which decides who wins a conflict, a
+lifetime (a blocker or purchase intent lasts 30 days, an address
 180, needs never), whether it may be read to a customer who is not yet
 VERIFIED, and a value type that the write gate checks. ``hint`` is what the
 MemoryAgent's model is told the slot means, with the everyday ways customers
@@ -36,7 +36,7 @@ Kind = Literal["preference", "business_event", "past_event", "open_note"]
 #: the raw value.
 ValueType = Literal["str", "int", "bool", "date", "code", "plain", "size", "token", "str_list"]
 
-#: The slot open notes are stored under (section 5.2's "ghi chú mở").
+#: The slot open notes are stored under (the "ghi chú mở").
 NOTE_SLOT = "note"
 
 
@@ -136,7 +136,7 @@ INDUSTRIES: dict[str, dict[str, Slot]] = {
     },
 }
 
-#: Needs asked once and never again while they hold (section 5.2), in the
+#: Needs asked once and never again while they hold, in the
 #: order the brief lists them.
 NEEDS: tuple[str, ...] = tuple(name for block in INDUSTRIES.values() for name in block) + ("budget_vnd",)
 

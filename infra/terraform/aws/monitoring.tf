@@ -1,4 +1,4 @@
-# The minimum alarms of aws-plan.md section 6, to one SNS topic (and an email when alarm_email is set).
+# The minimum alarms, to one SNS topic (and an email when alarm_email is set).
 resource "aws_sns_topic" "alarms" {
   name = "${local.prefix}-alarms"
 }

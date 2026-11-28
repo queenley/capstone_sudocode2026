@@ -1,8 +1,8 @@
-"""The Knowledge Gap Loop's gate for an entry a consultant saved. ``docs/design.md`` section 10.2.
+"""The Knowledge Gap Loop's gate for an entry a consultant saved.
 
 A consultant answers a question the agent could not, and saves the answer
 from the console. The entry waits, not served, until a person approves it;
-approving runs the checks of section 10.2 that code can make:
+approving runs the checks that code can make:
 
 | Gate | Checked here |
 |---|---|
@@ -13,7 +13,7 @@ approving runs the checks of section 10.2 that code can make:
 Gates 1 and 4 (every sentence follows from a passage in force, no
 contradiction with an entry already there) need reading, and gates 5 and 6
 are the evaluation's: they are the reviewer's to judge, and the measured
-rounds' (section 10.4).
+rounds'.
 """
 
 from __future__ import annotations

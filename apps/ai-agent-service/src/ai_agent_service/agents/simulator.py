@@ -1,4 +1,4 @@
-"""SimulatorAgent: the organisers' customer simulator. ``docs/design.md`` sections 9.8 and 10.3.
+"""SimulatorAgent: the organisers' customer simulator.
 
 It was written for the improvement loop's exploration, removed on 2026-11-07
 (commit ``b5ab1f00``). Its one user now is ``run_eval.py --simulate``

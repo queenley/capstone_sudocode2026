@@ -1,4 +1,4 @@
-"""The agent under evaluation. ``docs/design.md`` section 9, figure H.
+"""The agent under evaluation.
 
 The organisers' command, ``python -m ai_agent_service.pipeline.eval.cli``
 (:mod:`.cli`), runs scenarios in their format through the agent, writes their

@@ -1,4 +1,4 @@
-"""How often a verification code may be sent (``docs/deployment/eks-architecture.md`` section 3.3).
+"""How often a verification code may be sent.
 
 Every code is an SMS someone pays for, and nothing stopped one person from asking for code after code. Before a
 challenge is made:

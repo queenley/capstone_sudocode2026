@@ -1,4 +1,4 @@
-"""The model rate limiter shared by every pod, in Valkey/Redis (``docs/deployment/eks-architecture.md`` section 3.1).
+"""The model rate limiter shared by every pod, in Valkey/Redis.
 
 :class:`AdvancedTokenRateLimiter` counts requests and tokens in this process, so N pods together send N times the
 provider's limit of ``config/models.yaml`` and meet a wall of 429s. This one keeps the same sliding windows in

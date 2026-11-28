@@ -1,4 +1,4 @@
-"""Identity: who is speaking, and how sure we are. ``docs/design.md`` section 4.2, figure B.
+"""Identity: who is speaking, and how sure we are.
 
 Runs in ``load_context`` at the start of a call, and again on any turn that
 brings a key the call has not seen or answers the confirming question.

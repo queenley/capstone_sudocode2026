@@ -1,4 +1,4 @@
-"""The Knowledge Gap Loop's gate (``docs/design.md`` 10.2): what code refuses before a person's approval counts."""
+"""The Knowledge Gap Loop's gate: what code refuses before a person's approval counts."""
 
 from ai_agent_service.components.improvement.gap import gate
 from ai_agent_service.components.knowledge.corpus import entry_chunk

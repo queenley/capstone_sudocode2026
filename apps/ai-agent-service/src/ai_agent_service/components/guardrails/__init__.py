@@ -1,6 +1,6 @@
 """Guardrails: checks before anything reaches the customer or the business.
 
-``docs/design.md`` sections 4.4, 4.5 and 4.9, figure F. Hard before soft,
+Hard before soft,
 because hard is cheap, deterministic and stops most of what goes wrong.
 
 - :mod:`.actions`: before a tool with an effect runs (GUARDRAIL before ACT):

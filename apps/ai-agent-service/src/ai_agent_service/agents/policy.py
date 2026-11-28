@@ -1,11 +1,11 @@
-"""PolicyAgent: the soft guardrail, on OpenAI's Decisions API. ``docs/design.md`` sections 4.5 and 12.
+"""PolicyAgent: the soft guardrail, on OpenAI's Decisions API.
 
 Runs after the hard check passes and catches what a regular expression
 cannot: a promise outside policy, a rule no longer in force, a remark on a
 competitor's price, pressure the stock does not justify.
 
 It reads :class:`PolicyInput` and nothing else: **no brief and no
-messages**, on purpose (section 12). The advisor has the old brief, the
+messages**, on purpose. The advisor has the old brief, the
 customer's pleading and the new price all in view, which is what makes it
 soften; this agent sees only the draft, the tool results and the policy, so
 an old price standing next to a new one is plain.
@@ -108,7 +108,7 @@ REASONS = {
 }
 
 
-#: Section 10.3: what a change to a skill may not teach. Its own definitions, read against the change, the rules it
+#: What a change to a skill may not teach. Its own definitions, read against the change, the rules it
 #: cites and the skill it changes.
 #: Read when first asked, off the hot path: a reply's review never needs them.
 #: "contradicts" asked of each source apart: a writer told only that its change contradicts something cannot tell what
@@ -145,7 +145,7 @@ CHANGE_REASONS = {
     "unavailable": "Kiểm tra chính sách không trả lời.",
 }
 
-#: Section 4.4: actions whose condition is what the customer means, read in context. Each is
+#: Actions whose condition is what the customer means, read in context. Each is
 #: asked alone, only when its action is about to run; the state is the last few messages,
 #: tokenised (no raw personal data reaches the model).
 INTENTS = {
@@ -209,7 +209,7 @@ def early_verdict(intent: str, probability: float | None) -> bool | None:
 
 @dataclass(frozen=True)
 class PolicyInput:
-    """What the Policy may read (section 3.2)."""
+    """What the Policy may read."""
 
     text: str
     tool_results: tuple[dict[str, Any], ...]
@@ -219,7 +219,7 @@ class PolicyInput:
     #: What this call established before this turn: quotes, orders created. An old quote is not unquoted.
     earlier: Mapping[str, Any] = field(default_factory=dict)
     #: What the customer said in this call, the latest last: their own figure is not the shop's, and repeating
-    #: their words is not a claim. Only their words: the advisor's would bring back what makes it soften (section 12).
+    #: their words is not a claim. Only their words: the advisor's would bring back what makes it soften.
     customer_said: tuple[str, ...] = ()
     #: The reply's amounts with no source, when the hard check already traced the others; None when it did not run.
     open_amounts: tuple[int, ...] | None = None
@@ -242,7 +242,7 @@ def _plain(value: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def review_input(view: PolicyInput) -> list[dict[str, Any]]:
-    """A sentence against its evidence, and not the conversation, on purpose (section 12): the advisor has the old
+    """A sentence against its evidence, and not the conversation, on purpose: the advisor has the old
     brief, the customer's pleading and the new price all in view, which is what makes it soften.
 
     Most of the evidence stays the same through a turn, so it ends a prefix; this turn's tool results grow, then the text.
@@ -308,7 +308,7 @@ class PolicyAgent(BaseAgent):
 
     async def review_change(self, text: str, *, cited_rules: Mapping[str, str], skill_now: str,
                             fixed_rules: str = "") -> PolicyVerdict:
-        """Check a change to a skill before a person sees it (section 10.3), against its own rules (:data:`CHANGE_RULES`).
+        """Check a change to a skill before a person sees it, against its own rules (:data:`CHANGE_RULES`).
 
         A reply's questions do not fit here: an instruction names tools and states no tool result, so it would read as
         an unbacked action. A failure flags the change, which is then never published; the person still sees it with

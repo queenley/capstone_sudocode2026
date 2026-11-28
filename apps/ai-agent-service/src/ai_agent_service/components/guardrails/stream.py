@@ -1,4 +1,4 @@
-"""A streamed reply, cut into sentences that are checked one at a time. ``docs/design.md`` section 4.8.
+"""A streamed reply, cut into sentences that are checked one at a time.
 
 The advisor's answer arrives in chunks. A sentence is said only once the
 guard has passed it, hard rules first and then the PolicyAgent when it
@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import re
 
-#: Section 4.8: a sentence longer than this is cut at its last space.
+#: A sentence longer than this is cut at its last space.
 MAX_SENTENCE = 200
 
 _END = re.compile(r"[.!?…]+(?:\s*\[B\d+\])*\s+")

@@ -1,6 +1,6 @@
 """Searching the knowledge base: which passages a turn may read, and when to say "no information".
 
-``docs/design.md`` sections 4.2 and 7.3. :class:`KnowledgeBase` answers one
+:class:`KnowledgeBase` answers one
 question per customer turn, in a few milliseconds, with:
 
 - the top passages, keyword (BM25) and meaning (embedding) rankings fused by
@@ -66,7 +66,7 @@ NOT_PLACED = re.compile(r"\b(?:giao|nhan|ship|den)\b")
 
 @dataclass(frozen=True)
 class Settings:
-    """How retrieval behaves; ``config/knowledge.yaml`` holds the values (section 7.3)."""
+    """How retrieval behaves; ``config/knowledge.yaml`` holds the values."""
 
     top_k: int = 5
     fusion_k: int = 60
@@ -110,7 +110,7 @@ class Result:
     top_score: float | None
     abstain: bool
     reason: Reason | None
-    #: The changelog entries the hits cite, pulled along with them (section 4.2).
+    #: The changelog entries the hits cite, pulled along with them.
     changelog: dict[str, Chunk] = field(default_factory=dict)
     #: "hybrid" or "keyword": which retrieval produced the ranking.
     mode: str = "keyword"
@@ -123,7 +123,7 @@ class Result:
 
 
 class KnowledgeBase:
-    """The chunks, their two indexes, and the search policy of section 7.3."""
+    """The chunks, their two indexes, and the search policy."""
 
     def __init__(
         self,
@@ -175,7 +175,7 @@ class KnowledgeBase:
         order already placed, decides which version of a policy holds (CL-01:
         an order placed before 01/10 keeps the old returns policy). Without
         either day nothing is filtered. A playbook entry for *situation* is
-        preferred over others (section 7.3). *other_order_dates* are this
+        preferred over others. *other_order_dates* are this
         customer's other orders when the question names none: the answer may
         differ between them, and the result says so. *about* is the SKUs this
         call is on: an entry written for one of them is preferred, an entry

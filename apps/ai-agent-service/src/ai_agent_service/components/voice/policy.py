@@ -1,4 +1,4 @@
-"""Which utterances count as a turn. ``docs/design.md`` section 4.11.
+"""Which utterances count as a turn.
 
 Voice activity alone cannot tell a caller cutting in from a caller saying
 "ừ" to show they are listening, from a cough, or from the line hissing. The

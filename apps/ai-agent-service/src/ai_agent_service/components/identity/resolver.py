@@ -1,4 +1,4 @@
-"""Keys, tiers, and the one confirming question. ``docs/design.md`` section 4.2.
+"""Keys, tiers, and the one confirming question.
 
 Keys come from the connection (the number a call came from, the Zalo or
 Facebook identity of a chat) and from what the customer says (a phone

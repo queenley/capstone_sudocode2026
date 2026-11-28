@@ -10,8 +10,7 @@ picks a model by itself.
 
 That is all the base does. The agents differ too much for more: the Advisor
 is a tool loop, the Policy one request to the Decisions API, the Memory and QA agents run
-after the call. None holds state between calls (``docs/design.md``,
-principle 2). Each builds the rest from ``src/components`` and the framework.
+after the call. None holds state between calls. Each builds the rest from ``src/components`` and the framework.
 """
 
 from __future__ import annotations

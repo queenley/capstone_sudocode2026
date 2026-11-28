@@ -1,6 +1,6 @@
 """Personal data: tokenised before a model or a trace sees it, restored after.
 
-``docs/design.md`` sections 4.1 and 4.5. A phone number becomes
+A phone number becomes
 ``<PHONE_1>``, an ID card number ``<CCCD_1>``, a bank account ``<BANK_1>``,
 and the value goes into the call's :class:`Vault`. The models, Langfuse
 and the checkpoint only ever see the token. :func:`detokenize` runs after
@@ -15,11 +15,11 @@ customer is deleting their vault rows.
 
 **Addresses** have no ready-made recogniser for Vietnamese (Presidio has
 none for addresses either, and its documentation advises a pattern plus a
-list of place names), so the rule is section 4.1's: a cue ("địa chỉ", "giao
+list of place names), so the rule is: a cue ("địa chỉ", "giao
 về", "nhà chị ở", "anh ở") followed, in the same clause, by an
 administrative marker (số nhà, ngõ, hẻm, đường, phường, quận, huyện, "q7",
 "p12") or a province's name. The harness puts the real address back into the
-tools that take one (section 4.4): a regional promotion is decided by it
+tools that take one: a regional promotion is decided by it
 (KM-08).
 """
 
@@ -43,7 +43,7 @@ PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 TOKEN = re.compile(r"<(PHONE|CCCD|BANK|ADDR)_(\d+)>")
 
-#: Section 4.1: what announces an address, matched without diacritics.
+#: What announces an address, matched without diacritics.
 ADDRESS_CUE = re.compile(
     r"\b(dia chi( la| nha)?|giao (ve|toi|den|qua)|gui (ve|toi|den)|ship (ve|toi|den|qua)|"
     r"nha (anh|chi|em|minh|toi|tui|co|chu|a|c|e) o|(anh|chi|em|minh|toi|tui|co|chu|a|c|e) (dang )?o)\s+"

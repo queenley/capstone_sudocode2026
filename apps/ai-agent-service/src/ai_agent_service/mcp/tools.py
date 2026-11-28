@@ -1,14 +1,14 @@
 """Binding MCP tools to an agent: by lane, with a guard around every call.
 
-Two middleware, both straight from ``docs/design.md``, and both deliberately
+Two middleware, both deliberately
 *not* a tool class of our own — the framework's ``@tool`` and the MCP adapter
 already produce the tools; what is ours is the policy around them.
 
-- :class:`LaneToolsMiddleware`, section 4.3. The lane ``route`` chose decides
+- :class:`LaneToolsMiddleware`. The lane ``route`` chose decides
   which tools the model is offered on each call. The table is
   ``config/lanes.yaml``, a declaration rather than code, because the brief
   asks the team to present "when a tool is called and when it is not".
-- :class:`ToolGuardMiddleware`, sections 4.4, 4.9 and 6.1. A timeout on every
+- :class:`ToolGuardMiddleware`. A timeout on every
   call (2 s, 3 s for knowledge), one retry when the server says the failure
   is retryable, a circuit breaker that skips a tool for a minute after it
   fails twice in a row. Around the call, the harness's two duties of section
@@ -22,11 +22,11 @@ A tool with an effect (:data:`WRITE_TOOLS`) is never retried, whatever the
 server says: a timeout leaves its outcome unknown, and a second attempt is
 how one order becomes two. Each of its calls carries an idempotency key
 instead, ``call:turn:tool:hash of the arguments``, which the server keeps
-with the first result and answers again on a repeat (section 6.1; Stripe
+with the first result and answers again on a repeat (Stripe
 does the same for every request that creates or changes something). Its
 declared defaults (``qty``, ``payment``) are written into the arguments, so
 the trace records the order that was actually placed, not only what the
-model typed (section 9.3).
+model typed.
 
 Both are shared by every request that runs through one compiled agent, so
 the only mutable state is the breaker's, and it is meant to be shared: a
@@ -66,7 +66,7 @@ INFRASTRUCTURE_CODES = frozenset({"TIMEOUT", "TOOL_ERROR", "INTERNAL", "CIRCUIT_
 #: The logged-in shopper's website account (``mcp/servers/account.py``): offered only with an account.
 ACCOUNT_PREFIX = "account_"
 
-#: Tools with an effect on the business, by wire name (section 6.1): never
+#: Tools with an effect on the business, by wire name: never
 #: retried, each call keyed for idempotency, their defaults made explicit.
 WRITE_TOOLS = frozenset({
     "order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion",
@@ -376,7 +376,7 @@ def with_status_words(name: str, message: Any, today: Any = None) -> Any:
 class ToolGuardMiddleware(AgentMiddleware):
     """Timeout, one retry, a circuit breaker, and the virtual clock."""
 
-    #: Section 6.1: seconds per call, by tool; everything else gets DEFAULT_TIMEOUT.
+    #: Seconds per call, by tool; everything else gets DEFAULT_TIMEOUT.
     TIMEOUTS = {"kb_search": 3.0, "kb_upsert": 3.0}
     DEFAULT_TIMEOUT = 2.0
     #: A write that times out may still land on the server (2026-11-19, call 27: an order placed 70 ms after its 2 s
@@ -497,7 +497,7 @@ class ToolGuardMiddleware(AgentMiddleware):
         if count >= self._breaker_failures:
             self._open_until[name] = time.monotonic() + self._breaker_seconds
             self._failures[name] = 0
-            # docs/design.md section 4.9: repeated failure is what moves
+            # Repeated failure is what moves
             # route towards HANDOFF; the advisor step counts failures from
             # the tool results into the state's flags.
             logger.warning(
@@ -812,7 +812,7 @@ def with_addresses(value: Any, addresses: Mapping[str, str]) -> Any:
     """An ``address`` argument with the call's real addresses: tokens replaced, the latest one when it is empty.
 
     The model only ever sees ``<ADDR_1>``; the regional promotions and the
-    delivery time are decided by the real address (KM-08, section 4.4).
+    delivery time are decided by the real address (KM-08).
     """
     if not value:
         return list(addresses.values())[-1]
@@ -873,7 +873,7 @@ def with_args(result: Any, args: Mapping[str, Any]) -> Any:
     """The tool message, carrying the arguments the tool actually ran with.
 
     The model wrote some of them; the harness filled in the day and the
-    phone. The trace records what ran (section 9.3), so it is kept here.
+    phone. The trace records what ran, so it is kept here.
     """
     if not isinstance(result, ToolMessage):
         return result
@@ -917,7 +917,7 @@ def strip_internal(result: Any) -> Any:
     """A tool message whose envelope no longer carries internal fields.
 
     ``pricing.get_quote`` returns the price floor below which staff may not
-    go; it is for the harness, never for the model (section 4.4).
+    go; it is for the harness, never for the model.
     """
     envelope = envelope_of(result)
     if envelope is None:
@@ -964,7 +964,7 @@ class ToolBox:
     """A role's tools, called by the harness directly rather than by a model.
 
     ``load_context`` looks the caller up, reads the ledger and re-checks
-    prices through this (sections 4.2 and 6.2, role ``harness``); the
+    prices through this (role ``harness``); the
     ``after_call`` task writes the ledger through it (role
     ``memory_writer``). Every call answers with the ``{ok, data | error}``
     envelope, whatever went wrong, so a caller never needs a try block.

@@ -1,11 +1,11 @@
 # The data tier, private subnets only, reachable from the nodes only (network.tf).
 
-# ── Aurora PostgreSQL Serverless v2 (section 2.2) ─────────────────────────
+# ── Aurora PostgreSQL Serverless v2 ─────────────────────────
 # One cluster, one database app_db, the services' schemas inside it, as on EC2.
 #
 # On the AWS Free plan, RDS creates an Aurora cluster only "with express configuration", which the AWS provider
 # cannot request (no such argument in aws_rds_cluster). So the cluster is made once with the AWS CLI and adopted
-# here by aurora-import.tf (scripts/deployment/create-aurora-express.ps1; docs/deployment/eks-deploy.md, section 2.2, Aurora). Express sets its own values: one
+# here by aurora-import.tf (scripts/deployment/create-aurora-express.ps1). Express sets its own values: one
 # writer, 0-4 ACU, 1 day of backups, no storage encryption, and a master user (cluster_admin) that signs in with
 # IAM only. Terraform therefore only reads it (ignore_changes = all); change it with aws rds modify-db-cluster.
 #
@@ -24,7 +24,7 @@ resource "aws_rds_cluster" "main" {
   iam_database_authentication_enabled = true
   db_subnet_group_name                = module.vpc.database_subnet_group_name
   vpc_security_group_ids              = [aws_security_group.data.id]
-  skip_final_snapshot                 = true # destroy: snapshot first by hand if the data matters (section 5.3)
+  skip_final_snapshot                 = true # destroy: snapshot first by hand if the data matters
 
   serverlessv2_scaling_configuration {
     min_capacity = 0
@@ -47,7 +47,7 @@ resource "aws_rds_cluster_instance" "main" {
   }
 }
 
-# ── ElastiCache Serverless, Valkey (section 3) ────────────────────────────
+# ── ElastiCache Serverless, Valkey ────────────────────────────
 # The gateway's rate limit (REDIS_URL), the shared model limiter, the load signal, the spend ledger and kb:changed
 # (AGENT_REDIS_URL), the OTP limits. TLS only: the URLs are rediss://.
 resource "aws_elasticache_serverless_cache" "main" {
@@ -116,7 +116,7 @@ resource "aws_ecr_repository" "main" {
 }
 
 # ── the app's secrets (keys, tokens, DATABASE_URL), read by External Secrets ─────────
-# Terraform makes the empty secret; its values are set once by hand (docs/deployment/README.md), never in state.
+# Terraform makes the empty secret; its values are set once by hand, never in state.
 resource "aws_secretsmanager_secret" "app" {
   name                    = "${local.prefix}/app"
   recovery_window_in_days = 7

@@ -1,4 +1,4 @@
-"""The write gate: what gets remembered, and what does not. ``docs/design.md`` section 5.4.
+"""The write gate: what gets remembered, and what does not.
 
 The MemoryAgent proposes candidates; these doors, code only, decide. A joke
 never reaches the ledger because a model was in a good mood.
@@ -29,7 +29,7 @@ from ..intake import pii
 
 Door = Literal["noise", "under_cap", "valid_format", "wins"]
 
-#: Hard cap on open notes per customer (section 5.2).
+#: Hard cap on open notes per customer.
 OPEN_NOTE_CAP = 10
 
 #: Below this the extractor is guessing: a joke, a hypothetical, a third

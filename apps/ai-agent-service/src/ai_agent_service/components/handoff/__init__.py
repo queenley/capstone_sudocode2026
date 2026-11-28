@@ -1,4 +1,4 @@
-"""Handoff and copilot: a person takes the call. ``docs/design.md`` section 4.10, figure G.
+"""Handoff and copilot: a person takes the call.
 
 A handoff is not an ending; it switches the call's mode. The advisor calls
 ``handoff.transfer`` with a brief in the organisers' schema; the harness

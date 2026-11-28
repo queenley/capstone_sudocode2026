@@ -1,4 +1,4 @@
-"""The weekly improvement round and the evaluation history (docs/plan/001, parts B and C), with no model and no database."""
+"""The weekly improvement round and the evaluation history, with no model and no database."""
 import json
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone

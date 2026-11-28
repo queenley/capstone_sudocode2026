@@ -1,4 +1,4 @@
-"""The Call Brief: a pure function of the ledger. ``docs/design.md`` section 4.2.
+"""The Call Brief: a pure function of the ledger.
 
 Rendered from a template, never written freely by a model, which is why it
 is ready in well under the 3 s budget and why every line can carry the facts
@@ -10,7 +10,7 @@ behind it. The result is two things:
   and ``precomputed_parts``;
 - numbered lines ``B1..Bn`` for the advisor's prompt, each with the
   ``fact_ids`` it rests on, so that ``[B3]`` in a reply traces back to a fact,
-  a call and a turn (section 5.5). One line states one slot, so citing a line
+  a call and a turn. One line states one slot, so citing a line
   names exactly the facts used: the evaluation's ``facts_used`` follows that
   chain, and a line that bundled four needs would credit all four whenever
   one was used. A line carrying a price, an address or an order code is
@@ -186,7 +186,7 @@ def render(
             lines.append((text, bool(money_spans(text)), (), "open"))
 
     for product in products:
-        # Each line rests on the facts it states, and only those (section 5.5).
+        # Each line rests on the facts it states, and only those.
         ids = product.get("fact_ids") or {}
         label = product.get("name") or product["sku"]
         lines.append((f"Đã tư vấn {label} ({product['sku']}).", False, _ids(ids, "product_advised"), "product"))
@@ -280,7 +280,7 @@ def render(
             {k: p.get(k) for k in ("sku", "price_quoted_vnd", "promo_code", "promo_still_active", "quoted_on")}
             for p in products
         ],
-        # The day an order was placed decides which returns policy it keeps (CL-01, section 7.2).
+        # The day an order was placed decides which returns policy it keeps (CL-01).
         "orders": [
             {"order_id": o.get("order_id"), "variant_sku": o.get("sku") or o.get("variant_sku"), "status": o.get("status"),
              "date": o.get("date") or o.get("created_at"), "price_vnd": o.get("price_vnd")}
@@ -311,7 +311,7 @@ def _ids(by_slot: Mapping[str, str], *slots: str) -> tuple[str, ...]:
 
 
 def opening(who: str, products: Sequence[Mapping[str, Any]], blockers: Sequence[Mapping[str, Any]], returning: bool) -> str:
-    """A continuity opening naming at most two things (section 1, call 2)."""
+    """A continuity opening naming at most two things."""
     if not returning and not products:
         return f"Dạ em chào {who}, em là trợ lý tự động của shop. {who.capitalize()} cần em hỗ trợ gì ạ?"
     said = []

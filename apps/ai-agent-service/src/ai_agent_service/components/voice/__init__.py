@@ -1,4 +1,4 @@
-"""The voice channel: a live call, heard and spoken locally. ``docs/design.md`` section 4.11.
+"""The voice channel: a live call, heard and spoken locally.
 
     mic -> 16 kHz -> Silero VAD + Smart Turn -> local ASR -> lexicon
         -> the same turn as a chat message -> TTS, sentence by sentence -> speaker

@@ -1,4 +1,4 @@
-"""Retrieval, measured the way the organisers measure it. ``docs/design.md`` section 7.4.
+"""Retrieval, measured the way the organisers measure it.
 
 The 60 labelled questions of ``rag/qa_labeled.json`` go through the same
 knowledge base the calls use (``components.knowledge.build``), each asked on
@@ -14,7 +14,7 @@ grader scores retrieval and abstaining from this file, and leaves the answer
 to a judge.
 
 **Split.** θ and the other settings are tuned on 40 questions and reported on
-the other 20 (section 7.4): every third question in ``qid`` order is held out,
+the other 20: every third question in ``qid`` order is held out,
 which keeps every type in both halves. ``--calibrate`` prints the θ that
 abstains on no answerable question of the tuning half; a person writes it into
 ``config/knowledge.yaml``.

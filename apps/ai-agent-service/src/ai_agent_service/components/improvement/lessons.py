@@ -1,4 +1,4 @@
-"""What Reflection keeps: what counts as evidence, what a lesson or a change may never say. ``docs/design.md`` 10.3.
+"""What Reflection keeps: what counts as evidence, what a lesson or a change may never say.
 
 The brief, C.5: a lesson is "được kiểm tra rồi mới ghi vào bộ nhớ". So each
 lesson card is screened here before it is stored (:func:`screen_card`,

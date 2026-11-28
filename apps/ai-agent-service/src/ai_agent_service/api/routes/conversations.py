@@ -6,7 +6,7 @@ request ``{message, selected_sku?, memory_enabled?}``; ``/stream`` emits
 Behind it every turn goes through the hot graph (``runtime.harness.run_turn``)
 under the call's lease, as a task that survives a dropped connection, with a
 keepalive comment while the model works. A ``delta`` is a sentence the guard
-has passed, sent the moment it may be said (``docs/design.md`` section 4.8);
+has passed, sent the moment it may be said;
 a reply that did not stream comes as one ``delta`` at the end.
 """
 
@@ -48,7 +48,7 @@ class TurnRequest(BaseModel):
     selected_sku: str | None = Field(default=None, max_length=64)
     #: The web cart (it lives in the browser); None from channels without one, [] when it is empty.
     cart: list[CartLine] | None = Field(default=None, max_length=30)
-    #: False runs the organisers' baseline: same graph, no memory (docs/design.md 9.5).
+    #: False runs the organisers' baseline: same graph, no memory.
     memory_enabled: bool = True
     #: Chosen by the client so a retried turn replays the stored reply.
     turn_id: str | None = Field(default=None, min_length=1, max_length=64)
@@ -189,7 +189,7 @@ def _result(row: dict[str, Any], turn_id: str, outcome: harness.Outcome | None, 
     return {
         "reply": reply,
         "route": state.get("lane") or "unknown",
-        # Lanes are chosen by rules (docs/design.md 4.3), not by a classifier.
+        # Lanes are chosen by rules, not by a classifier.
         "confidence": 1.0 if state.get("lane") else 0.0,
         "trace_id": f"{row['id']}:{turn_id}",
         "products": _products(results, state.get("quotes") or {}),

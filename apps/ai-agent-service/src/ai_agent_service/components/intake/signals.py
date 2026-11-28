@@ -1,11 +1,11 @@
-"""What the customer's words hint at, by rule: notes for the advisor, never a decision. ``docs/design.md`` 4.1, 4.3.
+"""What the customer's words hint at, by rule: notes for the advisor, never a decision.
 
 Each detector reads the turn as intake left it (cleaned, NFC), lower case
 and without diacritics, so "khong", "ko" and "không" are one word.
 
 | Signal | Used by |
 |---|---|
-| ``impatient`` ("hỏi rồi mà", "lâu quá") | the PB-10 note on the lane (section 4.3) |
+| ``impatient`` ("hỏi rồi mà", "lâu quá") | the PB-10 note on the lane |
 
 A word list only adds a note the advisor reads. Nothing here allows or
 refuses an action: whether the customer wants a person, agreed to a

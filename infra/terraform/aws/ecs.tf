@@ -229,7 +229,7 @@ resource "aws_scheduler_schedule" "improve" {
     precondition {
       # The task runs on Fargate: it reaches RDS, not a PostgreSQL container inside the instance.
       condition     = !var.improve_schedule_enabled || var.use_rds
-      error_message = "improve_schedule_enabled needs use_rds = true. With PostgreSQL on the instance, run the round there (docs/deployment/aws-terraform-cicd.md, section 7)."
+      error_message = "improve_schedule_enabled needs use_rds = true. With PostgreSQL on the instance, run the round there."
     }
   }
 }

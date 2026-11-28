@@ -1,5 +1,5 @@
 # The weekly improvement round (Gap Loop + Reflection) as a one-shot container: AWS runs it as a Fargate task on an
-# EventBridge schedule (docs/deployment/aws-plan.md, 3.7), in place of Airflow.
+# EventBridge schedule, in place of Airflow.
 #
 #   docker build -f infra/improve/Dockerfile -t telesales-improve .
 #   docker run --rm --env-file .env telesales-improve learn     # Monday: restate gaps, R0, learn, proposals

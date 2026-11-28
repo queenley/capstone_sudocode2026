@@ -1,17 +1,17 @@
-"""mcp-knowledge: what the shop's documents say. ``docs/design.md`` section 7.
+"""mcp-knowledge: what the shop's documents say.
 
 One knowledge base, three sources (``components.knowledge``):
 
 - the organisers' policy corpus, ``policy/*.md``, one chunk per section;
 - the approved FAQ and playbook entries of the version ``config/knowledge.yaml``
   names, ``data/kb/v<N>.jsonl``, copied into ``kb_chunks`` at startup with
-  scope ``release`` (section 7.5), so rolling back is pointing at another
+  scope ``release``, so rolling back is pointing at another
   file and restarting;
 - entries a consultant saved during a demo (``kb_upsert``), scope ``demo``:
   in the database only, never exported, never counted as an improvement.
 
 ``kb_search`` is the harness's (``load_context`` searches every customer
-turn, section 4.2) and the admin's; the advisor never calls it, it reads the
+turn) and the admin's; the advisor never calls it, it reads the
 passages the harness put in its prompt. A restricted passage is returned with
 its code and the instruction to refuse, its text only to ``admin``.
 
@@ -304,7 +304,7 @@ async def kb_upsert(
     """Add, replace or revoke one FAQ or playbook entry saved during a demo, after a person approved it.
 
     A demo entry lives in the database only; what counts as the system's
-    improvement is what a release file holds (section 7.5).
+    improvement is what a release file holds.
 
     Args:
         source: faq or playbook.

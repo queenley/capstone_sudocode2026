@@ -1,6 +1,6 @@
 """Inverse text normalisation, and reading money back out of a reply.
 
-``docs/design.md`` sections 4.1 and 4.5. Two directions, one module, so that
+Two directions, one module, so that
 what the customer said and what the guardrail reads are counted the same way.
 
 :func:`normalise`, spoken to written, for a turn on its way in:
@@ -23,7 +23,7 @@ what the customer said and what the guardrail reads are counted the same way.
   scenarios days apart.
 
 The canonical value goes next to the words it came from, so the model reads
-both (section 4.1, step 4); a number replaces its words.
+both; a number replaces its words.
 
 :func:`money_spans`, written to value, for a reply on its way out: every
 amount in 5.200.000đ, 5,2 triệu, 5 triệu 2, 4tr890, 249k form, with its value

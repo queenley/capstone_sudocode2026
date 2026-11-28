@@ -7,7 +7,7 @@ config block, attach a rate limiter and a token-tracking callback, hand back a
 **Provider dispatch.** The reference dispatches with a chain of
 ``if provider == "openai" ... elif provider == "gemini"``, so every new
 provider edits the factory. LangChain's ``init_chat_model`` already performs
-that dispatch, and ``docs/design.md`` section 4.4 specifies it, so a provider here
+that dispatch, so a provider here
 is a line in ``config/models.yaml`` rather than a branch of code.
 
 **The API key is not passed.** Each integration reads its own key from the
@@ -196,7 +196,7 @@ class LLMFactory:
             callbacks.append(TokenTrackingCallback(limiter, agent_name=agent_name))
 
         # The advisor's Langfuse handler is not attached here: attached to the model it would trace calls with no
-        # run around them and no session; docs/design.md section 8 wants the whole run, gathered by customer, and
+        # run around them and no session; tracing wants the whole run, gathered by customer, and
         # BaseAgent.run_config passes it per invocation. Every other model (the MemoryAgent, the compactor, the
         # improvement loop's agents, the evaluation's extractor and judge) has no run config, so it is attached here:
         # without it their calls, and what they cost, are nowhere.

@@ -1,6 +1,6 @@
 """The organisers' reference business logic, shared by every path that serves it.
 
-``docs/design.md`` section 6.1: the catalogue, CRM and order tools wrap
+The catalogue, CRM and order tools wrap
 ``eval/mock_tools.py`` from the organisers' pack, so a price, a promotion, a
 stock level, the COD limit or a moved callback is what the grader computes,
 by construction rather than by care. The data is committed under
@@ -14,7 +14,7 @@ nine organisers' tools with its own copy of the mock, through
 so both paths answer alike:
 
 - :func:`enrich`: every applied promotion carries its end date, so the
-  ``MemoryAgent`` can write ``promo_expiry`` (section 6.1);
+  ``MemoryAgent`` can write ``promo_expiry``;
 - :func:`search_catalog`: a ``catalog.search`` whose words match nothing is
   retried loosely and says so;
 - :func:`delivery_estimate`: the mock's own delivery rule, asked before an
@@ -28,11 +28,10 @@ must be visible to ``order.status`` in another, and after a restart. So the
 state lives in one Postgres row. A read loads it and never writes it, so
 reads take no lock and never queue behind one another. A write runs under a
 transaction-scoped advisory lock and stores its result under its
-idempotency key: a write tool is never retried (section 6.1), and a key seen
+idempotency key: a write tool is never retried, and a key seen
 again returns the first outcome instead of creating a second order, which is
 how Stripe makes its create and update requests safe to repeat.
-:func:`reset` empties the row, which the evaluation runner does per scenario
-(section 9.2).
+:func:`reset` empties the row, which the evaluation runner does per scenario.
 
 A mock result carrying ``error`` becomes the ``{ok: false}`` envelope, with
 the rest of the result as details the model can act on (the expected price

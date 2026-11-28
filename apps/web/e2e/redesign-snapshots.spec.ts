@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-// Screenshots of every page, before and after a design change (docs/plan/UI-REDESIGN-TASTE.md).
+// Screenshots of every page, before and after a design change.
 // Every backend request is answered here from synthetic data and written down, so the
 // request list of two runs can be compared: a design change must not change it.
 //   SNAP_LABEL=before WEB_URL=http://127.0.0.1:3317 npx playwright test e2e/redesign-snapshots.spec.ts

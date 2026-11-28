@@ -1,4 +1,4 @@
-"""What the system says when it cannot trust a draft. ``docs/design.md`` section 4.9.
+"""What the system says when it cannot trust a draft.
 
 Admit first, never guess a number, and promise nothing the agent cannot do:
 it speaks only when the customer does, so no line says it will call or write
@@ -20,7 +20,7 @@ from ..intake.itn import format_vnd
 #: Says the information is missing in one of the phrases the organisers' grader reads ("chưa có thông tin").
 SAFE_LINE = "Dạ phần này em chưa có thông tin chắc chắn để báo {who} ạ."
 
-#: Section 4.2: a number two customers share. The first thing the agent says,
+#: A number two customers share. The first thing the agent says,
 #: by the harness and not by a model, asked once, and revealing nobody.
 AMBIGUOUS_QUESTION = "Dạ cho em xin tên của mình để em xem đúng thông tin ạ?"
 
@@ -31,7 +31,7 @@ LINES = {
     "asr_unclear": "Dạ em nghe chưa rõ, {who} nói lại giúp em được không ạ?",
     "model_error": "Dạ em xin lỗi, em chưa trả lời được ngay, {who} nhắc lại giúp em câu vừa rồi được không ạ?",
     "bridging": "Dạ em kết nối {who} với đồng nghiệp phụ trách ngay ạ, {who} chờ em một chút.",
-    # Section 4.8: said once as a tool round starts on a call with nothing heard yet; never the answer, never in the
+    # Said once as a tool round starts on a call with nothing heard yet; never the answer, never in the
     # transcript, never counted as the first token.
     "filler": "Dạ {who} chờ em một xíu ạ.",
     # A turn whose order was placed and whose answer was then blocked: the customer must not hear "chưa có thông

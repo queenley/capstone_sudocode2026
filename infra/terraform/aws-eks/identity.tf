@@ -1,5 +1,5 @@
-# Each workload's AWS rights, through EKS Pod Identity: a role per service account, nothing on the nodes
-# (section 4). The service accounts are the manifests' (overlays/aws-production).
+# Each workload's AWS rights, through EKS Pod Identity: a role per service account, nothing on the nodes.
+# The service accounts are the manifests' (overlays/aws-production).
 
 module "lb_controller_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"

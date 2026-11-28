@@ -1,4 +1,4 @@
-# Buys var.domain through Route 53 Domains when register_domain is true (docs/deployment/eks-deploy.md, 2.1):
+# Buys var.domain through Route 53 Domains when register_domain is true:
 # one year, paid when this is created and never refunded; auto-renew off. Route 53 makes the domain's hosted zone
 # itself; acm.tf validates the certificate in it. The Route 53 Domains API lives in us-east-1 only.
 #

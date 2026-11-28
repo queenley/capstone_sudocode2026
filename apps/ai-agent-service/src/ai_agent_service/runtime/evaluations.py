@@ -1,6 +1,6 @@
 """The evaluation history and the weekly improvement rounds, in the agent's schema.
 
-``docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md``, parts B and C. Until now a run's numbers lived only in its
+Until now a run's numbers lived only in its
 directory under ``evaluation/runs`` and a round's review was a JSON file someone edited by hand; neither can be shared
 by the Airflow worker that runs the loop, the API the admin uses and the pods that serve customers. These tables are
 what they share:

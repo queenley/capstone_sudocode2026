@@ -3,7 +3,7 @@
 # Run from the repository root:  bash infra/colab/up.sh  [voice] [asr-model]
 #   voice     the agent's TTS (default "remote:vieneu:Mỹ Duyên"; "remote:zerotts:maichi", ...)
 #   asr-model the agent's ASR on the GPU (default phowhisper-large)
-# Needs the Colab CLI signed in once (see docs/deployment/colab-gpu.md). Writes ASR_URL, ASR_API_KEY, TTS_URL,
+# Needs the Colab CLI signed in once. Writes ASR_URL, ASR_API_KEY, TTS_URL,
 # TTS_API_KEY and VOICE_TTS into .env (the key is never printed) and restarts ai-agent-service.
 set -euo pipefail
 VOICE="${1:-remote:vieneu:Mỹ Duyên}"; ASR_MODEL="${2:-phowhisper-large}"

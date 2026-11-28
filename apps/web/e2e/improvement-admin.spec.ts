@@ -1,6 +1,6 @@
 import { test, expect, type Page, type Route } from "@playwright/test";
 
-// docs/plan/001, parts C and D: the admin reviews the weekly round's proposals, switches a measured candidate on, and
+// The admin reviews the weekly round's proposals, switches a measured candidate on, and
 // reads the evaluation history week by week. The API is mocked; access is the API's to refuse.
 test.use({ channel: process.env.CI ? undefined : "chrome" });
 

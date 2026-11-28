@@ -3,10 +3,10 @@
 Ported from the reference project's ``api/harness.py``; storage is the agent
 schema (``runtime.db``) and a call is one platform conversation.
 
-``docs/design.md`` sections 2 to 4. One compiled hot graph with the
+One compiled hot graph with the
 Postgres checkpointer, shared by every call: it holds no per-call state, the
 checkpointer does, per thread ``call-<id>``. The collaborators the graph's
-nodes are handed each turn (section 3.2): the AdvisorAgent, the
+nodes are handed each turn: the AdvisorAgent, the
 PolicyAgent, the harness's own MCP tools, and the store ``persist`` writes
 through.
 
@@ -14,7 +14,7 @@ through.
 message over SSE or as speech over the voice WebSocket. It times the turn
 the organisers' way (``eval/huong-dan-do-latency.md``): from the request
 reaching the API, in integer milliseconds. The answer streams a checked
-sentence at a time (``docs/design.md`` section 4.8): TTFT is the first
+sentence at a time: TTFT is the first
 sentence said, Total the end of the turn. A filler line is never counted.
 
 :func:`remember` runs ``after_call`` once a call has ended.
@@ -214,7 +214,7 @@ async def _run_turn(
     """Take one turn through the hot graph; the caller holds the call's lease.
 
     *emit* hears each sentence the moment the guard lets it be said, its
-    tokens already restored for the customer (section 4.8); the whole reply
+    tokens already restored for the customer; the whole reply
     still comes back in the outcome.
     """
     global _turns_timed
@@ -251,7 +251,7 @@ async def _run_turn(
         "channel": row["channel"],
         "now": now,
         "on": clock.on(now),
-        # Off is the organisers' baseline (docs/design.md section 9.5): same graph, no memory.
+        # Off is the organisers' baseline: same graph, no memory.
         "switches": {"memory": memory},
         "mode": row.get("mode") or "speak",
         "phase": "opening" if content is None else "turn",
@@ -332,7 +332,7 @@ async def record_ttfa(call_id: int, turn_id: str, ttfa_ms: int, extra: dict[str,
 
 
 async def keep_heard(call_id: int, turn_id: str, heard: str) -> None:
-    """The caller cut the agent off: working memory keeps only what was said (section 4.11)."""
+    """The caller cut the agent off: working memory keeps only what was said."""
     built = await ready()
     config = thread(call_id)
     snapshot = await built.graph.aget_state(config)
@@ -359,7 +359,7 @@ async def add_spoken(call_id: int, message: AIMessage) -> None:
 
 class CallStore:
     """``persist``'s writes for a live call: the transcript rows and the
-    ``calls`` projection the screens read (section 3.1)."""
+    ``calls`` projection the screens read."""
 
     def __init__(self, call_id: int, vault: pii.Vault) -> None:
         self.call_id = call_id

@@ -51,8 +51,7 @@ load_dotenv(ROOT / ".env", override=False)
 def btc_data_dir() -> Path:
     """The organisers' pack: catalogue, CRM seed, policy corpus, reference mock.
 
-    ``docs/design.md`` Appendix A makes it the grading contract, and section
-    6.1 has the catalogue, CRM and order servers wrap its ``mock_tools.py``.
+    It is the grading contract, and the catalogue, CRM and order servers wrap its ``mock_tools.py``.
     Its data folders are committed under ``data/btc`` so a clone and the
     deployed service both run without it; ``BTC_DATA_DIR`` points elsewhere,
     at a newer pack, without editing the repository.
@@ -81,7 +80,7 @@ def review_head_start() -> float:
 
 
 def kb_dir() -> Path:
-    """The approved knowledge versions, ``data/kb/v<N>.jsonl`` (``docs/design.md`` section 7.5)."""
+    """The approved knowledge versions, ``data/kb/v<N>.jsonl``."""
     return ROOT / "data" / "kb"
 
 
@@ -286,7 +285,7 @@ class Evaluator(BaseModel):
 
 
 class VoiceConfig(BaseModel):
-    """The local voice models a call starts with (``docs/design.md`` 4.11)."""
+    """The local voice models a call starts with."""
 
     model_config = {"extra": "forbid"}
 
@@ -300,7 +299,7 @@ class VoiceConfig(BaseModel):
 
 
 class KnowledgeRetrieval(BaseModel):
-    """How the knowledge base searches (``docs/design.md`` section 7.3)."""
+    """How the knowledge base searches."""
 
     model_config = {"extra": "forbid"}
 
@@ -518,7 +517,7 @@ def require_api_key(provider: str) -> str:
         raise RuntimeError(
             f"{env_var} is not set, so provider {provider!r} cannot be used.\n"
             f"Add it to {ROOT / '.env'} (see .env.example), or set it in your "
-            f"IDE run configuration. See apps/ai-agent-service/README.md."
+            f"IDE run configuration."
         )
     return value
 

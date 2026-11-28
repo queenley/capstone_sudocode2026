@@ -1,6 +1,6 @@
 """The weekly round: learn, wait for a person, measure, and leave the switch to the admin.
 
-``docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md``, part C. Each step is one command, so a scheduler
+Each step is one command, so a scheduler
 (``infra/airflow/dags/improvement_weekly.py``) runs them in order and a person can run any of them by hand::
 
     python -m ai_agent_service.pipeline.improve weekly-learn   --week 2026-W46 --learn <dir> --frozen <dir> --frozen-ids <ids.json>

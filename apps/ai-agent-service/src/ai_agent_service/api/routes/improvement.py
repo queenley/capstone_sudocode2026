@@ -1,6 +1,6 @@
 """The admin's side of the weekly improvement loop, and the evaluation history.
 
-``docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md``, parts C and D. The weekly round
+The weekly round
 (``pipeline/improve/weekly.py``) files Reflection's proposals; here an admin reads each one with its evidence and
 decides, reads the round's measurement (R0 against the candidate, R1), and switches the candidate on or not. The
 evaluation history is what ``run_eval.py --ingest`` kept.

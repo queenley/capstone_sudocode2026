@@ -1,4 +1,4 @@
-"""QaAgent: scores calls and says what kind of failure each is. ``docs/design.md`` sections 9.7 and 10.3.
+"""QaAgent: scores calls and says what kind of failure each is.
 
 The brief's QA / Evaluator Agent (C.3): "chấm điểm cuộc gọi theo rubric (mục
 C.4)". It scores; it does not write the lesson (the ReflectionAgent does) and

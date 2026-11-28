@@ -1,4 +1,4 @@
-"""The evaluation in one command. ``docs/design.md`` section 9.2 and Appendix A.
+"""The evaluation in one command.
 
 The organisers' form, one configuration to one trace file (their pack's
 ``README``, "Quy trình chấm chéo")::
@@ -870,7 +870,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
 
 
 def _retrieval(into: Path) -> str:
-    """Section 7.4 in the same run: the 60 labelled questions through the knowledge base the calls used."""
+    """Retrieval in the same run: the 60 labelled questions through the knowledge base the calls used."""
     from ...components import knowledge
     from ...mcp.servers import btc
     from . import rag

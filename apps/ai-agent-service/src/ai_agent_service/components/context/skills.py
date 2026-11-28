@@ -1,4 +1,4 @@
-"""How the shop does a task, in the prompt only while the task is on. ``docs/design.md`` section 4.4.
+"""How the shop does a task, in the prompt only while the task is on.
 
 The model reads the catalogue (name and description) and calls ``load_skill``
 when it needs one: nothing here guesses what the customer wants. A skill grants

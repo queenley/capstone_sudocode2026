@@ -1,4 +1,4 @@
-"""The Handoff Brief, as a person reads it. ``docs/design.md`` section 4.10.
+"""The Handoff Brief, as a person reads it.
 
 Who the customer is, what was advised and at what price, the blocker, what
 was promised, what is disputed, why the call was handed over, the question

@@ -1,4 +1,4 @@
-"""The advisor's context, in priority order. ``docs/design.md`` section 4.4.
+"""The advisor's context, in priority order.
 
 Only the playbook is optional. Everything else is what the rules tell the model to rely on: rule 3 answers from the
 knowledge passages, an order uses a code from the products block, and with those cut the model answers from nothing.

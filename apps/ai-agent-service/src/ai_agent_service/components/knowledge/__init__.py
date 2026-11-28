@@ -1,4 +1,4 @@
-"""The knowledge base. ``docs/design.md`` section 7.
+"""The knowledge base.
 
 - :mod:`.corpus`: the chunks: the organisers' policy sections and the team's
   approved FAQ and playbook entries, each with its validity window, its

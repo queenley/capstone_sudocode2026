@@ -1,6 +1,6 @@
 """Scenarios in the organisers' format, as the evaluation reads them.
 
-``docs/design.md`` section 9.2 and Appendix A; the organisers'
+The organisers'
 ``schemas/scenario_format.md``. The organisers' command loads a directory of
 scenarios through here.
 
@@ -16,7 +16,7 @@ scenarios through here.
 - **Keys.** :func:`connection`, the one place the evaluation decides what
   identifies a caller.
 - **Prior sessions.** ``seed_history`` is written to the ledger before its
-  call (section 9.2, step 2); :func:`seed_sessions` reads the shapes it is
+  call; :func:`seed_sessions` reads the shapes it is
   likely to take and refuses the rest by name.
 """
 
@@ -171,7 +171,7 @@ def call_names(scenario: Mapping[str, Any]) -> list[str]:
 
 
 def call_days(scenario: Mapping[str, Any]) -> dict[str, str]:
-    """The day of each call, in call order (Appendix A)."""
+    """The day of each call, in call order."""
     day = date.fromisoformat(clock.REFERENCE_DAY)
     days: dict[str, str] = {}
     for name in call_names(scenario):
@@ -190,7 +190,7 @@ def call_days(scenario: Mapping[str, Any]) -> dict[str, str]:
 
 
 def connection(scenario: Mapping[str, Any], spec: Mapping[str, Any]) -> tuple[str, dict[str, str | None]]:
-    """The product's channel and the keys the connection brings (section 9.2).
+    """The product's channel and the keys the connection brings.
 
     A call that names no channel is a hotline call; its number is the call's
     ``channel_identity`` when given, else the scenario's ``customer_phone``.
