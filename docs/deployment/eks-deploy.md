@@ -27,6 +27,7 @@ flowchart LR
         WRK["ai-agent-worker<br/>(KEDA: độ dài SQS)"]
         MCP["mcp-servers<br/>(6 server HTTP, HPA)"]
         ASR["asr-service"]
+        TTS["tts-service"]
         ZM["zalo-mock"]
         CJ["CronJob improve-learn,<br/>improve-tick"]
     end
@@ -270,7 +271,8 @@ $images = @(
   @("telesales-ai-agent",       "apps/ai-agent-service/Dockerfile",   @("--build-arg", "WITH_VOICE=1", "--build-arg", "VOICE_TTS=openai:coral")),
   # Địa chỉ gọi thoại nằm sẵn trong bundle của trình duyệt: thiếu thì trình duyệt gọi wss://<domain>:8000, cổng ALB không mở.
   @("telesales-web",            "apps/web/Dockerfile",                @("--build-arg", "NEXT_PUBLIC_VOICE_URL=https://quivo.io.vn")),
-  @("telesales-asr",            "apps/asr-service/Dockerfile",        @())
+  @("telesales-asr",            "apps/asr-service/Dockerfile",        @()),
+  @("telesales-tts",            "apps/tts-service/Dockerfile",        @())
 )
 foreach ($i in $images) {
   # Một manifest, không attestation: Docker Desktop mặc định thêm index provenance, mà tag IMMUTABLE của ECR
@@ -432,7 +434,8 @@ kubectl apply -f reports/generated/deployment.yaml
 | ScaledObject `ai-agent-worker` báo `annotation 'eks.amazonaws.com/role-arn' not found` | `identityOwner: workload` tìm annotation IRSA, mà cluster dùng Pod Identity | Overlay đặt `identityOwner: keda`; KEDA operator có role riêng (`keda_identity` trong identity.tf) |
 | Agent trả "hệ thống tra cứu đang chậm"; log có `POST http://mcp-servers:88xx/mcp 404`, `MCPError`, `Circuit open for tool` | MCP qua HTTP có session: pod MCP khởi động lại (hay request sang replica khác) thì session mất, server trả 404, agent không mở session mới | MCP server chạy stateless (`FASTMCP_STATELESS_HTTP=true` trong [mcp.yaml](../../infra/kubernetes/overlays/aws-production/mcp.yaml)). Image cũ chưa có biến này: `kubectl rollout restart deploy/ai-agent-service deploy/ai-agent-worker` để mở session mới |
 | Tin nhắn thoại báo "Chưa nhận dạng được"; log agent `No ASR: set ASR_URL` | Không có `asr-service`, hoặc `ASR_URL` trống | [asr.yaml](../../infra/kubernetes/overlays/aws-production/asr.yaml) và `ASR_URL` trong kustomization; kiểm `kubectl exec deploy/ai-agent-service -- python -c "import urllib.request;print(urllib.request.urlopen('http://asr-service:8500/health/ready').read())"` |
-| Gọi thoại đóng ngay với mã `1011`; log agent `VieNeu-TTS is not installed here` | `VOICE_TTS` lúc chạy trống, nên agent dùng giọng VieNeu chạy tại chỗ, mà image không cài. `VOICE_TTS` lúc build chỉ quyết định gói nào được cài | ConfigMap có `VOICE_TTS=openai:coral` ([kustomization.yaml](../../infra/kubernetes/overlays/aws-production/kustomization.yaml)) |
+| Gọi thoại đóng ngay với mã `1011`; log agent `VieNeu-TTS is not installed here` | `VOICE_TTS=vieneu:` nhưng `TTS_URL` trống, nên agent tìm VieNeu ngay trong pod, mà image không cài. `VOICE_TTS` lúc build chỉ quyết định gói nào được cài | ConfigMap có `TTS_URL=http://tts-service:8600` ([kustomization.yaml](../../infra/kubernetes/overlays/aws-production/kustomization.yaml)) |
+| Gọi thoại đóng với `1011`; log agent `the TTS service ... is not ready` | `tts-service` đang tải weights (lần đầu khoảng 1,4 GB) hoặc bị OOM | `kubectl logs deploy/tts-service`; tạm chọn giọng `openai:coral` ở /admin |
 | Gọi thoại: nói xong chờ mãi không thấy trả lời, hoặc không nối được | Image agent build thiếu `WITH_VOICE=1` (`/health` báo `voice: unavailable`, thiếu `soxr`, `transformers`, không có Smart Turn để biết lượt nói đã hết), hoặc web build thiếu `NEXT_PUBLIC_VOICE_URL` (trình duyệt gọi cổng 8000) | Build lại hai image theo vòng ở mục 2.4 |
 | Pod `Pending` lâu, không có node mới | Karpenter chưa chạy, hoặc chưa apply NodePool | `kubectl logs -n kube-system deploy/karpenter`; kiểm `kubectl get nodepools` |
 | Pod `CreateContainerConfigError: secret "telesales-secrets" not found` | ExternalSecret chưa đọc được Secrets Manager | `kubectl describe externalsecret telesales-secrets -n telesales-production`: secret app còn rỗng, hoặc sai tên |

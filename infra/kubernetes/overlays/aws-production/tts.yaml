@@ -1,0 +1,61 @@
+# VieNeu-TTS on CPU (apps/tts-service), as the tts-service of docker-compose.yml: with the voice "vieneu:" (/admin)
+# the agent streams each sentence from TTS_URL (kustomization.yaml), so its pods carry neither VieNeu nor its weights.
+#
+# Small on purpose: it reserves half a vCPU and 2 GiB, so it fits on the two system nodes beside the app with no node
+# of its own, and bursts to 2 vCPUs while a sentence is being made (it is idle between them). One sentence at a time
+# (TTS_CONCURRENCY): with two calls speaking at once, the second waits for the first's sentence. The weights (about
+# 1.4 GB) are fetched once into the shared EFS volume (subPath tts-models). Only the agent pods may call it
+# (network-policy.yaml), so it has no TTS_API_KEY.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-tts}
+  template:
+    metadata:
+      labels: {app: telesales-tts}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: tts-service
+          image: telesales-tts:dev
+          ports: [{containerPort: 8600}]
+          env:
+            # ONNX Runtime's threads: the CPU limit below, never the node's count.
+            - {name: OMP_NUM_THREADS, value: "2"}
+            - {name: TTS_CONCURRENCY, value: "1"}
+            # v3turbo streams (the first audio before the sentence is done), 48 kHz, about 1.7 GiB. v3nano is lighter
+            # (about 0.7 GiB, 24 kHz) but returns each sentence whole.
+            - {name: TTS_MODE, value: v3turbo}
+            - {name: HF_HOME, value: /models/huggingface}
+          volumeMounts:
+            - {name: models, mountPath: /models, subPath: tts-models}
+          # The first start downloads the weights; /health/ready answers 503 until VieNeu is loaded and warmed.
+          startupProbe:
+            httpGet: {path: /health/ready, port: 8600}
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8600}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health, port: 8600}
+            periodSeconds: 20
+          resources:
+            requests: {cpu: 500m, memory: 2Gi}
+            limits: {cpu: '2', memory: 3Gi}
+      volumes:
+        - name: models
+          persistentVolumeClaim: {claimName: agent-data}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-service
+spec:
+  selector: {app: telesales-tts}
+  ports:
+    - {name: http, port: 8600, targetPort: 8600}

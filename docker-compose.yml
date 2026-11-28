@@ -127,6 +127,21 @@ services:
       retries: 20
       # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
       start_period: 600s
+  # VieNeu-TTS as its own service (apps/tts-service), as on EKS: start it with --profile tts and set
+  # TTS_URL=http://tts-service:8600 and VOICE_TTS=vieneu:. Without it, vieneu: runs inside the agent.
+  tts-service:
+    profiles: [tts]
+    build:
+      context: .
+      dockerfile: apps/tts-service/Dockerfile
+    environment:
+      OMP_NUM_THREADS: ${TTS_THREADS:-2}
+      TTS_API_KEY: ${TTS_API_KEY:-}
+    volumes:
+      - voice-models:/models
+    deploy:
+      resources:
+        limits: {cpus: "${TTS_CPUS:-2}", memory: 3g}
   # Speech recognition for calls (apps/asr-service). On this machine's CPU by default;
   # to use one hosted elsewhere (a rented GPU, Dockerfile.gpu), set ASR_URL (and
   # ASR_API_KEY) to it and ASR_LOCAL=0 so this container does not start.
@@ -208,6 +223,9 @@ services:
       # OPENAI_API_KEY) or vieneu: (local CPU, ~1.4 GB of weights on first use). Empty:
       # voice.tts in apps/ai-agent-service/config/models.yaml. The Admin page can still switch.
       VOICE_TTS: ${VOICE_TTS:-}
+      # vieneu: from the tts-service container (profile "tts") instead of this process.
+      TTS_URL: ${TTS_URL:-}
+      TTS_API_KEY: ${TTS_API_KEY:-}
       OPENAI_TTS_MODEL: ${OPENAI_TTS_MODEL:-gpt-4o-mini-tts}
       # VOICE_TTS=elevenlabs: speaks with the agent voices of evaluation/data-generation/config/voices.yaml,
       # by the caller's region (CRM); unknown callers hear VOICE_DEFAULT_REGION, VOICE_GENDER.

@@ -36,6 +36,9 @@ spec:
           readinessProbe: {tcpSocket: {port: 8801}}
           volumeMounts:
             - {name: tmp, mountPath: /tmp}
+            # Erasing a customer (memory_delete_customer) also drops their calls from the improvement signals,
+            # which live on the agents' shared volume (agent-patch.yaml).
+            - {name: agent-data, mountPath: /app/agent/data/improvement, subPath: improvement}
         - name: catalog
           image: telesales-ai-agent:dev
           command: [python, -m, ai_agent_service.mcp.servers.catalog, --transport, http, --host, 0.0.0.0, --port, "8802"]
@@ -136,6 +139,8 @@ spec:
       volumes:
         - {name: tmp, emptyDir: {}}
         - {name: models, emptyDir: {}}
+        - name: agent-data
+          persistentVolumeClaim: {claimName: agent-data}
 ---
 apiVersion: v1
 kind: Service

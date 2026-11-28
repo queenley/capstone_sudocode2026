@@ -94,13 +94,14 @@ jobs:
           build web            apps/web/Dockerfile --build-arg "NEXT_PUBLIC_VOICE_URL=https://$DOMAIN" \
             --build-arg "NEXT_PUBLIC_HOTLINE=$HOTLINE_NUMBER" --build-arg "NEXT_PUBLIC_ZALO_OA_ID=$ZALO_OA_ID"
           build asr            apps/asr-service/Dockerfile
+          build tts            apps/tts-service/Dockerfile
           # The weekly improvement round's CronJobs (infra/kubernetes/overlays/aws-production/improve.yaml).
           build improve        infra/improve/Dockerfile
 
       - name: Check every image is in ECR
         run: |
           set -euo pipefail
-          for repo in backend-common gateway commerce identity sales ai-agent web asr improve; do
+          for repo in backend-common gateway commerce identity sales ai-agent web asr tts improve; do
             aws ecr describe-images --repository-name "telesales-$repo" --image-ids imageTag="$TAG" >/dev/null \
               || { echo "::error::telesales-$repo:$TAG is not in ECR"; exit 1; }
           done

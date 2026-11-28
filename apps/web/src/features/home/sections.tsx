@@ -2,29 +2,145 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import ProductCard from "@/components/product/ProductCard";
-import { categoryName, discountPercent, fetchProducts, ShopProduct } from "@/lib/catalog";
-import { IMG, RANGE, ROWS, TERMS } from "./content";
+import Icon from "@/components/ui/Icon";
+import { categoryName, discountPercent, fetchProducts, money, ShopProduct } from "@/lib/catalog";
+import { shopContext } from "@/lib/shop-context";
+import { RANGE, ROWS, TERMS } from "./content";
 
-// The home page's sections, in page order (app/(shop)/page.tsx): a store front, as shoppers expect one.
-// The banner is one line high; the products lead the page.
+// The home page's sections, in page order (HomeStore, app/(shop)/page.tsx): a store front, as shoppers expect one.
+// A short hero whose window turns through four featured products; then the products lead the page.
 
-/** One strip across the top: the photograph as a band, what the shop sells, its delivery offer. */
-export function HomeBanner() {
+const HERO_MS = 5000;
+
+/**
+ * The hero: what the shop sells and its two actions on the left; on the right its four featured products, one at a
+ * time, as a shop window. Each moves on after a few seconds; the thumbnails under it say which is showing and how
+ * long until the next (the bar), and pick one directly. It holds still while the pointer or the keyboard is on it,
+ * when paused and under reduced motion; on a phone a swipe turns it.
+ */
+export function HomeHero({ products }: { products: ShopProduct[] | null }) {
+  const slides = (products || []).slice(0, 4);
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [held, setHeld] = useState(false);
+  const [still, setStill] = useState(false);
+  const touch = useRef<number | null>(null);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setStill(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  const running = !paused && !held && !still && slides.length > 1;
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setTimeout(() => setIndex((i) => (i + 1) % slides.length), HERO_MS);
+    return () => window.clearTimeout(timer);
+  }, [running, index, slides.length]);
+
+  const go = (next: number) => setIndex((next + slides.length) % slides.length);
+
   return (
-    <section className="s-home-banner s-home-block" data-enter aria-labelledby="home-h">
-      <img
-        className="s-home-banner__bg"
-        src={`${IMG}/photo-f107853503-1280.webp`}
-        srcSet={`${IMG}/photo-f107853503-960.webp 960w, ${IMG}/photo-f107853503-1280.webp 1280w, ${IMG}/photo-f107853503.webp 1920w`}
-        sizes="100vw" width={1920} height={1444} alt="" aria-hidden="true"
-        fetchPriority="high" decoding="async"
-      />
-      <div className="s-wrap s-home-banner__row">
-        <div>
-          <h1 id="home-h">Gia dụng, thời trang và đồ mẹ bé</h1>
-          <p>Giao miễn phí cho đơn từ 2.000.000₫ · Đổi trả trong 7 ngày</p>
+    <section className="s-home-hero s-home-block" data-enter aria-labelledby="home-h">
+      <div className="s-wrap s-home-hero__grid">
+        <div className="s-home-hero__copy">
+          <p className="s-home-hero__kicker">Quivo · mua sắm cho cả nhà</p>
+          <h1 id="home-h">Gia dụng, thời trang và đồ mẹ bé chính hãng</h1>
+          <p className="s-home-hero__lede">Giao miễn phí cho đơn từ 2.000.000₫ · Đổi trả trong 7 ngày · Trả tiền khi nhận hàng</p>
+          <div className="s-home-hero__actions">
+            <Link className="s-btn s-btn-lg" href="/khuyen-mai">Xem hàng giảm giá</Link>
+            <button type="button" className="s-btn s-btn-outline s-btn-lg" onClick={() => shopContext.openChat()}>
+              <Icon name="assistant" size={20} /> Hỏi tư vấn
+            </button>
+          </div>
         </div>
-        <Link className="s-btn" href="/khuyen-mai">Xem hàng giảm giá</Link>
+
+        <div
+          className="s-home-show"
+          aria-roledescription="băng chuyền"
+          aria-label="Sản phẩm nổi bật"
+          onMouseEnter={() => setHeld(true)}
+          onMouseLeave={() => setHeld(false)}
+          onFocus={() => setHeld(true)}
+          onBlur={() => setHeld(false)}
+          onTouchStart={(event) => { touch.current = event.touches[0].clientX; }}
+          onTouchEnd={(event) => {
+            const from = touch.current;
+            touch.current = null;
+            if (from === null) return;
+            const moved = event.changedTouches[0].clientX - from;
+            if (Math.abs(moved) > 40) go(index + (moved < 0 ? 1 : -1));
+          }}
+        >
+          {slides.length > 0 ? (
+            <>
+              <div className="s-home-show__stage">
+                {slides.map((product, i) => {
+                  const off = discountPercent(product.price, product.listPrice);
+                  return (
+                    <Link
+                      key={product.ref}
+                      href={`/san-pham/${encodeURIComponent(product.ref)}`}
+                      className={`s-home-show__slide${i === index ? " is-on" : ""}`}
+                      aria-hidden={i !== index}
+                      tabIndex={i === index ? 0 : -1}
+                      aria-roledescription="trang"
+                      aria-label={`${i + 1} / ${slides.length}: ${product.name}`}
+                    >
+                      <span className="s-home-show__pic">
+                        {product.image && <img src={product.image} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" />}
+                        {off > 0 && <span className="s-home-show__off">-{off}%</span>}
+                      </span>
+                      <span className="s-home-show__info">
+                        <span className="s-home-show__cat">{categoryName(product.category)}</span>
+                        <strong>{product.name}</strong>
+                        <span className="s-home-show__price">
+                          {money(product.price)}
+                          {off > 0 && <s>{money(product.listPrice)}</s>}
+                        </span>
+                        <span className="s-home-show__cta">Xem sản phẩm →</span>
+                      </span>
+                    </Link>
+                  );
+                })}
+                {slides.length > 1 && (
+                  <>
+                    <button type="button" className="s-home-round s-home-show__prev" onClick={() => go(index - 1)} aria-label="Sản phẩm trước">‹</button>
+                    <button type="button" className="s-home-round s-home-show__next" onClick={() => go(index + 1)} aria-label="Sản phẩm tiếp theo">›</button>
+                  </>
+                )}
+              </div>
+              <div className="s-home-show__thumbs">
+                {slides.map((product, i) => (
+                  <button
+                    key={product.ref}
+                    type="button"
+                    aria-label={`Xem ${product.name}`}
+                    aria-current={i === index ? "true" : undefined}
+                    className={`s-home-show__thumb${i === index ? " is-on" : ""}`}
+                    onClick={() => go(i)}
+                  >
+                    {product.image ? <img src={product.image} alt="" loading="lazy" decoding="async" /> : <span>{i + 1}</span>}
+                    {i === index && running && (
+                      <span className="s-home-show__bar" key={index} style={{ animationDuration: `${HERO_MS}ms` }} />
+                    )}
+                  </button>
+                ))}
+                {!still && slides.length > 1 && (
+                  <button type="button" className="s-home-pause" onClick={() => setPaused((value) => !value)}
+                    aria-pressed={paused} aria-label={paused ? "Chạy tiếp" : "Tạm dừng"} title={paused ? "Chạy tiếp" : "Tạm dừng"}>
+                    {paused ? "▶" : "❚❚"}
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="s-home-show__stage s-home-skeleton" aria-hidden="true" />
+          )}
+        </div>
       </div>
     </section>
   );
@@ -152,10 +268,24 @@ function Skeleton() {
   );
 }
 
-/** The featured window, then one row of four per department, each with a link to all of it. */
-export function ProductSections() {
+/** The whole page: the catalogue is read once, the hero takes the first four featured products. */
+export function HomeStore() {
   const { products, failed } = useProducts();
-  const showcase = useMemo(() => (products ? featured(products, 12) : []), [products]);
+  const showcase = useMemo(() => (products ? featured(products, 16) : null), [products]);
+  return (
+    <>
+      <HomeHero products={showcase} />
+      <CategoryStrip />
+      <ProductSections products={products} failed={failed} showcase={showcase ? showcase.slice(4) : []} />
+      <TermsStrip />
+    </>
+  );
+}
+
+/** The featured window, then one row of four per department, each with a link to all of it. */
+function ProductSections({ products, failed, showcase }: {
+  products: ShopProduct[] | null; failed: boolean; showcase: ShopProduct[];
+}) {
   const rows = useMemo(
     () => ROWS.map((row) => ({ ...row, items: (products || []).filter((p) => inCategory(p, row)).sort(byAppeal).slice(0, 4) }))
       .filter((row) => !products || row.items.length > 0),
@@ -170,13 +300,13 @@ export function ProductSections() {
   }
   return (
     <>
-      <section className="s-wrap s-home-section s-home-block" aria-labelledby="noi-bat-h">
+      {(!products || showcase.length > 0) && <section className="s-wrap s-home-section s-home-block" aria-labelledby="noi-bat-h">
         <div className="s-home-head">
           <h2 id="noi-bat-h">Sản phẩm nổi bật</h2>
           <Link className="s-home-more" href="/khuyen-mai">Xem tất cả ưu đãi →</Link>
         </div>
         {products ? <FeaturedCarousel products={showcase} /> : <Skeleton />}
-      </section>
+      </section>}
       {rows.map((row) => (
         <section className="s-wrap s-home-section s-home-block" key={row.id} aria-labelledby={`${row.id}-h`}>
           <div className="s-home-head">

@@ -552,9 +552,13 @@ async def memory_request_deletion(
 ) -> dict[str, Any]:
     """Record that the customer asked the shop to delete their data (policy QT-06).
 
-    Call it only after asking the customer to confirm and hearing them agree.
-    Nothing is deleted now: the system deletes everything within 72 hours,
-    which is what to tell the customer.
+    Call it only after asking the customer to confirm and hearing them agree,
+    and once per conversation: asked again ("xoá chưa?"), answer from the
+    first result instead of calling it again.
+    Nothing is deleted during the conversation: the deletion runs as soon as
+    it ends (the customer closes the chat or starts a new one, hangs up, or
+    stays silent for an hour), and within 72 hours at the latest. Tell the
+    customer that: it is done when this conversation ends.
 
     Args:
         customer_id: Set by the system; leave it out.
@@ -574,7 +578,8 @@ async def memory_request_deletion(
             (f"D-{uuid.uuid4().hex[:12]}", customer_id, call_id, reason),
         )
         request_id = (await cursor.fetchone())["request_id"]
-    return {"request_id": request_id, "status": "recorded", "deleted_within_hours": 72}
+    return {"request_id": request_id, "status": "recorded", "deleted_when": "this conversation ends",
+            "deleted_within_hours": 72}
 
 
 @server.tool(roles={"admin"}, name="memory_delete_customer")

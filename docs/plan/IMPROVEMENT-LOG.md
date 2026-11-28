@@ -21,6 +21,48 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-28 · Xóa dữ liệu theo yêu cầu khách thất bại trên EKS
+
+Loại: sửa lỗi (bộ nhớ, QT-06, hạ tầng) · Trạng thái: đang đo · Chỉ số: không có (tuân thủ)
+
+- **Vấn đề:** khách xin xóa dữ liệu trong chat, trợ lý ghi nhận (`memory_request_deletion`), nhưng dữ liệu không bị xóa.
+- **Bằng chứng:**
+  - Trên EKS, cuộc trò chuyện 35 kết thúc lúc 06:10 UTC, `memory_status = failed`, lý do "the deletion could not be carried out".
+  - Container `memory` báo khoảng 128 lần `memory_delete_customer failed`: `OSError: Read-only file system: '/app/data'`.
+  - Worker báo `AccessDenied` khi gọi `sqs:SendMessage`.
+- **Sửa:**
+  - `signals.DEFAULT_DIR` lấy theo `AGENT_HOME` (`ROOT/data/improvement`). Trước đây nó đếm từ vị trí file code, ra `/app/data/improvement`: nằm ngoài volume và trên hệ thống file chỉ đọc. Vì vậy `gaps.forget_calls` lỗi và hoàn tác cả transaction xóa.
+  - Container `memory` (`mcp.yaml`) gắn volume improvement.
+  - Worker có thêm quyền `sqs:SendMessage` (`queue.tf`). Trước đây việc xử lý sau cuộc gọi chờ lần quét kế tiếp.
+  - Mô tả tool và skill: dữ liệu được xóa khi cuộc trò chuyện kết thúc, chậm nhất 72 giờ. Khách hỏi lại "xóa chưa" thì trợ lý không gọi lại tool.
+- **Đã kiểm:**
+  - `tests/agent/test_improvement_home.py` (mới).
+  - `test_memory_erasure.py` cùng các test thoại, QR và sent_at: 83 test pass.
+- **Số đo:** chưa đo trên EKS sau deploy. Lần quét sẽ tự hoàn tất yêu cầu còn treo (cuộc trò chuyện 35) trong vòng 2 ngày sau khi kết thúc.
+- **Còn lại:**
+  - Trước bản sửa, tín hiệu cải tiến của pod agent cũng ghi vào thư mục sai trên EKS. Cần xem lại vòng cải tiến tuần sau khi deploy.
+
+### 2026-11-28 · VieNeu-TTS thành dịch vụ riêng (tts-service)
+
+Loại: tính năng (thoại, hạ tầng) · Trạng thái: đang đo · Chỉ số: latency (thời gian tới tiếng đầu tiên, tốc độ đọc so với tốc độ phát)
+
+- **Vấn đề:** muốn dùng giọng VieNeu chạy trên hạ tầng của mình, ít tài nguyên, để gọi realtime mượt hơn và không trả phí theo ký tự.
+- **Sửa:**
+  - `apps/tts-service` (FastAPI): `/v1/speak` trả PCM dạng stream, mỗi lần đọc một câu, chọn model bằng `TTS_MODE`.
+  - Agent dùng `RemoteVieNeuVoice` khi có `TTS_URL`.
+  - `tts.yaml`: giữ 0,5 vCPU và 2 GiB, dùng tối đa 2 vCPU.
+  - Network policy, CI, repo ECR, compose profile `tts`.
+  - EKS vẫn dùng `openai:coral` mặc định; chuyển sang `vieneu:` ở /admin.
+- **Đã kiểm:**
+  - `tests/agent/test_tts_service_client.py`: stream, cắt PCM, lỗi khi dịch vụ chưa sẵn sàng.
+  - Image build và chạy được.
+- **Số đo:**
+  - Đo trên laptop có CPU Docker khoảng 4 GFLOPS.
+  - v3turbo, 2 vCPU: tiếng đầu tiên sau 2,6–8 giây; thời gian đọc gấp 8,6–13 lần độ dài câu nói.
+  - v3nano: khoảng 0,7 GiB RAM, thời gian đọc gấp 5,4–15 lần độ dài câu nói, và không stream.
+  - Chưa đo trên node EKS.
+- **Còn lại:** đo bằng `apps/tts-service/tts_time.py` trên node. Chỉ chuyển giọng sang VieNeu khi thời gian đọc nhỏ hơn độ dài câu nói.
+
 ### 2026-11-27 · Link trang chính hãng dưới câu trả lời
 
 Loại: tính năng (tri thức, giao diện web) · Trạng thái: đang đo · Chỉ số: không có (trải nghiệm)

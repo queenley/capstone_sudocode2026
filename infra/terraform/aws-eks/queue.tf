@@ -34,14 +34,16 @@ resource "aws_iam_policy" "jobs_send" {
   })
 }
 
-# ai-agent-worker: receive and delete; KEDA's scaler reads the queue's length with GetQueueAttributes.
+# ai-agent-worker: receive and delete; KEDA's scaler reads the queue's length with GetQueueAttributes. It also sends:
+# its sweep hangs up idle calls and queues their after-call work (runtime/jobs.py), which AccessDenied left to the
+# next sweep, a minute later.
 resource "aws_iam_policy" "jobs_consume" {
   name = "${local.prefix}-after-call-consume"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Effect   = "Allow"
-      Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility", "sqs:GetQueueAttributes"]
+      Action   = ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility", "sqs:GetQueueAttributes"]
       Resource = aws_sqs_queue.after_call.arn
     }]
   })

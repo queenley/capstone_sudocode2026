@@ -10,7 +10,9 @@ Engines:
 
 - ``vieneu``: VieNeu-TTS on CPU through ONNX Runtime, fully local. Streams:
   on this laptop the first chunk is ready in about 0.35 s and synthesis runs
-  faster than playback, so the stream never starves.
+  faster than playback, so the stream never starves. With ``TTS_URL`` set it
+  runs in the TTS service (``apps/tts-service``, on its own CPU share) and
+  streams from there; the agent then installs and loads nothing of it.
 - ``openai``: OpenAI's speech API (``openai:<voice>``, model ``OPENAI_TTS_MODEL``,
   ``gpt-4o-mini-tts`` unless set) with ``OPENAI_API_KEY``. In the cloud: no
   weights to download, no CPU taken from the recogniser, about a second per
@@ -253,6 +255,58 @@ class ElevenLabsVoice:
         yield Speech(b"".join(chunks), "audio/mpeg", time.perf_counter() - started, first)
 
 
+def tts_url() -> str:
+    """The TTS service's address (``apps/tts-service``), empty when VieNeu runs in this process."""
+    return os.environ.get("TTS_URL", "").strip().rstrip("/")
+
+
+class RemoteVieNeuVoice:
+    """VieNeu in the TTS service: the same voice, streamed over HTTP as 16-bit PCM."""
+
+    parallel = False  # the service synthesises one sentence at a time: asking for all at once only queues them
+    _client = None
+
+    def __init__(self, voice: str | None) -> None:
+        self.voice = voice
+
+    @classmethod
+    def _api(cls) -> httpx.AsyncClient:
+        if cls._client is None:
+            key = os.environ.get("TTS_API_KEY", "").strip()
+            headers = {"Authorization": f"Bearer {key}"} if key else {}
+            limits = httpx.Limits(keepalive_expiry=KEEP_ALIVE_SECONDS)
+            cls._client = httpx.AsyncClient(base_url=tts_url(), headers=headers, limits=limits,
+                                            timeout=httpx.Timeout(30.0, connect=5.0))
+        return cls._client
+
+    async def warm(self) -> None:
+        """Fail early, outside any timed turn, when the service is down or still loading."""
+        response = await self._api().get("/health/ready")
+        if response.status_code != 200:
+            raise RuntimeError(f"the TTS service at {tts_url()} is not ready ({response.status_code}): {response.text[:200]}")
+
+    async def stream(self, text: str) -> AsyncIterator[Speech]:
+        started = time.perf_counter()
+        first: float | None = None
+        held = bytearray()
+        async with self._api().stream("POST", "/v1/speak", json={"text": text, "voice": self.voice}) as response:
+            if response.status_code >= 400:
+                detail = (await response.aread()).decode("utf-8", "replace")[:200]
+                raise RuntimeError(f"TTS service {response.status_code}: {detail}")
+            rate = int(response.headers.get("x-sample-rate") or 24_000)
+            chunk_bytes = rate // 2  # a quarter of a second, as OpenAI's pcm
+            async for chunk in response.aiter_bytes():
+                if first is None:
+                    first = time.perf_counter() - started
+                held += chunk
+                if len(held) >= chunk_bytes:
+                    size = len(held) - len(held) % 2  # a sample is never cut in two
+                    yield _pcm_speech(bytes(held[:size]), started, first, rate)
+                    del held[:size]
+        if len(held) >= 2:
+            yield _pcm_speech(bytes(held[:len(held) - len(held) % 2]), started, first, rate)
+
+
 class VieNeuVoice:
     """Local and streaming. One engine per process, used by one sentence at a time."""
 
@@ -320,10 +374,9 @@ class VieNeuVoice:
             await worker
 
 
-def _pcm_speech(pcm: bytes, started: float, first: float | None) -> Speech:
+def _pcm_speech(pcm: bytes, started: float, first: float | None, rate: int = OPENAI_PCM_RATE) -> Speech:
     audio = np.frombuffer(pcm, dtype="<i2").astype(np.float32) / 32768
-    return Speech(_wav(audio, OPENAI_PCM_RATE), "audio/wav", time.perf_counter() - started, first,
-                  len(audio) / OPENAI_PCM_RATE)
+    return Speech(_wav(audio, rate), "audio/wav", time.perf_counter() - started, first, len(audio) / rate)
 
 
 def _wav(audio: np.ndarray, rate: int) -> bytes:
@@ -347,7 +400,9 @@ def _vieneu_installed() -> bool:
 
 def voices() -> list[dict[str, str]]:
     offered = []
-    if _vieneu_installed():
+    if tts_url():
+        offered.append({"name": "vieneu:", "label": "VieNeu-TTS · TTS service, CPU, streaming"})
+    elif _vieneu_installed():
         offered.append({"name": "vieneu:", "label": "VieNeu-TTS · local CPU, streaming"})
     from ...config.config_manager import has_api_key
 
@@ -362,7 +417,7 @@ def voices() -> list[dict[str, str]]:
     return offered
 
 
-def voice(name: str) -> EdgeVoice | ElevenLabsVoice | OpenAIVoice | VieNeuVoice:
+def voice(name: str) -> EdgeVoice | ElevenLabsVoice | OpenAIVoice | RemoteVieNeuVoice | VieNeuVoice:
     engine, _, rest = name.partition(":")
     if engine == "elevenlabs":
         return ElevenLabsVoice(rest or None)
@@ -371,7 +426,7 @@ def voice(name: str) -> EdgeVoice | ElevenLabsVoice | OpenAIVoice | VieNeuVoice:
     if engine == "edge":
         return EdgeVoice(rest)
     if engine == "vieneu":
-        return VieNeuVoice(rest or None)
+        return RemoteVieNeuVoice(rest or None) if tts_url() else VieNeuVoice(rest or None)
     raise ValueError(f"Unknown voice {name!r}")
 
 

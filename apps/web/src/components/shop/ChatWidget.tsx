@@ -82,6 +82,13 @@ const SPEAKER: Record<string, string> = {
   system: "Hệ thống",
 };
 
+/** "2026-12-24T19:30" as "19:30 24/12/2026", for the clock button's tooltip. */
+function momentLabel(value: string): string {
+  const [day, time] = value.split("T");
+  const [y, m, d] = day.split("-");
+  return `${time || "10:00"} ${d}/${m}/${y}`;
+}
+
 export default function ChatWidget() {
   const { account, status } = useAccount();
   return <ConversationWidget key={`${account?.customer_id || "guest"}:${accountStore.revision()}`} customerId={status === "signed-in" ? account?.customer_id : undefined} />;
@@ -106,6 +113,11 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   const [call, setCall] = useState<VoiceCall | null>(null);
   // Testing aid: when messages and calls say they were sent (lib/sent-at.ts).
   const [sentAt, setSentAt] = useSentAt();
+  // "Thời điểm gửi" lives in a popup behind the clock button; the draft is applied with "Áp dụng" only, so typing
+  // the date field part by part never starts a session per keystroke.
+  const [clockOpen, setClockOpen] = useState(false);
+  const [clockDraft, setClockDraft] = useState("");
+  const clockButton = useRef<HTMLButtonElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const fab = useRef<HTMLButtonElement>(null);
@@ -215,9 +227,16 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
 
   /** A new send time is a new session: one conversation never spans two days of the shop's clock. */
   function pickMoment(value: string) {
+    setClockOpen(false);
+    clockButton.current?.focus();
     if (value === sentAt) return;
     setSentAt(value);
     if (session || lines.length > 0) void startOver();
+  }
+
+  function toggleClock() {
+    setClockDraft(sentAt);
+    setClockOpen((open) => !open);
   }
 
   // Signing in or out starts a new conversation, as the new person (lib/account.ts).
@@ -508,25 +527,22 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
           aria-label="Chat với trợ lý"
           aria-haspopup="dialog"
         >
-          <span className="s-chat-fab-dot" />
-          <svg
-            className="s-chat-fab-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />
-            <path d="M8.5 11h.01M12 11h.01M15.5 11h.01" />
-          </svg>
+          {/* The assistant's face: a bubble with a spark, and the green "online" dot on its corner. */}
+          <span className="s-chat-fab-avatar" aria-hidden="true">
+            <Icon name="assistant" size={22} className="s-chat-fab-icon" />
+            <span className="s-chat-fab-dot" />
+          </span>
           <span className="s-chat-fab-label">Tư vấn ngay</span>
         </button>
       {chatOpen && (
         <dialog ref={dialog} className="s-chat" aria-label="Trò chuyện với cửa hàng" onCancel={(event) => {
           event.preventDefault();
+          // Escape closes the time popup first, then the chat.
+          if (clockOpen) {
+            setClockOpen(false);
+            clockButton.current?.focus();
+            return;
+          }
           shopContext.closeChat();
         }}>
           <header className={`s-chat-head${status === "handed_off" ? " s-chat-head-human" : ""}`}>
@@ -541,6 +557,46 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
               </span>
             </div>
             <div className="s-chat-head-actions">
+              <span className="s-chat-clock-wrap">
+                <button
+                  ref={clockButton}
+                  type="button"
+                  className={`s-icon-btn s-chat-clock-btn${sentAt ? " is-set" : ""}`}
+                  title={sentAt ? `Thời điểm gửi: ${momentLabel(sentAt)}` : "Thời điểm gửi: giờ cửa hàng"}
+                  aria-label="Thời điểm gửi"
+                  aria-expanded={clockOpen}
+                  aria-controls="s-chat-clock"
+                  disabled={call !== null || busy}
+                  onClick={toggleClock}
+                >
+                  <Icon name="clock" />
+                </button>
+                {clockOpen && (
+                  <div id="s-chat-clock" className="s-chat-clock" role="group" aria-label="Thời điểm gửi">
+                    <label>
+                      <span>Thời điểm gửi</span>
+                      <input
+                        type="datetime-local"
+                        value={clockDraft}
+                        min="2026-01-01T00:00"
+                        max="2027-12-31T23:59"
+                        autoFocus
+                        onChange={(event) => setClockDraft(event.target.value)}
+                        onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); pickMoment(clockDraft); } }}
+                      />
+                    </label>
+                    <small>Thử agent ở ngày giờ khác (tồn kho, khuyến mãi, giờ làm việc). Đổi thời điểm sẽ mở phiên mới.</small>
+                    <div className="s-chat-clock-actions">
+                      <button type="button" className="s-chat-clock-reset" onClick={() => pickMoment("")} disabled={!sentAt}>
+                        Dùng giờ cửa hàng
+                      </button>
+                      <button type="button" className="s-btn" onClick={() => pickMoment(clockDraft)} disabled={!clockDraft || clockDraft === sentAt}>
+                        Áp dụng
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </span>
               <button
                 ref={callButton}
                 className="s-icon-btn"
@@ -578,27 +634,6 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
               </button>
             </div>
           </header>
-          <div className="s-chat-clock">
-            <label>
-              <span>Thời điểm gửi</span>
-              <input
-                type="datetime-local"
-                value={sentAt}
-                min="2026-01-01T00:00"
-                max="2027-12-31T23:59"
-                title="Thử agent ở một ngày giờ khác (tồn kho, khuyến mãi, giờ làm việc). Để trống: giờ của cửa hàng."
-                disabled={call !== null || busy}
-                onChange={(event) => pickMoment(event.target.value)}
-              />
-            </label>
-            {sentAt ? (
-              <button type="button" className="s-chat-clock-reset" disabled={call !== null || busy} onClick={() => pickMoment("")}>
-                Dùng giờ cửa hàng
-              </button>
-            ) : (
-              <small>Giờ cửa hàng</small>
-            )}
-          </div>
           {sku && (
             <div className="s-chat-context">
               Đang xem: <b>{productName || sku}</b>

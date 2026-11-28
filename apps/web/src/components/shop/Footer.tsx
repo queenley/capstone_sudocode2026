@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { categoryName, DEPARTMENTS } from "@/lib/catalog";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
 import { shopContext } from "@/lib/shop-context";
+import Icon from "@/components/ui/Icon";
 import { MAIN_ACTION } from "./Header";
 
 // The storefront's footer, the same on every page: taste-skill's footer--dark on the inverse ground, in the
@@ -21,7 +22,9 @@ export default function Footer() {
             <Link className="nav__logo" href="/" aria-label="Quivo, trang chủ"><Logo height={28} title="" /></Link>
             <p className="s-footer__lede">Gia dụng, thời trang và đồ mẹ bé. Mua trên web, qua hotline hoặc Zalo.</p>
             <div className="s-footer__reach">
-              <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}</button>
+              <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>
+                <Icon name="assistant" size={18} /> {MAIN_ACTION}
+              </button>
               <a className="btn btn--secondary" href={tel}>Gọi {HOTLINE}</a>
             </div>
           </div>

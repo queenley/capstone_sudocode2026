@@ -15,6 +15,7 @@ resources:
   - storage.yaml
   - mcp.yaml
   - asr.yaml
+  - tts.yaml
   - zalo-mock.yaml
   - scaling.yaml
   - ingress.yaml
@@ -45,10 +46,12 @@ configMapGenerator:
       - LANGFUSE_HOST=__LANGFUSE_HOST__
       # Voice messages and calls are recognised by asr-service (asr.yaml).
       - ASR_URL=http://asr-service:8500
-      # The voice calls are spoken with OpenAI's voice. VOICE_TTS at build time only chooses what is installed
-      # (apps/ai-agent-service/Dockerfile); the agent reads this one at run time, and without it falls back to the
-      # local VieNeu voice, which a cloud build does not install: the call then closes with 1011.
+      # The voice calls are spoken with OpenAI's voice. VieNeu runs beside it in tts-service (tts.yaml), reached at
+      # TTS_URL: /admin's voice "vieneu:" switches a call to it, with no restart, once it is measured fast enough on
+      # these nodes (apps/tts-service/README.md). VOICE_TTS at build time only chooses what the agent image installs
+      # (apps/ai-agent-service/Dockerfile); this one is read at run time.
       - VOICE_TTS=openai:coral
+      - TTS_URL=http://tts-service:8600
       # The weekly improvement round runs as CronJobs (improve.yaml); /admin's pipeline view and its "Chạy vòng mới"
       # button drive them through the Kubernetes API (runtime/k8s_pipeline.py), not Airflow.
       - IMPROVE_RUNNER=kubernetes

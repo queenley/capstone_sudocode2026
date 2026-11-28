@@ -3,7 +3,7 @@
 # - only the gateway (and web's server side) reaches the services;
 # - only the agent and the worker reach the MCP servers: over HTTP a call's role is a header (mcp.yaml), so this
 #   policy is what keeps a pod from claiming the admin role;
-# - only the agent and the worker reach the ASR service (asr.yaml);
+# - only the agent and the worker reach the ASR service (asr.yaml) and the TTS service (tts.yaml);
 # - only web (an admin's page) and the agent (Zalo's OA API) reach the Zalo mock, which reaches the gateway's webhook;
 # - only KEDA reaches the agent's /internal/load (the same port as the API: the gateway never routes /internal).
 # Egress is open: the model APIs, Aurora, Valkey, SQS and EFS are all outside the namespace.
@@ -92,6 +92,20 @@ spec:
             matchExpressions:
               - {key: app, operator: In, values: [telesales-ai-agent, telesales-ai-agent-worker]}
       ports: [{port: 8500, protocol: TCP}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tts-from-the-agent-only
+spec:
+  podSelector: {matchLabels: {app: telesales-tts}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - {key: app, operator: In, values: [telesales-ai-agent, telesales-ai-agent-worker]}
+      ports: [{port: 8600, protocol: TCP}]
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

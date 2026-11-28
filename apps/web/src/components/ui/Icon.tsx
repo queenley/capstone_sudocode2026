@@ -6,6 +6,14 @@ import React from "react";
 const PATHS = {
   phone: <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />,
   chat: <path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6.2A8 8 0 1 1 21 12z" />,
+  // The shop's assistant: a speech bubble with a spark, for "chat with the assistant" buttons.
+  assistant: (
+    <>
+      <path d="M20 13.5A7.5 7.5 0 0 1 9 19.3L3.5 21l1.7-5.2A7.5 7.5 0 0 1 12.5 5" />
+      <path d="M17.5 2.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" />
+      <path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01" />
+    </>
+  ),
   package: (
     <>
       <path d="M21 8 12 3 3 8v8l9 5 9-5z" />

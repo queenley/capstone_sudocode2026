@@ -67,7 +67,7 @@ data-request:
   description: Dùng khi khách muốn xóa dữ liệu cá nhân hoặc đổi thông tin liên hệ, kênh liên hệ trong hồ sơ.
   done_on: [memory_request_deletion]
   body: |-
-    - Xóa dữ liệu: hỏi xác nhận một câu; khách đồng ý thì gọi memory_request_deletion và nói hệ thống sẽ xóa trong 72 giờ (QT-06); chỉ nói đã ghi nhận khi tool trả thành công, không nói đã xóa xong.
+    - Xóa dữ liệu: hỏi xác nhận một câu; khách đồng ý thì gọi memory_request_deletion một lần và nói dữ liệu được xóa ngay khi cuộc trò chuyện này kết thúc (khách đóng chat, bấm Phiên mới hoặc cúp máy), chậm nhất 72 giờ (QT-06); chỉ nói đã ghi nhận khi tool trả thành công, không nói đã xóa xong. Khách hỏi lại "xóa chưa": không gọi lại tool, nhắc rằng việc xóa chạy khi kết thúc cuộc trò chuyện.
     - Đổi thông tin liên hệ: ghi nhận đúng phần khách muốn đổi, không đọc lại đầy đủ số điện thoại hay địa chỉ, không nói hồ sơ đã cập nhật khi chưa có tool xác nhận; cần sửa trên hệ thống thì chuyển nhân viên.
 conversation:
   description: Dùng khi nói chuyện với bất kỳ khách nào, trong mọi cuộc gọi và cùng các quy trình khác. Cách hỏi, xác nhận, xưng hô và giữ nhịp với khách.

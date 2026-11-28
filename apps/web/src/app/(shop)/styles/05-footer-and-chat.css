@@ -27,12 +27,35 @@
   font-weight: 500;
   box-shadow: 0 10px 28px rgb(var(--shadow-rgb) / 0.35);
 }
+/* The assistant's face on the button: the bubble icon in a light disc, the green online dot on its corner. */
+.s-chat-fab-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: -6px 0 -6px -8px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.18);
+}
+.s-chat-fab-icon {
+  display: block;
+  transition: transform 0.2s ease;
+}
+.s-chat-fab:hover .s-chat-fab-icon { transform: rotate(-8deg) scale(1.06); }
 .s-chat-fab-dot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 4px rgb(5 150 105 / 0.3);
+  border: 2px solid var(--s-brand);
+  box-shadow: 0 0 0 3px rgb(5 150 105 / 0.3);
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-chat-fab-icon { transition: none; }
 }
 .s-returning {
   position: fixed;
@@ -96,6 +119,7 @@
   display: none;
 }
 .s-chat-head {
+  position: relative; /* the send-time popup hangs from it, across the chat's width */
   background: var(--chrome);
   color: var(--on-chrome);
   padding: 14px 16px;
@@ -118,52 +142,79 @@
 }
 .s-chat-head .s-icon-btn {
   color: var(--on-chrome);
+  width: 40px;
+  height: 40px;
 }
+.s-chat-head .s-chat-head-actions { gap: 6px; flex: none; }
 .s-chat-context {
   background: var(--surface-3);
   font-size: 13px;
   padding: 8px 14px;
   border-bottom: 1px solid var(--s-line);
 }
-/* Testing aid: the moment messages and calls say they were sent (lib/sent-at.ts). */
+/* Testing aid: the moment messages and calls say they were sent (lib/sent-at.ts), in a popup behind the clock
+   button of the chat header. A dot on the button while a moment other than the shop's clock is chosen. */
+.s-chat-clock-wrap {
+  display: inline-flex;
+}
+.s-chat-clock-btn.is-set::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--chrome);
+}
+.s-chat-clock-btn { position: relative; }
 .s-chat-clock {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 12px;
+  right: 12px;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--s-line);
+  border-radius: 12px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  box-shadow: 0 12px 32px rgb(var(--shadow-rgb) / 0.25);
+  font-size: 13px;
+}
+.s-chat-clock label {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+}
+/* The popup sits inside the header: its words take the card's colours, not the header's muted white. */
+.s-chat-head .s-chat-clock span {
+  font-size: 13px;
+  color: var(--s-ink);
+}
+.s-chat-clock input {
+  font: inherit;
+  font-weight: 400;
+  padding: 6px 8px;
+  border: 1px solid var(--s-line);
+  border-radius: 8px;
+  background: var(--s-bg);
+  color: inherit;
+}
+.s-chat-clock small {
+  color: var(--s-muted);
+  line-height: 1.4;
+}
+.s-chat-clock-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 12px;
-  padding: 6px 14px;
-  border-bottom: 1px solid var(--s-line);
 }
-.s-chat-clock label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.s-chat-clock label span,
-.s-chat-clock small,
-.s-chat-clock-reset {
-  white-space: nowrap;
-}
-.s-chat-clock {
-  flex-wrap: wrap;
-  row-gap: 4px;
-}
-.s-chat-clock input {
-  min-width: 13.5rem;
-}
-.s-chat-clock input {
-  font: inherit;
-  padding: 2px 6px;
-  border: 1px solid var(--s-line);
-  border-radius: 6px;
-  background: transparent;
-  color: inherit;
-}
-.s-chat-clock small {
-  opacity: 0.7;
-}
+.s-chat-clock-actions .s-btn { min-height: 36px; padding: 6px 14px; }
 .s-chat-clock-reset {
   font: inherit;
   background: none;
@@ -173,6 +224,7 @@
   text-decoration: underline;
   cursor: pointer;
 }
+.s-chat-clock-reset:disabled { opacity: 0.45; cursor: default; }
 .s-chat-body {
   flex: 1;
   min-height: 0;

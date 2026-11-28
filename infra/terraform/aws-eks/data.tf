@@ -103,7 +103,7 @@ resource "aws_efs_access_point" "agent" {
 # ── ECR ───────────────────────────────────────────────────────────────────
 locals {
   images = ["telesales-web", "telesales-gateway", "telesales-backend-common", "telesales-commerce", "telesales-identity",
-  "telesales-sales", "telesales-ai-agent", "telesales-asr", "telesales-improve"]
+  "telesales-sales", "telesales-ai-agent", "telesales-asr", "telesales-tts", "telesales-improve"]
 }
 
 resource "aws_ecr_repository" "main" {

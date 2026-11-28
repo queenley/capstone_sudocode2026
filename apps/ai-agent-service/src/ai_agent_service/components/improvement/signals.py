@@ -41,12 +41,16 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, Iterable, Literal, Mapping, Sequence
 
-from ...config.config_manager import btc_data_dir
+from ...config.config_manager import ROOT, btc_data_dir
 from .storage import locked
 
 Kind = Literal["outcome", "score", "consultant", "repeat", "oos_early", "oos_late", "violation", "eval_error"]
 
-DEFAULT_DIR = Path(__file__).resolve().parents[4] / "data" / "improvement"
+# Under AGENT_HOME, as the skills and the knowledge base: the image keeps its code (/app/service) and its data
+# (/app/agent) apart, and the pods mount the shared improvement volume at /app/agent/data/improvement. Counted
+# from this file it was /app/data/improvement, outside the volume and on a read-only root: erasing a customer
+# (gaps.forget_calls) failed there and rolled the whole deletion back.
+DEFAULT_DIR = ROOT / "data" / "improvement"
 
 
 def home() -> Path:

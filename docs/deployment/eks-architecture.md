@@ -79,7 +79,7 @@ flowchart TB
         AGT["ai-agent-service · worker<br/>FastAPI · LangGraph · LangChain<br/>checkpoint Postgres · Pydantic"]
         MCPT["mcp-servers<br/>FastMCP (HTTP) · 6 server tool"]
         KBT["Tìm tri thức<br/>BM25 + multilingual-e5-small<br/>ONNX Runtime"]
-        VOT["Thoại<br/>asr-service: sherpa-onnx Zipformer<br/>TTS: OpenAI coral · VAD, Smart Turn"]
+        VOT["Thoại<br/>asr-service: sherpa-onnx Zipformer<br/>TTS: OpenAI coral, VieNeu (tts-service) · VAD, Smart Turn"]
     end
 
     subgraph EXT["☁️ Dịch vụ ngoài"]
@@ -114,7 +114,7 @@ flowchart TB
 | Agent | **LangGraph** (đồ thị xử lý một lượt, checkpoint trên Postgres), **LangChain** (`langchain-openai`), FastAPI, Pydantic, jsonschema | trả lời từng lượt, gọi tool, guard, bộ nhớ khách, việc sau cuộc gọi | [apps/ai-agent-service](../../apps/ai-agent-service) |
 | Tool của agent | **FastMCP** (Model Context Protocol, chạy HTTP trên EKS) | 6 server: memory, catalog, crm, order, knowledge, account | [mcp/servers](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers) |
 | Tìm tri thức | BM25 + **multilingual-e5-small** (int8 ONNX, chạy bằng **ONNX Runtime** trên CPU) | tìm đoạn chính sách, FAQ cho từng lượt | [config/knowledge.yaml](../../apps/ai-agent-service/config/knowledge.yaml) |
-| Thoại | **sherpa-onnx** (Zipformer 30M int8) cho nhận dạng giọng nói; TTS giọng `openai:coral`; VAD và Smart Turn (ONNX Runtime, transformers) để biết khách nói xong | tin nhắn thoại, gọi điện trực tiếp, ngắt lời | [apps/asr-service](../../apps/asr-service), [requirements-voice.txt](../../apps/ai-agent-service/requirements-voice.txt) |
+| Thoại | **sherpa-onnx** (Zipformer 30M int8) cho nhận dạng giọng nói; TTS giọng `openai:coral`; **VieNeu-TTS** (ONNX trên CPU) chạy sẵn trong `tts-service`, trả âm thanh dạng stream, bật bằng giọng `vieneu:` ở /admin khi đo đủ nhanh; VAD và Smart Turn (ONNX Runtime, transformers) để biết khách nói xong | tin nhắn thoại, gọi điện trực tiếp, ngắt lời | [apps/asr-service](../../apps/asr-service), [apps/tts-service](../../apps/tts-service), [requirements-voice.txt](../../apps/ai-agent-service/requirements-voice.txt) |
 | Model | **OpenAI**: `gpt-5.6-luna` cho advisor, `gpt-4.1-mini` cho các agent phụ và extractor đánh giá | sinh câu trả lời; gán nhãn khi chấm | [config/models.yaml](../../apps/ai-agent-service/config/models.yaml) |
 | Theo dõi | **Langfuse**, SSE cho trang Trực tiếp, CloudWatch alarm | trace LLM; xem từng lượt ngay khi lưu; cảnh báo hàng đợi | mục 6.1 |
 | Dữ liệu | **PostgreSQL** (Aurora), **Valkey** trên ElastiCache Serverless (tương thích giao thức Redis; code dùng client `redis-py`, biến `REDIS_URL`, `AGENT_REDIS_URL`), **SQS**, **EFS** | dữ liệu chính; bộ đếm và tín hiệu; việc sau cuộc gọi; skills và kb dùng chung | mục 2.2, mục 3 |
@@ -137,6 +137,7 @@ flowchart LR
     GW --> AG["ai-agent-service"]
     AG --> MCP["mcp-servers<br/>6 tool server"]
     AG --> ASR["asr-service"]
+    AG --> TTS["tts-service"]
     AG -->|"cuộc gọi kết thúc"| SQS[("SQS")]
     SQS --> WRK["ai-agent-worker"]
     WRK --> MCP
@@ -185,6 +186,7 @@ Từ 27/11/2026, pod của app không bị ghim vào pool nào. Scheduler đặt
 | `mcp-servers` | 1 (trước 27/11: 2) | bất kỳ | HPA theo CPU | 6 server, cổng 8801–8806 ([mcp.yaml](../../infra/kubernetes/overlays/aws-production/mcp.yaml)). Chỉ agent và worker gọi được (NetworkPolicy) |
 | `ai-agent-worker` | 1 | bất kỳ | KEDA theo độ dài hàng đợi SQS, **tối thiểu 1** ([after-call-worker.yaml](../../infra/kubernetes/overlays/production/after-call-worker.yaml)) | vòng quét 60 giây nằm ở đây, nên không về 0 |
 | `asr-service` | 1 | bất kỳ | — | Zipformer int8 trên CPU ([asr.yaml](../../infra/kubernetes/overlays/aws-production/asr.yaml)); chỉ agent và worker gọi được |
+| `tts-service` | 1 | bất kỳ | — | VieNeu-TTS trên CPU ([tts.yaml](../../infra/kubernetes/overlays/aws-production/tts.yaml)): giữ 0,5 vCPU và 2 GiB, dùng tối đa 2 vCPU khi đang đọc; mỗi lần đọc một câu; chỉ agent và worker gọi được |
 | `identity-events`, `commerce-events`, `sales-events`, `ai-agent-events` | 1 mỗi cái | bất kỳ | — | relay outbox trên Postgres, không dùng Kafka |
 | `zalo-mock` | 1 | bất kỳ | — | demo kênh Zalo khi chưa có Official Account ([zalo-mock.yaml](../../infra/kubernetes/overlays/aws-production/zalo-mock.yaml)) |
 | Job `telesales-migrate`, `telesales-seed` | mỗi lần deploy | bất kỳ | — | do `deploy-eks.yml` tạo |
