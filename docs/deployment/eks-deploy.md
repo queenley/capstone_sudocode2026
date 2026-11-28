@@ -474,6 +474,16 @@ flowchart LR
 
 ### 5.1 Tạm dừng (giữ cluster)
 
+Một lệnh làm cả các bước dưới đây, theo đúng thứ tự ([eks_idle.sh](../../scripts/deployment/eks_idle.sh)):
+
+```bash
+bash scripts/deployment/eks_idle.sh status    # node group, số node, số pod đang chạy
+bash scripts/deployment/eks_idle.sh pause     # tắt khi không demo; site trả 503, dữ liệu giữ nguyên
+bash scripts/deployment/eks_idle.sh resume    # bật lại trước buổi demo 10 phút
+```
+
+Các bước thủ công, nếu cần làm từng bước:
+
 App xuống 0 trước. Karpenter tự xóa node trống của pool `general` sau 2 phút. Sau đó mới đưa 2 node hệ thống về 0, vì Karpenter chạy trên chính chúng.
 
 ```powershell

@@ -16,6 +16,11 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
+  # The control plane's logs in CloudWatch: who signed in (authenticator) only, kept two weeks. The module's
+  # default (api, audit, authenticator for 90 days) wrote 1.5 GB in six days on a quiet demo (2026-11-28).
+  enabled_log_types                      = var.control_plane_log_types
+  cloudwatch_log_group_retention_in_days = 14
+
   addons = {
     coredns                = {}
     kube-proxy             = {}

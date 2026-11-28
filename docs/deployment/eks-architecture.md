@@ -338,6 +338,9 @@ Lý do cũ cần 7 node: 2 node hệ thống có taint `CriticalAddonsOnly` nên
 | Replica tối thiểu 2 → 1 (HPA và KEDA); vẫn tự scale lên khi tải tăng | [scaling.yaml](../../infra/kubernetes/overlays/aws-production/scaling.yaml) |
 | PDB `minAvailable: 1` → `maxUnavailable: 1`, để node có 1 pod vẫn dọn được | [availability.yaml](../../infra/kubernetes/overlays/production/availability.yaml) |
 | AWS Budgets gửi email khi chi tiêu vượt ngưỡng | [budget.tf](../../infra/terraform/aws-eks/budget.tf) |
+| Log control plane EKS chỉ còn `authenticator`, giữ 14 ngày (trước: `api`, `audit`, `authenticator`, 90 ngày, 1,5 GB trong 6 ngày) | [eks.tf](../../infra/terraform/aws-eks/eks.tf) |
+| ECR giữ 10 image mới nhất mỗi repo, xóa image không tag sau 1 ngày (trước: không dọn, khoảng 1 GB mỗi lần deploy) | [data.tf](../../infra/terraform/aws-eks/data.tf) |
+| Tắt và bật lại bằng một lệnh khi không demo | [eks_idle.sh](../../scripts/deployment/eks_idle.sh) |
 
 Đổi lại: mỗi service chỉ còn 1 pod, nên pod chết thì service gián đoạn vài giây đến vài phút, trong lúc pod mới khởi động. Với shop thật, đặt lại mức tối thiểu 2 và `dedicated_system_nodes = true` nếu cần.
 

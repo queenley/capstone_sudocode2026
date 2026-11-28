@@ -57,6 +57,12 @@ variable "dedicated_system_nodes" {
   description = "true: the system node group runs the add-ons only (taint CriticalAddonsOnly) and every app pod needs a Karpenter node. false: the app uses the room the add-ons leave, so a quiet shop runs on these two nodes alone."
 }
 
+variable "control_plane_log_types" {
+  type        = list(string)
+  default     = ["authenticator"]
+  description = "EKS control plane logs sent to CloudWatch. Add \"audit\" and \"api\" while investigating an incident: they are most of the volume."
+}
+
 variable "monthly_budget_usd" {
   type        = number
   default     = 150

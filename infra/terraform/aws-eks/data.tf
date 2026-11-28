@@ -115,6 +115,29 @@ resource "aws_ecr_repository" "main" {
   }
 }
 
+# Each deploy pushes a new tag of every image (about 1 GB, most of it the agent's); nothing removed them. Keep the
+# last 10 tagged images of each repository, enough to roll back (deploy-eks.yml image_tag), and drop untagged layers.
+resource "aws_ecr_lifecycle_policy" "main" {
+  for_each   = aws_ecr_repository.main
+  repository = each.value.name
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Untagged images after a day"
+        selection    = { tagStatus = "untagged", countType = "sinceImagePushed", countUnit = "days", countNumber = 1 }
+        action       = { type = "expire" }
+      },
+      {
+        rulePriority = 2
+        description  = "Keep the last 10 releases"
+        selection    = { tagStatus = "any", countType = "imageCountMoreThan", countNumber = 10 }
+        action       = { type = "expire" }
+      },
+    ]
+  })
+}
+
 # ── the app's secrets (keys, tokens, DATABASE_URL), read by External Secrets ─────────
 # Terraform makes the empty secret; its values are set once by hand (docs/deployment/README.md), never in state.
 resource "aws_secretsmanager_secret" "app" {
