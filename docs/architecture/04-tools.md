@@ -1,6 +1,6 @@
 # 04. Danh sách tools
 
-> Phạm vi: tất cả tool mà agent có thể gọi (qua MCP hoặc không), ai được gọi, ở lane nào, và lớp bảo vệ quanh mỗi lần gọi.
+> Phạm vi: tất cả tool mà agent có thể gọi (qua MCP hoặc không), ai được gọi, ở lane nào, và lớp bảo vệ quanh mỗi lần gọi. Đối chiếu với yêu cầu tool (C.2) và MCP (C.3) của đề: mục 8, 9, 10.
 > Quy ước: `A/` = `apps/ai-agent-service/src/ai_agent_service/`. Mọi số liệu trích từ code; nếu comment và code khác nhau thì theo code.
 > Liên quan: [00-tong-quan.md](00-tong-quan.md) · [01-he-thong.md](01-he-thong.md) · [02-vong-lap-harness.md](02-vong-lap-harness.md) · [03-bo-nho.md](03-bo-nho.md) · [05-trien-khai.md](05-trien-khai.md) · [06-quyet-dinh-thiet-ke.md](06-quyet-dinh-thiet-ke.md)
 
@@ -186,11 +186,11 @@ Thứ tự middleware của advisor (`A/agents/advisor.py:1276-1287`): `ChainLoo
 
 | Bước | Tác dụng | Dòng |
 |---|---|---|
-| `strip_internal` | xoá mọi key bắt đầu bằng `_internal` ở mọi độ sâu; phong bì sai thành `BAD_ENVELOPE` | 907-932 |
+| `strip_internal` | xoá mọi key bắt đầu bằng `_internal` ở mọi độ sâu; phong bì sai thành `BAD_ENVELOPE` | 916-932 |
 | `with_args` | gắn args thật đã chạy vào message (bỏ `purchase_authorization`) cho trace | 872-880 |
 | `visible_result` | token hoá lại PII qua vault; `crm_get_customer` chỉ giữ hồ sơ của `customer_id` đã xác minh, nếu không thì `PROFILE_SCOPE` | 883-904 |
 | `with_status_words` | `order_status`: thêm `status_text` tiếng Việt và `return_window` khi quá 7/30 ngày | 346-373 |
-| `with_hints` | lỗi `UNKNOWN_SKU` kèm gợi ý gọi `catalog_search` | 325-343 |
+| `with_hints` | lỗi `UNKNOWN_SKU` kèm gợi ý gọi `catalog_search` | 331-343 |
 
 ### 5.4 ActionGuard: kiểm tra trước khi ghi (tóm tắt)
 
@@ -263,3 +263,98 @@ Tool hoàn toàn của đội: `delivery_estimate`, 12 tool `memory`/`identity`,
 | `kb_upsert` | Chỉ role `admin`, gọi từ `runtime/calls.py` khi lưu FAQ demo | `A/runtime/calls.py:408-409` |
 | `product_advise` | Có trong lane nhưng chỉ được gắn khi `ADVISOR_PRODUCT_ADVISE=1` (mặc định tắt) | `A/mcp/tools.py:667-669` |
 | `load_skill` | Có trong lane nhưng bị gỡ khỏi request khi `ADVISOR_SKILLS` tắt (mặc định) | `A/agents/advisor.py:573-575` |
+
+## 8. Đối chiếu tool của đề (C.2 Tool integration)
+
+Đề yêu cầu: ở M1 agent gọi được ít nhất 3 tool (`crm.get_customer`, `catalog.search` + `inventory.check`, `order.create`), và "giá phải lấy từ tool, agent không được tự bịa giá hay khuyến mãi"; ở M2 thêm `pricing.get_quote` (chỉ khuyến mãi còn hiệu lực), `order.status` / `order.update`, `schedule.callback`.
+
+### 8.1 Bảng "Đối chiếu tool của đề"
+
+| Tool của đề | Mức theo đề | Tên trên dây | Server | Trạng thái | Nguồn |
+|---|---|---|---|---|---|
+| `crm.get_customer` | M1 | `crm_get_customer` | crm | Có. Harness gọi khi nhận diện khách và dựng Call Brief; advisor cũng được offer | `A/mcp/servers/crm.py:34`; `A/pipeline/hot/nodes.py:419`, `456` |
+| `catalog.search` | M1 | `catalog_search` | catalog | Có, thêm tìm lỏng của đội | `A/mcp/servers/catalog.py:36` |
+| `inventory.check` | M1 | `inventory_check` | catalog | Có; harness tự gọi kèm khi search trả đúng 1 sản phẩm (mục 3) | `catalog.py:80`; `A/mcp/tools.py:596`, `710-731` |
+| `order.create` | M1 | `order_create` | **crm** | Có, write tool | `A/mcp/servers/crm.py:65` |
+| `pricing.get_quote` | M2 | `pricing_get_quote` | catalog | Có (mục 8.3) | `catalog.py:97-129` |
+| `pricing.quote_order` | BTC bổ sung 11/2026 | `pricing_quote_order` | catalog | Có, cho đơn nhiều máy | `catalog.py:141` |
+| `order.status` | M2 | `order_status` | order | Có | `A/mcp/servers/order.py:29` |
+| `order.update` | M2 | `order_update` | order | Có, write tool | `order.py:58` |
+| `schedule.callback` | M2 | `schedule_callback` | crm | Có, write tool | `crm.py:157` |
+| `handoff.transfer` | (schema BTC: M1) | `handoff_transfer` | crm | Có, write tool | `crm.py:194` |
+| `memory.read` / `memory.write` | M1, qua mcp-memory | `memory_get_*`, `memory_commit_*`... | memory | Có, schema do đội thiết kế (mục 2, mục 9) | `A/mcp/servers/memory.py:159-580` |
+
+- Cột "Mức theo đề" theo C.2. `tools.schema.json` của BTC ghi mức riêng, ví dụ `schedule.callback` "M1", `pricing.get_quote` "M1 (khuyến nghị) / M2" (`apps/ai-agent-service/data/btc/schemas/tools.schema.json:90`, `157`).
+- Tên tool và tham số bắt buộc giữ đúng của BTC vì server gọi thẳng hàm của mock (mục 6); chỉ đổi dấu chấm thành gạch dưới trên dây (mục 1.2). `tests/test_auth_mcp.py:39-49` kiểm tra các server phục vụ đủ chín tool của BTC cùng `memory_get_profile`, `kb_search`.
+- Ở lane `NEW` và `CONTINUITY`, model được offer toàn bộ tool trên (mục 4.1), tối đa 20 lần gọi tool mỗi lượt (`A/agents/advisor.py:1243`).
+- Lệch so với cách chia server của đề: ba tool ghi `order.create`, `schedule.callback`, `handoff.transfer` nằm ở server `crm`; server `order` chỉ có `order.status`, `order.update`.
+
+### 8.2 Giá lấy từ tool: cơ chế thực thi
+
+Câu "agent không được tự bịa giá hay khuyến mãi" được thực thi bằng code ở 5 chỗ, không chỉ bằng prompt:
+
+| Lớp | Cơ chế | Nguồn |
+|---|---|---|
+| Model không viết số giá | Luật 1 của advisor: giá và tổng viết bằng nhãn `{giá:<mã>}`, `{tổng}`. `fill_figures` thay nhãn bằng giá hôm nay của mã đó lấy từ `quotes` của cuộc gọi và `pricing.quote_order` của lượt; nhãn không có báo giá thì câu đó **không được nói** | `config/prompts/agent/advisor/rules.md:33-34`; `A/components/guardrails/fallback.py:88-112`; `A/pipeline/hot/nodes.py:583`, `1337-1343`, `1560-1578` |
+| Hard check số tiền | Mọi số tiền trong câu (số hoặc chữ) phải có nguồn: kết quả tool của cuộc gọi, báo giá hôm nay, tổng giỏ, đoạn chính sách BTC đọc lượt này, số lượng nhân đơn giá, hiệu hai số của cùng một đối tượng, lời khách, giá trong brief. Không có nguồn thì bị chặn | `A/components/guardrails/hard.py:13`, `117-155`, `224-231`; `unsourced_money` dòng 218-221 |
+| Model không thấy trường giá khi đặt đơn | `StrictToolsMiddleware` ẩn `price_vnd`, `promo_code` của `order_create` khỏi schema (`HARNESS_ARGS`); `_filled_order` điền giá bằng báo giá hôm nay, thiếu thì ActionGuard tự gọi `pricing_get_quote` | `A/mcp/tools.py:98-101`, `182-194`; `A/agents/advisor.py:834-844`, `947-951` |
+| Kiểm tra trước khi ghi | `actions.check`: `price_vnd` phải bằng `pricing.get_quote` hôm nay của mã đó; đơn nhiều dòng phải khớp từng máy với `pricing.quote_order`; mã sản phẩm phải xuất hiện trong kết quả tool của cuộc gọi | `A/components/guardrails/actions.py:9`, `264-277`, `330-339` |
+| Mock của BTC | `order.create` tự báo giá lại và trả `price_mismatch` kèm `expected_units` khi giá không khớp | `apps/ai-agent-service/data/btc/eval/mock_tools.py:224-229` |
+
+Ghi chú: `StrictToolsMiddleware` chỉ bật khi LLM là `openai-chat` (`A/agents/advisor.py:1271`, `1283`); với provider khác, `price_vnd` vẫn hiện trong schema nhưng hai lớp `_filled_order` và `actions.check` vẫn chạy. Mô tả tool `pricing_get_quote` mà model đọc ghi rõ đây là "the only source of a price or a promotion" (`catalog.py:112`).
+
+### 8.3 `pricing.get_quote` chỉ trả khuyến mãi còn hiệu lực
+
+Logic nằm trong mock của BTC, đội không sửa (`mock_tools.py:92-138`):
+
+- Khuyến mãi mà ngày `on` nằm ngoài `[start, end]` bị bỏ qua: đã hết hạn thì chỉ ghi **mã** vào `expired_promos`; chưa bắt đầu thì không trả ra gì (comment "chưa bắt đầu → không lộ", dòng 107-109).
+- Còn hạn nhưng không đủ điều kiện (số lượng, vùng, `requires_owned_sku`, `once_per_customer`, giá trị tối thiểu) thì vào `ineligible_promos` kèm lý do (dòng 110-118).
+- Chỉ khuyến mãi còn hạn và đủ điều kiện mới vào `applied_promos` và `final_price_vnd`; nhóm không cộng dồn chỉ lấy cái có lợi nhất (KM-04, dòng 128-133).
+- `on` không do model viết: bị ẩn khỏi schema (`SYSTEM_ARGS`) và ToolGuard ghi đè bằng ngày của cuộc gọi (`A/mcp/tools.py:95-96`, `530-532`); server dùng ngày tham chiếu nếu thiếu (`catalog.py:124-128`).
+- Đội chỉ **thêm** `name`, `end` vào từng mục của `applied_promos`, không thêm hay bỏ khuyến mãi nào (`A/mcp/servers/btc.py:256-277`). `_internal_price_floor_vnd` bị `strip_internal` xoá trước khi model thấy (`mock_tools.py:138`, `A/mcp/tools.py:916`).
+- Lớp dự phòng: hard check KM-02 chặn câu nhắc mã hoặc ngày bắt đầu của khuyến mãi chưa bắt đầu (`A/components/guardrails/hard.py:264-279`).
+
+## 9. Đối chiếu yêu cầu MCP của đề (C.3)
+
+| Yêu cầu của đề | Mức | Trạng thái | Cách đáp ứng | Nguồn |
+|---|---|---|---|---|
+| Ít nhất 2 MCP server | M1 | Có | 6 server: memory, catalog, crm, order, knowledge, account | `A/mcp/client.py:53-60` |
+| `mcp-memory` bắt buộc, đọc/ghi bộ nhớ khách | M1 | Có | Đọc: `memory_get_profile`, `memory_get_episodes`, `memory_search_calls`. Ghi: `memory_commit_facts`, `memory_commit_episode`, `memory_confirm_identity`, `memory_settle_unconfirmed`. Provenance: mỗi fact có `source` (`call_id`, `turn`, `extractor_version`), cũng là khoá idempotency | `A/mcp/servers/memory.py:1-4`, `61-84`, `159-580` |
+| `mcp-catalog` hoặc `mcp-crm` | M1 | Có cả hai | catalog 5 tool, crm 4 tool | `A/mcp/servers/catalog.py`, `crm.py` |
+| `mcp-order` | M2 | Một phần | Server có, nhưng chỉ chứa `order.status`, `order.update`; `order.create` nằm ở `mcp-crm` | `A/mcp/servers/order.py:29`, `58`; `crm.py:65` |
+| `mcp-knowledge` (RAG chính sách/FAQ) | M2 | Có | `kb_search` trên `policy/*.md` của BTC + FAQ/playbook đã duyệt; harness gọi mỗi lượt trước advisor | `A/mcp/servers/knowledge.py:1-22`, `251`; `A/pipeline/hot/nodes.py:165-171` |
+| Phân quyền theo tool (tool nào được ghi dữ liệu) | M2 | Có | Mỗi tool khai danh sách role; `RoleMiddleware` kiểm ở server trước khi tool chạy | `A/mcp/server_base.py:98-114`, `131-165` |
+
+### 9.1 Mô hình phân quyền
+
+Quyền được thực thi **ở server**, "whatever the client claims" (`A/mcp/server_base.py:6-11`). Role đi theo biến môi trường `MCP_ROLE` (stdio) hoặc header `x-role` (HTTP). Khi chạy HTTP trên EKS, NetworkPolicy `mcp-from-the-agent-only` chỉ cho `ai-agent-service` và `ai-agent-worker` chạm cổng MCP để không pod nào tự xưng role khác ([05-trien-khai.md](05-trien-khai.md), mục 3).
+
+| Role | Ai dùng | Tool **ghi** được phép | Không được |
+|---|---|---|---|
+| `advisor` | AdvisorAgent (LLM) | `order_create`, `order_update`, `schedule_callback`, `handoff_transfer`, `memory_request_deletion` (chỉ ghi yêu cầu) | mọi tool ghi ledger, `identity_*`, `kb_search`, `kb_upsert`, `memory_delete_customer` |
+| `harness` | code hot path (`ToolBox`) | `identity_link_provisional`, `handoff_transfer` (lane HANDOFF) | commit ledger, `order_create`, `order_update`, `schedule_callback` |
+| `memory_writer` | `after_call` (MemoryAgent) | `memory_confirm_identity`, `memory_commit_facts`, `memory_settle_unconfirmed`, `memory_commit_episode` | không nạp server nghiệp vụ nào (chỉ `memory`) |
+| `admin` | `after_call` khi xoá (QT-06), lưu FAQ demo | `memory_delete_customer`, `kb_upsert` (chỉ scope `demo`) | không nạp catalog, crm, order |
+
+Nguồn: decorator `roles=` của từng tool (`A/mcp/servers/memory.py:280`, `302`, `330`, `355`, `470`, `511`, `548`, `580`; `crm.py:65`, `157`, `194`; `order.py:58`; `knowledge.py:251`, `289`), `SERVER_ROLES` (`A/mcp/client.py:64-71`).
+
+- **Advisor không ghi được ledger.** Chỉ `memory_writer` được commit (`memory.py:355`). Sự kiện nghiệp vụ trong ledger do MemoryAgent đọc từ tool log bằng code, không từ lời ai nói (`A/agents/memory.py:7-13`).
+- **Xoá chỉ có `admin`.** Advisor chỉ ghi yêu cầu (`memory.py:548`); `after_call` thực hiện xoá bằng role `admin`, mở lười (`A/pipeline/cold/after_call.py:16-18`, `A/runtime/harness.py:84`).
+- **Lớp thứ hai ở phía client:** `LaneToolsMiddleware` gỡ mọi `WRITE_TOOLS` ở chế độ copilot và `account_*` khi chưa đăng nhập (mục 4.2); `actions.check` kiểm tham số mọi write tool (mục 5.4).
+
+## 10. Chất lượng tích hợp tool (đúng schema, xử lý lỗi)
+
+| Khía cạnh | Cách làm | Nguồn |
+|---|---|---|
+| Schema từ một nguồn | FastMCP sinh schema từ type hints và docstring `Args:` của hàm tool; `lines` dùng `TypedDict` để strict mode không gửi object rỗng | `A/mcp/server_base.py:23-26`, `136-137`; `A/mcp/servers/catalog.py:132-140` |
+| Strict mode | Mọi object đóng (`additionalProperties: false`), mọi trường `required`, trường tuỳ chọn thành nullable; null bị bỏ trước khi gọi | `A/mcp/tools.py:154-198`, `237` |
+| Tham số lạ | ActionGuard bỏ tham số tool không khai báo (model hay mang tham số của tool này sang tool khác) | `A/agents/advisor.py:613-624` |
+| Tham số hệ thống | `on`, `customer_phone`, `idempotency_key`... do harness điền, model không viết (mục 4.3, 5.2) | `A/mcp/tools.py:95-96`, `508-577` |
+| Handoff Brief | Kiểm trực tiếp với `schemas/handoff_brief.schema.json` của BTC sau khi harness điền | `A/components/guardrails/actions.py:428-436`; `A/components/btc_schemas.py:1-30` |
+| Phong bì lỗi chung | `{"ok": false, "error": {code, retryable, message, details}}`; lỗi nghiệp vụ trả như dữ liệu để model đọc (ví dụ báo giá thay thế), không raise | `A/mcp/server_base.py:12-17`, `78-88`, `146-161` |
+| Lỗi của mock | `{"error": ...}` thành `ToolFailure` mã viết hoa, `retryable: false`, phần còn lại vào `details` (`PRICE_MISMATCH` kèm giá đúng, `OUT_OF_STOCK` kèm tồn kho) | `A/mcp/servers/btc.py:36-38`, `236-242` |
+| Hạ tầng | Quá giờ thành `TIMEOUT`, exception thành `TOOL_ERROR` (đều `retryable: true`); phong bì sai thành `BAD_ENVELOPE`; tool lạ role thì server raise `FORBIDDEN` | `A/mcp/tools.py:427-442`, `927`; `A/mcp/server_base.py:110-113` |
+| Retry | 1 lần, chỉ khi `retryable` và không phải write tool | `A/mcp/tools.py:473-489` |
+| Circuit breaker | 2 lỗi hạ tầng liên tiếp thì mở 60 s (`CIRCUIT_OPEN`); lỗi tool liên tiếp đưa lượt sau sang lane HANDOFF (luật 1, `TOOL_FAILURES = 2`) | `A/mcp/tools.py:392-393`, `494-506`; `A/components/orchestration/rules.py:40` |
+| Ghi an toàn khi lặp | Write tool không retry; `idempotency_key` do harness tạo; server lưu kết quả lần đầu theo key | `A/mcp/tools.py:71-73`; `A/mcp/servers/btc.py:24-33` |
+| Gợi ý sửa | `UNKNOWN_SKU` kèm gợi ý gọi `catalog_search`; ActionGuard trả lý do bằng tiếng Việt để lần gọi sau sửa | `A/mcp/tools.py:331`; `A/components/guardrails/actions.py:264-277` |

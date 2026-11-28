@@ -123,6 +123,16 @@ Overlay `aws-production` gỡ `spec.replicas` của `api-gateway`, `web`, `comme
 
 Mọi container chạy `runAsNonRoot` uid 1000, `readOnlyRootFilesystem: true`, drop toàn bộ capability (ví dụ `base/workloads.yaml:13,21-24`; riêng `zalo-mock` không đặt read-only root, `zalo-mock.yaml:44-46`).
 
+### 2.1. Mở rộng theo số khách hàng
+
+Thêm khách thì thêm pod, không phải thêm cấu hình theo khách:
+
+- Pod agent không giữ state cuộc gọi: state nằm trong Postgres checkpointer, graph compile một lần dùng chung (`apps/ai-agent-service/src/ai_agent_service/pipeline/hot/graph.py:41-42`), nên lượt chat kế tiếp chạy được ở pod bất kỳ. Cuộc gọi thoại giữ WebSocket ở một pod, vì vậy scale-in chậm (tối đa 1 pod mỗi 120 s, `scaling.yaml:8-36`) và pod có `terminationGracePeriodSeconds: 120` (`agent-patch.yaml:13`).
+- Mỗi cuộc gọi chỉ một lượt chạy một lúc nhờ lease `turn_lease_until` trên bảng `calls` (`apps/ai-agent-service/src/ai_agent_service/runtime/calls.py:38`, `132-147`), dù lượt đến pod nào.
+- Việc sau cuộc gọi đi qua SQS sang `ai-agent-worker` (`apps/ai-agent-service/src/ai_agent_service/runtime/jobs.py:1-13`); giới hạn tốc độ gọi mô hình dùng chung qua Valkey cho mọi pod (`apps/ai-agent-service/src/ai_agent_service/llm/shared_limiter.py:1-14`).
+
+Chi tiết, giới hạn (state mock BTC ghi tuần tự dưới một advisory lock) và cách thêm ngành hàng hoặc kênh mới: [06-quyet-dinh-thiet-ke.md](06-quyet-dinh-thiet-ke.md), mục 6.
+
 ## 3. NetworkPolicy
 
 File `infra/kubernetes/overlays/aws-production/network-policy.yaml`. Mặc định chặn mọi ingress (`default-deny-ingress`, dòng 11-17); egress để mở vì model API, Aurora, Valkey, SQS, EFS đều nằm ngoài namespace (dòng 9). Cần network policy agent của VPC CNI (dòng 10). Các đường được mở:

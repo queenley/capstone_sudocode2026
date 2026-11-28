@@ -13,6 +13,8 @@ Phần lý do chỉ lấy từ những gì mã nguồn và docstring nói. Con s
 
 Mọi đường dẫn bên dưới tính từ gốc repo. `A/` là viết tắt của `apps/ai-agent-service/src/ai_agent_service/`.
 
+Đối chiếu với đề: lý do chọn MCP ở ADR-03; multi-agent (A2A) ở mục 5; khả năng mở rộng và chi phí (tiêu chí 7) ở mục 6.
+
 ## 1. Bảng tóm tắt
 
 | # | Quyết định | Lý do chính | Phương án đã loại |
@@ -77,6 +79,13 @@ Các ADR bên dưới đều theo vài nguyên tắc chung, có thể thấy nga
 - **Bối cảnh:** Advisor, harness, MemoryAgent và admin có quyền khác nhau. Đồng thời giá, tồn kho, khuyến mãi phải khớp với cách grader của BTC tính.
 - **Quyết định:** Có 6 MCP server (memory, catalog, crm, order, knowledge, account) và 4 role (`advisor`, `harness`, `memory_writer`, `admin`). Mỗi role có một client riêng. Role được truyền qua biến môi trường `MCP_ROLE` khi dùng stdio, hoặc header `x-role` khi dùng HTTP. `RoleMiddleware` từ chối mọi tool không có role trong danh sách của nó. Catalogue, CRM và order bọc `eval/mock_tools.py` của BTC.
 - **Lý do:** Quyền do server kiểm tra "whatever the client claims" (`A/mcp/server_base.py:6-11,96-113`). Một role chỉ khởi động những server nó được dùng (`A/mcp/client.py:62-71`). Bọc mock giúp giá và tồn kho đúng với grader "by construction rather than by care" (`A/mcp/servers/btc.py:3-6`).
+- **Vì sao chọn MCP (đề yêu cầu "giải thích lý do chọn"):** các lý do dưới đây đều có trong docstring hoặc code:
+  1. **Quyền nằm ở biên tiến trình, không nằm trong prompt.** Mỗi tool khai danh sách role, `RoleMiddleware` từ chối trước khi tool chạy (`A/mcp/server_base.py:6-11`, `98-114`). Dù model của advisor có đòi gọi tool ghi ledger, server `memory` vẫn từ chối vì `memory_commit_facts` chỉ nhận `memory_writer` (`A/mcp/servers/memory.py:355`). Gọi hàm Python trực tiếp thì không có biên này.
+  2. **Một hợp đồng cho mọi tool.** Cùng phong bì `ok/error`, cùng tool `health`, schema sinh từ chữ ký hàm và docstring `Args:`, nên model, trace và test cùng đọc một nguồn (`server_base.py:12-26`).
+  3. **Mỗi role chỉ nạp những gì nó cần.** "a memory writer must not load six Python processes and another embedding model" (`A/mcp/client.py:62-63`); `memory_writer` chỉ nạp server `memory`.
+  4. **Đổi transport mà không đổi tool.** stdio (mỗi role một subprocess) cho máy local và lệnh đánh giá; HTTP "when several sessions share one server" (`server_base.py:169-171`, `client.py:1-7`). Trên EKS sáu server là một Deployment riêng, scale riêng ([05-trien-khai.md](05-trien-khai.md), mục 2).
+  5. **Khớp hình thức của BTC.** Đề gọi tên `mcp-memory` ("The one server the brief requires by name", `memory.py:3-4`); tên tool có dấu chấm của BTC được giữ nguyên trong trace để grader đối chiếu (`client.py:9-17`); cùng một logic phục vụ cả API lẫn lệnh đánh giá (`btc.py:10-14`).
+  - Ghi chú: docstring `server_base.py:3` ghi "five small FastMCP processes", còn `SERVERS` có 6 server (`client.py:53-60`); theo code là 6.
 - **Phương án đã cân nhắc:** Gọi hàm Python trực tiếp, hoặc tự viết lại logic nghiệp vụ. Cách thứ hai dễ lệch so với grader.
 - **Đánh đổi / hệ quả:** Thêm tiến trình và độ trễ IPC. Tên tool có dấu chấm của BTC phải đổi thành gạch dưới khi truyền đi rồi đổi ngược lại (`client.py:9-17`). State của mock nằm trong một dòng Postgres, ghi dưới advisory lock, có idempotency key, và write tool không bao giờ được retry (`btc.py:25-35`).
 - **Role nào khởi động server nào** (`A/mcp/client.py:64-71`). Tool `health` thì role nào cũng gọi được:
@@ -257,3 +266,105 @@ Các giới hạn dưới đây đều đã được đối chiếu với code:
 5. **Dữ liệu thương mại của agent đến từ mock của BTC, không qua API của commerce-service.** Giá, khuyến mãi, mã đơn và ngày giao do mock quyết định, vì guardrail và grader đọc state đó. `SHOP_ORDERS=1` chỉ là cầu nối phản chiếu đơn sang website (`A/runtime/shop_orders.py:1-17`).
 6. **PolicyAgent duyệt từng câu bị tắt mặc định** (`ADVISOR_SENTENCE_REVIEW`, `A/mcp/tools.py:803-805`). Lý do ghi trong code: tắt từ 2026-11-25 vì không chỉ số nào của BTC đọc nó, các cờ của nó lại gây sửa câu hoặc từ chối ghi, còn hard guard vẫn giữ những gì được chấm (PII, tự nhận là người, giá, KM-02) (`A/pipeline/hot/nodes.py:1281-1284`). Hệ quả: trên câu trả lời stream, mỗi câu chỉ qua hard check. PolicyAgent vẫn duyệt bản nháp nguyên khối trong node `guard` và vẫn đọc ý định trước các write tool.
 7. **Ngưỡng của PolicyAgent là tạm thời** cho tới khi có ví dụ gán nhãn từ chính ứng dụng (`A/agents/policy.py:15-18`). Ngưỡng tải KEDA cũng vậy (`scaling.yaml:6-7`).
+
+## 5. Multi-agent (A2A): các agent phối hợp thật sự
+
+Các agent **không gọi nhau trực tiếp**. Chúng phối hợp qua state dùng chung do harness điều phối: "None of them holds state: the hot graph owns it, and hands each a slice. The router is not here: ``route`` is rules in the harness" (`A/agents/__init__.py:11-12`). Mỗi agent chỉ nhận đúng phần state nó được đọc, và chỉ ghi qua đường mà role của nó cho phép.
+
+### 5.1 Vai trò của đề và thành phần trong code
+
+| Vai trò trong đề | Thành phần trong code | Loại | Khi chạy | Đọc | Ghi / trả về | Nguồn |
+|---|---|---|---|---|---|---|
+| Orchestrator / Router | Hot graph 7 node + node `route` (bảng luật `decide`) + `run_turn` | **Code, không phải LLM agent** | mỗi lượt | `tier`, có brief hay không, `flags`, `tool_failures`, `model_failures`, `awaiting` | `lane`, `route_rule`, `route_reason`, `route_notes` | `A/pipeline/hot/graph.py:40-60`, `A/pipeline/hot/nodes.py:501-517`, `A/components/orchestration/rules.py:1-30`, `88` |
+| Context & Memory Agent | (a) node `load_context`: nhận diện, Call Brief, `kb_search` (code). (b) `MemoryAgent`: trích xuất sau cuộc gọi (LLM + luật dự phòng) | (a) code, (b) LLM | (a) mỗi lượt, (b) `after_call` | (a) khoá kết nối, ledger, CRM, kho tri thức. (b) transcript, tool log, facts hiện có | (a) `customer_id`, `tier`, `brief`, `brief_lines`, `knowledge`, `passages_read`. (b) ứng viên → gate → `memory_commit_facts`, `memory_commit_episode` | `nodes.py:150-172`, `446-460`; `A/agents/memory.py:1-31`; `A/pipeline/cold/after_call.py:20-23` |
+| Sales Advisor Agent | `AdvisorAgent` (ReAct `create_agent`) | LLM | mỗi lượt | `AgentContext` (lát cắt state) + tin nhắn gần đây | `draft`, `tool_results`, `quotes`, `created_orders`, `call_log`... | `A/agents/advisor.py:1-35`; `A/pipeline/hot/state.py:115-166` |
+| Policy & Compliance Agent | `PolicyAgent` (Decisions API) + hard check bằng code | LLM + code | node `guard`; trước write tool | `PolicyInput`: bản nháp, kết quả tool, tầng, đoạn chính sách, điều đã xác lập, **chỉ lời khách** | verdict, `block_reasons`, `regen_count`; xác suất ý định | `A/agents/policy.py:1-33`, `211-225`; `nodes.py:1453-1500`; `A/components/guardrails/hard.py:1-22` |
+| QA / Evaluator Agent | `QaAgent` | LLM | `after_call`, vòng cải thiện | ứng viên của MemoryAgent, cuộc gọi, rubric J01-J12 | tình huống, kết quả, PASS/FAIL, chẩn đoán | `A/agents/qa.py:1-25` |
+| (thêm) Reflection | `ReflectionAgent` | LLM | vòng cải thiện | cuộc gọi, lỗi QaAgent chỉ ra, skill đang dùng | `LessonCard`, `SkillPatch` | `A/agents/reflection.py:1-22` |
+| (thêm) Approval | `ApprovalAgent` | LLM | vòng cải thiện | bài học được chấp nhận, thay đổi, phát hiện của PolicyAgent | chấp nhận / từ chối | `A/agents/approval.py:1-12` |
+| (thêm) Simulator | `SimulatorAgent` | LLM + luật | chỉ `run_eval.py --simulate` | persona, outline | lượt nói của khách | `A/agents/simulator.py:1-10` |
+
+**Một phần:** PolicyAgent duyệt từng câu đã stream chỉ khi `ADVISOR_SENTENCE_REVIEW=1`, mặc định tắt (`nodes.py:1281-1285`). Trên đường nói mặc định, câu trả lời stream nên node `guard` không còn gì để kiểm (`nodes.py:1462-1463`); mỗi câu chỉ qua hard check. PolicyAgent vẫn duyệt bản nháp nguyên khối (chế độ copilot) trong `guard`, và vẫn đọc ý định khách trước write tool (`A/agents/advisor.py:1056-1086`, `A/agents/policy.py:151-159`).
+
+### 5.2 State dùng chung và hand-off
+
+| State dùng chung | Ai ghi | Ai đọc | Nguồn |
+|---|---|---|---|
+| `HotState` nhóm `load_context` (`customer_id`, `tier`, `brief_lines`, `knowledge`...) | `load_context` | `route`, `advisor` (dưới VERIFIED bị giữ lại dòng có giá, địa chỉ, mã đơn), `guard` | `A/pipeline/hot/state.py:70-96`; `nodes.py:526-528` |
+| `lane`, `route_notes` | `route` | `advisor`, `LaneToolsMiddleware` (tool theo lane) | `state.py:108-113`; `A/mcp/tools.py:263` |
+| `tool_results`, `draft`, `quotes`, `order_quotes`, `created_orders`, `call_log` | `advisor` | `guard` (hard check, `PolicyInput`), `fill_figures`, lượt sau | `state.py:115-166` |
+| `guard`, `block_reasons`, `regen_count` | `guard` | `advisor` (regenerate kèm lý do, tối đa 1 lần) | `state.py:168-174`; `nodes.py:1495-1497` |
+| Cờ review (`Reviews.flags`) | PolicyAgent duyệt câu (khi bật) | ActionGuard: write tool chờ review, có cờ thì trả `PRECONDITION` | `A/pipeline/hot/review.py:1-15`, `107-110`; `A/agents/advisor.py:785-791` |
+| Transcript + tool log của cuộc gọi | hot path | MemoryAgent (sự kiện nghiệp vụ đọc từ tool log bằng code), QaAgent (đọc ứng viên của MemoryAgent) | `A/agents/memory.py:7-13`; `A/agents/qa.py:14-15` |
+| Ledger `mcp-memory` (`facts`, `episodes`, `identities`) | chỉ role `memory_writer` | `load_context` của cuộc gọi sau (`memory_get_profile`, `memory_get_episodes`) | `A/mcp/servers/memory.py:355`, `511`; `A/components/memory/recall.py:40-47` |
+| Đề xuất skill `review/<round>.json`, `improvement-log.jsonl` | ReflectionAgent viết | bộ lọc + PolicyAgent gắn cờ, ApprovalAgent hoặc người quyết | `A/components/improvement/review.py:1-23` |
+
+```mermaid
+flowchart LR
+  LC["load_context (code)"] -->|"tier, brief, knowledge"| RT["route (luật)"]
+  RT -->|"lane"| ADV["AdvisorAgent"]
+  ADV -->|"draft, tool_results"| GD["guard: hard check + PolicyAgent"]
+  GD -->|"block_reasons"| ADV
+  GD --> RSP["respond, persist"]
+  RSP -->|"transcript, tool log"| MEM["MemoryAgent (memory_writer)"]
+  MEM -->|"ứng viên"| QA["QaAgent"]
+  MEM -->|"commit qua gate"| LED[("ledger mcp-memory")]
+  LED -->|"cuộc gọi sau"| LC
+  QA -->|"lỗi + chẩn đoán"| REF["ReflectionAgent"]
+  REF -->|"SkillPatch"| APR["PolicyAgent, ApprovalAgent, người duyệt"]
+  APR -->|"skill đã duyệt"| ADV
+```
+
+### 5.3 Tình huống cụ thể mà tách agent giúp hệ thống tốt hơn
+
+Đề yêu cầu "chỉ ra được ít nhất một tình huống cụ thể mà tách agent giúp hệ thống tốt hơn". Ba tình huống dưới đây đều có trong code:
+
+1. **Khách nài giữ giá cũ: người duyệt không được nhìn thứ làm advisor mềm lòng.** Advisor có brief với giá hôm trước, lời nài của khách và giá mới, "which is what makes it soften". PolicyAgent cố ý **không nhận brief và không nhận tin nhắn**, chỉ thấy bản nháp, kết quả tool và chính sách, "so an old price standing next to a new one is plain" (`A/agents/policy.py:7-12`). Trong `PolicyInput` chỉ có lời khách, không có lời advisor: "the advisor's would bring back what makes it soften" (`policy.py:221-223`). Nếu gộp duyệt vào advisor thì người viết và người duyệt nhìn cùng một ngữ cảnh. Một phần: trên câu stream mặc định, việc này chỉ chạy khi bật `ADVISOR_SENTENCE_REVIEW` (mục 5.1); hard check số tiền vẫn luôn chạy.
+2. **Lời khách nói đùa hoặc người lạ đọc số người khác không vào được ledger.** Advisor nói chuyện với khách nhưng role `advisor` không có tool ghi ledger (`A/mcp/servers/memory.py:330`, `355`, `470`, `511`). Chỉ sau cuộc gọi, MemoryAgent (role `memory_writer`, `A/runtime/harness.py:156`) đề xuất, cổng bằng code quyết: "A joke never reaches the ledger because a model was in a good mood" (`A/components/memory/gate.py:3-4`), và chỉ ghi cho khách đã được cuộc gọi xác nhận, AMBIGUOUS thì không ghi cho ai (`A/pipeline/cold/after_call.py:3-14`).
+3. **Không agent nào vừa viết vừa duyệt thay đổi skill.** QaAgent chấm và chẩn đoán, ReflectionAgent viết bài học và thay đổi, bộ lọc và PolicyAgent gắn cờ, ApprovalAgent quyết theo kỳ vọng của người viết tập học, rồi người duyệt (`A/components/improvement/review.py:8-13`; `A/agents/approval.py:9-10`). Nhờ vậy một bài học chỉ đúng cho một khách không thành luật: "One call is one vote of evidence, never a rule" (`A/components/improvement/__init__.py:14-15`).
+
+## 6. Khả năng mở rộng & chi phí (tiêu chí 7)
+
+### 6.1 Mở rộng theo số khách hàng
+
+| Cơ chế | Tác dụng | Nguồn |
+|---|---|---|
+| Pod không giữ state cuộc gọi | Graph compile một lần, state mỗi cuộc gọi nằm trong Postgres checkpointer theo thread `call-<id>`; AdvisorAgent stateless. Lượt chat kế tiếp chạy được ở pod bất kỳ; cuộc gọi thoại giữ WebSocket ở một pod nên KEDA scale-in chậm (ADR-13) | `A/pipeline/hot/graph.py:41-42`; `A/runtime/harness.py:6-9`; `A/agents/advisor.py:12-17` |
+| Lease theo cuộc gọi | `turn_lease_until` trên bảng `calls`: mỗi cuộc gọi chỉ một lượt chạy một lúc, lease tự hết sau `TURN_LEASE_SECONDS = 180`; `after_call` có lease riêng, gia hạn định kỳ | `A/runtime/calls.py:38`, `132-147`; `A/runtime/harness.py:518-544` |
+| Scale theo tải thật | KEDA đọc số lượt đang chạy và số cuộc gọi thoại mỗi pod (ADR-13) | `infra/kubernetes/overlays/aws-production/scaling.yaml:8-36` |
+| Việc sau cuộc gọi qua hàng đợi | Gác máy chỉ gửi một message SQS; worker chạy `after_call` và scale theo độ dài hàng đợi; sweep bảo đảm không mất việc | `A/runtime/jobs.py:1-13` |
+| Rate limiter dùng chung | Cửa sổ trượt của mỗi `provider/model` nằm trong Valkey, một 429 ở một pod làm mọi pod chờ; mất Valkey thì chia ngân sách theo `MODEL_LIMITER_PODS` | `A/llm/shared_limiter.py:1-14` |
+| MCP qua HTTP | Sáu server là Deployment riêng, HTTP stateless, scale bằng HPA | [05-trien-khai.md](05-trien-khai.md), mục 2 |
+| Nhiều cuộc gọi cùng một khách | Ghi ledger dưới advisory lock theo khách, partial unique index chỉ cho một dòng active mỗi slot | `A/mcp/servers/memory.py:23-33` |
+
+Giới hạn (đã đối chiếu code): state của mock BTC là **một dòng** JSONB `mock_state`, mọi lần ghi (`order.create`, `order.update`, `schedule.callback`, `handoff.transfer`) chạy dưới **một** advisory lock chung (`A/mcp/servers/btc.py:24-33`, `67-71`), nên các lệnh ghi nghiệp vụ được xếp hàng tuần tự trên toàn hệ thống. Ngưỡng scale của agent là con số khởi đầu, chưa đo (`scaling.yaml:6-7`).
+
+### 6.2 Thêm ngành hàng mới
+
+| Phần phụ thuộc ngành | Nằm ở đâu | Nguồn |
+|---|---|---|
+| Danh mục, giá, khuyến mãi | `data/btc/catalog/products.json`, `promotions.json`, đọc qua mock; ngành là tiền tố `category` (`gia-dung`, `thoi-trang`, `me-be`) | `apps/ai-agent-service/data/btc/eval/mock_tools.py:22-24` |
+| Slot nhu cầu của khách | Mỗi ngành một khối trong `INDUSTRIES` (ví dụ `room_area_m2` cho gia dụng, `child_age_months` cho mẹ bé) | `A/components/memory/ontology.py:121-139` |
+| Chính sách, FAQ | `policy/*.md` của BTC và `data/kb/v<N>.jsonl`; ngành của từng chunk qua `INDUSTRY_BY_PREFIX`, `INDUSTRY_BY_ID` | `A/mcp/servers/knowledge.py:5-10`; `A/components/knowledge/corpus.py:82-95` |
+| Quy trình bán | Skill của advisor `config/prompts/agent/advisor/skills.yaml`, hoặc phiên bản Reflection đã duyệt | `A/components/context/skills.py:36-42` |
+| Không phụ thuộc ngành | Lane (chọn theo trạng thái danh tính và lỗi), hard check (số tiền, PII), danh sách tình huống ("not one product") | `A/components/orchestration/rules.py:15-23`; `apps/ai-agent-service/config/situations.yaml:8-10` |
+
+**Một phần:** thiết kế là "one schema file per industry so that a new one is a file and no code", nhưng hiện các khối vẫn nằm trong code (`ontology.py:15-17`), và bản đồ ngành của corpus cũng viết cứng. Thêm ngành hiện cần sửa `ontology.py` và `corpus.py`, cộng dữ liệu catalogue và skill.
+
+### 6.3 Thêm kênh mới
+
+- **Kênh là một giá trị**, hot graph không đổi: `Channel = Literal["web", "hotline", "zalo", "facebook"]` (`A/pipeline/hot/state.py:41`).
+- **Danh tính theo loại khoá**: `phone`, `zalo_id`, `fb_id` (`A/components/identity/resolver.py:37`; ràng buộc `CHECK` ở `A/mcp/servers/memory.py:124`). `channel_ref` của cuộc gọi được đổi thành `zalo_id` hoặc `fb_id` theo kênh (`A/runtime/harness.py:236-237`), rồi băm HMAC làm khoá kết nối (`A/pipeline/hot/nodes.py:389-399`).
+- **Ví dụ Zalo** (`A/runtime/zalo.py:1-33`): kiểm chữ ký webhook, mỗi `msg_id` xử lý một lần, mỗi người gửi một hội thoại kênh `zalo`, lượt chạy "exactly as a web chat turn", trả lời qua API tin nhắn của OA. Phần riêng của kênh chỉ là adapter vào/ra.
+- **Các bước thêm một kênh**: viết adapter webhook và gửi tin; thêm giá trị vào `Channel`; nếu kênh mang loại khoá mới thì thêm vào `KeyType`, ràng buộc `identities` và ánh xạ ở `harness.py:236-237`; thêm ánh xạ tên kênh của kịch bản BTC (`A/pipeline/eval/scenarios.py:37`).
+- **Một phần:** Facebook mới là nhãn kênh, chưa có adapter (mục 4, giới hạn 3).
+
+### 6.4 Chi phí
+
+Tài liệu này không nêu số chi phí. Các lựa chọn trong code nhằm giảm số lời gọi mô hình:
+
+- Chọn lane bằng luật, không tốn lời gọi mô hình (ADR-02); advisor tối đa 2 lời gọi mô hình mỗi lượt (`A/agents/advisor.py:1244-1245`).
+- PolicyAgent chỉ đọc ý định khi hành động sắp xảy ra, "so an ordinary turn costs nothing more" (`A/agents/policy.py:31-32`); duyệt từng câu mặc định tắt (mục 4, giới hạn 6).
+- Mô hình của QaAgent được tạo khi cần lần đầu (`A/agents/qa.py:23-24`).
+- Ẩn tham số harness tự điền vì "each costs output tokens" (`A/mcp/tools.py:98-99`); sắp tool theo thứ tự ổn định để giữ prefix chung cho prompt cache (`A/mcp/tools.py:246-260`).
+- Mỗi role một mô hình (ADR-12). Chi phí thật đọc từ trace Langfuse (`A/llm/spend_guard.py:1-10`).

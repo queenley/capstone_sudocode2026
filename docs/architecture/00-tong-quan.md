@@ -7,11 +7,11 @@ Bộ tài liệu này trả lời yêu cầu "Tài liệu kiến trúc: sơ đ�
 | Yêu cầu | Tài liệu | Nội dung chính |
 |---|---|---|
 | Sơ đồ hệ thống | [01-he-thong.md](01-he-thong.md) | Sơ đồ logic toàn platform, bảng service, gateway, outbox, Valkey, luồng theo từng kênh (web chat, gọi thoại, Zalo, chuyển nhân viên) |
-| Vòng lặp harness | [02-vong-lap-harness.md](02-vong-lap-harness.md) | Hot graph 7 node, trình tự một lượt, chọn lane, vòng tool của advisor, guardrail, stream từng câu, cold path, vòng cải tiến, đánh giá, model theo vai trò |
-| Thiết kế bộ nhớ | [03-bo-nho.md](03-bo-nho.md) | Các tầng bộ nhớ, ontology slot, đường ghi và đường đọc, mức định danh, PII, quyền được quên, knowledge base và lọc hiệu lực |
-| Danh sách tools | [04-tools.md](04-tools.md) | 6 MCP server, 4 role, bảng đầy đủ từng tool, tool ngoài MCP, lọc theo lane, `ToolGuardMiddleware` |
-| (Bổ sung) Triển khai | [05-trien-khai.md](05-trien-khai.md) | AWS EKS (Terraform, Kustomize, KEDA, Karpenter), CI/CD, môi trường local bằng docker-compose, lịch vòng cải tiến |
-| Quyết định thiết kế và lý do | [06-quyet-dinh-thiet-ke.md](06-quyet-dinh-thiet-ke.md) | Bảng tóm tắt, 14 ADR (bối cảnh, quyết định, lý do, phương án đã cân nhắc, đánh đổi), giới hạn hiện tại và hướng tới |
+| Vòng lặp harness | [02-vong-lap-harness.md](02-vong-lap-harness.md) | Hot graph 7 node, trình tự một lượt, chọn lane, vòng tool của advisor, guardrail, stream từng câu, cold path, vòng cải tiến, đánh giá, model theo vai trò. Đối chiếu đề: vòng lặp PERCEIVE → … → PERSIST (mục 13), Session Continuity (mục 14), "Phải trình bày và bảo vệ được" (mục 15), mục tiêu hiệu năng (mục 16), không giả làm người (mục 17) |
+| Thiết kế bộ nhớ | [03-bo-nho.md](03-bo-nho.md) | Các tầng bộ nhớ (đối chiếu Working / Episodic / Profile / Semantic của đề), ontology slot, ghi gì và không ghi gì, khách đổi ý, hết hạn theo thời gian, nguồn gốc ký ức, chống đầu độc bộ nhớ, mức định danh và ngữ cảnh đa kênh (Case 2), PII, quyền được quên, knowledge base và lọc hiệu lực, bộ nhớ dùng chung giữa agent và người (Case 3) |
+| Danh sách tools | [04-tools.md](04-tools.md) | 6 MCP server, 4 role, bảng đầy đủ từng tool, tool ngoài MCP, lọc theo lane, `ToolGuardMiddleware`. Đối chiếu đề: tool của C.2 và cơ chế "giá phải lấy từ tool" (mục 8), yêu cầu MCP của C.3 và phân quyền theo tool (mục 9), chất lượng tích hợp tool (mục 10) |
+| (Bổ sung) Triển khai | [05-trien-khai.md](05-trien-khai.md) | AWS EKS (Terraform, Kustomize, KEDA, Karpenter), mở rộng theo số khách hàng, CI/CD, môi trường local bằng docker-compose, lịch vòng cải tiến |
+| Quyết định thiết kế và lý do | [06-quyet-dinh-thiet-ke.md](06-quyet-dinh-thiet-ke.md) | Bảng tóm tắt, 14 ADR (bối cảnh, quyết định, lý do, phương án đã cân nhắc, đánh đổi) gồm lý do chọn MCP (ADR-03), giới hạn hiện tại và hướng tới (mục 4), multi-agent và tình huống tách agent giúp hệ thống tốt hơn (mục 5), khả năng mở rộng (mục 6) |
 
 Thứ tự đọc gợi ý: 01 → 02 → 03 → 04 → 06; 05 khi cần biết hệ thống chạy ở đâu.
 
