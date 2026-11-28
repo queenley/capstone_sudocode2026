@@ -1,8 +1,9 @@
 # VieNeu-TTS on CPU (apps/tts-service), as the tts-service of docker-compose.yml: with the voice "vieneu:" (/admin)
 # the agent streams each sentence from TTS_URL (kustomization.yaml), so its pods carry neither VieNeu nor its weights.
 #
-# Small on purpose: it reserves half a vCPU and 2 GiB, so it fits on the two system nodes beside the app with no node
-# of its own, and bursts to 2 vCPUs while a sentence is being made (it is idle between them). One sentence at a time
+# Small on purpose: it reserves a tenth of a vCPU and 2 GiB, so it fits on the two system nodes beside the app (their
+# CPU requests stood at 90-95% on 2026-11-28) with no node of its own, and bursts to 2 vCPUs of the nodes' idle CPU
+# while a sentence is being made (it is idle between them). One sentence at a time
 # (TTS_CONCURRENCY): with two calls speaking at once, the second waits for the first's sentence. The weights (about
 # 1.4 GB) are fetched once into the shared EFS volume (subPath tts-models). Only the agent pods may call it
 # (network-policy.yaml), so it has no TTS_API_KEY.
@@ -45,7 +46,7 @@ spec:
             httpGet: {path: /health, port: 8600}
             periodSeconds: 20
           resources:
-            requests: {cpu: 500m, memory: 2Gi}
+            requests: {cpu: 100m, memory: 2Gi}
             limits: {cpu: '2', memory: 3Gi}
       volumes:
         - name: models

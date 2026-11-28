@@ -50,7 +50,7 @@ Loại: tính năng (thoại, hạ tầng) · Trạng thái: đang đo · Chỉ 
 - **Sửa:**
   - `apps/tts-service` (FastAPI): `/v1/speak` trả PCM dạng stream, mỗi lần đọc một câu, chọn model bằng `TTS_MODE`.
   - Agent dùng `RemoteVieNeuVoice` khi có `TTS_URL`.
-  - `tts.yaml`: giữ 0,5 vCPU và 2 GiB, dùng tối đa 2 vCPU.
+  - `tts.yaml`: giữ 0,1 vCPU và 2 GiB, dùng tối đa 2 vCPU.
   - Network policy, CI, repo ECR, compose profile `tts`.
   - EKS vẫn dùng `openai:coral` mặc định; chuyển sang `vieneu:` ở /admin.
 - **Đã kiểm:**

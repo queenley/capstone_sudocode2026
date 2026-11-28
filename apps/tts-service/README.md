@@ -23,7 +23,7 @@ GET  /health/ready  503 until the model is loaded and warmed
 
 Locally: `docker compose --profile tts up -d tts-service`, then `TTS_URL=http://tts-service:8600` and
 `VOICE_TTS=vieneu:` for the agent. On EKS: [tts.yaml](../../infra/kubernetes/overlays/aws-production/tts.yaml)
-(0.5 vCPU and 2 GiB reserved, bursting to 2 vCPUs).
+(0.1 vCPU and 2 GiB reserved, bursting to 2 vCPUs).
 
 ## Measured (2026-11-28)
 

@@ -186,7 +186,7 @@ Từ 27/11/2026, pod của app không bị ghim vào pool nào. Scheduler đặt
 | `mcp-servers` | 1 (trước 27/11: 2) | bất kỳ | HPA theo CPU | 6 server, cổng 8801–8806 ([mcp.yaml](../../infra/kubernetes/overlays/aws-production/mcp.yaml)). Chỉ agent và worker gọi được (NetworkPolicy) |
 | `ai-agent-worker` | 1 | bất kỳ | KEDA theo độ dài hàng đợi SQS, **tối thiểu 1** ([after-call-worker.yaml](../../infra/kubernetes/overlays/production/after-call-worker.yaml)) | vòng quét 60 giây nằm ở đây, nên không về 0 |
 | `asr-service` | 1 | bất kỳ | — | Zipformer int8 trên CPU ([asr.yaml](../../infra/kubernetes/overlays/aws-production/asr.yaml)); chỉ agent và worker gọi được |
-| `tts-service` | 1 | bất kỳ | — | VieNeu-TTS trên CPU ([tts.yaml](../../infra/kubernetes/overlays/aws-production/tts.yaml)): giữ 0,5 vCPU và 2 GiB, dùng tối đa 2 vCPU khi đang đọc; mỗi lần đọc một câu; chỉ agent và worker gọi được |
+| `tts-service` | 1 | bất kỳ | — | VieNeu-TTS trên CPU ([tts.yaml](../../infra/kubernetes/overlays/aws-production/tts.yaml)): giữ 0,1 vCPU và 2 GiB, dùng tối đa 2 vCPU khi đang đọc; mỗi lần đọc một câu; chỉ agent và worker gọi được |
 | `identity-events`, `commerce-events`, `sales-events`, `ai-agent-events` | 1 mỗi cái | bất kỳ | — | relay outbox trên Postgres, không dùng Kafka |
 | `zalo-mock` | 1 | bất kỳ | — | demo kênh Zalo khi chưa có Official Account ([zalo-mock.yaml](../../infra/kubernetes/overlays/aws-production/zalo-mock.yaml)) |
 | Job `telesales-migrate`, `telesales-seed` | mỗi lần deploy | bất kỳ | — | do `deploy-eks.yml` tạo |
