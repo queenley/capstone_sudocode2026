@@ -49,6 +49,20 @@ export function forgetConversation() {
   window.dispatchEvent(new Event("shop-conversation-reset"));
 }
 
+/** "Phiên mới": end this tab's conversation on the server (the assistant hangs up its call and remembers it),
+ *  then forget it here, so the next message opens a new one. Ending is best effort: a conversation the server
+ *  no longer knows is forgotten all the same. */
+export async function endConversation(session: Session | null) {
+  if (session) {
+    try {
+      await api(`/api/conversations/${session.conversation_id}/end`, session.conversation_token, {});
+    } catch {
+      /* already closed or gone: nothing to end */
+    }
+  }
+  forgetConversation();
+}
+
 export function savedSession(): ShopSession | null {
   try {
     const saved = sessionStorage.getItem(CONVERSATION);

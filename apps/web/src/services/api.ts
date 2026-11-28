@@ -132,12 +132,24 @@ export type CommerceCatalogItem = {
 };
 export type Session = { conversation_id: string; conversation_token: string };
 export type ChatMessage = { speaker: string; text: string };
+/** A VietQR to pay one order by bank transfer, as the assistant's order_payment_qr or order_create made it. */
+export type PaymentQr = {
+  order_id: string | null;
+  amount_vnd: number | null;
+  transfer_note: string | null;
+  bank_name: string | null;
+  account_name: string | null;
+  account_no: string | null;
+  qr_url: string;
+};
 export type TurnResult = {
   reply: string;
   route: string;
   confidence: number;
   trace_id: string;
   products: CommerceCatalogItem[];
+  /** The transfer QR this turn's tools made, shown under the reply (api/routes/conversations.py payment_qr_of). */
+  payment_qr?: PaymentQr | null;
   /** Manufacturer pages a reviewer approved with the knowledge that answered this turn (docs/plan/002, section 12). */
   references?: { url: string; domain: string; title: string }[];
   stages?: string[];

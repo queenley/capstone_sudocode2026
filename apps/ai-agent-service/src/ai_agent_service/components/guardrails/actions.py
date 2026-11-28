@@ -8,6 +8,7 @@ a tool error with the reason, and nothing happens in the business.
 |---|---|
 | ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); today's ``pricing.get_quote`` for that code exists (the harness writes its price in); COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer wants one more (*intents* ``one_more``, read by Jev; the word list :data:`ONE_MORE` only when Jev gave no answer) |
 | ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made, in any turn (a second exchange is charged, DT-03); the customer asked for this change or agreed to it (*intents* ``change``, read by Jev: a complaint alone, "size M hơi chật", is not a choice yet). An order this call created may be corrected by its caller whatever the tier |
+| ``order.set_payment`` | nothing here: the tool changes only an order of this customer (``trusted_orders``, the logged-in account), before it ships and while it is unpaid; COD at most 10.000.000đ |
 | ``schedule.callback`` | a date and time in Vietnam time, not in the past, inside working hours (LN-01) or on a holiday, which the tool itself moves (LN-02, ``moved_from``, and the customer is told); otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | the advisor decides; outside lane HANDOFF the PolicyAgent checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | VERIFIED, and the customer agreed when asked to confirm (QT-06): *intents* ``delete``, read by Jev; the word lists only when Jev gave no answer |
@@ -34,7 +35,8 @@ from . import Verdict, purchase
 
 #: Tools with an effect wait for the reviews of what was just said (section 4.8).
 #: They are the write tools, so the two sets are one.
-WRITE_TOOLS = frozenset({"order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion"})
+WRITE_TOOLS = frozenset({"order_create", "order_update", "order_set_payment", "schedule_callback", "handoff_transfer",
+                         "memory_request_deletion"})
 CUSTOMER_READ_TOOLS = frozenset({"order_status", "crm_get_customer"})
 
 COD_LIMIT_VND = 10_000_000
@@ -121,6 +123,9 @@ def check(
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
                                                     updated=updated, agreed=(intents or {}).get("change"))),
+        # Whose order it is, the tool checks against the orders the system trusts (trusted_orders, account_id):
+        # the change itself is the customer's to ask for, and moves no money.
+        "order_set_payment": lambda: [],
         "schedule_callback": lambda: _schedule_callback(args, now=now, has_phone=has_phone),
         "handoff_transfer": lambda: _handoff(args, lane=lane, warranted=(intents or {}).get("handoff")),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said,
@@ -196,8 +201,9 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     if wants_more is None:
         wants_more = bool(ONE_MORE.search(plain(customer_said or "")))  # Jev gave no answer
     if again and not other_half and not wants_more:
-        return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
-                "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
+        return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ thì "
+                "gọi order_update trên đơn đó, đổi cách thanh toán thì order_set_payment nếu có tool này; chỉ tạo đơn "
+                "mới khi khách muốn mua thêm."]
     reasons = []
     if not has_phone:
         reasons.append("Chưa có số điện thoại của khách để tạo đơn; xin số điện thoại trước.")
@@ -235,8 +241,9 @@ def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trus
     if wants_more is None:
         wants_more = bool(ONE_MORE.search(plain(customer_said or "")))
     if again and not wants_more:
-        return [f"Đơn {again[-1]['order_id']} có sản phẩm này đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
-                "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
+        return [f"Đơn {again[-1]['order_id']} có sản phẩm này đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ thì "
+                "gọi order_update trên đơn đó, đổi cách thanh toán thì order_set_payment nếu có tool này; chỉ tạo đơn "
+                "mới khi khách muốn mua thêm."]
     reasons = []
     if not has_phone:
         reasons.append("Chưa có số điện thoại của khách để tạo đơn; xin số điện thoại trước.")

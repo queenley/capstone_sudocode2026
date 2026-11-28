@@ -18,8 +18,6 @@ spec:
       labels: {app: telesales-zalo-mock}
     spec:
       securityContext: {runAsNonRoot: true, runAsUser: 1000}
-      nodeSelector:
-        karpenter.sh/nodepool: general
       containers:
         - name: zalo-mock
           image: telesales-backend-common:dev

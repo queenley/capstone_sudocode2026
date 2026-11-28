@@ -1,0 +1,201 @@
+/* ---------- the home page as a store front (features/home/sections.tsx) ----------
+   A one-line banner, the departments as pictures, the featured products moving four at a time, a row of four
+   per department, the shop's terms. The products lead; the banner is a strip, not a screen. */
+
+.s-home-banner {
+  position: relative;
+  overflow: hidden;
+  background: var(--s-brand-dark);
+  color: #fff;
+}
+.s-home-banner__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+  opacity: 0.45;
+}
+.s-home-banner__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  min-height: 128px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.s-home-banner h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 0 1px 12px rgb(3 32 24 / 0.45);
+}
+.s-home-banner p {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: rgb(255 255 255 / 0.9);
+}
+.s-home-banner .s-btn { flex: none; }
+
+.s-home-cats {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 24px;
+  padding-bottom: 8px;
+}
+.s-home-cat {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  border-radius: var(--s-radius);
+  color: var(--s-ink);
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.s-home-cat:hover { background: var(--surface-3, rgb(0 0 0 / 0.04)); transform: translateY(-2px); }
+.s-home-cat__pic {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--s-card);
+  border: 1px solid var(--s-line);
+}
+.s-home-cat__pic img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+.s-home-cat:hover .s-home-cat__pic img { transform: scale(1.03); }
+
+.s-home-section { padding-top: 32px; padding-bottom: 8px; }
+.s-home-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.s-home-head h2 { margin: 0; font-size: clamp(20px, 2vw, 26px); }
+.s-home-more {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--s-brand);
+  font-weight: 600;
+  text-decoration: none;
+}
+.s-home-more:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.s-home-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.s-home-skeleton {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--s-radius);
+  background: linear-gradient(90deg, var(--s-line) 0%, var(--s-card) 50%, var(--s-line) 100%);
+  background-size: 200% 100%;
+  animation: s-home-shimmer 1.4s linear infinite;
+}
+@keyframes s-home-shimmer { to { background-position: -200% 0; } }
+
+/* The featured products: four in view, scrolled by one card; a swipe on a phone. */
+.s-home-carousel { position: relative; }
+.s-home-carousel__controls {
+  position: absolute;
+  top: -60px;
+  right: 190px;
+  display: flex;
+  gap: 8px;
+}
+.s-home-round,
+.s-home-pause {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--s-line);
+  border-radius: 999px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.s-home-pause { padding: 0 14px; font-size: 14px; }
+.s-home-round:hover,
+.s-home-pause:hover { transform: translateY(-1px); background: var(--s-bg); }
+.s-home-round:active,
+.s-home-pause:active { transform: translateY(1px); }
+.s-home-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 3 * 16px) / 4);
+  column-gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.s-home-track::-webkit-scrollbar { display: none; }
+.s-home-slide { scroll-snap-align: start; display: grid; }
+
+.s-home-terms {
+  margin-top: 40px;
+  padding: 32px 0 40px;
+  background: var(--s-card);
+  border-top: 1px solid var(--s-line);
+}
+.s-home-terms__list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.s-home-terms__list li {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+  background: var(--s-bg);
+}
+.s-home-terms__value { color: var(--s-brand); font-weight: 700; }
+.s-home-terms__list p { margin: 0; color: var(--s-muted); font-size: 14px; }
+
+@media (max-width: 1023px) {
+  .s-home-cats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .s-home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s-home-track { grid-auto-columns: calc((100% - 16px) / 2); }
+  .s-home-terms__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s-home-carousel__controls { position: static; justify-content: flex-end; margin: -4px 0 12px; }
+}
+@media (max-width: 640px) {
+  .s-home-banner__row { flex-direction: column; align-items: flex-start; min-height: 0; }
+  .s-home-banner .s-btn { width: 100%; }
+  .s-home-cats { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 84px; overflow-x: auto; scrollbar-width: none; }
+  .s-home-cat__pic { width: 60px; height: 60px; }
+  .s-home-track { grid-auto-columns: 78%; }
+  .s-home-terms__list { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-home-skeleton { animation: none; }
+  .s-home-cat, .s-home-cat__pic img, .s-home-round, .s-home-pause { transition: none; }
+}
+
+/* system.css makes every `main > section` one or two screens tall (the taste-skill's one-section-a-screen rule).
+   A store front is a list of rows, so these sections are as tall as what they hold. :not(.hero) outweighs the
+   kit's tablet and phone rules, which carry it too. */
+main > section.s-home-block:not(.hero) {
+  height: auto;
+  min-height: 0;
+  display: block;
+}
+/* The header is fixed (system.css --nav-h): the banner starts under it, as the old full-screen hero did. */
+main > section.s-home-banner.s-home-block:not(.hero) { padding: 0; margin-top: var(--nav-h, 72px); }
+main > section.s-home-section.s-home-block:not(.hero) { padding: 32px 20px 8px; }
+main > section.s-home-terms.s-home-block:not(.hero) { padding: 32px 0 40px; }

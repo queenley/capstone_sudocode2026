@@ -16,8 +16,6 @@ spec:
       labels: {app: telesales-mcp}
     spec:
       securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
-      nodeSelector:
-        karpenter.sh/nodepool: general
       containers:
         - name: memory
           image: telesales-ai-agent:dev

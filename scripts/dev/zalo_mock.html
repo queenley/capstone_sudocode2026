@@ -89,6 +89,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .bubble .meta { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); }
 .bubble.sticker { background: transparent; border: 0; box-shadow: none; font-size: 56px; line-height: 1; padding: 0; }
 .bubble.image { padding: 4px; }
+.bubble.image .photo { display: block; width: 220px; height: 220px; border-radius: 8px; background: #fff; object-fit: contain; }
 .bubble.image .pic { width: 220px; height: 150px; border-radius: 8px; background: linear-gradient(135deg, #8ec5fc, #e0c3fc); display: grid; place-items: center; color: #fff; font-size: 34px; }
 .bubble.card { border-left: 3px solid var(--blue); }
 .status { align-self: flex-end; font-size: 11px; color: var(--muted); margin: 2px 2px 6px; }
@@ -104,6 +105,10 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 
 /* ── composer ── */
 .composer { background: var(--bg); border-top: 1px solid var(--line); flex: 0 0 auto; }
+.clock { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-right: auto; }
+.clock[hidden] { display: none; }
+.clock input { font: inherit; font-size: 12px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; }
+.clock button { border: 0; background: none; cursor: pointer; font-size: 16px; color: var(--muted); }
 .tools { display: flex; gap: 2px; padding: 6px 10px 0; }
 .tools button { height: 32px; padding: 0 8px; border-radius: 6px; display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 13px; }
 .tools button:hover { background: var(--hover); }
@@ -182,6 +187,11 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
       <button type="button" data-kind="sticker" title="Gửi sticker"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg></button>
       <button type="button" data-kind="image" title="Gửi hình ảnh"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
       <button type="button" id="open-share" title="Chia sẻ tên và số điện thoại với OA"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M15 10h3M15 13h3"/></svg><span>Chia sẻ thông tin</span></button>
+      <label class="clock" id="clock" hidden title="Chỉ có ở staging: thử agent ở ngày giờ khác (tồn kho, khuyến mãi, giờ làm việc)">
+        <span>Thời điểm gửi</span>
+        <input type="datetime-local" id="sent-at" min="2026-01-01T00:00" max="2027-12-31T23:59">
+        <button type="button" id="sent-at-clear" title="Dùng giờ cửa hàng">×</button>
+      </label>
       <button type="button" data-kind="follow" title="Quan tâm OA"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span>Quan tâm</span></button>
     </div>
     <form class="write" id="form">
@@ -236,6 +246,7 @@ function renderChat() {
   const user = state.users.find((u) => u.id === current);
   $("oa-name").textContent = state.oa_name; $("share-oa").textContent = state.oa_name;
   $("text").placeholder = `Nhập tin nhắn tới ${state.oa_name}`;
+  $("clock").hidden = !state.clock_picker;
   $("me-avatar").textContent = user ? initials(user.name) : "Z";
   $("me-avatar").style.background = user ? color(user.id) : "transparent";
   $("who").textContent = user ? `Bạn là ${user.name} · zalo id ${user.id} · ${user.phone ? "☎ " + user.phone : "chưa chia sẻ SĐT"}` : "Chọn một người dùng để bắt đầu";
@@ -259,7 +270,9 @@ function renderChat() {
     const row = document.createElement("div");
     row.className = `row ${m.direction}${first ? " first" : ""}`;
     let kind = m.kind === "sticker" ? " sticker" : m.kind === "image" ? " image" : m.kind === "info" ? " card" : "";
-    let body = kind === " sticker" ? "😊" : kind === " image" ? `<div class="pic">🖼️</div>` : linkify(m.text);
+    let body = kind === " sticker" ? "😊" : kind === " image"
+      ? (m.image_url && /^https:\/\//.test(m.image_url) ? `<img class="photo" src="${escape(m.image_url)}" alt="Ảnh">` : `<div class="pic">🖼️</div>`) + (m.text ? `<div>${linkify(m.text)}</div>` : "")
+      : linkify(m.text);
     const meta = kind === " sticker" ? "" : `<span class="meta">${m.at.slice(0, 5)}</span>`;
     const slot = m.direction === "out" ? (lastOfGroup ? `<div class="avatar sm oa">TN</div>` : `<div class="slot"></div>`) : "";
     row.innerHTML = `${slot}<div class="bubble${kind}">${body}${meta}</div>`;
@@ -283,9 +296,11 @@ async function post(path, body) {
 async function send(kind, text = "", info = null) {
   if (!current) { alert("Chọn một người dùng trước"); return; }
   waiting[current] = Date.now(); renderChat();
-  await post("api/send", { user_id: current, kind, text, info });
+  const sentAt = state.clock_picker ? $("sent-at").value : "";
+  await post("api/send", { user_id: current, kind, text, info, ...(sentAt ? { sent_at: sentAt } : {}) });
 }
 
+$("sent-at-clear").onclick = () => { $("sent-at").value = ""; };
 $("form").onsubmit = (e) => { e.preventDefault(); const t = $("text").value.trim(); if (t) { $("text").value = ""; autosize(); send("text", t); } };
 $("text").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("form").requestSubmit(); } });
 const autosize = () => { const t = $("text"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; };

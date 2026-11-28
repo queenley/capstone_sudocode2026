@@ -4,7 +4,8 @@
 // browser (the agent's voice channel), the Zalo link, and the hand-over to a
 // person (the agent hands off; staff reply from /calls or /ban-hang).
 import { useEffect, useRef, useState } from "react";
-import { ChatCartLine, streamTurn, transcribeVoice } from "@/services/api";
+import { ChatCartLine, PaymentQr, streamTurn, transcribeVoice } from "@/services/api";
+import TransferInfo, { type Transfer } from "@/components/shop/TransferInfo";
 import { useSentAt } from "@/lib/sent-at";
 import { VoiceCall } from "@/services/voice";
 import VoiceCallPanel from "@/features/voice/voice-call";
@@ -12,6 +13,7 @@ import ChatProducts from "@/components/shop/ChatProducts";
 import ChatOrders from "@/components/shop/ChatOrders";
 import ChatReferences, { type Reference } from "@/components/shop/ChatReferences";
 import {
+  endConversation,
   loadConversation,
   newSession,
   openSession,
@@ -98,6 +100,8 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
   // The manufacturer's pages sent with a reply, by its words, as the steps are: the lines are read again from the
   // server after each turn, and a line has no room for them.
   const [doneRefs, setDoneRefs] = useState<Map<string, Reference[]>>(() => new Map());
+  // The bank transfer QR a reply came with (the assistant's order_payment_qr), kept by the reply's words as above.
+  const [doneQr, setDoneQr] = useState<Map<string, PaymentQr>>(() => new Map());
   const [error, setError] = useState("");
   const [call, setCall] = useState<VoiceCall | null>(null);
   // Testing aid: when messages and calls say they were sent (lib/sent-at.ts).
@@ -203,6 +207,18 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
     panel.showModal();
     return () => panel.close();
   }, [chatOpen]);
+
+  /** "Phiên mới": the conversation ends on the server and the chat starts empty; the next message opens a new one. */
+  async function startOver() {
+    await endConversation(currentSession.current || session);
+  }
+
+  /** A new send time is a new session: one conversation never spans two days of the shop's clock. */
+  function pickMoment(value: string) {
+    if (value === sentAt) return;
+    setSentAt(value);
+    if (session || lines.length > 0) void startOver();
+  }
 
   // Signing in or out starts a new conversation, as the new person (lib/account.ts).
   useEffect(() => {
@@ -315,6 +331,10 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
       if (reply && result?.references?.length) {
         const refs = result.references;
         setDoneRefs((old) => new Map(old).set(reply, refs));
+      }
+      if (reply && result?.payment_qr?.qr_url) {
+        const qr = result.payment_qr;
+        setDoneQr((old) => new Map(old).set(reply, qr));
       }
       setLiveSteps([]);
       pending.current = null;
@@ -542,6 +562,15 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
               </button>
               <button
                 className="s-icon-btn"
+                title="Bắt đầu phiên trò chuyện mới"
+                aria-label="Phiên mới"
+                disabled={busy || call !== null || (!session && lines.length === 0)}
+                onClick={() => void startOver()}
+              >
+                <Icon name="refresh" />
+              </button>
+              <button
+                className="s-icon-btn"
                 aria-label="Đóng"
                 onClick={() => shopContext.closeChat()}
               >
@@ -558,12 +587,12 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                 min="2026-01-01T00:00"
                 max="2027-12-31T23:59"
                 title="Thử agent ở một ngày giờ khác (tồn kho, khuyến mãi, giờ làm việc). Để trống: giờ của cửa hàng."
-                disabled={call !== null}
-                onChange={(event) => setSentAt(event.target.value)}
+                disabled={call !== null || busy}
+                onChange={(event) => pickMoment(event.target.value)}
               />
             </label>
             {sentAt ? (
-              <button type="button" className="s-chat-clock-reset" disabled={call !== null} onClick={() => setSentAt("")}>
+              <button type="button" className="s-chat-clock-reset" disabled={call !== null || busy} onClick={() => pickMoment("")}>
                 Dùng giờ cửa hàng
               </button>
             ) : (
@@ -666,6 +695,12 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                 {/* The manufacturer's page a reviewer approved with the answer this reply rests on. */}
                 {line.speaker === "assistant" && doneRefs.has(line.text) && (
                   <ChatReferences references={doneRefs.get(line.text)!} />
+                )}
+                {/* The QR to pay an order by transfer, with the exact amount and note, as the checkout shows it. */}
+                {line.speaker === "assistant" && doneQr.has(line.text) && (
+                  <div className="s-chat-qr">
+                    <TransferInfo transfer={transferOf(doneQr.get(line.text)!)} />
+                  </div>
                 )}
               </div>
             ))}
@@ -801,6 +836,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
           call={call}
           conversationId={session.conversation_id}
           token={session.conversation_token}
+          onPaymentQr={(reply, qr) => setDoneQr((old) => new Map(old).set(reply, qr))}
           onClose={() => {
             setCall(null);
             requestAnimationFrame(() => callButton.current?.focus());
@@ -814,6 +850,18 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
 
 /** What the customer said: typed lines as text, voice messages with their recording (when this browser made it)
  *  and the words the recogniser heard. */
+/** The assistant's QR in the shape the checkout's TransferInfo shows. */
+function transferOf(qr: PaymentQr): Transfer {
+  return {
+    bank_name: qr.bank_name || "",
+    account_no: qr.account_no || "",
+    account_name: qr.account_name || "",
+    amount: qr.amount_vnd || 0,
+    content: qr.transfer_note || "",
+    qr_url: qr.qr_url,
+  };
+}
+
 function CustomerWords({ line, audio }: { line: Line; audio: Map<string, string> }) {
   if (line.voice && line.voice.state !== "done")
     return (

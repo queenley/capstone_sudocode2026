@@ -131,6 +131,15 @@ async def order_create(
         await asyncio.to_thread(shop_orders.mirror_create, result, {
             "customer_phone": customer_phone, "sku": sku, "qty": qty, "price_vnd": price_vnd, "lines": lines,
             "payment": payment, "address": address})
+        if payment != "COD" and isinstance(result, dict) and result.get("order_id"):
+            # Paid by transfer: the QR comes with the order, so the chat shows it in the reply that places it.
+            qr = await asyncio.to_thread(shop_orders.payment_qr, str(result["order_id"]),
+                                         trusted=(str(result["order_id"]),))
+            if qr.get("ok"):
+                # The chat shows the QR and the account (api/routes/conversations.py payment_qr_for); the model
+                # needs only the amount and the note.
+                result = {**result, "payment_qr": {"amount_vnd": qr["amount"], "transfer_note": qr["content"],
+                                                   "qr_shown_in_chat": True}}
     return result
 
 

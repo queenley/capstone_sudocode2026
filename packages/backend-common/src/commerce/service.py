@@ -16,6 +16,31 @@ from src.db.models import (
 )
 
 
+def transfer_note(order) -> str:
+    """What the customer writes in the transfer, and staff look for on the statement: ``TN`` and the order's id."""
+    return "TN" + str(order.id).replace("-", "")[:8].upper()
+
+
+def transfer_details(settings, order):
+    """How to pay *order* by bank transfer: the shop's account, the amount, the note, and a VietQR image of all
+    three. None when the shop has no account (``BANK_BIN``, ``BANK_ACCOUNT_NO``) or the order is not paid by
+    transfer. The checkout page and the assistant's ``order_payment_qr`` both use this one, so a transfer from
+    either carries the same note."""
+    if not (settings.bank_bin and settings.bank_account_no) or order.payment_method != "bank_transfer":
+        return None
+    amount = int(order.subtotal - (order.discount or 0))
+    note = transfer_note(order)
+    query = urlencode({"amount": amount, "addInfo": note, "accountName": settings.bank_account_name})
+    return {
+        "bank_name": settings.bank_name,
+        "account_no": settings.bank_account_no,
+        "account_name": settings.bank_account_name,
+        "amount": amount,
+        "content": note,
+        "qr_url": f"https://img.vietqr.io/image/{settings.bank_bin}-{settings.bank_account_no}-compact2.png?{query}",
+    }
+
+
 class CatalogService:
     def __init__(self, db):
         self.db, self.repo = db, CatalogRepository(db)
@@ -222,20 +247,7 @@ class OrderService:
 
     def transfer(self, order):
         """How to pay *order* by bank transfer: account, amount, the note to write, and a VietQR image."""
-        bank = self._bank()
-        if bank is None or order.payment_method != "bank_transfer":
-            return None
-        amount = int(order.subtotal - order.discount)
-        note = "TN" + str(order.id).replace("-", "")[:8].upper()
-        query = urlencode({"amount": amount, "addInfo": note, "accountName": bank.bank_account_name})
-        return {
-            "bank_name": bank.bank_name,
-            "account_no": bank.bank_account_no,
-            "account_name": bank.bank_account_name,
-            "amount": amount,
-            "content": note,
-            "qr_url": f"https://img.vietqr.io/image/{bank.bank_bin}-{bank.bank_account_no}-compact2.png?{query}",
-        }
+        return transfer_details(self.security.settings, order)
 
     def mark_paid(self, order):
         order = self.db.scalar(

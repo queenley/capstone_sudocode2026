@@ -282,6 +282,48 @@ async def send(user_id: str, text: str, conversation_id: str | None = None) -> d
     return {"status": status, "error": error}
 
 
+async def send_image(user_id: str, url: str, caption: str = "", conversation_id: str | None = None) -> dict[str, Any]:
+    """Send one image (an https URL, e.g. a VietQR) to a Zalo user, with a caption, and log it.
+
+    Zalo OA v3: a ``media`` template attachment of ``media_type`` image; the caption is the message's text.
+    """
+    await ensure_tables()
+    if not url.startswith("https://"):
+        return {"status": "skipped"}
+    token = await _token()
+    status, error = ("not_sent", "No Zalo access token configured") if not token else ("sent", None)
+    if token:
+        message: dict[str, Any] = {"attachment": {"type": "template", "payload": {
+            "template_type": "media", "elements": [{"media_type": "image", "url": url}]}}}
+        if caption:
+            message["text"] = caption[:MAX_TEXT]
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                response = await client.post(_url("ZALO_OPENAPI_URL", OPENAPI_URL, SEND_PATH),
+                                             headers={"access_token": token},
+                                             json={"recipient": {"user_id": user_id}, "message": message})
+            body = response.json() if response.content else {}
+            if not response.is_success or body.get("error", 0) != 0:
+                status, error = "failed", f"{body.get('error')}: {body.get('message')}"[:300]
+        except httpx.HTTPError as exc:
+            status, error = "failed", f"{type(exc).__name__}: {exc}"[:300]
+    async with connection() as conn:
+        await conn.execute(
+            "INSERT INTO zalo_messages (user_id, direction, text, conversation_id, status, error) VALUES (%s, 'out', %s, %s, %s, %s)",
+            (user_id, f"[ảnh] {caption}".strip(), conversation_id, status, error),
+        )
+    if status == "failed":
+        logger.warning("Zalo image to %s failed: %s", user_id[-4:], error)
+    return {"status": status, "error": error}
+
+
+def qr_caption(qr: dict[str, Any]) -> str:
+    """What goes under the transfer QR on Zalo: the amount and the note, which the picture also carries."""
+    amount = f"{int(qr.get('amount_vnd') or 0):,}".replace(",", ".")
+    return (f"Mã QR chuyển khoản đơn {qr.get('order_id')}: {amount}đ, nội dung {qr.get('transfer_note')}. "
+            f"Tài khoản {qr.get('bank_name') or ''} {qr.get('account_no') or ''}, {qr.get('account_name') or ''}.")
+
+
 # ── one incoming event ────────────────────────────────────────────────────
 
 
@@ -323,7 +365,10 @@ async def handle(app: Any, event: dict[str, Any]) -> dict[str, Any]:
 
     started = time.perf_counter()
     try:
-        result = await answer_turn(app, conversation, TurnRequest(message=text[:4000], turn_id=msg_id),
+        # sent_at: only the staging Zalo mock sends it (scripts/dev/zalo_mock.py), a tester's chosen moment;
+        # answer_turn ignores it where options.client_clock_allowed() is off, as for the web chat.
+        sent_at = str(event.get("sent_at") or "")[:40] or None
+        result = await answer_turn(app, conversation, TurnRequest(message=text[:4000], turn_id=msg_id, sent_at=sent_at),
                                    arrived=started, channel_ref=user_id)
     except Exception as exc:  # noqa: BLE001 - the customer still gets an answer
         logger.exception("Zalo turn failed for conversation %s", conversation.id)
@@ -337,6 +382,10 @@ async def handle(app: Any, event: dict[str, Any]) -> dict[str, Any]:
         return {"status": "waiting_for_staff", "conversation_id": conversation.id}
     sent = await send(user_id, result["reply"] + product_links(result["reply"], result.get("seen_products") or []),
                       conversation.id)
+    qr = result.get("payment_qr")
+    if sent["status"] == "sent" and qr and qr.get("qr_url"):
+        # The bank transfer QR the turn made, as a picture after the words (api/routes/conversations.py).
+        await send_image(user_id, qr["qr_url"], qr_caption(qr), conversation.id)
     return {"status": sent["status"], "conversation_id": conversation.id}
 
 

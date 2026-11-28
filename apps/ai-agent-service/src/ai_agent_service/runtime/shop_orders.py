@@ -141,13 +141,17 @@ def _sku(db: Any, code: str) -> Any:
 
 
 def _find(db: Any, code: str, *, lock: bool = False) -> Any:
-    """The website order the customer knows as *code*: an OD code, or WEB- and its id's first eight characters."""
+    """The website order the customer knows as *code*: an OD code, or WEB- (or the website's own #) and its id's
+    first eight characters."""
     from sqlalchemy import String, cast, select
     from src.db.models import Order
 
     code = (code or "").strip().upper()
     if code.startswith("WEB-") and len(code) == 12:
         query = select(Order).where(cast(Order.id, String).like(code[4:].lower() + "%"), Order.order_code.is_(None))
+    elif code.startswith("#") and len(code) == 9 and code[1:].isalnum():
+        # The website's account page numbers every order so, an order the assistant placed included (account_orders).
+        query = select(Order).where(cast(Order.id, String).like(code[1:].lower() + "%"))
     else:
         query = select(Order).where(Order.order_code == code)
     found = db.scalars(query.limit(2)).all()
@@ -372,6 +376,121 @@ def orders_for_phone(phone: str | None) -> list[dict[str, Any]]:
     except Exception:
         logger.warning("Could not read the website's orders", exc_info=True)
         return []
+
+
+#: Why there is no QR for an order, as the tool's error code, with what the assistant tells the customer.
+QR_REFUSALS = {
+    "NOT_FOUND": "Không tìm thấy đơn này trong đơn của khách.",
+    "NO_BANK_ACCOUNT": "Cửa hàng chưa bật thanh toán chuyển khoản; đơn thanh toán khi nhận hàng (COD).",
+    "NOT_BANK_TRANSFER": "Đơn này thanh toán khi nhận hàng (COD), không cần chuyển khoản.",
+    "ALREADY_PAID": "Đơn này đã thanh toán.",
+    "CANCELLED": "Đơn này đã hủy.",
+}
+
+
+def _owned(order: Any, ref: str, account_id: str | None, trusted: Iterable[str]) -> bool:
+    """Whether *order* is this customer's: its code is in *trusted* (orders this call created, or a verified
+    customer's orders a tool showed), or it belongs to the logged-in *account_id*."""
+    if order is None:
+        return False
+    trusted = {str(code).strip().upper() for code in trusted}
+    return (ref.strip().upper() in trusted or (order.order_code or "").upper() in trusted
+            or (account_id is not None and str(order.customer_id) == str(account_id)))
+
+
+#: Why an order's payment cannot change, as the tool's error code, with what the assistant tells the customer.
+PAYMENT_REFUSALS = {
+    "NOT_FOUND": "Không tìm thấy đơn này trong đơn của khách.",
+    "NO_BANK_ACCOUNT": "Cửa hàng chưa bật thanh toán chuyển khoản; đơn vẫn thanh toán khi nhận hàng (COD).",
+    "ALREADY_PAID": "Đơn này đã thanh toán, không đổi cách thanh toán được.",
+    "ALREADY_SHIPPED": "Đơn đã giao cho đơn vị vận chuyển, không đổi cách thanh toán được nữa.",
+    "CANCELLED": "Đơn này đã hủy hoặc đã trả.",
+    "COD_LIMIT": "Đơn trên 10.000.000đ không thanh toán khi nhận hàng được (VC-03).",
+}
+
+#: VC-03: cash on delivery up to this total.
+COD_LIMIT_VND = 10_000_000
+
+
+def set_payment(order_ref: str, payment: str, *, account_id: str | None = None,
+                trusted: Iterable[str] = ()) -> dict[str, Any]:
+    """Change how one of the customer's orders is paid: ``bank_transfer`` (awaiting the transfer) or ``cod``.
+
+    Only before Sales ships it and while nothing is paid. The order must be the customer's (:func:`_owned`);
+    anyone else's is NOT_FOUND. Returns ``{"ok": True, "order_id", "payment", "changed"}`` or ``{"ok": False,
+    "code"}``. The website's order is the record; the mock's copy of an order the assistant placed follows
+    (``mcp/servers/order.py``).
+    """
+    ref = (order_ref or "").strip()
+    if payment not in ("bank_transfer", "cod") or not enabled() or not ref:
+        return {"ok": False, "code": "NOT_FOUND"}
+    try:
+        from src.db.models import Outbox
+
+        database, security = _resources()
+        with database.sessions() as db:
+            order = _find(db, ref, lock=True)
+            if not _owned(order, ref, account_id, trusted):
+                return {"ok": False, "code": "NOT_FOUND"}
+            code = order.order_code or "#" + str(order.id)[:8].upper()
+            if order.status in ("cancelled", "returned", "return_requested"):
+                return {"ok": False, "code": "CANCELLED"}
+            if order.payment_status == "paid":
+                return {"ok": False, "code": "ALREADY_PAID"}
+            if order.status not in ("pending", "confirmed"):
+                return {"ok": False, "code": "ALREADY_SHIPPED"}
+            if order.payment_method == payment:
+                return {"ok": True, "order_id": code, "payment": payment, "changed": False}
+            settings = security.settings
+            if payment == "bank_transfer" and not (settings.bank_bin and settings.bank_account_no):
+                return {"ok": False, "code": "NO_BANK_ACCOUNT"}
+            if payment == "cod" and int(order.subtotal - (order.discount or 0)) > COD_LIMIT_VND:
+                return {"ok": False, "code": "COD_LIMIT"}
+            order.payment_method = payment
+            order.payment_status = "awaiting_transfer" if payment == "bank_transfer" else "unpaid"
+            db.add(Outbox(event_type="order.payment_changed", aggregate_id=order.id,
+                          payload={"order_id": str(order.id), "method": payment}))
+            db.commit()
+            return {"ok": True, "order_id": code, "payment": payment, "changed": True}
+    except Exception:
+        logger.warning("Could not change the payment of order %s", ref, exc_info=True)
+        return {"ok": False, "code": "UNAVAILABLE"}
+
+
+def payment_qr(order_ref: str, *, account_id: str | None = None,
+               trusted: Iterable[str] = ()) -> dict[str, Any]:
+    """The bank transfer of one order as a VietQR (``src/commerce/service.py`` ``transfer_details``, the checkout's).
+
+    *order_ref* is the order's code (``OD600001``, an order the assistant placed) or the website's ``#ABCD1234``.
+    The order must be the customer's: a code in *trusted* (orders this call created, or a verified customer's
+    orders a tool showed), or an order of the logged-in *account_id*. Anyone else's order is NOT_FOUND, as one that
+    does not exist, so the tool says nothing of it. Returns ``{"ok": True, ...}`` or ``{"ok": False, "code"}``.
+    """
+    ref = (order_ref or "").strip()
+    if not enabled() or not ref:
+        return {"ok": False, "code": "NOT_FOUND"}
+    try:
+        from src.commerce.service import transfer_details
+
+        database, security = _resources()
+        with database.sessions() as db:
+            order = _find(db, ref)
+            if not _owned(order, ref, account_id, trusted):
+                return {"ok": False, "code": "NOT_FOUND"}
+            if order.status == "cancelled":
+                return {"ok": False, "code": "CANCELLED"}
+            if order.payment_status == "paid":
+                return {"ok": False, "code": "ALREADY_PAID"}
+            settings = security.settings
+            if not (settings.bank_bin and settings.bank_account_no):
+                return {"ok": False, "code": "NO_BANK_ACCOUNT"}
+            details = transfer_details(settings, order)
+            if details is None:
+                return {"ok": False, "code": "NOT_BANK_TRANSFER"}
+            return {"ok": True, "order_id": order.order_code or "#" + str(order.id)[:8].upper(), **details}
+    except Exception:
+        logger.warning("Could not make the transfer QR of order %s", ref, exc_info=True)
+        return {"ok": False, "code": "UNAVAILABLE"}
 
 
 def seed_crm_customers(customers: Iterable[Mapping[str, Any]], *, demo_password: str | None = None) -> tuple[int, int]:

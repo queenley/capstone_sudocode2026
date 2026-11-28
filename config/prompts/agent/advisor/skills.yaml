@@ -14,19 +14,23 @@ place-order:
     - Khách đổi sản phẩm, số lượng, thanh toán hay địa chỉ thì gọi lại order_create với giá trị mới. Chưa gọi order_create khi khách còn đang chọn hay đang hỏi.
     - Tổng đơn COD quá 10.000.000đ: đề nghị chuyển khoản, hoặc hỏi khách có muốn tách hai đơn; chỉ khi khách đồng ý mới tách, mỗi đơn order_group "1"/"2", COD tối đa 10.000.000đ, basket_skus là các máy lọc không khí của đơn kia (VC-03, QT-01).
     - order_create trả needs_confirmation_call: true thì nói thêm một câu: nhân viên sẽ gọi xác nhận đơn trước khi giao.
+    - order_create trả payment_qr (đơn chuyển khoản): khung chat đã hiện mã QR kèm tài khoản dưới câu trả lời; nói số tiền, mời khách quét mã và giữ nguyên nội dung chuyển khoản. Không đọc số tài khoản.
+    - Khách xin mã QR, xin lại tài khoản hay muốn chuyển khoản cho một đơn chuyển khoản đã có: gọi order_payment_qr với mã đơn (OD… hoặc #ABCD1234), rồi nói như trên. Tool báo đơn COD, đã thanh toán hay đã hủy thì nói đúng điều đó. Trong cuộc gọi thoại: nói mã QR đã hiện trong khung chat trên website; khách gọi bằng điện thoại thì mời mở khung chat trên website hoặc nhắn Zalo của shop để nhận mã.
 change-order:
-  description: Dùng khi khách muốn đổi size, đổi sản phẩm, trả hàng, đổi địa chỉ hay hủy một đơn đã có. Mua mới thì dùng place-order.
-  done_on: [order_update]
+  description: Dùng khi khách muốn đổi size, đổi sản phẩm, trả hàng, đổi địa chỉ, đổi cách thanh toán hay hủy một đơn đã có. Mua mới thì dùng place-order.
+  done_on: [order_update, order_set_payment]
   body: |-
     - Mọi thay đổi trên đơn đã có là order_update, không bao giờ là order_create.
+    - Khách muốn đổi cách thanh toán của đơn đã có (COD sang chuyển khoản, hay ngược lại): gọi order_set_payment nếu có tool này. Sang chuyển khoản thì khung chat hiện mã QR; nói số tiền, mời khách quét, không đọc số tài khoản.
     - Khách chưa nêu mã đơn: lấy từ order_status hoặc crm_get_customer; một đơn chưa giao thì dùng luôn, nhiều đơn thì chọn đơn đúng sản phẩm khách nói hoặc đọc danh sách cho khách chọn; không xin khách đọc mã đơn.
     - Khách mới than phiền (chật, lỗi, không ưng): đề xuất cách xử lý (đổi size, đổi sản phẩm, trả hàng) và hỏi. Khách đã nói rõ muốn đổi hay trả: gọi order_update ngay, không hỏi lại lý do, không chuyển máy.
     - Khách nói đã nhận hàng mà order_status chưa ghi đã giao thì không từ chối vì trạng thái: order_update trả điều kiện và số tiền.
     - Mỗi thay đổi gọi một lần; báo đúng phí, chênh lệch, số tiền hoàn order_update trả về, kể cả khi khác điều đã nói trước đó.
 order-lookup:
-  description: Dùng khi khách hỏi đơn đã đặt tới đâu, giao chưa, hay hỏi giỏ hàng và đơn trên tài khoản website.
+  description: Dùng khi khách hỏi đơn đã đặt tới đâu, giao chưa, hỏi giỏ hàng và đơn trên tài khoản website, hay xin mã QR để chuyển khoản cho một đơn.
   done_on: []
   body: |-
+    - Khách xin mã QR hay tài khoản để chuyển khoản cho một đơn: gọi order_payment_qr với mã đơn; khung chat hiện mã QR, em nói số tiền, mời khách quét, không đọc số tài khoản. Chưa biết mã đơn thì tra order_status hoặc account_orders trước.
     - Đơn đã đặt (tình trạng, giao chưa, tới đâu): gọi order_status, không đoán từ Call Brief hay lời trước; đọc trạng thái bằng tiếng Việt.
     - Có tool account_* là khách đã đăng nhập: giỏ hàng thì account_cart, tổng giỏ đọc đúng total_vnd; đơn đặt trên website (mã dạng #ABCD1234) thì account_orders; đơn qua hotline, Zalo vẫn tra bằng order_status.
     - Không có tool account_*: giỏ hàng chỉ biết qua dòng "(Giỏ hàng trên website …)" dưới lời khách; không có thì mời khách đăng nhập hoặc cho biết sản phẩm đang quan tâm.

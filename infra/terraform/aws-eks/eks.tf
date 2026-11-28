@@ -37,10 +37,12 @@ module "eks" {
       max_size       = 3
       desired_size   = 2
       labels         = { "telesales/pool" = "system" }
-      # Only what tolerates this runs here: the add-ons and Karpenter; the app goes to Karpenter's nodes.
-      taints = {
+      # The app shares these two nodes with the add-ons, so a quiet shop needs no Karpenter node at all; Karpenter
+      # adds nodes only for what does not fit (docs/deployment/eks-architecture.md, section 5). With
+      # dedicated_system_nodes only the add-ons run here, as before 2026-11-27: two more nodes, around the clock.
+      taints = var.dedicated_system_nodes ? {
         system = { key = "CriticalAddonsOnly", value = "true", effect = "NO_SCHEDULE" }
-      }
+      } : {}
     }
   }
 

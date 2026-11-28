@@ -2,7 +2,9 @@
 
 Trang này mô tả hệ thống **đang chạy** trên Amazon EKS (`ap-southeast-1`, tên miền `quivo.io.vn`): từng thành phần chạy ở đâu, scale theo tín hiệu nào, CI/CD đưa bản mới lên ra sao, và theo dõi bằng gì. Mục 6 ghi phần còn là đề xuất.
 
-**Trạng thái (kiểm ngày 24/11/2026 bằng `kubectl` và Terraform):** đã apply [infra/terraform/aws-eks](../../infra/terraform/aws-eks) và overlay [aws-production](../../infra/kubernetes/overlays/aws-production); 14 Deployment chạy đủ replica; Kubernetes 1.34. Tài khoản ở gói Free plan, nên không có Spot và Aurora chạy chế độ express (mục 2.3). Giá ở mục 5 vẫn là ước lượng từ bảng giá niêm yết, chưa kiểm bằng AWS Pricing Calculator. Chưa có số đo tải cho kiến trúc này.
+**Trạng thái (27/11/2026): hệ thống đang dừng.** Tài khoản AWS ở gói Free plan đã dùng hết credit, nên AWS đóng tài khoản ngày 27/11/2026. Web, DNS (Route 53 trả `REFUSED`), API của cluster và access key ngừng cùng lúc. Đang làm thủ tục mở lại tài khoản và lên gói trả phí. Sau sự cố, cấu hình được thu gọn cho rẻ hơn (mục 5.1) nhưng **chưa apply**: cần chạy lại Terraform và deploy khi tài khoản mở lại.
+
+Lần kiểm trước đó (24/11/2026, bằng `kubectl` và Terraform): đã apply [infra/terraform/aws-eks](../../infra/terraform/aws-eks) và overlay [aws-production](../../infra/kubernetes/overlays/aws-production); 14 Deployment chạy đủ replica; Kubernetes 1.34; 7 node. Free plan không có Spot và Aurora chạy chế độ express (mục 2.3). Giá ở mục 5 vẫn là ước lượng từ bảng giá niêm yết, chưa kiểm bằng AWS Pricing Calculator. Chưa có số đo tải cho kiến trúc này.
 
 Ngoài phạm vi:
 
@@ -174,16 +176,19 @@ flowchart LR
 
 ### 2.1 Workload trong cluster
 
-| Thành phần | Replica (24/11) | Node pool | Scale theo | Ghi chú |
+Từ 27/11/2026, pod của app không bị ghim vào pool nào. Scheduler đặt pod lên phần trống của 2 node hệ thống trước; chỗ nào không đủ thì Karpenter thêm node từ pool `general` (mục 5.1). Chỉ hai CronJob cải tiến còn ghim vào `general`.
+
+| Thành phần | Replica tối thiểu | Node | Scale theo | Ghi chú |
 |---|---|---|---|---|
-| `web`, `api-gateway`, `identity-service`, `commerce-service`, `sales-service` | 2 mỗi cái | `general` | HPA theo CPU 70% ([scaling.yaml](../../infra/kubernetes/overlays/aws-production/scaling.yaml)) | stateless |
-| `ai-agent-service` | 2 | **`on-demand`** | KEDA `metrics-api`: số lượt đang chạy và số WebSocket thoại đang mở (`GET /internal/load`, mục 3.6) | agent chủ yếu chờ model nên CPU không phản ánh tải. Không đặt trên node có thể bị thu hồi, vì sẽ cắt ngang cuộc gọi |
-| `mcp-servers` | 2 | `general` | HPA theo CPU | 6 server, cổng 8801–8806 ([mcp.yaml](../../infra/kubernetes/overlays/aws-production/mcp.yaml)). Chỉ agent và worker gọi được (NetworkPolicy) |
-| `ai-agent-worker` | 1 | `general` | KEDA theo độ dài hàng đợi SQS, **tối thiểu 1** ([after-call-worker.yaml](../../infra/kubernetes/overlays/production/after-call-worker.yaml)) | vòng quét 60 giây nằm ở đây, nên không về 0 |
-| `asr-service` | 1 | `general` | — | Zipformer int8 trên CPU ([asr.yaml](../../infra/kubernetes/overlays/aws-production/asr.yaml)); chỉ agent và worker gọi được |
-| `identity-events`, `commerce-events`, `sales-events`, `ai-agent-events` | 1 mỗi cái | `general` | — | relay outbox trên Postgres, không dùng Kafka |
-| `zalo-mock` | 1 | `general` | — | demo kênh Zalo khi chưa có Official Account ([zalo-mock.yaml](../../infra/kubernetes/overlays/aws-production/zalo-mock.yaml)) |
-| Job `telesales-migrate`, `telesales-seed` | mỗi lần deploy | `general` | — | do `deploy-eks.yml` tạo |
+| `web`, `api-gateway`, `identity-service`, `commerce-service`, `sales-service` | 1 mỗi cái (trước 27/11: 2) | bất kỳ | HPA theo CPU 70% ([scaling.yaml](../../infra/kubernetes/overlays/aws-production/scaling.yaml)) | stateless |
+| `ai-agent-service` | 1 (trước 27/11: 2) | bất kỳ, có `karpenter.sh/do-not-disrupt` | KEDA `metrics-api`: số lượt đang chạy và số WebSocket thoại đang mở (`GET /internal/load`, mục 3.6) | agent chủ yếu chờ model nên CPU không phản ánh tải. Annotation `do-not-disrupt` cấm Karpenter dọn node đang có pod agent, để không cắt ngang cuộc gọi ([agent-patch.yaml](../../infra/kubernetes/overlays/aws-production/agent-patch.yaml)) |
+| `mcp-servers` | 1 (trước 27/11: 2) | bất kỳ | HPA theo CPU | 6 server, cổng 8801–8806 ([mcp.yaml](../../infra/kubernetes/overlays/aws-production/mcp.yaml)). Chỉ agent và worker gọi được (NetworkPolicy) |
+| `ai-agent-worker` | 1 | bất kỳ | KEDA theo độ dài hàng đợi SQS, **tối thiểu 1** ([after-call-worker.yaml](../../infra/kubernetes/overlays/production/after-call-worker.yaml)) | vòng quét 60 giây nằm ở đây, nên không về 0 |
+| `asr-service` | 1 | bất kỳ | — | Zipformer int8 trên CPU ([asr.yaml](../../infra/kubernetes/overlays/aws-production/asr.yaml)); chỉ agent và worker gọi được |
+| `identity-events`, `commerce-events`, `sales-events`, `ai-agent-events` | 1 mỗi cái | bất kỳ | — | relay outbox trên Postgres, không dùng Kafka |
+| `zalo-mock` | 1 | bất kỳ | — | demo kênh Zalo khi chưa có Official Account ([zalo-mock.yaml](../../infra/kubernetes/overlays/aws-production/zalo-mock.yaml)) |
+| Job `telesales-migrate`, `telesales-seed` | mỗi lần deploy | bất kỳ | — | do `deploy-eks.yml` tạo |
+| CronJob `improve-learn`, `improve-tick` | mỗi lần chạy | `general` | — | xin 1 CPU, 2 GiB; Karpenter thêm node rồi trả lại sau 2 phút ([improve.yaml](../../infra/kubernetes/overlays/aws-production/improve.yaml)) |
 
 ### 2.2 Hạ tầng AWS
 
@@ -191,7 +196,8 @@ flowchart LR
 |---|---|---|
 | VPC | subnet private, public và database ở 3 AZ; **một** NAT Gateway (`single_nat_gateway = true`) | [network.tf](../../infra/terraform/aws-eks/network.tf) |
 | EKS | Kubernetes 1.34; API public nhưng chỉ mở cho `cluster_admin_cidrs`, workflow deploy mở tạm cho runner | [eks.tf](../../infra/terraform/aws-eks/eks.tf) |
-| Node | node hệ thống do Terraform tạo, cộng hai NodePool của Karpenter: `general` và `on-demand`. Hôm 24/11: 7 node `c7i-flex.large` / `m7i-flex.large`, ở `ap-southeast-1a` và `1b` | [overlays/aws-cluster](../../infra/kubernetes/overlays/aws-cluster) |
+| Node | 2 node hệ thống do Terraform tạo, app dùng chung với add-on (`dedicated_system_nodes = false`), cộng NodePool `general` của Karpenter cho phần không vừa. Hôm 24/11, trước khi thu gọn: 7 node `c7i-flex.large` / `m7i-flex.large`, ở `ap-southeast-1a` và `1b` | [eks.tf](../../infra/terraform/aws-eks/eks.tf), [overlays/aws-cluster](../../infra/kubernetes/overlays/aws-cluster) |
+| AWS Budgets | ngân sách tháng `monthly_budget_usd` (mặc định 150 USD), email `alarm_email` khi chi thật vượt 50% và 100%, và khi dự báo vượt 80% | [budget.tf](../../infra/terraform/aws-eks/budget.tf) |
 | Add-on | AWS Load Balancer Controller, External Secrets, KEDA, metrics-server, Karpenter (Helm); EFS CSI (EKS add-on) | [addons.tf](../../infra/terraform/aws-eks/addons.tf) |
 | Aurora PostgreSQL | chế độ express của Free plan, script tạo rồi Terraform import | [aurora-import.tf](../../infra/terraform/aws-eks/aurora-import.tf), [eks-deploy.md](eks-deploy.md) mục 2.2 |
 | ElastiCache Serverless (Valkey) | TLS (`rediss://`); gateway (`REDIS_URL`) và agent (`AGENT_REDIS_URL`) dùng chung | [data.tf](../../infra/terraform/aws-eks/data.tf), mục 3 |
@@ -317,23 +323,44 @@ Sau mỗi lần gọi model, cộng tiền vào `spend:day:<ngày>` và `spend:c
 
 ## 5. Chi phí
 
-Ước lượng thô, sai khoảng ±30%, **chưa tính phí API model** (gần như chắc chắn là khoản lớn nhất). Gói Free plan trừ vào credit, không phải chi phí thật cho tới khi hết credit.
+Ước lượng thô, sai khoảng ±30%, **chưa tính phí API model** (gần như chắc chắn là khoản lớn nhất). Từ khi lên gói trả phí, mọi khoản là tiền thật.
 
-| Khoản | USD/tháng, chạy 24/7, tải nhỏ |
+**Bài học ngày 27/11/2026:** cấu hình cũ chạy 7 node suốt ngày đêm và đã dùng hết credit Free plan. AWS đóng tài khoản mà không ai được báo trước. Hai thay đổi dưới đây nhằm để chuyện đó không lặp lại.
+
+### 5.1 Cấu hình thu gọn (27/11/2026)
+
+Lý do cũ cần 7 node: 2 node hệ thống có taint `CriticalAddonsOnly` nên app không được dùng; pod app lại bị ghim vào hai pool của Karpenter (`on-demand` cho agent, `general` cho phần còn lại); mỗi service chạy tối thiểu 2 replica. Trong khi đó, tổng tài nguyên các pod xin ở mức tối thiểu chỉ khoảng 2 vCPU và 5 GiB.
+
+| Thay đổi | File |
 |---|---|
-| EKS control plane | ≈ 73 |
-| Node: khoảng 7 máy `*-flex.large` on-demand như hôm 24/11 | ≈ 400–450 |
-| NAT Gateway (1) | ≈ 35–45 |
-| ALB | ≈ 20–25 |
-| Aurora express (0–4 ACU) | tùy tải, về gần 0 khi không có kết nối |
-| Valkey, SQS, EFS, ECR, Secrets | ≈ 20–30 |
+| Bỏ taint node hệ thống: app dùng phần trống mà add-on để lại (`dedicated_system_nodes = false`) | [eks.tf](../../infra/terraform/aws-eks/eks.tf), [variables.tf](../../infra/terraform/aws-eks/variables.tf) |
+| Bỏ ghim pod vào pool; xóa pool `on-demand`. Agent giữ node bằng `karpenter.sh/do-not-disrupt` | [agent-patch.yaml](../../infra/kubernetes/overlays/aws-production/agent-patch.yaml), [asr.yaml](../../infra/kubernetes/overlays/aws-production/asr.yaml), [mcp.yaml](../../infra/kubernetes/overlays/aws-production/mcp.yaml), [zalo-mock.yaml](../../infra/kubernetes/overlays/aws-production/zalo-mock.yaml), [karpenter.yaml](../../infra/kubernetes/overlays/aws-cluster/karpenter.yaml) |
+| Replica tối thiểu 2 → 1 (HPA và KEDA); vẫn tự scale lên khi tải tăng | [scaling.yaml](../../infra/kubernetes/overlays/aws-production/scaling.yaml) |
+| PDB `minAvailable: 1` → `maxUnavailable: 1`, để node có 1 pod vẫn dọn được | [availability.yaml](../../infra/kubernetes/overlays/production/availability.yaml) |
+| AWS Budgets gửi email khi chi tiêu vượt ngưỡng | [budget.tf](../../infra/terraform/aws-eks/budget.tf) |
 
-Số node là con số lớn nhất và Karpenter tự gom pod để trả bớt máy. Chỉ bật khi demo thì có hai cách (lệnh: [eks-deploy.md, mục 5](eks-deploy.md#5-tắt-hệ-thống)):
+Đổi lại: mỗi service chỉ còn 1 pod, nên pod chết thì service gián đoạn vài giây đến vài phút, trong lúc pod mới khởi động. Với shop thật, đặt lại mức tối thiểu 2 và `dedicated_system_nodes = true` nếu cần.
+
+| Khoản | Trước (7 node) | Sau, khi bật | USD/tháng |
+|---|---|---|---|
+| EKS control plane | ≈ 73 | ≈ 73 | cố định khi còn cluster |
+| Node `*-flex.large` on-demand | ≈ 400–450 | ≈ 120–130 (2 node hệ thống; Karpenter chỉ thêm khi tải tăng hoặc CronJob chạy) | lớn nhất |
+| NAT Gateway (1) | ≈ 35–45 | ≈ 35–45 | |
+| ALB | ≈ 20–25 | ≈ 20–25 | |
+| Aurora express (0–4 ACU) | tùy tải | tùy tải | về gần 0 khi không có kết nối |
+| Valkey, SQS, EFS, ECR, Secrets | ≈ 20–30 | ≈ 20–30 | |
+| **Tổng, bật 24/7** | **≈ 550–620** | **≈ 270–300** | |
+
+Số "sau" là ước lượng, chưa đo trên hóa đơn: sau khi deploy, kiểm `kubectl get nodes` (mong đợi 2 node lúc vắng khách) và Cost Explorer sau vài ngày.
+
+### 5.2 Chỉ bật khi demo
+
+Ngay cả cấu hình thu gọn vẫn tốn khoảng 270–300 USD/tháng nếu bật suốt. Khi không demo, mặc định nên **xóa cluster, giữ dữ liệu** (cách đầu trong bảng dưới). Lệnh: [eks-deploy.md, mục 5](eks-deploy.md#5-tắt-hệ-thống).
 
 | Cách | Khi tắt | Bật lại mất |
 |---|---|---|
 | Xóa cluster, NAT, ALB; giữ ECR, Secrets, EFS, S3, Route 53, ACM và Aurora | ≈ 5–10 USD/tháng | ≈ 20–30 phút |
-| Giữ cluster, Karpenter đưa node về 0 | ≈ 120–150 USD/tháng (EKS, NAT, ALB) | ≈ 3–5 phút |
+| Giữ cluster, app và node về 0 | ≈ 120–150 USD/tháng (EKS, NAT, ALB, Valkey) | ≈ 3–5 phút |
 
 ## 6. Việc còn lại
 

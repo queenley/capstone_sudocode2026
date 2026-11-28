@@ -174,7 +174,9 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
                                       reason=handoff.get("reason") or "assistant_handoff", brief=handoff.get("brief") or {})
     result = {**_result(row, turn_id, outcome, outcome.content or ""), "waiting": waiting,
               # The products tools showed this call, for a channel that links them (Zalo).
-              "seen_products": list(state.get("seen_products") or [])}
+              "seen_products": list(state.get("seen_products") or []),
+              # The bank transfer QR this turn made, shown under the reply.
+              "payment_qr": await payment_qr_for(qr_order_of(state.get("tool_results") or []))}
     tracker = getattr(app.state, "turn_tracker", None)
     if tracker is not None:
         tracker.log_turn(
@@ -242,6 +244,40 @@ def references_of(state: dict[str, Any], reply: str) -> list[dict[str, str]]:
         return []
     return [{"url": str(link["url"]), "domain": str(link.get("domain") or ""), "title": str(first.get("title") or "")}
             for link in first.get("references") or () if isinstance(link, dict) and link.get("url")]
+
+
+def qr_order_of(results: list[dict[str, Any]]) -> str | None:
+    """The order this turn's tools made a bank transfer QR for (``order_payment_qr``; ``order_create`` of an order
+    paid by transfer; ``order_set_payment`` to a transfer); the last one when there are several, None when none."""
+    found = None
+    for result in results:
+        envelope = result.get("result") or {}
+        data = envelope.get("data") if envelope.get("ok") else None
+        if not isinstance(data, dict) or not data.get("order_id"):
+            continue
+        name = str(result.get("name") or "")
+        if (name in ("order.payment_qr", "order_payment_qr")
+                or (name in ("order.create", "order_create", "order.set_payment", "order_set_payment")
+                    and isinstance(data.get("payment_qr"), dict))):
+            found = str(data["order_id"])
+    return found
+
+
+async def payment_qr_for(order_id: str | None) -> dict[str, Any] | None:
+    """The QR the chat shows for *order_id*, read again from the shop's order, not from the tool's result: what the
+    tool returned went through the model's view, where the PII vault has put a token in place of the account number.
+    The tool has already checked the order is this customer's this turn."""
+    if not order_id:
+        return None
+    from ...runtime import shop_orders
+
+    qr = await asyncio.to_thread(shop_orders.payment_qr, order_id, trusted=(order_id,))
+    # Only VietQR's own images: the URL is shown as an <img>, so nothing else may get there.
+    if not qr.get("ok") or not str(qr.get("qr_url") or "").startswith("https://img.vietqr.io/"):
+        return None
+    return {"order_id": qr["order_id"], "amount_vnd": qr["amount"], "transfer_note": qr["content"],
+            "bank_name": qr["bank_name"], "account_name": qr["account_name"], "account_no": qr["account_no"],
+            "qr_url": qr["qr_url"]}
 
 
 def _products(results: list[dict[str, Any]], quotes: dict[str, int]) -> list[dict[str, Any]]:

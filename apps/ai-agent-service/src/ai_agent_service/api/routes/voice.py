@@ -523,8 +523,12 @@ class Session:
             await self.send({"type": "state", "state": "listening"})
             return
         text = outcome.content if outcome.kind == "message" else FALLBACK
+        from .conversations import payment_qr_for, qr_order_of
+
+        # A bank transfer QR this turn made: a call in the browser shows it under the words (features/voice).
+        qr = await payment_qr_for(qr_order_of((outcome.state or {}).get("tool_results") or []))
         await self.send({"type": "reply", "turn": turn_id, "text": text, "meta": outcome.meta,
-                         "error": outcome.error})
+                         "error": outcome.error, **({"payment_qr": qr} if qr else {})})
         await self._choose_voice(outcome)
         stream = self.streams.pop(turn_id, None)
         if stream is not None:

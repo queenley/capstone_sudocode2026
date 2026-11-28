@@ -1,5 +1,7 @@
-# ai-agent-service on EKS: its service account (Pod Identity: send to the queue), on-demand nodes only (a Spot node
-# taken back cuts a voice call short), the shared data on EFS, and room to finish the turns in hand on SIGTERM.
+# ai-agent-service on EKS: its service account (Pod Identity: send to the queue), a node Karpenter never takes away
+# to save money while a pod of it runs there (do-not-disrupt: consolidating would cut a voice call short), the shared
+# data on EFS, and room to finish the turns in hand on SIGTERM. Any node will do: the system nodes first, where
+# there is room (docs/deployment/eks-architecture.md, section 5).
 # The EFS volume starts empty: the init container copies what the image ships and EFS lacks, never over it, so an
 # approved skills version or knowledge entry written at run time is kept.
 apiVersion: apps/v1
@@ -8,11 +10,12 @@ metadata:
   name: ai-agent-service
 spec:
   template:
+    metadata:
+      annotations:
+        karpenter.sh/do-not-disrupt: "true"
     spec:
       serviceAccountName: ai-agent-service
       terminationGracePeriodSeconds: 120
-      nodeSelector:
-        karpenter.sh/nodepool: on-demand
       initContainers:
         - name: seed-agent-data
           image: telesales-ai-agent:dev
@@ -44,8 +47,6 @@ metadata:
 spec:
   template:
     spec:
-      nodeSelector:
-        karpenter.sh/nodepool: general
       containers:
         - name: ai-agent-worker
           volumeMounts:

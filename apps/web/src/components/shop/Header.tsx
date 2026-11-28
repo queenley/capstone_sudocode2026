@@ -25,7 +25,7 @@ const PICTURE: Record<string, string> = {
   "thoi-trang/phu-kien": "/products/SKU-SN-SOCK.jpg",
 };
 
-export const MAIN_ACTION = "Chat với trợ lý AI";
+export const MAIN_ACTION = "Chat với cửa hàng";
 
 export default function Header() {
   const lines = useCart();

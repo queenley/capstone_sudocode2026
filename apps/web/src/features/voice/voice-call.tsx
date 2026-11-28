@@ -13,6 +13,8 @@ import {
   VoiceMessage,
 } from "@/services/voice";
 import Icon from "@/components/ui/Icon";
+import TransferInfo from "@/components/shop/TransferInfo";
+import type { PaymentQr } from "@/services/api";
 
 type Line = {
   id: string;
@@ -21,6 +23,8 @@ type Line = {
   heard?: string;
   superseded?: boolean;
   ttfaMs?: number;
+  /** The bank transfer QR this answer came with (order_payment_qr, order_set_payment, order_create). */
+  qr?: PaymentQr;
 };
 type Input = {
   level: number;
@@ -51,11 +55,14 @@ export default function VoiceCallPanel({
   conversationId,
   token,
   onClose,
+  onPaymentQr,
 }: {
   call: VoiceCall;
   conversationId: string;
   token: string;
   onClose: () => void;
+  /** Keeps a QR for the chat, so it is still under the answer once the call ends. */
+  onPaymentQr?: (reply: string, qr: PaymentQr) => void;
 }) {
   const [state, setState] = useState("connecting");
   const [lines, setLines] = useState<Line[]>([]);
@@ -119,7 +126,8 @@ export default function VoiceCallPanel({
                   text: "Nhân viên tư vấn đang nhận cuộc gọi.",
                 },
               ]);
-            else if (m.text)
+            else if (m.text) {
+              const qr = paymentQrOf(m.payment_qr);
               setLines((all) => [
                 ...all,
                 {
@@ -127,8 +135,11 @@ export default function VoiceCallPanel({
                   who: "agent",
                   text: String(m.text),
                   superseded: Boolean(m.superseded),
+                  ...(qr ? { qr } : {}),
                 },
               ]);
+              if (qr) onPaymentQr?.(String(m.text), qr);
+            }
             break;
           case "truncated":
             setLines((all) =>
@@ -358,6 +369,20 @@ export default function VoiceCallPanel({
                         : `Âm thanh đầu sau ${(line.ttfaMs! / 1000).toFixed(1)} s`}
                   </small>
                 )}
+                {line.qr && (
+                  <div className="s-chat-qr">
+                    <TransferInfo
+                      transfer={{
+                        bank_name: line.qr.bank_name || "",
+                        account_no: line.qr.account_no || "",
+                        account_name: line.qr.account_name || "",
+                        amount: line.qr.amount_vnd || 0,
+                        content: line.qr.transfer_note || "",
+                        qr_url: line.qr.qr_url,
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ),
           )}
@@ -424,4 +449,10 @@ function useLevel(analyser: AnalyserNode | null): number {
 
 function clock(total: number) {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+}
+
+/** A QR the server sent with an answer, when it is one: only VietQR's own images are shown. */
+function paymentQrOf(value: unknown): PaymentQr | null {
+  const qr = value as PaymentQr | null | undefined;
+  return qr && typeof qr.qr_url === "string" && qr.qr_url.startsWith("https://img.vietqr.io/") ? qr : null;
 }

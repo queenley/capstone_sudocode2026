@@ -155,7 +155,9 @@ alarm_email         = "ops@example.com"           # tùy chọn: nhận báo đ�
 
 **Loại máy và tài khoản Free plan:** tài khoản AWS ở gói Free plan chỉ bật được các loại máy Free Tier và không có Spot. Nếu chạy loại khác, node group báo `CREATE_FAILED ... The specified instance type is not eligible for Free Tier`. Vì vậy cấu hình mặc định chỉ dùng máy on-demand và hai loại máy lớn nhất được phép:
 - Node hệ thống (`system_instance_types`): 2 máy `m7i-flex.large` (2 vCPU, 8 GiB).
-- Node của Karpenter, cả hai NodePool `on-demand` và `general`: `m7i-flex.large` hoặc `c7i-flex.large` (2 vCPU, 4 GiB).
+- Node của Karpenter, NodePool `general`: `m7i-flex.large` hoặc `c7i-flex.large` (2 vCPU, 4 GiB).
+
+Free plan chạy bằng credit: **hết credit thì AWS đóng tài khoản**, và mọi thứ ngừng cùng lúc, kể cả DNS và access key. Ngày 27/11/2026 đã xảy ra đúng như vậy. Nên đặt `alarm_email` trong `terraform.tfvars` để [budget.tf](../../infra/terraform/aws-eks/budget.tf) tạo ngân sách tháng (`monthly_budget_usd`, mặc định 150 USD) và gửi email cảnh báo. Lúc tạo, AWS Budgets không gửi email xác nhận; SNS của alarm hàng đợi thì có, nhớ bấm xác nhận.
 
 Danh sách loại máy được phép trong region:
 
@@ -297,11 +299,13 @@ Kết quả: `reports/generated/deployment.yaml`, gồm cả app ([aws-productio
 
 ### 2.6 Database: migration
 
-Node hệ thống chỉ nhận add-on (taint `CriticalAddonsOnly`), nên Job migration cần node của Karpenter. Apply NodePool trước, riêng phần có nhãn `telesales/part=cluster`:
+Apply NodePool trước, riêng phần có nhãn `telesales/part=cluster`. Từ 27/11/2026, Job migration chạy được ngay trên node hệ thống (không còn taint, trừ khi đặt `dedicated_system_nodes = true`); NodePool cần cho phần không vừa:
 
 ```powershell
 kubectl apply -f reports/generated/deployment.yaml -l telesales/part=cluster
-kubectl get nodepools          # on-demand và general, READY True
+kubectl get nodepools          # general, READY True
+# Cluster dựng trước 27/11/2026 còn pool cũ on-demand: xóa một lần
+kubectl delete nodepool on-demand --ignore-not-found
 ```
 
 Overlay không tạo `telesales-migration-secrets`, vì credential này có quyền DDL. Tạo bằng tay từ secret của user `telesales`, chủ của `app_db`:
@@ -448,7 +452,16 @@ Ba mức, từ nhẹ đến hết. Chọn theo thời gian sẽ không dùng.
 | 5.2 Xóa cluster, giữ dữ liệu | Valkey, lưu trữ Aurora/EFS/ECR, secret: vài chục USD/tháng hoặc ít hơn | 30–40 phút | Không |
 | 5.3 Xóa hết | Chỉ snapshot cuối của Aurora (và ECR nếu giữ) | Như deploy lần đầu | Có: EFS, Valkey, hàng đợi |
 
-Các con số là ước tính thô từ [eks-architecture.md, mục 5](eks-architecture.md#5-chi-phí), chưa đo trên hóa đơn thật.
+Các con số là ước tính thô từ [eks-architecture.md, mục 5](eks-architecture.md#5-chi-phí), chưa đo trên hóa đơn thật. Khi không demo, mặc định nên ở mức 5.2.
+
+**Sau khi tài khoản bị đóng rồi mở lại** (như ngày 27/11/2026):
+
+1. Tạo access key mới, nên là của một IAM user thay vì root. Key cũ không dùng được nữa.
+2. Kiểm tra cái gì còn: `aws eks describe-cluster --name telesales-production`, `aws rds describe-db-clusters`, `aws route53 list-hosted-zones`, `aws ecr describe-repositories`.
+3. Nếu hosted zone phải tạo lại, 4 nameserver mới (`terraform output name_servers`) phải được điền lại ở nhà đăng ký tên miền .vn, và chứng chỉ ACM chỉ được cấp sau khi nameserver mới có hiệu lực.
+4. Đặt `alarm_email` trong `terraform.tfvars`, chạy `terraform plan` (mong đợi: node group bỏ taint, tạo ngân sách), rồi `terraform apply`.
+5. Kiểm secret app còn đủ key (gồm `GOOGLE_CALENDAR_ID`, `GOOGLE_CALENDAR_CREDENTIALS_JSON`), rồi chạy workflow **Deploy EKS** và `kubectl delete nodepool on-demand --ignore-not-found`.
+6. `kubectl get nodes` lúc vắng khách nên còn 2 node.
 
 ```mermaid
 flowchart LR
@@ -461,7 +474,7 @@ flowchart LR
 
 ### 5.1 Tạm dừng (giữ cluster)
 
-App xuống 0 trước. Karpenter tự xóa node trống: node của pool `general` sau 2 phút, node của pool `on-demand` sau 10 phút. Sau đó mới đưa 2 node hệ thống về 0, vì Karpenter chạy trên chính chúng.
+App xuống 0 trước. Karpenter tự xóa node trống của pool `general` sau 2 phút. Sau đó mới đưa 2 node hệ thống về 0, vì Karpenter chạy trên chính chúng.
 
 ```powershell
 $ns = "telesales-production"; $cluster = "telesales-production"

@@ -5,13 +5,17 @@
 #
 # The per-pod targets are first figures, not measurements: measure them with
 # `run_eval.py --performance --sessions <n>` and set them here (section 3.6).
+#
+# Every minimum is 1 (it was 2): a demo shop's traffic fits one pod of each, and two of each kept about seven nodes
+# running around the clock, which used up the account's Free plan credits and closed it on 2026-11-27. A pod that
+# dies is replaced in seconds to minutes; for a real shop's availability, put the minimums back to 2.
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: ai-agent-service
 spec:
   scaleTargetRef: {name: ai-agent-service}
-  minReplicaCount: 2
+  minReplicaCount: 1
   maxReplicaCount: 10 # = MODEL_LIMITER_PODS in kustomization.yaml
   pollingInterval: 15
   cooldownPeriod: 300 # a voice call lasts minutes: never scale in under one
@@ -41,7 +45,7 @@ metadata:
   name: mcp-servers
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: mcp-servers}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 6
   metrics:
     - type: Resource
@@ -53,7 +57,7 @@ metadata:
   name: api-gateway
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: api-gateway}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 6
   metrics:
     - type: Resource
@@ -65,7 +69,7 @@ metadata:
   name: web
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: web}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 6
   metrics:
     - type: Resource
@@ -77,7 +81,7 @@ metadata:
   name: commerce-service
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: commerce-service}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 4
   metrics:
     - type: Resource
@@ -89,7 +93,7 @@ metadata:
   name: identity-service
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: identity-service}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 4
   metrics:
     - type: Resource
@@ -101,7 +105,7 @@ metadata:
   name: sales-service
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: sales-service}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 4
   metrics:
     - type: Resource

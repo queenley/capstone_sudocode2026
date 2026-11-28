@@ -56,6 +56,10 @@ configMapGenerator:
       # another day and hour (stock, promotions, working hours). Off by default with ENVIRONMENT=production, since any
       # shopper can then choose the agent's clock; delete this line for a real shop.
       - CLIENT_CLOCK=1
+      # The orders the assistant places go into the website's order store too, under the same code, and it can show
+      # a bank transfer QR for them (runtime/shop_orders.py, order_payment_qr), as docker-compose.yml does. The
+      # improvement CronJobs do not read this ConfigMap, and an *_eval database never reaches the shop.
+      - SHOP_ORDERS=1
       # The Zalo channel talks to the Zalo mock (zalo-mock.yaml), with the mock's own keys: they open nothing but the
       # mock. A real Official Account: delete these six, and put its keys in the app secret instead.
       - ZALO_APP_ID=mock-app

@@ -103,6 +103,66 @@ Loại: guard trước hành động (`components/guardrails/actions.py`), promp
 - **Số đo:** chưa đo.
 - **Còn lại:** chạy một kịch bản đặt hàng (rồi cả cohort) để xem TSR và số lần chặn. Nới `review_flags` nghĩa là một đơn có thể được tạo ngay sau một câu sai; câu trả lời phải đính chính. Nhận HMAC (R1) và TTL/dùng một lần vẫn giữ nguyên.
 
+### 2026-11-28 · Đổi COD sang chuyển khoản, QR trên Zalo và cuộc gọi, trang chủ kiểu cửa hàng, phiên chat mới
+
+Loại: tính năng (tool, kênh, giao diện, hạ tầng) · Trạng thái: đang đo · Chỉ số: không có
+
+- **Vấn đề:** khách không đổi được đơn COD sang chuyển khoản; QR chỉ hiện ở web chat; trang chủ là trang giới thiệu trợ lý AI với hero cao cả màn hình, không giống cửa hàng; chat web không có cách bắt đầu phiên mới; Zalo mock không chọn được thời điểm gửi.
+- **Bằng chứng:** yêu cầu của người dùng.
+- **Sửa:**
+  - Tool `order_set_payment` ([order.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers/order.py), [shop_orders.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/shop_orders.py) `set_payment`): COD ↔ chuyển khoản, chỉ đơn của chính khách, trước khi giao và khi chưa trả tiền; về COD tối đa 10.000.000đ. Đổi sang chuyển khoản thì kèm QR. Là tool ghi (copilot bị chặn). Câu hướng dẫn cũ "đổi thanh toán thì gọi order_update" được sửa.
+  - Zalo: [zalo.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/zalo.py) `send_image` gửi QR dạng ảnh (OA v3, template `media`); Zalo mock hiện ảnh ([zalo_mock.py](../../scripts/dev/zalo_mock.py)).
+  - Cuộc gọi trên website: tin `reply` kèm `payment_qr`, panel cuộc gọi hiện thẻ QR và giữ lại trong chat sau khi cúp máy. Gọi qua tổng đài: trợ lý mời mở chat trên website hoặc Zalo.
+  - Trang chủ ([sections.tsx](../../apps/web/src/features/home/sections.tsx), [11-home-store.css](../../apps/web/src/app/(shop)/styles/11-home-store.css)): banner một dòng, dải danh mục, "Sản phẩm nổi bật" 4 thẻ chạy lần lượt (xen kẽ ngành, có nút trước/sau và tạm dừng, đứng yên khi giảm chuyển động), một hàng 4 sản phẩm mỗi ngành với "Xem thêm", dải chính sách. Bỏ khung chat hero, mục trợ lý, câu hỏi về AI; nút chat ở footer là "Chat với cửa hàng".
+  - Chat web: nút "Phiên mới" kết thúc cuộc trò chuyện trên server (`/end`) và mở phiên mới; đổi "Thời điểm gửi" cũng mở phiên mới.
+  - Zalo mock: ô "Thời điểm gửi" khi `ENVIRONMENT=staging`; event mang `sent_at`, agent dùng theo luật `client_clock_allowed`.
+  - [sync_app_secret.py](../../scripts/deployment/sync_app_secret.py): chép một danh sách biến cho phép từ `.env` vào secret app trên EKS; đã chạy, thêm `BANK_*` và tùy chọn Google Calendar.
+- **Đã kiểm:** `tests/agent/test_payment_qr.py` 20 test qua, cùng các test shop, chat, voice liên quan; `tsc --noEmit` sạch. Trên docker compose: trang chủ ở 1440 và 390 (carousel tự chạy, không tràn ngang, không còn chữ "AI"/"trợ lý"); nút "Phiên mới" và chọn ngày đều kết thúc phiên cũ, phiên mới trả lời theo ngày đã chọn.
+- **Số đo:** chưa đo.
+- **Còn lại:**
+  - Trang chủ mới không chạy finish gate của taste-skill, vì yêu cầu (banner một dòng, carousel) trái với luật một section một màn hình và luật cấm carousel.
+  - Thay đổi prompt chưa chạy lại evaluation (hai tool mới bị ẩn khi evaluation).
+
+### 2026-11-28 · Trợ lý hiện mã QR chuyển khoản trong khung chat
+
+Loại: tính năng (tool, prompt, giao diện) · Trạng thái: đang đo · Chỉ số: không có (tính năng mới)
+
+- **Vấn đề:** mã VietQR chỉ có ở trang thanh toán của website. Khách đặt hàng qua trợ lý và chọn chuyển khoản, hoặc xin lại tài khoản, không nhận được mã có sẵn số tiền.
+- **Bằng chứng:** yêu cầu của người dùng.
+- **Sửa:**
+  - Tách công thức QR của checkout thành `transfer_details` ([service.py](../../packages/backend-common/src/commerce/service.py)), để QR của trợ lý dùng cùng nội dung `TN…` mà nhân viên đối soát.
+  - [shop_orders.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/shop_orders.py) `payment_qr`: tìm đơn theo mã `OD…` hoặc `#ABCD1234`, chỉ trả mã cho đơn của chính khách; đơn của người khác báo `NOT_FOUND`.
+  - Tool `order_payment_qr` ([order.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers/order.py)). `order_create` với thanh toán chuyển khoản trả kèm `payment_qr`.
+  - Tham số hệ thống `trusted_orders` ([tools.py](../../apps/ai-agent-service/src/ai_agent_service/mcp/tools.py)): đơn tạo trong cuộc, cộng đơn đã tra nếu khách VERIFIED; model không đặt được. Tool bị ẩn khi `SHOP_ORDERS` tắt, nên evaluation không thấy.
+  - Lane NEW và CONTINUITY ([lanes.yaml](../../apps/ai-agent-service/config/lanes.yaml)); quy tắc trong `place-order` và `order-lookup` ([skills.yaml](../../config/prompts/agent/advisor/skills.yaml)): nói số tiền, không đọc số tài khoản.
+  - Chat nhận `payment_qr` ([conversations.py](../../apps/ai-agent-service/src/ai_agent_service/api/routes/conversations.py), chỉ ảnh từ `img.vietqr.io`) và hiện bằng `TransferInfo` của checkout ([ChatWidget.tsx](../../apps/web/src/components/shop/ChatWidget.tsx)).
+  - EKS bật `SHOP_ORDERS=1` ([kustomization.yaml](../../infra/kubernetes/overlays/aws-production/kustomization.yaml)): trước đây đơn trợ lý tạo trên EKS không vào kho đơn của website.
+- **Đã kiểm:** `tests/agent/test_payment_qr.py` 11 test qua; `test_shop_orders.py` và `test_cod_limit_and_bank_transfer` vẫn qua; `tsc --noEmit` của web không lỗi.
+- **Số đo:** chưa đo.
+- **Còn lại:**
+  - Đổi đơn COD sang chuyển khoản chưa hỗ trợ (`order_update` không đổi phương thức thanh toán).
+  - Zalo và cuộc gọi thoại chưa hiện ảnh QR.
+  - Thay đổi prompt chưa chạy lại evaluation; tool bị ẩn khi evaluation nên tác động dự kiến chỉ đến từ hai dòng prompt.
+
+### 2026-11-28 · Thu gọn hạ tầng EKS sau khi tài khoản AWS bị đóng
+
+Loại: tính năng (hạ tầng) · Trạng thái: đang đo · Chỉ số: số node lúc vắng khách, chi phí tháng
+
+- **Vấn đề:** ngày 27/11/2026 AWS đóng tài khoản vì Free plan hết credit. Web, DNS, API cluster và access key ngừng cùng lúc, không có cảnh báo trước. Cluster chạy khoảng 7 node suốt ngày đêm, ước ≈ 550–620 USD/tháng.
+- **Bằng chứng:** Route 53 trả `REFUSED`, STS trả `InvalidClientTokenId`, Console báo "Your account is closed". Tổng tài nguyên pod xin ở mức tối thiểu chỉ khoảng 2 vCPU và 5 GiB, vừa 2 node.
+- **Sửa:**
+  - Node hệ thống không còn taint `CriticalAddonsOnly` (biến `dedicated_system_nodes`, mặc định `false`), nên app dùng phần trống mà add-on để lại.
+  - Bỏ `nodeSelector` ghim pod vào pool; xóa NodePool `on-demand`. Agent giữ node bằng `karpenter.sh/do-not-disrupt`.
+  - HPA và KEDA tối thiểu 2 → 1. PDB `minAvailable: 1` → `maxUnavailable: 1`.
+  - Thêm [budget.tf](../../infra/terraform/aws-eks/budget.tf): AWS Budgets gửi email `alarm_email` ở 50% và 100% chi thật, 80% dự báo (`monthly_budget_usd`, mặc định 150).
+  - Cập nhật [eks-architecture.md](../deployment/eks-architecture.md) mục 2 và 5, [eks-deploy.md](../deployment/eks-deploy.md) mục 2 và 5.
+- **Đã kiểm:** `terraform fmt -check` và `terraform validate` qua; `kubectl kustomize` của `aws-production` và `aws-cluster` build được. Chưa apply, vì tài khoản đang đóng.
+- **Số đo:** chưa đo. Ước sau khi đổi: ≈ 270–300 USD/tháng khi bật 24/7, 2 node lúc vắng khách; ≈ 5–10 USD/tháng khi xóa cluster giữ dữ liệu.
+- **Còn lại:**
+  - Mỗi service còn 1 pod, nên pod chết thì gián đoạn ngắn.
+  - NAT Gateway (≈ 35–45 USD) vẫn giữ; thay bằng NAT instance thì rẻ hơn nhưng phải tự vận hành.
+  - Cần đặt `alarm_email` trong `terraform.tfvars`, nếu không thì không có ngân sách.
+
 ### 2026-11-27 · Chọn thời điểm gửi cho tin nhắn chat và cuộc gọi
 
 Loại: tính năng (kiểm thử, giao diện) · Trạng thái: đang đo · Chỉ số: không có (công cụ để kiểm thử bằng tay)

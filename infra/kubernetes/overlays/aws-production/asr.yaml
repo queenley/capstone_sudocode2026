@@ -15,8 +15,6 @@ spec:
       labels: {app: telesales-asr}
     spec:
       securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
-      nodeSelector:
-        karpenter.sh/nodepool: general
       containers:
         - name: asr-service
           image: telesales-asr:dev

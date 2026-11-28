@@ -73,6 +73,10 @@ DEFAULTS = {"ZALO_APP_ID": "mock-app", "ZALO_OA_ID": "mock-oa", "ZALO_OA_SECRET_
             "ZALO_ACCESS_TOKEN": "mock-access-token"}
 #: The OA's name on the page (ZALO_OA_NAME).
 OA_NAME = os.environ.get("ZALO_OA_NAME", "").strip() or "Quivo"
+#: Testing aid: with ENVIRONMENT=staging the mock lets the tester say when a message was sent; anywhere else (unset
+#: included) it does not. It goes in the event as ``sent_at``, a field of this mock only, and the agent reads it only
+#: where ``options.client_clock_allowed()`` lets it (apps/ai-agent-service runtime/options.py).
+CLOCK_PICKER = os.environ.get("ENVIRONMENT", "").strip().lower() == "staging"
 
 
 def load_env() -> dict[str, str]:
@@ -93,6 +97,16 @@ def sign(app_id: str, body: str, timestamp: str, secret: str) -> str:
 
 # ── the platform's state ──────────────────────────────────────────────────
 
+
+
+def _image_of(message: dict) -> str | None:
+    """The https URL of an image message (``attachment.payload.elements[0]`` of a media template), else None."""
+    payload = ((message.get("attachment") or {}).get("payload") or {}) if isinstance(message, dict) else {}
+    if payload.get("template_type") != "media":
+        return None
+    element = next(iter(payload.get("elements") or []), None) or {}
+    url = str(element.get("url") or "")
+    return url if element.get("media_type") == "image" and url.startswith("https://") else None
 
 class Platform:
     """Users, their messages with the OA, the tokens the OA holds, and who is watching."""
@@ -136,7 +150,8 @@ class Platform:
 
     # ── the users' side: events to the shop's webhook ──
 
-    def event(self, user_id: str, kind: str, text: str = "", extra: dict | None = None) -> dict:
+    def event(self, user_id: str, kind: str, text: str = "", extra: dict | None = None,
+              sent_at: str | None = None) -> dict:
         """Post one Zalo event for *user_id* to the webhook; returns what the shop answered."""
         config = self.config
         timestamp = str(int(time.time() * 1000))
@@ -167,6 +182,8 @@ class Platform:
             event = {**base, "event_name": {"text": "user_send_text", "image": "user_send_image",
                                             "sticker": "user_send_sticker"}[kind],
                      "sender": {"id": user_id}, "recipient": {"id": config["ZALO_OA_ID"]}, "message": message}
+            if sent_at and CLOCK_PICKER:
+                event["sent_at"] = sent_at
             shown = text if kind == "text" else f"[{'ảnh' if kind == 'image' else 'sticker'}] {text}".strip()
         body = json.dumps(event, ensure_ascii=False, separators=(",", ":"))
         headers = {"Content-Type": "application/json",
@@ -191,7 +208,21 @@ class Platform:
         if token not in self.tokens:
             return self._refuse(-216, "Access token is invalid", payload)
         recipient = str(((payload or {}).get("recipient") or {}).get("user_id") or "")
-        text = ((payload or {}).get("message") or {}).get("text")
+        message = (payload or {}).get("message") or {}
+        text = message.get("text")
+        image = _image_of(message)
+        if image is not None and recipient:
+            # An image message (Zalo OA v3: an attachment of template media, media_type image), e.g. a VietQR.
+            with self.lock:
+                user = self.users.get(recipient)
+            if user is None:
+                return self._refuse(-213, "User has not followed or interacted with the OA", payload)
+            if time.time() - user["last_message_at"] > REPLY_WINDOW:
+                return self._refuse(-230, "User has not interacted with the OA in the last 7 days", payload)
+            message_id = secrets.token_hex(16)
+            self.note(recipient, "out", text or "", kind="image", image_url=image, status="đã gửi",
+                      message_id=message_id)
+            return {"error": 0, "message": "Success", "data": {"message_id": message_id, "user_id": recipient}}
         if not recipient or not isinstance(text, str) or not text.strip():
             return self._refuse(-201, "Parameters are invalid: recipient.user_id and message.text are required", payload)
         if len(text) > MAX_TEXT:
@@ -294,7 +325,7 @@ def handler(platform: Platform, base: str = "") -> type[BaseHTTPRequestHandler]:
             elif path == "/api/state":
                 with platform.lock:
                     self.reply(200, {"users": list(platform.users.values()), "messages": platform.messages,
-                                     "webhook": platform.webhook, "oa_name": OA_NAME})
+                                     "webhook": platform.webhook, "oa_name": OA_NAME, "clock_picker": CLOCK_PICKER})
             elif path == "/api/stream":
                 self.stream()
             else:
@@ -347,7 +378,8 @@ def handler(platform: Platform, base: str = "") -> type[BaseHTTPRequestHandler]:
                     self.reply(400, {"error": "user_id, kind and (for text) text are required"})
                     return
                 info = {k: str(v).strip() for k, v in (data.get("info") or {}).items() if isinstance(v, (str, int))}
-                self.reply(200, platform.event(user_id, kind, text, info if kind == "info" else None))
+                sent_at = str(data.get("sent_at") or "").strip()[:40] or None
+                self.reply(200, platform.event(user_id, kind, text, info if kind == "info" else None, sent_at=sent_at))
             elif path == "/api/users":
                 data = json.loads(raw or b"{}")
                 user_id = str(data.get("id") or "").strip() or str(9000000000 + secrets.randbelow(999999))

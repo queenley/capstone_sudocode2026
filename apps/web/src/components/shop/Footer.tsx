@@ -19,7 +19,7 @@ export default function Footer() {
         <div className="s-footer__top">
           <div className="s-footer__brand">
             <Link className="nav__logo" href="/" aria-label="Quivo, trang chủ"><Logo height={28} title="" /></Link>
-            <p className="s-footer__lede">Gia dụng, thời trang và đồ mẹ bé. Mua trên web, qua hotline hoặc Zalo, có trợ lý AI trả lời cả đêm.</p>
+            <p className="s-footer__lede">Gia dụng, thời trang và đồ mẹ bé. Mua trên web, qua hotline hoặc Zalo.</p>
             <div className="s-footer__reach">
               <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}</button>
               <a className="btn btn--secondary" href={tel}>Gọi {HOTLINE}</a>
@@ -59,7 +59,7 @@ export default function Footer() {
           </nav>
         </div>
         <div className="footer__legal">
-          <span>© {new Date().getFullYear()} Quivo · dữ liệu sản phẩm minh họa cho dự án capstone. Trợ lý AI có thể sai; giá và tồn kho được xác nhận lại khi đặt hàng.</span>
+          <span>© {new Date().getFullYear()} Quivo · dữ liệu sản phẩm minh họa cho dự án capstone. Giá và tồn kho được xác nhận lại khi đặt hàng.</span>
           <Link className="credits" href="/anh">Ảnh qua Openverse, Flickr và Wikimedia Commons</Link>
         </div>
       </div>

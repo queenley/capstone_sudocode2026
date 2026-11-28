@@ -1,5 +1,3 @@
-import { HOTLINE } from "@/lib/contact";
-
 /** The photographs folder of the storefront kit (public/assets/img, credited on /anh). */
 export const IMG = "/assets/img";
 
@@ -15,11 +13,13 @@ export const RANGE: { slug: string; picture: string; alt: string }[] = [
   { slug: "gia-dung/combo", picture: "/products/SKU-BDL-AIR.jpg", alt: "Mặt trên của máy lọc không khí với bảng điều khiển cảm ứng" },
 ];
 
-/** What the assistant does, one row each in #tro-ly. */
-export const ASSIST: { icon: "sparkles" | "cart" | "headset"; name: string; line: string }[] = [
-  { icon: "sparkles", name: "Tư vấn theo nhu cầu", line: "Diện tích phòng, tuổi của bé, cỡ giày: trợ lý hỏi lại cho đủ rồi mới gợi ý." },
-  { icon: "cart", name: "Đặt hàng trong khung chat", line: "Thêm vào giỏ, xác minh số điện thoại và đặt mà không rời trang." },
-  { icon: "headset", name: "Chuyển cho nhân viên", line: "Khi bạn muốn nói với người thật, nhân viên nhận cả cuộc trò chuyện." },
+/** The home page's rows: a department or a few categories, four products each, and the listing "Xem thêm" opens. */
+export const ROWS: { id: string; title: string; href: string; slugs: string[]; except?: string[] }[] = [
+  { id: "may-loc", title: "Máy lọc không khí", href: "gia-dung/may-loc-khong-khi", slugs: ["gia-dung/may-loc-khong-khi"] },
+  { id: "giay", title: "Giày dép", href: "thoi-trang/giay", slugs: ["thoi-trang/giay"] },
+  { id: "thoi-trang", title: "Thời trang", href: "thoi-trang", slugs: ["thoi-trang"], except: ["thoi-trang/giay"] },
+  { id: "me-be", title: "Mẹ & Bé", href: "me-be", slugs: ["me-be"] },
+  { id: "gia-dung", title: "Gia dụng cho bếp và nhà", href: "gia-dung", slugs: ["gia-dung"], except: ["gia-dung/may-loc-khong-khi"] },
 ];
 
 // From the store policy (chinh-sach), version 10/2026, and the catalogue.
@@ -28,11 +28,4 @@ export const TERMS: { name: string; line: string; value: string }[] = [
   { name: "Thanh toán", line: "Trả khi nhận hàng cho đơn dưới 10.000.000₫, hoặc chuyển khoản VietQR.", value: "Phí thu hộ 0₫" },
   { name: "Đổi trả", line: "Gia dụng và đồ mẹ bé lỗi kỹ thuật từ nhà sản xuất được đổi mới trong 30 ngày.", value: "7 ngày" },
   { name: "Bảo hành", line: "Máy lọc nước RO 36 tháng, máy lọc không khí đến 24 tháng.", value: "Đến 36 tháng" },
-];
-
-export const QUESTIONS: { q: string; a: string }[] = [
-  { q: "Trợ lý AI lấy giá ở đâu?", a: "Từ hệ thống bán hàng của Quivo, cùng nguồn với trang sản phẩm. Giá và tồn kho được xác nhận lại khi bạn đặt hàng." },
-  { q: "Khi nào trợ lý chuyển tôi cho nhân viên?", a: "Khi bạn yêu cầu, hoặc khi trợ lý không chắc câu trả lời. Nhân viên nhận cuộc trò chuyện kèm những gì bạn đã nói." },
-  { q: "Trợ lý có nhớ tôi ở lần sau không?", a: "Có, sau khi bạn xác minh số điện thoại: lần sau trợ lý nhớ nhu cầu và đơn hàng cũ. Bạn có thể yêu cầu xóa những gì trợ lý nhớ." },
-  { q: "Tôi có gọi điện cho Quivo được không?", a: `Có. Gọi hotline ${HOTLINE}, hoặc bấm Gọi thoại trong khung chat để gọi qua web, không tốn cước.` },
 ];

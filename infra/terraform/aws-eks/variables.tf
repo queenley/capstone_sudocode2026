@@ -51,6 +51,18 @@ variable "system_instance_types" {
   description = "The small on-demand node group that runs the add-ons and Karpenter itself; Karpenter adds the rest. An AWS Free plan account launches only Free Tier types (aws ec2 describe-instance-types --filters Name=free-tier-eligible,Values=true): m7i-flex.large (2 vCPU, 8 GiB) is the largest; on a paid plan any type works."
 }
 
+variable "dedicated_system_nodes" {
+  type        = bool
+  default     = false
+  description = "true: the system node group runs the add-ons only (taint CriticalAddonsOnly) and every app pod needs a Karpenter node. false: the app uses the room the add-ons leave, so a quiet shop runs on these two nodes alone."
+}
+
+variable "monthly_budget_usd" {
+  type        = number
+  default     = 150
+  description = "AWS Budgets warns alarm_email when this month's cost is forecast to pass 80% of this, and when it passes 50% and 100% (budget.tf). The account is not stopped; the warning is for a person to act on (docs/deployment/eks-deploy.md, section 5)."
+}
+
 variable "karpenter_version" {
   type        = string
   default     = "1.14.3"

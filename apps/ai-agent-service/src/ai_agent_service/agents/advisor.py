@@ -403,8 +403,8 @@ def _orders_block(orders: Sequence[Mapping[str, Any]], changes: Sequence[Mapping
     parts = []
     if orders:
         lines = [f"- {o['order_id']}" + (f": {o['sku']}" if o.get("sku") else "") for o in orders]
-        parts.append("Đơn đã tạo trong cuộc này (khách bổ sung địa chỉ, đổi thanh toán thì gọi order_update trên đơn "
-                     "đó, không tạo đơn mới):\n" + "\n".join(lines))
+        parts.append("Đơn đã tạo trong cuộc này (khách bổ sung địa chỉ thì gọi order_update trên đơn đó, đổi cách "
+                     "thanh toán thì gọi order_set_payment nếu có tool này; không tạo đơn mới):\n" + "\n".join(lines))
     if changes:
         lines = [f"- {c.get('order_id')}: {c.get('action')}" + (f" sang {c['new_variant_sku']}" if c.get("new_variant_sku") else "")
                  + (f" về {c['new_address']}" if c.get("new_address") else "") for c in changes]

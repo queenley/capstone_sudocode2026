@@ -195,3 +195,12 @@ BANK_ACCOUNT_NAME=CONG TY ...   # tên chủ tài khoản, viết hoa không d�
 ```
 
 Sau khi đặt, khách thấy mã **VietQR** (ảnh từ img.vietqr.io) với đúng số tiền và nội dung `TN<mã đơn>`. Nhân viên đối soát sao kê rồi bấm **"Đã nhận tiền"** trong `/ban-hang` → Đơn hàng. Cổng thanh toán online (MoMo, VNPAY, thẻ) cần tài khoản merchant nên chưa tích hợp.
+
+**Mã QR trong khung chat.** Trợ lý cũng hiện mã QR đó, cùng số tiền và cùng nội dung `TN…`, nên nhân viên đối soát như đơn đặt trên website:
+
+- Khách đặt hàng qua trợ lý và chọn chuyển khoản (`bank`, `momo`, `zalopay`): `order_create` trả kèm `payment_qr`, mã hiện ngay dưới câu xác nhận đơn.
+- Khách xin lại mã QR hay tài khoản cho một đơn chuyển khoản: trợ lý gọi `order_payment_qr` với mã đơn (`OD…`, hoặc `#ABCD1234` của đơn đặt trên website).
+
+Trợ lý chỉ tạo mã cho **đơn của chính khách**: đơn tạo trong cuộc này, đơn của khách đã xác minh mà tool đã tra, hoặc đơn của tài khoản đang đăng nhập. Danh sách đơn được tin (`trusted_orders`) và `account_id` do hệ thống điền, model không đặt được. Đơn của người khác được báo như đơn không tồn tại. Đơn COD, đã thanh toán hay đã hủy thì không có mã, và trợ lý nói rõ lý do. Trợ lý nói số tiền, không đọc số tài khoản; thẻ QR hiện tài khoản. Cuộc gọi thoại không hiện được ảnh, nên trợ lý mời khách mở khung chat.
+
+Tính năng cần `SHOP_ORDERS=1` (docker-compose đặt sẵn; EKS đặt trong [kustomization.yaml](../infra/kubernetes/overlays/aws-production/kustomization.yaml)), vì mã được tạo từ đơn trong kho đơn của website. Không có `SHOP_ORDERS`, như khi chạy evaluation, model không thấy tool này. Code: [shop_orders.py](../apps/ai-agent-service/src/ai_agent_service/runtime/shop_orders.py) `payment_qr`, [order.py](../apps/ai-agent-service/src/ai_agent_service/mcp/servers/order.py) `order_payment_qr`, công thức QR chung với checkout ở `transfer_details` ([service.py](../packages/backend-common/src/commerce/service.py)).

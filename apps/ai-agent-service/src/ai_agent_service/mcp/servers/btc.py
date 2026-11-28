@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS mock_state (
 _LOCK_KEY = 1510_2026
 
 #: The organisers' tools that change the mock's state (``tools.schema.json``).
-WRITES = frozenset({"order.create", "order.update", "schedule.callback", "handoff.transfer"})
+WRITES = frozenset({"order.create", "order.update", "order.set_payment", "schedule.callback", "handoff.transfer"})
 
 #: Areas of the mock's delivery rule (``mock_tools._eta``), named as a
 #: customer would hear them, each with an address the rule places there.

@@ -124,6 +124,7 @@ const PATHS = {
   ),
   trash: <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M9 7V4h6v3" />,
   "arrow-left": <path d="M19 12H5M11 18l-6-6 6-6" />,
+  refresh: <path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" />,
   filter: <path d="M4 5h16M7 12h10M10 19h4" />,
   info: (
     <>

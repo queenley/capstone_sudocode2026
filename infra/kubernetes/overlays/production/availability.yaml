@@ -1,9 +1,12 @@
+# A node drain or a consolidation takes these pods one at a time. maxUnavailable, not minAvailable: 1: with two
+# pods it is the same rule, and with one (aws-production runs one of each, scaling.yaml) minAvailable: 1 would
+# forbid every eviction, so the node under the pod could never be drained or given back.
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: commerce-service
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
   selector:
     matchLabels: {app: telesales-commerce}
 ---
@@ -12,6 +15,6 @@ kind: PodDisruptionBudget
 metadata:
   name: web
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
   selector:
     matchLabels: {app: telesales-web}

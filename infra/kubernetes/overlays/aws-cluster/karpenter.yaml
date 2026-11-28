@@ -1,12 +1,16 @@
-# The app's nodes (eks-architecture.md 2.2). Two pools: on-demand for ai-agent-service (agent-patch.yaml selects it;
-# it never consolidates a node with a call on it), general for everything else. Both go down to zero nodes when
-# nothing asks for them, and are found by the karpenter.sh/discovery tag Terraform puts on the private subnets and
-# the node security group (infra/terraform/aws-eks). Cluster-scoped: no namespace (kustomization.yaml).
+# The app's nodes (eks-architecture.md 2.2). The app first uses the room the add-ons leave on the two system nodes
+# (infra/terraform/aws-eks/eks.tf); Karpenter adds a node from the general pool only for what does not fit, and goes
+# back to zero nodes when nothing asks for one. Nodes are found by the karpenter.sh/discovery tag Terraform puts on the
+# private subnets and the node security group. Cluster-scoped: no namespace (kustomization.yaml).
 #
-# Instance types: the account is on the AWS Free plan, which launches only Free Tier types and no Spot, so both pools
-# take on-demand m7i-flex.large / c7i-flex.large (2 vCPU each). On a paid plan, widen them: the on-demand pool to
-# instance-category [c, m, t] and size [large, xlarge]; the general pool to capacity-type [spot, on-demand],
-# category [c, m, r, t], size [medium, large, xlarge] (Spot is about 60-70% cheaper).
+# There was an on-demand pool for ai-agent-service that never consolidated a busy node. A pod of the agent now carries
+# karpenter.sh/do-not-disrupt (aws-production/agent-patch.yaml), which keeps any node it runs on, so the pool is gone.
+# A cluster made before 2026-11-27 still has it: `kubectl delete nodepool on-demand` once (eks-deploy.md, section 5).
+#
+# Instance types: on the AWS Free plan only Free Tier types and no Spot, so on-demand m7i-flex.large / c7i-flex.large
+# (2 vCPU each). On a paid plan, widen them: capacity-type [spot, on-demand], category [c, m, r, t], size [medium,
+# large, xlarge] (Spot is about 60-70% cheaper; the agent's do-not-disrupt does not stop Spot taking a node back, so
+# keep the agent on-demand with a nodeAffinity on karpenter.sh/capacity-type if you add Spot).
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
@@ -25,23 +29,6 @@ spec:
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs: {volumeSize: 40Gi, volumeType: gp3, encrypted: true}
----
-apiVersion: karpenter.sh/v1
-kind: NodePool
-metadata:
-  name: on-demand
-spec:
-  template:
-    spec:
-      nodeClassRef: {group: karpenter.k8s.aws, kind: EC2NodeClass, name: telesales}
-      requirements:
-        - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
-        - {key: kubernetes.io/arch, operator: In, values: [amd64]}
-        - {key: node.kubernetes.io/instance-type, operator: In, values: [m7i-flex.large, c7i-flex.large]}
-  limits: {cpu: "32"}
-  disruption:
-    consolidationPolicy: WhenEmpty # never move a pod with a call on it to save money
-    consolidateAfter: 10m
 ---
 apiVersion: karpenter.sh/v1
 kind: NodePool

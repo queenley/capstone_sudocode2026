@@ -1,178 +1,217 @@
 "use client";
 import Link from "next/link";
-import React from "react";
-import { categoryName } from "@/lib/catalog";
-import { shopContext } from "@/lib/shop-context";
-import { MAIN_ACTION } from "@/components/shop/Header";
-import HeroChat from "@/components/shop/HeroChat";
-import Icon from "@/components/ui/Icon";
-import { ASSIST, IMG, QUESTIONS, RANGE, TERMS } from "./content";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import ProductCard from "@/components/product/ProductCard";
+import { categoryName, discountPercent, fetchProducts, ShopProduct } from "@/lib/catalog";
+import { IMG, RANGE, ROWS, TERMS } from "./content";
 
-// The home page's sections, in page order (app/(shop)/page.tsx). Each is one screen at 1440x900.
+// The home page's sections, in page order (app/(shop)/page.tsx): a store front, as shoppers expect one.
+// The banner is one line high; the products lead the page.
 
-const arrow = (
-  <svg className="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path className="m-arrow__stem" d="M1 6h8" /><path className="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5" /></svg>
-);
-
-/** The photograph is the ground, a gradient over its left for the words (shop.css, "the home hero"),
-    and the assistant's small conversation on the right (HeroChat: one button that opens the chat). */
-export function HomeHero() {
+/** One strip across the top: the photograph as a band, what the shop sells, its delivery offer. */
+export function HomeBanner() {
   return (
-    <section className="hero s-hero" data-enter aria-labelledby="hero-h">
+    <section className="s-home-banner s-home-block" data-enter aria-labelledby="home-h">
       <img
-        className="hero__bg"
-        src={`${IMG}/photo-f107853503.webp`}
+        className="s-home-banner__bg"
+        src={`${IMG}/photo-f107853503-1280.webp`}
         srcSet={`${IMG}/photo-f107853503-960.webp 960w, ${IMG}/photo-f107853503-1280.webp 1280w, ${IMG}/photo-f107853503.webp 1920w`}
-        sizes="100vw" width={1920} height={1444}
-        alt="Máy lọc không khí bọc vải xám đặt sát tường trong một căn phòng sáng"
-        style={{ "--ly-pos": "50% 62%" } as React.CSSProperties}
-        fetchPriority="high" decoding="async" data-source="stand-in" data-subject="air purifier"
+        sizes="100vw" width={1920} height={1444} alt="" aria-hidden="true"
+        fetchPriority="high" decoding="async"
       />
-      <div className="s-hero__shade" aria-hidden="true" />
-      <div className="wrap">
-        <div className="s-hero__grid">
-          <div className="s-hero__copy">
-            <h1 id="hero-h">Gia dụng, thời trang và đồ mẹ bé</h1>
-            <p className="hero__lead">Trợ lý AI báo giá, tồn kho và khuyến mãi lấy thẳng từ cửa hàng, cả đêm. Giao miễn phí cho đơn từ 2.000.000₫.</p>
-            <div className="btn-row">
-              <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}{arrow}</button>
-              <Link className="btn btn--secondary" href="/danh-muc/gia-dung/may-loc-khong-khi">Xem máy lọc không khí</Link>
-            </div>
-          </div>
-          <HeroChat />
+      <div className="s-wrap s-home-banner__row">
+        <div>
+          <h1 id="home-h">Gia dụng, thời trang và đồ mẹ bé</h1>
+          <p>Giao miễn phí cho đơn từ 2.000.000₫ · Đổi trả trong 7 ngày</p>
         </div>
+        <Link className="s-btn" href="/khuyen-mai">Xem hàng giảm giá</Link>
       </div>
     </section>
   );
 }
 
-function Tile({ slug, picture, alt }: { slug: string; picture: string; alt: string }) {
+/** The departments as small pictures in one row: a shortcut to each listing. */
+export function CategoryStrip() {
   return (
-    <Link className="tile span-3 m-zoom" href={`/danh-muc/${slug}`}>
-      <div className="tile__media"><img src={picture} alt={alt} width={900} height={600} decoding="async" /></div>
-      <div className="tile__head"><h3>{categoryName(slug)}</h3></div>
-    </Link>
+    <nav className="s-wrap s-home-cats" aria-label="Danh mục">
+      {RANGE.map((item) => (
+        <Link key={item.slug} className="s-home-cat" href={`/danh-muc/${item.slug}`}>
+          <span className="s-home-cat__pic"><img src={item.picture} alt="" width={96} height={96} loading="lazy" decoding="async" /></span>
+          <span>{categoryName(item.slug)}</span>
+        </Link>
+      ))}
+    </nav>
   );
 }
 
-export function RangeSection() {
+/** The shop's catalogue, read once for the whole page. */
+function useProducts() {
+  const [products, setProducts] = useState<ShopProduct[] | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let active = true;
+    fetchProducts()
+      .then((all) => { if (active) setProducts(all); })
+      .catch(() => { if (active) setFailed(true); });
+    return () => { active = false; };
+  }, []);
+  return { products, failed };
+}
+
+/** With a photograph, then in stock, then the deepest discount: what a shop puts in its window. */
+function byAppeal(a: ShopProduct, b: ShopProduct) {
+  return Number(Boolean(b.image)) - Number(Boolean(a.image))
+    || Number(b.available > 0) - Number(a.available > 0)
+    || discountPercent(b.price, b.listPrice) - discountPercent(a.price, a.listPrice);
+}
+
+/** One product from each category in turn, so the window shows the whole shop, not one department. */
+function featured(products: ShopProduct[], count: number): ShopProduct[] {
+  const groups = new Map<string, ShopProduct[]>();
+  for (const product of [...products].sort(byAppeal)) {
+    const key = product.category;
+    groups.set(key, [...(groups.get(key) || []), product]);
+  }
+  const lists = [...groups.values()];
+  const picked: ShopProduct[] = [];
+  for (let round = 0; picked.length < count && lists.some((list) => list.length > round); round++) {
+    for (const list of lists) if (list[round] && picked.length < count) picked.push(list[round]);
+  }
+  return picked;
+}
+
+function inCategory(product: ShopProduct, row: (typeof ROWS)[number]) {
+  const inside = row.slugs.some((slug) => product.category === slug || product.category.startsWith(slug + "/"));
+  return inside && !row.except?.some((slug) => product.category === slug || product.category.startsWith(slug + "/"));
+}
+
+const SLIDE_MS = 4000;
+
+/** "Sản phẩm nổi bật": four at a time, moving on by one every few seconds; arrows, a pause, and a swipe on a phone. */
+function FeaturedCarousel({ products }: { products: ShopProduct[] }) {
+  const track = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
+  const [held, setHeld] = useState(false);
+  const [still, setStill] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setStill(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  function step(direction: 1 | -1) {
+    const el = track.current;
+    const card = el?.querySelector<HTMLElement>(".s-home-slide");
+    if (!el || !card) return;
+    const width = card.offsetWidth + parseFloat(getComputedStyle(el).columnGap || "16");
+    const end = el.scrollWidth - el.clientWidth - 4;
+    const left = direction > 0 && el.scrollLeft >= end ? 0
+      : direction < 0 && el.scrollLeft <= 4 ? el.scrollWidth
+        : el.scrollLeft + direction * width;
+    el.scrollTo({ left, behavior: still ? "auto" : "smooth" });
+  }
+
+  useEffect(() => {
+    if (paused || held || still || products.length <= 4) return;
+    const timer = window.setInterval(() => step(1), SLIDE_MS);
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused, held, still, products.length]);
+
   return (
-    <section className="section" id="hang" aria-labelledby="hang-h">
-      <div className="wrap">
-        <div className="section-head section-head--split">
-          <div>
-            <h2 id="hang-h">Hàng đang bán. <span className="muted">Giá và tồn kho theo kho của cửa hàng.</span></h2>
+    <div className="s-home-carousel" onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)}
+      onFocus={() => setHeld(true)} onBlur={() => setHeld(false)}>
+      <div className="s-home-carousel__controls">
+        <button type="button" className="s-home-round" onClick={() => step(-1)} aria-label="Sản phẩm trước">‹</button>
+        <button type="button" className="s-home-round" onClick={() => step(1)} aria-label="Sản phẩm tiếp theo">›</button>
+        {!still && products.length > 4 && (
+          <button type="button" className="s-home-pause" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
+            {paused ? "Chạy tiếp" : "Tạm dừng"}
+          </button>
+        )}
+      </div>
+      <div className="s-home-track" ref={track} aria-roledescription="băng chuyền" aria-label="Sản phẩm nổi bật">
+        {products.map((product, index) => (
+          <div className="s-home-slide" key={product.ref} aria-roledescription="trang" aria-label={`${index + 1} / ${products.length}`}>
+            <ProductCard product={product} />
           </div>
-          <Link className="link" href="/khuyen-mai">Xem hàng đang giảm giá</Link>
-        </div>
-        <div className="grid">{RANGE.map((item) => <Tile key={item.slug} {...item} />)}</div>
-      </div>
-    </section>
-  );
-}
-
-/** A picture of a conversation, and one button over it that opens the real chat. */
-function ChatPreview() {
-  return (
-    <div className="ui ui-panel ui-chat s-chat-preview" data-ui="chat">
-      <button className="s-chat-preview-open" type="button" onClick={() => shopContext.openChat()}
-        aria-label="Ví dụ: khách hỏi máy lọc cho phòng 25 mét vuông có bé nhỏ, trợ lý gợi ý AirPure Pro. Bấm để chat với trợ lý" />
-      <div className="ui-head" aria-hidden="true">
-        <span className="ui-agent" aria-hidden="true"></span>
-        <div className="ui-title">Trợ lý Quivo</div>
-        <span className="ui-chat__online">Trực tuyến</span>
-        <span className="ui-spacer"></span>
-      </div>
-      <div className="ui-chat__body" aria-hidden="true">
-        <div className="ui-msg ui-msg--me"><span className="ui-msg__text">Phòng 25m², nhà có bé nhỏ thì nên chọn máy lọc nào?</span></div>
-        <div className="ui-msg ui-msg--bot">
-          <span className="ui-agent ui-msg__av" aria-hidden="true"></span>
-          <span className="ui-msg__col">
-            <span className="ui-chat__answer">Dạ, AirPure Pro có <b>khóa trẻ em</b>, lọc HEPA H13 và hợp với phòng đến 45m². Giá niêm yết 7.990.000₫, kho còn hàng ạ.</span>
-            <span className="ui-chat__srcs">
-              <span className="ui-chat__src"><svg className="ui-icon" viewBox="0 0 16 16"><path d="M4 2.5h5l3 3v8H4z" /><path d="M9 2.5v3h3" /></svg>Máy lọc không khí AirPure Pro</span>
-            </span>
-          </span>
-        </div>
-        <div className="ui-msg ui-msg--me"><span className="ui-msg__text">Thêm vào giỏ giúp mình nhé.</span></div>
-      </div>
-      <div className="ui-chat__input" aria-hidden="true">
-        <span className="ui-chat__ph">Nhập tin nhắn</span>
-        <span className="ui-chat__send" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 13V3.5M3.8 7.5 8 3.3l4.2 4.2" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
+        ))}
       </div>
     </div>
   );
 }
 
-export function AssistantSection() {
+function Skeleton() {
   return (
-    <section className="section" id="tro-ly" aria-labelledby="tro-ly-h">
-      <div className="wrap">
-        <div className="section-head">
-          <h2 id="tro-ly-h">Trợ lý trả lời bằng dữ liệu của cửa hàng</h2>
-        </div>
-        <div className="grid fill s-tro-ly">
-          <div className="split-col span-5">
-            <p className="t-lead">Bạn hỏi bằng lời của mình. Trợ lý tra catalogue, kho và khuyến mãi rồi mới trả lời, và nói rõ khi chưa chắc.</p>
-            {/* Each row's icon in a tinted round tile (shop.css, "rows with icons"). */}
-            <ul className="rows s-rows-icons">
-              {ASSIST.map((row) => (
-                <li key={row.name}><span className="s-row-icon"><Icon name={row.icon} size={20} /></span><span className="rows__name">{row.name}</span><p>{row.line}</p></li>
-              ))}
-            </ul>
-          </div>
-          <div className="frame span-6 q-col-7 s-tro-ly__frame"><ChatPreview /></div>
-        </div>
-      </div>
-    </section>
+    <div className="s-grid s-home-grid" aria-hidden="true">
+      {[0, 1, 2, 3].map((i) => <div className="s-home-skeleton" key={i} />)}
+    </div>
   );
 }
 
-/** The two smaller departments on the brand band: a photograph each, linked to its listing. */
-export function FamilySection() {
+/** The featured window, then one row of four per department, each with a link to all of it. */
+export function ProductSections() {
+  const { products, failed } = useProducts();
+  const showcase = useMemo(() => (products ? featured(products, 12) : []), [products]);
+  const rows = useMemo(
+    () => ROWS.map((row) => ({ ...row, items: (products || []).filter((p) => inCategory(p, row)).sort(byAppeal).slice(0, 4) }))
+      .filter((row) => !products || row.items.length > 0),
+    [products],
+  );
+  if (failed) {
+    return (
+      <section className="s-wrap s-home-section s-home-block">
+        <p className="s-muted">Chưa tải được sản phẩm. <Link href="/danh-muc/gia-dung">Xem danh mục Gia dụng</Link></p>
+      </section>
+    );
+  }
   return (
-    <section className="section ground-brand" id="me-be" aria-labelledby="me-be-h">
-      <div className="wrap">
-        <div className="section-head">
-          <h2 id="me-be-h">Đồ cho bé và giày cho cả nhà</h2>
+    <>
+      <section className="s-wrap s-home-section s-home-block" aria-labelledby="noi-bat-h">
+        <div className="s-home-head">
+          <h2 id="noi-bat-h">Sản phẩm nổi bật</h2>
+          <Link className="s-home-more" href="/khuyen-mai">Xem tất cả ưu đãi →</Link>
         </div>
-        <div className="grid fill">
-          <Link className="tile span-6 m-zoom" href="/danh-muc/me-be">
-            <div className="tile__media"><img src={`${IMG}/photo-f131628124.webp`} srcSet={`${IMG}/photo-f131628124-500.webp 500w, ${IMG}/photo-f131628124-960.webp 960w, ${IMG}/photo-f131628124.webp 1280w`} sizes="(max-width: 1023px) 100vw, 628px" alt="Một người đẩy xe nôi trên con phố vắng lúc chiều" width={1280} height={854} loading="lazy" decoding="async" /></div>
-            <div className="tile__head"><h3>Xe đẩy, máy hút sữa, bình sữa và ghế ô tô</h3></div>
-            <p>Joie, Combi, Spectra, Medela, Pigeon, Chicco. Lỗi kỹ thuật được đổi mới trong 30 ngày.</p>
-          </Link>
-          <Link className="tile span-6 m-zoom" href="/danh-muc/thoi-trang">
-            <div className="tile__media"><img src={`${IMG}/photo-f184936789.webp`} srcSet={`${IMG}/photo-f184936789-500.webp 500w, ${IMG}/photo-f184936789-960.webp 960w, ${IMG}/photo-f184936789.webp 1280w`} sizes="(max-width: 1023px) 100vw, 628px" alt="Đôi giày vải trắng buộc dây đặt trên nền đá" width={1280} height={960} loading="lazy" decoding="async" /></div>
-            <div className="tile__head"><h3>Giày chạy bộ, giày đi phố và áo khoác</h3></div>
-            <p>Chưa chắc cỡ thì hỏi trợ lý trước khi đặt. Đổi trả trong 7 ngày.</p>
-          </Link>
-        </div>
-      </div>
-    </section>
+        {products ? <FeaturedCarousel products={showcase} /> : <Skeleton />}
+      </section>
+      {rows.map((row) => (
+        <section className="s-wrap s-home-section s-home-block" key={row.id} aria-labelledby={`${row.id}-h`}>
+          <div className="s-home-head">
+            <h2 id={`${row.id}-h`}>{row.title}</h2>
+            <Link className="s-home-more" href={`/danh-muc/${row.href}`}>Xem thêm →</Link>
+          </div>
+          {products ? (
+            <div className="s-grid s-home-grid">
+              {row.items.map((product) => <ProductCard key={product.ref} product={product} />)}
+            </div>
+          ) : <Skeleton />}
+        </section>
+      ))}
+    </>
   );
 }
 
-export function TermsSection() {
+/** Delivery, payment, returns and warranty in one band, each with its figure. */
+export function TermsStrip() {
   return (
-    <section className="section" id="mua-hang" aria-labelledby="mua-hang-h">
-      <div className="wrap">
-        <div className="section-head section-head--split">
-          <div><h2 id="mua-hang-h">Giao hàng, đổi trả và câu hỏi về Quivo</h2></div>
-          <Link className="link" href="/chinh-sach">Đọc chính sách đầy đủ</Link>
+    <section className="s-home-terms s-home-block" aria-labelledby="mua-hang-h">
+      <div className="s-wrap">
+        <div className="s-home-head">
+          <h2 id="mua-hang-h">Mua sắm tại Quivo</h2>
+          <Link className="s-home-more" href="/chinh-sach">Đọc chính sách →</Link>
         </div>
-        <div className="grid grid--top">
-          <ul className="rows rows--spec span-6">
-            {TERMS.map((term) => (
-              <li key={term.name}><span className="rows__name">{term.name}</span><p>{term.line}</p><span className="rows__value">{term.value}</span></li>
-            ))}
-          </ul>
-          <div className="faq span-6 q-col-7">
-            {QUESTIONS.map((item) => (
-              <div className="faq__item" key={item.q}><h3>{item.q}</h3><p>{item.a}</p></div>
-            ))}
-          </div>
-        </div>
+        <ul className="s-home-terms__list">
+          {TERMS.map((term) => (
+            <li key={term.name}>
+              <strong>{term.name}</strong>
+              <span className="s-home-terms__value">{term.value}</span>
+              <p>{term.line}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

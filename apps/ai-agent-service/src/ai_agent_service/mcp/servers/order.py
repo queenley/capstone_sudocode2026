@@ -107,6 +107,88 @@ async def order_update(
     return result
 
 
+@server.tool(roles={"advisor"}, name="order_payment_qr")
+async def order_payment_qr(order_id: str, account_id: str | None = None,
+                           trusted_orders: list[str] | None = None) -> dict[str, Any]:
+    """The QR code to pay one order by bank transfer: the exact amount and the transfer note are in the code.
+
+    Call it when the customer asks to pay by transfer, asks for the QR or the account again, for an order of theirs
+    paid by bank transfer, or to switch a COD order to a transfer (order_set_payment does that and shows the QR).
+    The web chat, Zalo and a call on the website show the QR with the account under your reply: say the amount and
+    ask them to scan it, keep the transfer note unchanged; do not read out the account number. On a voice call, say
+    the QR is in the chat on the website; a caller on a phone line opens the website's chat or the shop's Zalo.
+
+    Args:
+        order_id: The order's code, e.g. OD600001, or the website's #ABCD1234.
+        account_id: Filled in by the system for the logged-in customer; leave it out.
+        trusted_orders: Set by the system; leave it out.
+    """
+    from ...runtime import shop_orders
+
+    if not shop_orders.enabled():
+        raise ToolFailure("UNAVAILABLE", "Chưa tạo được mã QR ở kênh này.")
+    result = await asyncio.to_thread(shop_orders.payment_qr, order_id, account_id=account_id,
+                                     trusted=trusted_orders or ())
+    if not result.get("ok"):
+        code = str(result.get("code") or "UNAVAILABLE")
+        raise ToolFailure(code, shop_orders.QR_REFUSALS.get(code, "Chưa tạo được mã QR lúc này."))
+    # What the reply needs; the chat shows the QR and the account itself (api/routes/conversations.py
+    # payment_qr_for), so the account number never enters the model's view.
+    return {"order_id": result["order_id"], "amount_vnd": result["amount"], "transfer_note": result["content"],
+            "bank_name": result["bank_name"], "qr_shown_in_chat": True}
+
+
+@server.tool(roles={"advisor"}, name="order_set_payment")
+async def order_set_payment(order_id: str, payment: Literal["bank", "COD"], account_id: str | None = None,
+                            trusted_orders: list[str] | None = None,
+                            idempotency_key: str | None = None) -> dict[str, Any]:
+    """Change how one of the customer's orders is paid, when they ask: bank transfer instead of cash on delivery,
+    or back to COD (at most 10.000.000đ). Only before the order ships and while it is unpaid.
+
+    For a bank transfer the chat shows the QR with the exact amount under your reply: say the amount, ask them to
+    scan it and keep the transfer note; do not read out the account number.
+
+    Args:
+        order_id: The order's code, e.g. OD600001, or the website's #ABCD1234.
+        payment: bank for a bank transfer, COD for cash on delivery.
+        account_id: Filled in by the system for the logged-in customer; leave it out.
+        trusted_orders: Set by the system; leave it out.
+        idempotency_key: Set by the system; leave it out.
+    """
+    from ...runtime import shop_orders
+
+    if not shop_orders.enabled():
+        raise ToolFailure("UNAVAILABLE", "Chưa đổi được cách thanh toán ở kênh này.")
+    method = "bank_transfer" if payment == "bank" else "cod"
+    changed = await asyncio.to_thread(shop_orders.set_payment, order_id, method, account_id=account_id,
+                                      trusted=trusted_orders or ())
+    if not changed.get("ok"):
+        code = str(changed.get("code") or "UNAVAILABLE")
+        raise ToolFailure(code, shop_orders.PAYMENT_REFUSALS.get(code, "Chưa đổi được cách thanh toán lúc này."))
+    if changed["changed"]:
+        # The organisers' mock keeps its own copy of an order the assistant placed: order_status reads it there.
+        await btc.call("order.set_payment", _set_mock_payment(btc.mock()), idempotency_key=idempotency_key,
+                       order_id=changed["order_id"], payment=payment)
+    result: dict[str, Any] = {"order_id": changed["order_id"], "payment": payment, "changed": changed["changed"]}
+    if method == "bank_transfer":
+        qr = await asyncio.to_thread(shop_orders.payment_qr, changed["order_id"], trusted=(changed["order_id"],))
+        if qr.get("ok"):
+            # The chat shows the QR and the account (api/routes/conversations.py payment_qr_for).
+            result["payment_qr"] = {"amount_vnd": qr["amount"], "transfer_note": qr["content"],
+                                    "qr_shown_in_chat": True}
+    return result
+
+
+def _set_mock_payment(m: Any) -> Any:
+    def set_payment(order_id: str, payment: str) -> dict[str, Any]:
+        order = m._ORDERS.get(order_id)
+        if order is not None:
+            order["payment"] = payment
+        return {"order_id": order_id, "payment": payment}
+
+    return set_payment
+
+
 def _with_address(m: Any) -> Any:
     """The organisers' ``order_update`` (read-only pack), plus the address it never took.
 

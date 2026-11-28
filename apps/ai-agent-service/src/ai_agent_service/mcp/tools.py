@@ -65,8 +65,12 @@ ACCOUNT_PREFIX = "account_"
 #: Tools with an effect on the business, by wire name (section 6.1): never
 #: retried, each call keyed for idempotency, their defaults made explicit.
 WRITE_TOOLS = frozenset({
-    "order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion",
+    "order_create", "order_update", "order_set_payment", "schedule_callback", "handoff_transfer",
+    "memory_request_deletion",
 })
+
+#: Tools on the website's own orders (``runtime/shop_orders.py``): offered only where those orders are.
+SHOP_ORDER_TOOLS = frozenset({"order_payment_qr", "order_set_payment"})
 
 #: The argument a write tool's server keeps its first result under.
 IDEMPOTENCY_ARG = "idempotency_key"
@@ -89,7 +93,7 @@ def _tool_name(tool: Any) -> str | None:
 
 #: Arguments the harness fills in (:meth:`ToolGuardMiddleware._with_context`): the model is never asked for them.
 SYSTEM_ARGS = frozenset({"on", "customer_phone", "customer_id", "account_id", "call_id", "turn_id",
-                         "purchase_authorization", IDEMPOTENCY_ARG})
+                         "purchase_authorization", "trusted_orders", IDEMPOTENCY_ARG})
 
 #: ``handoff_transfer`` takes the brief as an open object, since the harness adds to it; the model writes these.
 MODEL_ARGS = {
@@ -228,6 +232,13 @@ class LaneToolsMiddleware(AgentMiddleware):
         if not getattr(context, "account_id", None):
             # The website account's tools are for a logged-in shopper only.
             allowed = frozenset(name for name in allowed if not name.startswith(ACCOUNT_PREFIX))
+        if allowed & SHOP_ORDER_TOOLS:
+            from ..runtime import shop_orders
+
+            if not shop_orders.enabled():
+                # These read and change the website's orders: an evaluation run, or a channel without them, never
+                # sees them.
+                allowed = allowed - SHOP_ORDER_TOOLS
         tools = [
             tool
             for tool in request.tools
@@ -415,6 +426,10 @@ class ToolGuardMiddleware(AgentMiddleware):
         if "account_id" in accepted:
             # The logged-in shopper of this conversation, never one the model names.
             args["account_id"] = getattr(context, "account_id", None)
+        if "trusted_orders" in accepted:
+            # The orders this customer may be shown (order_payment_qr): those this call created, in any turn, and a
+            # verified customer's orders a tool showed this call. Never the model's list.
+            args["trusted_orders"] = trusted_orders(context, getattr(request, "state", None) or {})
         call_id = getattr(context, "call_id", None)
         if "call_id" in accepted:
             args["call_id"] = str(call_id) if call_id is not None else None
@@ -640,6 +655,25 @@ def strip_internal(result: Any) -> Any:
     if cleaned == envelope:
         return result
     return result.model_copy(update={"content": json.dumps(cleaned, ensure_ascii=False)})
+
+
+def trusted_orders(context: Any, state: Mapping[str, Any]) -> list[str]:
+    """The order codes this call may show the customer: created by this call (earlier turns, and this run's
+    ``order_create`` results in *state*), and, for a VERIFIED customer, every order a tool showed this call."""
+    verified = getattr(context, "tier", None) == "VERIFIED"
+    codes = {str(o.get("order_id")) for o in getattr(context, "created_orders", ()) or () if o.get("order_id")}
+    if verified:
+        codes |= {str(code) for code in getattr(context, "known_orders", ()) or ()}
+    for message in state.get("messages") or ():
+        if not isinstance(message, ToolMessage) or (message.name != "order_create" and not verified):
+            continue
+        data = (envelope_of(message) or {}).get("data")
+        if not isinstance(data, dict):
+            continue
+        for order in data.get("orders") or ([data] if data.get("order_id") else []):
+            if isinstance(order, dict) and order.get("order_id"):
+                codes.add(str(order["order_id"]))
+    return sorted(codes)
 
 
 def envelope_of(result: Any) -> dict[str, Any] | None:

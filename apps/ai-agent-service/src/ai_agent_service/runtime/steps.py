@@ -54,6 +54,8 @@ LABELS = {
     "order_create": "Đang tạo đơn hàng",
     "order_status": "Đang kiểm tra đơn hàng",
     "order_update": "Đang cập nhật đơn hàng",
+    "order_payment_qr": "Đang tạo mã QR thanh toán",
+    "order_set_payment": "Đang đổi cách thanh toán",
     "account_orders": "Đang xem đơn hàng của bạn",
     "account_cart": "Đang xem giỏ hàng",
     "account_profile": "Đang xem tài khoản",
